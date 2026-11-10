@@ -1,0 +1,288 @@
+{
+  "schema_version": "snapshot/1",
+  "instrument_id": "ETF:512100.SH",
+  "asset_class": "etf",
+  "as_of": "2026-11-10",
+  "available_at": "2026-11-10T15:00:00+08:00",
+  "facts": [
+    {
+      "fact_id": "etf.custody_fee_pct",
+      "metric": "custody_fee_pct",
+      "status": "known",
+      "value": 0.05,
+      "unit": "percent",
+      "currency": null,
+      "period": "2026-11-11",
+      "available_at": null,
+      "fetched_at": "2026-11-11T02:44:26+08:00",
+      "source": {
+        "source_id": "eastmoney.fund_profile",
+        "publisher": "天天基金（基金概况页）",
+        "interface": "HTTP 抓取基金概况页面",
+        "url": "http://fundf10.eastmoney.com/jbgk_512100.html",
+        "retrieved_at": "2026-11-11T02:44:26+08:00",
+        "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
+      },
+      "transform": "基金概况页『托管费率』（每年）",
+      "restated": false,
+      "notes": "",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.iopv_reference",
+      "metric": "iopv_reference",
+      "status": "known",
+      "value": 2.6761,
+      "unit": "CNY_per_share",
+      "currency": "CNY",
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T02:44:26+08:00",
+      "source": {
+        "source_id": "em.etf_spot",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_spot_em",
+        "url": "https://quote.eastmoney.com/center/gridlist.html#fund_etf",
+        "retrieved_at": "2026-11-11T02:44:26+08:00",
+        "notes": "含最新价、IOPV 实时估值、折价率、数据日期与更新时间"
+      },
+      "transform": "ETF 行情清单『IOPV实时估值』",
+      "restated": false,
+      "notes": "IOPV 为参考值，不保证可成交或可赎回",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.management_fee_pct",
+      "metric": "management_fee_pct",
+      "status": "known",
+      "value": 0.15,
+      "unit": "percent",
+      "currency": null,
+      "period": "2026-11-11",
+      "available_at": null,
+      "fetched_at": "2026-11-11T02:44:26+08:00",
+      "source": {
+        "source_id": "eastmoney.fund_profile",
+        "publisher": "天天基金（基金概况页）",
+        "interface": "HTTP 抓取基金概况页面",
+        "url": "http://fundf10.eastmoney.com/jbgk_512100.html",
+        "retrieved_at": "2026-11-11T02:44:26+08:00",
+        "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
+      },
+      "transform": "基金概况页『管理费率』（每年）",
+      "restated": false,
+      "notes": "",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.nav",
+      "metric": "unit_nav",
+      "status": "known",
+      "value": 2.6776,
+      "unit": "CNY_per_share",
+      "currency": "CNY",
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T02:44:26+08:00",
+      "source": {
+        "source_id": "em.etf_nav",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_fund_info_em",
+        "url": "http://fundf10.eastmoney.com/jjzq_512100.html",
+        "retrieved_at": "2026-11-11T02:44:26+08:00",
+        "notes": "单位净值/累计净值；接口不含净值披露时间"
+      },
+      "transform": "基金净值序列『单位净值』",
+      "restated": false,
+      "notes": "净值日期有，但披露时间未提供",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.nav_date",
+      "metric": "nav_date",
+      "status": "known",
+      "value": "2026-11-10",
+      "unit": null,
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T02:44:26+08:00",
+      "source": {
+        "source_id": "em.etf_nav",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_fund_info_em",
+        "url": "http://fundf10.eastmoney.com/jjzq_512100.html",
+        "retrieved_at": "2026-11-11T02:44:26+08:00",
+        "notes": "单位净值/累计净值；接口不含净值披露时间"
+      },
+      "transform": "基金净值序列『净值日期』",
+      "restated": false,
+      "notes": "",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.nav_disclosed_at",
+      "metric": "nav_disclosure_time",
+      "status": "missing",
+      "value": null,
+      "unit": null,
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T02:44:26+08:00",
+      "source": {
+        "source_id": "em.etf_nav",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_fund_info_em",
+        "url": "http://fundf10.eastmoney.com/jjzq_512100.html",
+        "retrieved_at": "2026-11-11T02:44:26+08:00",
+        "notes": "单位净值/累计净值；接口不含净值披露时间"
+      },
+      "transform": "",
+      "restated": false,
+      "notes": "所有已核实免费接口都不提供净值披露时间，无法确认收盘时是否已知当日净值",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.premium_discount_pct",
+      "metric": "premium_discount_pct",
+      "status": "missing",
+      "value": null,
+      "unit": null,
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T02:44:26+08:00",
+      "source": {
+        "source_id": "em.etf_nav",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_fund_info_em",
+        "url": "http://fundf10.eastmoney.com/jjzq_512100.html",
+        "retrieved_at": "2026-11-11T02:44:26+08:00",
+        "notes": "单位净值/累计净值；接口不含净值披露时间"
+      },
+      "transform": "",
+      "restated": false,
+      "notes": "净值披露时间缺失，按设计书要求不计算日终折溢价（不能用不知何时公布的净值对收盘价）",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.price",
+      "metric": "etf_close_price",
+      "status": "known",
+      "value": 2.672,
+      "unit": "CNY_per_share",
+      "currency": "CNY",
+      "period": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "fetched_at": "2026-11-11T02:44:26+08:00",
+      "source": {
+        "source_id": "em.etf_spot",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_spot_em",
+        "url": "https://quote.eastmoney.com/center/gridlist.html#fund_etf",
+        "retrieved_at": "2026-11-11T02:44:26+08:00",
+        "notes": "含最新价、IOPV 实时估值、折价率、数据日期与更新时间"
+      },
+      "transform": "ETF 行情清单『最新价』（收盘）",
+      "restated": false,
+      "notes": "行情商页面更新时间（非交易所披露时间）：2026-11-10 16:11:52+08:00",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.tracking_note",
+      "metric": "tracking_note",
+      "status": "known",
+      "value": "跟踪标的：中证1000指数；业绩比较基准：中证1000指数",
+      "unit": null,
+      "currency": null,
+      "period": "2026-11-11",
+      "available_at": null,
+      "fetched_at": "2026-11-11T02:44:26+08:00",
+      "source": {
+        "source_id": "eastmoney.fund_profile",
+        "publisher": "天天基金（基金概况页）",
+        "interface": "HTTP 抓取基金概况页面",
+        "url": "http://fundf10.eastmoney.com/jbgk_512100.html",
+        "retrieved_at": "2026-11-11T02:44:26+08:00",
+        "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
+      },
+      "transform": "基金概况页文本",
+      "restated": false,
+      "notes": "",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.trading_status",
+      "metric": "trading_status",
+      "status": "missing",
+      "value": null,
+      "unit": null,
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T02:44:26+08:00",
+      "source": {
+        "source_id": "em.etf_spot",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_spot_em",
+        "url": "https://quote.eastmoney.com/center/gridlist.html#fund_etf",
+        "retrieved_at": "2026-11-11T02:44:26+08:00",
+        "notes": "含最新价、IOPV 实时估值、折价率、数据日期与更新时间"
+      },
+      "transform": "",
+      "restated": false,
+      "notes": "未取得交易所停复牌状态字段；仅能确认当日有行情",
+      "conflict_values": []
+    }
+  ],
+  "coverage": {
+    "price_history": {
+      "source_id": "em.etf_spot",
+      "frequency": "daily (vendor)"
+    },
+    "nav_history": {
+      "source_id": "em.etf_nav",
+      "observations_2026": 205,
+      "frequency": "daily",
+      "note": "净值序列可回溯多年，但无披露时间字段"
+    },
+    "nav_disclosure_time": {
+      "available": false
+    },
+    "premium_discount_same_day": {
+      "available": false
+    },
+    "trading_status": {
+      "available": false
+    },
+    "fees_from_profile_page": {
+      "available": true,
+      "note": "来自基金概况页，非基金合同原文"
+    },
+    "tracking_error_series": {
+      "available": false,
+      "note": "免费接口未提供跟踪偏离/跟踪误差序列"
+    },
+    "point_in_time_safe": false,
+    "availability_unknown": [
+      "etf.custody_fee_pct",
+      "etf.iopv_reference",
+      "etf.management_fee_pct",
+      "etf.nav",
+      "etf.nav_date",
+      "etf.nav_disclosed_at",
+      "etf.premium_discount_pct",
+      "etf.tracking_note",
+      "etf.trading_status"
+    ],
+    "availability_note": "净值披露时间缺失，无法断言收盘时已知当日净值"
+  },
+  "snapshot_id": "snap-a3a962265466a536",
+  "fetched_at": "2026-11-11T02:44:26+08:00",
+  "producers": [
+    "akshare",
+    "tools/build_snapshots.py"
+  ],
+  "notes": "阶段一固定快照：展示指数判断与 ETF 执行判断必须分开所需的数据状态"
+}

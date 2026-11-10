@@ -327,7 +327,9 @@ def build_index_snapshot(code: str) -> Snapshot:
 
 
 # --- ETF --------------------------------------------------------------------
-ETF_CODES = ["510300"]
+ETF_CODES = ["510300", "510500", "512100"]
+
+_ETF_VENUE_SUFFIX = {"510300": "SH", "510500": "SH", "512100": "SH", "159845": "SZ", "159919": "SZ"}
 
 
 def build_etf_snapshot(code: str) -> Snapshot:
@@ -505,7 +507,7 @@ def build_etf_snapshot(code: str) -> Snapshot:
     }
 
     return Snapshot(
-        instrument_id=f"ETF:{code}.SH",
+        instrument_id=f"ETF:{code}.{_ETF_VENUE_SUFFIX.get(code, 'SH')}",
         asset_class="etf",
         as_of=AS_OF,
         available_at=_max_available(facts, f"{AS_OF}T16:11:00+08:00"),
