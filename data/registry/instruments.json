@@ -1,0 +1,777 @@
+{
+  "schema_version": "identity-registry/1",
+  "project": "investment-system",
+  "description": "已核实标的身份注册表。只登记经过来源核实的对象；运行时不做网络查询。",
+  "verified_at": "2026-11-11T02:30:00+08:00",
+  "policies": {
+    "scope_note": "第一版范围：A股个股、境内A股宽基指数、跟踪这些指数的境内普通被动 ETF。",
+    "heuristic_rule": "名称启发式只用于排除范围外对象，绝不用于把未核实对象纳入宽基流程。"
+  },
+  "instruments": [
+    {
+      "instrument_id": "INDEX:000300.SH",
+      "display_name": "沪深300",
+      "aliases": [
+        "沪深300指数",
+        "沪深三百",
+        "CSI300",
+        "CSI 300"
+      ],
+      "asset_class": "index",
+      "code": "000300",
+      "market": "CN",
+      "venue": "CSI",
+      "venue_type": "index_publisher",
+      "currency": null,
+      "index_class": "broad_based",
+      "region": "domestic",
+      "in_first_batch": true,
+      "data_coverage_verified": true,
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "FIRST_BATCH_BROAD_INDEX",
+        "detail": "首批研究样本：境内A股宽基指数"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-csi-indicator-000300",
+          "kind": "index_publisher",
+          "publisher": "中证指数有限公司",
+          "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000300indicator.xls",
+          "retrieved_at": "2026-11-11T02:20:00+08:00",
+          "fields_cited": [
+            "指数代码",
+            "指数中文全称",
+            "指数中文简称",
+            "指数英文全称"
+          ],
+          "note": "官方指标文件：沪深300指数，代码 000300"
+        },
+        {
+          "evidence_id": "ev-em-index-spot",
+          "kind": "vendor_api",
+          "publisher": "东方财富（经 AKShare stock_zh_index_spot_em）",
+          "url": null,
+          "retrieved_at": "2026-11-11T02:18:00+08:00",
+          "fields_cited": [
+            "代码",
+            "名称",
+            "最新价"
+          ],
+          "note": "行情清单中 000300 名称显示为「沪深300」"
+        }
+      ]
+    },
+    {
+      "instrument_id": "INDEX:000905.SH",
+      "display_name": "中证500",
+      "aliases": [
+        "中证500指数",
+        "中证小盘500",
+        "CSI500",
+        "CSI 500"
+      ],
+      "asset_class": "index",
+      "code": "000905",
+      "market": "CN",
+      "venue": "CSI",
+      "venue_type": "index_publisher",
+      "currency": null,
+      "index_class": "broad_based",
+      "region": "domestic",
+      "in_first_batch": true,
+      "data_coverage_verified": true,
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "FIRST_BATCH_BROAD_INDEX",
+        "detail": "首批研究样本：境内A股宽基指数"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-csi-indicator-000905",
+          "kind": "index_publisher",
+          "publisher": "中证指数有限公司",
+          "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000905indicator.xls",
+          "retrieved_at": "2026-11-11T02:20:00+08:00",
+          "fields_cited": [
+            "指数代码",
+            "指数中文全称",
+            "指数中文简称",
+            "指数英文全称"
+          ],
+          "note": "官方指标文件：中证小盘500指数，简称中证500，代码 000905"
+        }
+      ]
+    },
+    {
+      "instrument_id": "INDEX:000852.SH",
+      "display_name": "中证1000",
+      "aliases": [
+        "中证1000指数",
+        "CSI1000",
+        "CSI 1000"
+      ],
+      "asset_class": "index",
+      "code": "000852",
+      "market": "CN",
+      "venue": "CSI",
+      "venue_type": "index_publisher",
+      "currency": null,
+      "index_class": "broad_based",
+      "region": "domestic",
+      "in_first_batch": true,
+      "data_coverage_verified": true,
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "FIRST_BATCH_BROAD_INDEX",
+        "detail": "首批研究样本：境内A股宽基指数"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-csi-indicator-000852",
+          "kind": "index_publisher",
+          "publisher": "中证指数有限公司",
+          "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000852indicator.xls",
+          "retrieved_at": "2026-11-11T02:20:00+08:00",
+          "fields_cited": [
+            "指数代码",
+            "指数中文全称",
+            "指数中文简称",
+            "指数英文全称"
+          ],
+          "note": "官方指标文件：中证1000指数，代码 000852"
+        }
+      ]
+    },
+    {
+      "instrument_id": "INDEX:000001.SH",
+      "display_name": "上证指数",
+      "aliases": [
+        "上证综指",
+        "上证综合指数"
+      ],
+      "asset_class": "index",
+      "code": "000001",
+      "market": "CN",
+      "venue": "SSE",
+      "venue_type": "index_publisher",
+      "currency": null,
+      "index_class": "broad_based",
+      "region": "domestic",
+      "in_first_batch": false,
+      "data_coverage_verified": false,
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "BROAD_INDEX_NOT_IN_FIRST_BATCH",
+        "detail": "境内A股宽基，但不在首批研究样本内；数据覆盖尚未核实，不套用已验证标签"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-em-index-spot",
+          "kind": "vendor_api",
+          "publisher": "东方财富（经 AKShare stock_zh_index_spot_em）",
+          "url": null,
+          "retrieved_at": "2026-11-11T02:18:00+08:00",
+          "fields_cited": [
+            "代码",
+            "名称",
+            "最新价"
+          ],
+          "note": "注意：代码 000001 同时对应深市个股平安银行，解析时必须澄清"
+        }
+      ]
+    },
+    {
+      "instrument_id": "INDEX:000510.SH",
+      "display_name": "中证A500",
+      "aliases": [
+        "中证A500指数"
+      ],
+      "asset_class": "index",
+      "code": "000510",
+      "market": "CN",
+      "venue": "CSI",
+      "venue_type": "index_publisher",
+      "currency": null,
+      "index_class": "broad_based",
+      "region": "domestic",
+      "in_first_batch": false,
+      "data_coverage_verified": false,
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "BROAD_INDEX_NOT_IN_FIRST_BATCH",
+        "detail": "境内A股宽基，但不在首批研究样本内；数据覆盖尚未核实"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-em-index-spot",
+          "kind": "vendor_api",
+          "publisher": "东方财富（经 AKShare stock_zh_index_spot_em）",
+          "url": null,
+          "retrieved_at": "2026-11-11T02:18:00+08:00",
+          "fields_cited": [
+            "代码",
+            "名称",
+            "最新价"
+          ],
+          "note": "行情清单中 000510 名称显示为「中证A500」"
+        }
+      ]
+    },
+    {
+      "instrument_id": "INDEX:399001.SZ",
+      "display_name": "深证成指",
+      "aliases": [
+        "深证成份指数",
+        "深成指"
+      ],
+      "asset_class": "index",
+      "code": "399001",
+      "market": "CN",
+      "venue": "SZSE",
+      "venue_type": "index_publisher",
+      "currency": null,
+      "index_class": "broad_based",
+      "region": "domestic",
+      "in_first_batch": false,
+      "data_coverage_verified": false,
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "BROAD_INDEX_NOT_IN_FIRST_BATCH",
+        "detail": "境内A股宽基，但不在首批研究样本内；数据覆盖尚未核实"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-em-index-spot",
+          "kind": "vendor_api",
+          "publisher": "东方财富（经 AKShare stock_zh_index_spot_em）",
+          "url": null,
+          "retrieved_at": "2026-11-11T02:18:00+08:00",
+          "fields_cited": [
+            "代码",
+            "名称",
+            "最新价"
+          ],
+          "note": "行情清单中 399001 名称显示为「深证成指」"
+        }
+      ]
+    },
+    {
+      "instrument_id": "INDEX:000015.SH",
+      "display_name": "上证红利",
+      "aliases": [
+        "上证红利指数",
+        "红利指数"
+      ],
+      "asset_class": "index",
+      "code": "000015",
+      "market": "CN",
+      "venue": "SSE",
+      "venue_type": "index_publisher",
+      "currency": null,
+      "index_class": "strategy",
+      "region": "domestic",
+      "in_first_batch": false,
+      "data_coverage_verified": false,
+      "scope": {
+        "status": "out_of_scope",
+        "reason_code": "OUT_OF_SCOPE_STRATEGY_INDEX",
+        "detail": "红利等策略指数不因名称含「指数」就视为宽基；本版识别为范围外"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-legulegu-pe-map",
+          "kind": "vendor_api",
+          "publisher": "乐咕乐股（经 AKShare stock_index_pe_lg 的指数映射表）",
+          "url": "https://legulegu.com/stockdata/sz50-ttm-lyr",
+          "retrieved_at": "2026-11-11T02:19:00+08:00",
+          "fields_cited": [
+            "指数名称",
+            "指数代码"
+          ],
+          "note": "映射表中「上证红利」对应 000015.SH"
+        }
+      ]
+    },
+    {
+      "instrument_id": "INDEX:000922.CSI",
+      "display_name": "中证红利",
+      "aliases": [
+        "中证红利指数"
+      ],
+      "asset_class": "index",
+      "code": "000922",
+      "market": "CN",
+      "venue": "CSI",
+      "venue_type": "index_publisher",
+      "currency": null,
+      "index_class": "strategy",
+      "region": "domestic",
+      "in_first_batch": false,
+      "data_coverage_verified": false,
+      "scope": {
+        "status": "out_of_scope",
+        "reason_code": "OUT_OF_SCOPE_STRATEGY_INDEX",
+        "detail": "策略指数：按股息率选样，不属于宽基估值区间研究范围"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-csi-strategy-note",
+          "kind": "index_publisher",
+          "publisher": "中证指数有限公司",
+          "url": "https://www.csindex.com.cn/zh-CN/indices/index-detail/000922",
+          "retrieved_at": "2026-11-11T02:25:00+08:00",
+          "fields_cited": [
+            "指数名称",
+            "选样方法"
+          ],
+          "note": "中证红利为按股息率选样的策略指数"
+        }
+      ]
+    },
+    {
+      "instrument_id": "INDEX:NDX.NASDAQ",
+      "display_name": "纳斯达克100",
+      "aliases": [
+        "纳指100",
+        "NASDAQ100",
+        "NDX"
+      ],
+      "asset_class": "index",
+      "code": "NDX",
+      "market": "US",
+      "venue": "NASDAQ",
+      "venue_type": "index_publisher",
+      "currency": "USD",
+      "index_class": "overseas",
+      "region": "cross_border",
+      "in_first_batch": false,
+      "data_coverage_verified": false,
+      "scope": {
+        "status": "out_of_scope",
+        "reason_code": "OUT_OF_SCOPE_CROSS_BORDER",
+        "detail": "境外指数不在第一版范围"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-fundf10-513100",
+          "kind": "fund_profile",
+          "publisher": "天天基金（基金概况页）",
+          "url": "http://fundf10.eastmoney.com/jbgk_513100.html",
+          "retrieved_at": "2026-11-11T02:26:00+08:00",
+          "fields_cited": [
+            "跟踪标的",
+            "基金类型"
+          ],
+          "note": "纳指ETF国泰跟踪标的为纳斯达克100指数，基金类型为指数型-海外股票"
+        }
+      ]
+    },
+    {
+      "instrument_id": "INDEX:HSI.HKEX",
+      "display_name": "恒生指数",
+      "aliases": [
+        "恒指",
+        "HSI"
+      ],
+      "asset_class": "index",
+      "code": "HSI",
+      "market": "HK",
+      "venue": "HKEX",
+      "venue_type": "index_publisher",
+      "currency": "HKD",
+      "index_class": "overseas",
+      "region": "cross_border",
+      "in_first_batch": false,
+      "data_coverage_verified": false,
+      "scope": {
+        "status": "out_of_scope",
+        "reason_code": "OUT_OF_SCOPE_CROSS_BORDER",
+        "detail": "境外指数不在第一版范围"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-generic-market-scope",
+          "kind": "policy",
+          "publisher": "设计书 v1.1 §1",
+          "url": null,
+          "retrieved_at": "2026-11-11T02:07:00+08:00",
+          "fields_cited": [
+            "范围"
+          ],
+          "note": "港美股、跨境 QDII 不进入第一版模型范围"
+        }
+      ]
+    },
+    {
+      "instrument_id": "ETF:510300.SH",
+      "display_name": "沪深300ETF华泰柏瑞",
+      "aliases": [
+        "华泰柏瑞沪深300ETF",
+        "300ETF华泰柏瑞",
+        "510300"
+      ],
+      "asset_class": "etf",
+      "code": "510300",
+      "market": "CN",
+      "venue": "SSE",
+      "venue_type": "exchange",
+      "currency": "CNY",
+      "etf_strategy": "passive_plain",
+      "region": "domestic",
+      "underlying_index_id": "INDEX:000300.SH",
+      "in_first_batch": true,
+      "data_coverage_verified": true,
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "PASSIVE_BROAD_ETF",
+        "detail": "普通被动 ETF，跟踪首批宽基沪深300"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-fundf10-510300",
+          "kind": "fund_profile",
+          "publisher": "天天基金（基金概况页）",
+          "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
+          "retrieved_at": "2026-11-11T02:24:00+08:00",
+          "fields_cited": [
+            "基金全称",
+            "跟踪标的",
+            "业绩比较基准",
+            "管理费率",
+            "托管费率",
+            "成立日期"
+          ],
+          "note": "跟踪标的：沪深300指数；管理费率 0.15%/年；托管费率 0.05%/年；成立 2012-05-04"
+        },
+        {
+          "evidence_id": "ev-sse-etf-list",
+          "kind": "exchange_list",
+          "publisher": "上海证券交易所（经 AKShare fund_etf_scale_sse）",
+          "url": "https://www.sse.com.cn/assortment/fund/etf/list/scale/",
+          "retrieved_at": "2026-11-11T02:28:00+08:00",
+          "fields_cited": [
+            "基金代码",
+            "基金简称"
+          ],
+          "note": "上交所 ETF 列表中包含 510300；该接口返回的统计日期为 2025-01-15（数据陈旧）"
+        }
+      ]
+    },
+    {
+      "instrument_id": "ETF:159919.SZ",
+      "display_name": "沪深300ETF嘉实",
+      "aliases": [
+        "嘉实沪深300ETF",
+        "300ETF嘉实",
+        "159919"
+      ],
+      "asset_class": "etf",
+      "code": "159919",
+      "market": "CN",
+      "venue": "SZSE",
+      "venue_type": "exchange",
+      "currency": "CNY",
+      "etf_strategy": "passive_plain",
+      "region": "domestic",
+      "underlying_index_id": "INDEX:000300.SH",
+      "in_first_batch": true,
+      "data_coverage_verified": true,
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "PASSIVE_BROAD_ETF",
+        "detail": "普通被动 ETF，跟踪首批宽基沪深300"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-fundf10-159919",
+          "kind": "fund_profile",
+          "publisher": "天天基金（基金概况页）",
+          "url": "http://fundf10.eastmoney.com/jbgk_159919.html",
+          "retrieved_at": "2026-11-11T02:24:00+08:00",
+          "fields_cited": [
+            "基金全称",
+            "跟踪标的",
+            "业绩比较基准",
+            "管理费率",
+            "托管费率",
+            "成立日期"
+          ],
+          "note": "跟踪标的：沪深300指数；管理费率 0.15%/年；托管费率 0.05%/年；成立 2012-05-07。深交所 ETF 份额接口当前不可用，交易所归属依据代码段 159 与行情清单"
+        }
+      ]
+    },
+    {
+      "instrument_id": "ETF:510500.SH",
+      "display_name": "中证500ETF南方",
+      "aliases": [
+        "南方中证500ETF",
+        "500ETF南方",
+        "510500"
+      ],
+      "asset_class": "etf",
+      "code": "510500",
+      "market": "CN",
+      "venue": "SSE",
+      "venue_type": "exchange",
+      "currency": "CNY",
+      "etf_strategy": "passive_plain",
+      "region": "domestic",
+      "underlying_index_id": "INDEX:000905.SH",
+      "in_first_batch": true,
+      "data_coverage_verified": true,
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "PASSIVE_BROAD_ETF",
+        "detail": "普通被动 ETF，跟踪首批宽基中证500"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-fundf10-510500",
+          "kind": "fund_profile",
+          "publisher": "天天基金（基金概况页）",
+          "url": "http://fundf10.eastmoney.com/jbgk_510500.html",
+          "retrieved_at": "2026-11-11T02:24:00+08:00",
+          "fields_cited": [
+            "基金全称",
+            "跟踪标的",
+            "业绩比较基准",
+            "管理费率",
+            "托管费率",
+            "成立日期"
+          ],
+          "note": "跟踪标的：中证500指数；管理费率 0.15%/年；托管费率 0.05%/年；成立 2013-02-06"
+        },
+        {
+          "evidence_id": "ev-sse-etf-list",
+          "kind": "exchange_list",
+          "publisher": "上海证券交易所（经 AKShare fund_etf_scale_sse）",
+          "url": "https://www.sse.com.cn/assortment/fund/etf/list/scale/",
+          "retrieved_at": "2026-11-11T02:28:00+08:00",
+          "fields_cited": [
+            "基金代码",
+            "基金简称"
+          ],
+          "note": "上交所 ETF 列表中包含 510500"
+        }
+      ]
+    },
+    {
+      "instrument_id": "ETF:512100.SH",
+      "display_name": "中证1000ETF南方",
+      "aliases": [
+        "南方中证1000ETF",
+        "1000ETF南方",
+        "512100"
+      ],
+      "asset_class": "etf",
+      "code": "512100",
+      "market": "CN",
+      "venue": "SSE",
+      "venue_type": "exchange",
+      "currency": "CNY",
+      "etf_strategy": "passive_plain",
+      "region": "domestic",
+      "underlying_index_id": "INDEX:000852.SH",
+      "in_first_batch": true,
+      "data_coverage_verified": true,
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "PASSIVE_BROAD_ETF",
+        "detail": "普通被动 ETF，跟踪首批宽基中证1000"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-fundf10-512100",
+          "kind": "fund_profile",
+          "publisher": "天天基金（基金概况页）",
+          "url": "http://fundf10.eastmoney.com/jbgk_512100.html",
+          "retrieved_at": "2026-11-11T02:24:00+08:00",
+          "fields_cited": [
+            "基金全称",
+            "跟踪标的",
+            "业绩比较基准",
+            "管理费率",
+            "托管费率",
+            "成立日期"
+          ],
+          "note": "跟踪标的：中证1000指数；管理费率 0.15%/年；托管费率 0.05%/年；成立 2016-09-29"
+        },
+        {
+          "evidence_id": "ev-sse-etf-list",
+          "kind": "exchange_list",
+          "publisher": "上海证券交易所（经 AKShare fund_etf_scale_sse）",
+          "url": "https://www.sse.com.cn/assortment/fund/etf/list/scale/",
+          "retrieved_at": "2026-11-11T02:28:00+08:00",
+          "fields_cited": [
+            "基金代码",
+            "基金简称"
+          ],
+          "note": "上交所 ETF 列表中包含 512100"
+        }
+      ]
+    },
+    {
+      "instrument_id": "ETF:159845.SZ",
+      "display_name": "中证1000ETF华夏",
+      "aliases": [
+        "华夏中证1000ETF",
+        "1000ETF华夏",
+        "159845"
+      ],
+      "asset_class": "etf",
+      "code": "159845",
+      "market": "CN",
+      "venue": "SZSE",
+      "venue_type": "exchange",
+      "currency": "CNY",
+      "etf_strategy": "passive_plain",
+      "region": "domestic",
+      "underlying_index_id": "INDEX:000852.SH",
+      "in_first_batch": true,
+      "data_coverage_verified": true,
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "PASSIVE_BROAD_ETF",
+        "detail": "普通被动 ETF，跟踪首批宽基中证1000"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-fundf10-159845",
+          "kind": "fund_profile",
+          "publisher": "天天基金（基金概况页）",
+          "url": "http://fundf10.eastmoney.com/jbgk_159845.html",
+          "retrieved_at": "2026-11-11T02:24:00+08:00",
+          "fields_cited": [
+            "基金全称",
+            "跟踪标的",
+            "业绩比较基准",
+            "管理费率",
+            "托管费率",
+            "成立日期"
+          ],
+          "note": "跟踪标的：中证1000指数；管理费率 0.15%/年；托管费率 0.05%/年；成立 2021-03-18"
+        }
+      ]
+    },
+    {
+      "instrument_id": "ETF:512880.SH",
+      "display_name": "证券ETF国泰",
+      "aliases": [
+        "国泰证券ETF",
+        "券商ETF国泰",
+        "512880"
+      ],
+      "asset_class": "etf",
+      "code": "512880",
+      "market": "CN",
+      "venue": "SSE",
+      "venue_type": "exchange",
+      "currency": "CNY",
+      "etf_strategy": "passive_plain",
+      "region": "domestic",
+      "underlying_index_id": null,
+      "in_first_batch": false,
+      "data_coverage_verified": false,
+      "scope": {
+        "status": "out_of_scope",
+        "reason_code": "OUT_OF_SCOPE_INDUSTRY_ETF",
+        "detail": "跟踪中证全指证券公司指数（行业主题），不属于宽基流程"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-fundf10-512880",
+          "kind": "fund_profile",
+          "publisher": "天天基金（基金概况页）",
+          "url": "http://fundf10.eastmoney.com/jbgk_512880.html",
+          "retrieved_at": "2026-11-11T02:24:00+08:00",
+          "fields_cited": [
+            "基金全称",
+            "跟踪标的",
+            "管理费率"
+          ],
+          "note": "跟踪标的：中证全指证券公司指数；行业主题 ETF"
+        }
+      ]
+    },
+    {
+      "instrument_id": "ETF:513100.SH",
+      "display_name": "纳指ETF国泰",
+      "aliases": [
+        "国泰纳指ETF",
+        "纳斯达克ETF国泰",
+        "513100"
+      ],
+      "asset_class": "etf",
+      "code": "513100",
+      "market": "CN",
+      "venue": "SSE",
+      "venue_type": "exchange",
+      "currency": "CNY",
+      "etf_strategy": "passive_plain",
+      "region": "cross_border",
+      "underlying_index_id": "INDEX:NDX.NASDAQ",
+      "in_first_batch": false,
+      "data_coverage_verified": false,
+      "scope": {
+        "status": "out_of_scope",
+        "reason_code": "OUT_OF_SCOPE_CROSS_BORDER",
+        "detail": "跨境 ETF（QDII），跟踪纳斯达克100，不在第一版范围"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-fundf10-513100",
+          "kind": "fund_profile",
+          "publisher": "天天基金（基金概况页）",
+          "url": "http://fundf10.eastmoney.com/jbgk_513100.html",
+          "retrieved_at": "2026-11-11T02:26:00+08:00",
+          "fields_cited": [
+            "基金全称",
+            "基金类型",
+            "跟踪标的",
+            "管理费率"
+          ],
+          "note": "跟踪标的：纳斯达克100指数；基金类型：指数型-海外股票"
+        }
+      ]
+    },
+    {
+      "instrument_id": "ETF:159555.SZ",
+      "display_name": "中证2000增强ETF银华",
+      "aliases": [
+        "银华中证2000增强ETF",
+        "159555"
+      ],
+      "asset_class": "etf",
+      "code": "159555",
+      "market": "CN",
+      "venue": "SZSE",
+      "venue_type": "exchange",
+      "currency": "CNY",
+      "etf_strategy": "passive_enhanced",
+      "region": "domestic",
+      "underlying_index_id": null,
+      "in_first_batch": false,
+      "data_coverage_verified": false,
+      "scope": {
+        "status": "out_of_scope",
+        "reason_code": "OUT_OF_SCOPE_ENHANCED_ETF",
+        "detail": "指数增强策略 ETF（银华中证2000增强策略ETF），不属于普通被动 ETF"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-fundf10-159555",
+          "kind": "fund_profile",
+          "publisher": "天天基金（基金概况页）",
+          "url": "http://fundf10.eastmoney.com/jbgk_159555.html",
+          "retrieved_at": "2026-11-11T02:27:00+08:00",
+          "fields_cited": [
+            "基金全称",
+            "跟踪标的"
+          ],
+          "note": "基金全称：银华中证2000增强策略交易型开放式指数证券投资基金（增强策略）"
+        }
+      ]
+    }
+  ]
+}

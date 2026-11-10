@@ -1,0 +1,44 @@
+{
+  "snapshots": [
+    {
+      "snapshot_id": "snap-f9f0d2c00e8c1fd5",
+      "instrument_id": "EQUITY:601398.SH",
+      "asset_class": "equity",
+      "as_of": "2026-09-30",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "file": "snap-f9f0d2c00e8c1fd5.json"
+    },
+    {
+      "snapshot_id": "snap-23eaf5b0bfc82144",
+      "instrument_id": "ETF:510300.SH",
+      "asset_class": "etf",
+      "as_of": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "file": "snap-23eaf5b0bfc82144.json"
+    },
+    {
+      "snapshot_id": "snap-efb00dcacf4c74c8",
+      "instrument_id": "INDEX:000300.SH",
+      "asset_class": "index",
+      "as_of": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "file": "snap-efb00dcacf4c74c8.json"
+    },
+    {
+      "snapshot_id": "snap-fd346de1c14562ec",
+      "instrument_id": "INDEX:000852.SH",
+      "asset_class": "index",
+      "as_of": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "file": "snap-fd346de1c14562ec.json"
+    },
+    {
+      "snapshot_id": "snap-549f2af3917da603",
+      "instrument_id": "INDEX:000905.SH",
+      "asset_class": "index",
+      "as_of": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "file": "snap-549f2af3917da603.json"
+    }
+  ]
+}

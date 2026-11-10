@@ -1,0 +1,120 @@
+{
+  "schema_version": "analysis-result/1",
+  "analysis_id": "analysis-83233d4242a544c2",
+  "generated_at": "2026-11-11T02:42:42+08:00",
+  "instrument": {
+    "instrument_id": "ETF:512880.SH",
+    "display_name": "证券ETF国泰",
+    "asset_class": "etf",
+    "code": "512880",
+    "market": "CN",
+    "venue": "SSE",
+    "venue_type": "exchange",
+    "currency": "CNY",
+    "aliases": [
+      "国泰证券ETF",
+      "券商ETF国泰",
+      "512880"
+    ],
+    "vendor_codes": [],
+    "index_class": null,
+    "etf_strategy": "passive_plain",
+    "region": "domestic",
+    "underlying_index_id": null,
+    "scope": {
+      "status": "out_of_scope",
+      "reason_code": "OUT_OF_SCOPE_INDUSTRY_ETF",
+      "detail": "跟踪中证全指证券公司指数（行业主题），不属于宽基流程"
+    },
+    "in_first_batch": false,
+    "data_coverage_verified": false,
+    "evidence": [
+      {
+        "evidence_id": "ev-fundf10-512880",
+        "kind": "fund_profile",
+        "publisher": "天天基金（基金概况页）",
+        "url": "http://fundf10.eastmoney.com/jbgk_512880.html",
+        "retrieved_at": "2026-11-11T02:24:00+08:00",
+        "fields_cited": [
+          "基金全称",
+          "跟踪标的",
+          "管理费率"
+        ],
+        "note": "跟踪标的：中证全指证券公司指数；行业主题 ETF"
+      }
+    ],
+    "valid_from": null,
+    "valid_to": null,
+    "raw_input": "512880",
+    "identity_source": ""
+  },
+  "instrument_id": "ETF:512880.SH",
+  "intent": "buy_point_check",
+  "identity": {
+    "status": "out_of_scope",
+    "raw_input": "512880",
+    "matched_by": "exact_code",
+    "candidates": [],
+    "reason_codes": [
+      "OUT_OF_SCOPE_INDUSTRY_ETF"
+    ],
+    "clarification_question": null
+  },
+  "snapshot_id": null,
+  "as_of": null,
+  "available_at": null,
+  "analysis_status": "unsupported",
+  "model_status": null,
+  "valuation_state": "not_applicable",
+  "decision": "undetermined",
+  "reason_codes": [
+    "OUT_OF_SCOPE_INDUSTRY_ETF"
+  ],
+  "model_plan": {
+    "primary_model": null,
+    "required_checks": [],
+    "selection_reason": "标的不在第一版模型范围，不进入宽基指数流程",
+    "not_selected": [],
+    "candidate_models": []
+  },
+  "assumptions": [],
+  "model_results": [],
+  "conditions": [],
+  "invalidation": [
+    "若该产品的真实跟踪指数或产品性质被更正（例如被证实为普通被动宽基 ETF），本结论需要重跑。"
+  ],
+  "evidence_refs": [
+    {
+      "evidence_id": "ev-fundf10-512880",
+      "kind": "fund_profile",
+      "publisher": "天天基金（基金概况页）",
+      "url": "http://fundf10.eastmoney.com/jbgk_512880.html",
+      "retrieved_at": "2026-11-11T02:24:00+08:00",
+      "fields_cited": [
+        "基金全称",
+        "跟踪标的",
+        "管理费率"
+      ],
+      "note": "跟踪标的：中证全指证券公司指数；行业主题 ETF"
+    }
+  ],
+  "missing_data": [],
+  "warnings": [
+    "范围外只代表「本版不建模」，不代表对该产品或行业的投资价值判断。"
+  ],
+  "clarification": null,
+  "payload": {
+    "payload_type": "etf",
+    "underlying_index": null,
+    "price": null,
+    "nav": null,
+    "premium_discount": null,
+    "fees": null,
+    "trading": null,
+    "tracking": null,
+    "_etf_strategy": "passive_plain"
+  },
+  "code_version": "phase1-0.1.0",
+  "policy_version": "unapproved-phase1",
+  "model_version": "none"
+}

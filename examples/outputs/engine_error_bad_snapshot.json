@@ -1,0 +1,143 @@
+{
+  "schema_version": "analysis-result/1",
+  "analysis_id": "analysis-41ce26382b3ce294",
+  "generated_at": "2026-11-11T02:42:42+08:00",
+  "instrument": {
+    "instrument_id": "INDEX:000300.SH",
+    "display_name": "沪深300",
+    "asset_class": "index",
+    "code": "000300",
+    "market": "CN",
+    "venue": "CSI",
+    "venue_type": "index_publisher",
+    "currency": null,
+    "aliases": [
+      "沪深300指数",
+      "沪深三百",
+      "CSI300",
+      "CSI 300"
+    ],
+    "vendor_codes": [],
+    "index_class": "broad_based",
+    "etf_strategy": null,
+    "region": "domestic",
+    "underlying_index_id": null,
+    "scope": {
+      "status": "in_scope",
+      "reason_code": "FIRST_BATCH_BROAD_INDEX",
+      "detail": "首批研究样本：境内A股宽基指数"
+    },
+    "in_first_batch": true,
+    "data_coverage_verified": true,
+    "evidence": [
+      {
+        "evidence_id": "ev-csi-indicator-000300",
+        "kind": "index_publisher",
+        "publisher": "中证指数有限公司",
+        "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000300indicator.xls",
+        "retrieved_at": "2026-11-11T02:20:00+08:00",
+        "fields_cited": [
+          "指数代码",
+          "指数中文全称",
+          "指数中文简称",
+          "指数英文全称"
+        ],
+        "note": "官方指标文件：沪深300指数，代码 000300"
+      },
+      {
+        "evidence_id": "ev-em-index-spot",
+        "kind": "vendor_api",
+        "publisher": "东方财富（经 AKShare stock_zh_index_spot_em）",
+        "url": null,
+        "retrieved_at": "2026-11-11T02:18:00+08:00",
+        "fields_cited": [
+          "代码",
+          "名称",
+          "最新价"
+        ],
+        "note": "行情清单中 000300 名称显示为「沪深300」"
+      }
+    ],
+    "valid_from": null,
+    "valid_to": null,
+    "raw_input": "沪深300",
+    "identity_source": ""
+  },
+  "instrument_id": "INDEX:000300.SH",
+  "intent": "buy_point_check",
+  "identity": {
+    "status": "resolved",
+    "raw_input": "沪深300",
+    "matched_by": "exact_name",
+    "candidates": [],
+    "reason_codes": [
+      "FIRST_BATCH_BROAD_INDEX"
+    ],
+    "clarification_question": null
+  },
+  "snapshot_id": null,
+  "as_of": null,
+  "available_at": null,
+  "analysis_status": "engine_error",
+  "model_status": null,
+  "valuation_state": "unknown",
+  "decision": "undetermined",
+  "reason_codes": [
+    "ENGINE_ERROR",
+    "SNAPSHOT_NOT_FOUND"
+  ],
+  "model_plan": {
+    "primary_model": null,
+    "required_checks": [],
+    "selection_reason": "数据快照不可用，未进入模型环节",
+    "not_selected": [],
+    "candidate_models": []
+  },
+  "assumptions": [],
+  "model_results": [],
+  "conditions": [],
+  "invalidation": [
+    "修复快照或重新取数后需要重跑本分析。"
+  ],
+  "evidence_refs": [],
+  "missing_data": [],
+  "warnings": [
+    "快照加载失败：找不到快照文件: snap-0000000000000000.json"
+  ],
+  "clarification": null,
+  "payload": {
+    "payload_type": "index",
+    "index_class": "broad_based",
+    "level": null,
+    "valuation_facts": {},
+    "history_coverage": {},
+    "strategy_state": {
+      "status": "not_implemented",
+      "model_status": "research",
+      "candidates": [
+        {
+          "candidate": "A",
+          "name": "估值回归基线",
+          "model_id": "index_strategy_a_valuation_reversion",
+          "model_status": "research",
+          "entry": "PE-TTM 5年历史分位 ≤ 20",
+          "exit": "PE 分位 ≥ 60，或持有满 12 个日历月",
+          "implemented": false
+        },
+        {
+          "candidate": "B",
+          "name": "估值交叉确认",
+          "model_id": "index_strategy_b_cross_confirmation",
+          "model_status": "research",
+          "entry": "PE 分位 ≤ 20 且 PB 分位 ≤ 40",
+          "exit": "PE 分位 ≥ 60 或 PB 分位 ≥ 70，或持有满 12 个日历月",
+          "implemented": false
+        }
+      ],
+      "note": "阶段一不计算任何分位或信号；候选策略规则留待阶段三固定后回测。"
+    }
+  },
+  "code_version": "phase1-0.1.0",
+  "policy_version": "unapproved-phase1",
+  "model_version": "none"
+}

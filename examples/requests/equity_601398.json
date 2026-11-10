@@ -1,0 +1,5 @@
+{
+  "query": "工商银行",
+  "intent": "buy_point_check",
+  "note": "个股：范围内，但阶段一未实现任何估值模型"
+}

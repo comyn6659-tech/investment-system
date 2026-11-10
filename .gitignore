@@ -1,0 +1,20 @@
+# 虚拟环境
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# 本项目的独立缓存：大体积原始数据不入版本控制
+data/cache/*
+!data/cache/.gitkeep
+
+# 工具产物
+reports/_runtime/
+
+# macOS
+.DS_Store

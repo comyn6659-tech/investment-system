@@ -1,0 +1,140 @@
+{
+  "schema_version": "analysis-result/1",
+  "analysis_id": "analysis-a3e34b7754caece2",
+  "generated_at": "2026-11-11T02:42:42+08:00",
+  "instrument": null,
+  "instrument_id": null,
+  "intent": "buy_point_check",
+  "identity": {
+    "status": "ambiguous",
+    "raw_input": "000001",
+    "matched_by": "",
+    "candidates": [
+      {
+        "instrument_id": "EQUITY:000001.SZ",
+        "display_name": "平安银行",
+        "asset_class": "equity",
+        "code": "000001",
+        "market": "CN",
+        "venue": "SZSE",
+        "venue_type": "exchange",
+        "currency": "CNY",
+        "aliases": [],
+        "vendor_codes": [],
+        "index_class": null,
+        "etf_strategy": null,
+        "region": "domestic",
+        "underlying_index_id": null,
+        "scope": {
+          "status": "in_scope",
+          "reason_code": "DOMESTIC_A_SHARE",
+          "detail": "境内A股个股（交易所清单）"
+        },
+        "in_first_batch": false,
+        "data_coverage_verified": false,
+        "evidence": [
+          {
+            "evidence_id": "ev-cn-a-equity-list",
+            "kind": "exchange_list",
+            "publisher": "上海证券交易所 / 深圳证券交易所 / 北京证券交易所（经 AKShare 采集）",
+            "url": null,
+            "retrieved_at": "2026-11-11T02:24:42+08:00",
+            "fields_cited": [
+              "证券代码",
+              "证券简称",
+              "板块",
+              "上市日期"
+            ],
+            "note": "三个交易所清单均取到"
+          }
+        ],
+        "valid_from": "1991-04-03",
+        "valid_to": null,
+        "raw_input": "",
+        "identity_source": ""
+      },
+      {
+        "instrument_id": "INDEX:000001.SH",
+        "display_name": "上证指数",
+        "asset_class": "index",
+        "code": "000001",
+        "market": "CN",
+        "venue": "SSE",
+        "venue_type": "index_publisher",
+        "currency": null,
+        "aliases": [
+          "上证综指",
+          "上证综合指数"
+        ],
+        "vendor_codes": [],
+        "index_class": "broad_based",
+        "etf_strategy": null,
+        "region": "domestic",
+        "underlying_index_id": null,
+        "scope": {
+          "status": "in_scope",
+          "reason_code": "BROAD_INDEX_NOT_IN_FIRST_BATCH",
+          "detail": "境内A股宽基，但不在首批研究样本内；数据覆盖尚未核实，不套用已验证标签"
+        },
+        "in_first_batch": false,
+        "data_coverage_verified": false,
+        "evidence": [
+          {
+            "evidence_id": "ev-em-index-spot",
+            "kind": "vendor_api",
+            "publisher": "东方财富（经 AKShare stock_zh_index_spot_em）",
+            "url": null,
+            "retrieved_at": "2026-11-11T02:18:00+08:00",
+            "fields_cited": [
+              "代码",
+              "名称",
+              "最新价"
+            ],
+            "note": "注意：代码 000001 同时对应深市个股平安银行，解析时必须澄清"
+          }
+        ],
+        "valid_from": null,
+        "valid_to": null,
+        "raw_input": "",
+        "identity_source": ""
+      }
+    ],
+    "reason_codes": [
+      "IDENTITY_MULTI_MARKET"
+    ],
+    "clarification_question": "「000001」同一代码在不同市场/类型下分别对应不同标的：\n- 上证指数（INDEX:000001.SH，in_scope）\n- 平安银行（EQUITY:000001.SZ，in_scope）\n请给出完整代码（如 510300）或完整名称。"
+  },
+  "snapshot_id": null,
+  "as_of": null,
+  "available_at": null,
+  "analysis_status": "needs_clarification",
+  "model_status": null,
+  "valuation_state": "not_applicable",
+  "decision": "undetermined",
+  "reason_codes": [
+    "IDENTITY_MULTI_MARKET"
+  ],
+  "model_plan": {
+    "primary_model": null,
+    "required_checks": [],
+    "selection_reason": "身份存在多个候选，未进入模型环节",
+    "not_selected": [],
+    "candidate_models": []
+  },
+  "assumptions": [],
+  "model_results": [],
+  "conditions": [],
+  "invalidation": [],
+  "evidence_refs": [],
+  "missing_data": [],
+  "warnings": [
+    "存在多个候选标的，引擎不做猜测，也不对任一候选给出买点结论。"
+  ],
+  "clarification": "「000001」同一代码在不同市场/类型下分别对应不同标的：\n- 上证指数（INDEX:000001.SH，in_scope）\n- 平安银行（EQUITY:000001.SZ，in_scope）\n请给出完整代码（如 510300）或完整名称。",
+  "payload": {
+    "payload_type": "none"
+  },
+  "code_version": "phase1-0.1.0",
+  "policy_version": "unapproved-phase1",
+  "model_version": "none"
+}

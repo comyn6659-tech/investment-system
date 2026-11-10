@@ -1,0 +1,11 @@
+# 数据采集工具链锁定版本（2026-11-11 实测可安装、可取数）
+# 安装：.venv/bin/python -m pip install -r requirements-data.txt
+#
+# 注意：engine 运行时（python -m engine.cli）不需要 akshare。
+#       akshare 只被 tools/ 下的取数脚本使用。
+akshare==1.20.35
+pandas==3.1.1
+numpy==2.5.4
+requests==2.34.2
+openpyxl==3.1.5
+xlrd==2.0.2

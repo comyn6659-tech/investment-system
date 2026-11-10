@@ -1,0 +1,5 @@
+{
+  "query": "沪深300",
+  "intent": "buy_point_check",
+  "note": "宽基指数：只说指数时不擅自选 ETF"
+}

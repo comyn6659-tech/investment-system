@@ -1,0 +1,179 @@
+{
+  "schema_version": "snapshot/1",
+  "instrument_id": "INDEX:000905.SH",
+  "asset_class": "index",
+  "as_of": "2026-11-10",
+  "available_at": "2026-11-10T15:00:00+08:00",
+  "facts": [
+    {
+      "fact_id": "index.dividend_yield_csindex_1",
+      "metric": "csindex_dividend_yield_1",
+      "status": "known",
+      "value": 1.59,
+      "unit": "percent",
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "source": {
+        "source_id": "csindex.indicator_file",
+        "publisher": "中证指数有限公司",
+        "interface": "官方指数估值指标文件（.xls）",
+        "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000905indicator.xls",
+        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "notes": "文件仅包含最近 20 个交易日；市盈率/股息率口径未在文件内说明"
+      },
+      "transform": "官方指标文件列『股息率1』；聚合方法与分母口径未在文件中说明",
+      "restated": false,
+      "notes": "发布时点未披露，可获得时间为 None；因此该快照不能用于点位时点回放",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "index.level",
+      "metric": "index_close_level",
+      "status": "known",
+      "value": 6645.89,
+      "unit": "index_point",
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "source": {
+        "source_id": "em.index_spot",
+        "publisher": "东方财富",
+        "interface": "AKShare stock_zh_index_spot_em（沪深重要指数）",
+        "url": "https://quote.eastmoney.com/center/gridlist.html#index_sh",
+        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "notes": "收盘行情快照，含最新价与昨收"
+      },
+      "transform": "行情清单『最新价』（2026-11-10 收盘）",
+      "restated": false,
+      "notes": "",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "index.pb",
+      "metric": "pb",
+      "status": "known",
+      "value": 2.05,
+      "unit": "ratio",
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "source": {
+        "source_id": "legulegu.index_pe",
+        "publisher": "乐咕乐股",
+        "interface": "AKShare stock_index_pe_lg / stock_index_pb_lg",
+        "url": "https://legulegu.com/stockdata/index-basic-pe",
+        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "notes": "第三方聚合数据；实测按月采样，非日频/周频；聚合方法与亏损股处理未获官方说明"
+      },
+      "transform": "乐咕乐股『市净率』列；月度采样",
+      "restated": false,
+      "notes": "第三方口径，可获得时间未披露",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "index.pe_csindex_1",
+      "metric": "csindex_pe_ratio_1",
+      "status": "known",
+      "value": 25.8,
+      "unit": "ratio",
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "source": {
+        "source_id": "csindex.indicator_file",
+        "publisher": "中证指数有限公司",
+        "interface": "官方指数估值指标文件（.xls）",
+        "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000905indicator.xls",
+        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "notes": "文件仅包含最近 20 个交易日；市盈率/股息率口径未在文件内说明"
+      },
+      "transform": "官方指标文件列『市盈率1』；聚合方法与分母口径未在文件中说明",
+      "restated": false,
+      "notes": "发布时点未披露，可获得时间为 None；因此该快照不能用于点位时点回放",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "index.pe_ttm",
+      "metric": "pe_ttm",
+      "status": "known",
+      "value": 22.72,
+      "unit": "ratio",
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "source": {
+        "source_id": "legulegu.index_pe",
+        "publisher": "乐咕乐股",
+        "interface": "AKShare stock_index_pe_lg / stock_index_pb_lg",
+        "url": "https://legulegu.com/stockdata/index-basic-pe",
+        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "notes": "第三方聚合数据；实测按月采样，非日频/周频；聚合方法与亏损股处理未获官方说明"
+      },
+      "transform": "乐咕乐股『滚动市盈率』列；月度采样",
+      "restated": false,
+      "notes": "第三方口径，聚合方法（整体法/等权）与亏损股处理未获官方说明；可获得时间未披露",
+      "conflict_values": []
+    }
+  ],
+  "coverage": {
+    "valuation_source_official": {
+      "source_id": "csindex.indicator_file",
+      "publisher": "中证指数有限公司",
+      "start": "2026-10-14",
+      "end": "2026-11-10",
+      "observations": 20,
+      "frequency": "daily",
+      "note": "官方指标文件只提供最近 20 个交易日，不能用于 5 年分位"
+    },
+    "valuation_source_monthly": {
+      "source_id": "legulegu.index_pe",
+      "publisher": "乐咕乐股",
+      "start": "2007-01-31",
+      "end": "2026-11-10",
+      "observations": 239,
+      "frequency": "monthly",
+      "note": "实测为月度采样，无法满足设计书要求的 5 年周度样本"
+    },
+    "price_series": {
+      "source_id": "em.index_daily_em",
+      "start": "2005-01-04",
+      "end": "2026-11-10",
+      "observations": 5306,
+      "frequency": "daily"
+    },
+    "total_return_series": {
+      "available": false,
+      "note": "免费源未提供全收益指数（如 H00300/H00905/H00852）行情；H 前缀代码在东方财富接口返回空表"
+    },
+    "dividend_yield_history": {
+      "available": false,
+      "note": "官方文件仅 20 个交易日，第三方月度序列不含股息率"
+    },
+    "aggregation_method": "unknown",
+    "aggregation_note": "官方文件未说明整体法/加权法与亏损成分处理；两套来源口径不可直接拼接",
+    "supports_weekly_5y_history": false,
+    "supports_5y_window": true,
+    "index_identity_verified": true,
+    "point_in_time_safe": false,
+    "availability_unknown": [
+      "index.dividend_yield_csindex_1",
+      "index.pb",
+      "index.pe_csindex_1",
+      "index.pe_ttm"
+    ],
+    "availability_note": "估值指标的发布时点未披露，不能断言某个历史时点已可知"
+  },
+  "snapshot_id": "snap-549f2af3917da603",
+  "fetched_at": "2026-11-11T02:40:59+08:00",
+  "producers": [
+    "akshare",
+    "tools/build_snapshots.py"
+  ],
+  "notes": "阶段一固定快照：只证明「有哪些数据、覆盖多长、口径是否说明」，不构成估值结论"
+}

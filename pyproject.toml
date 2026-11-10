@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "investment-system"
+version = "0.1.0"
+description = "A股个股 / 境内A股宽基指数 / 普通被动ETF 的分析引擎（阶段一：身份、契约与数据可用性）"
+requires-python = ">=3.11"
+readme = "README.md"
+
+# 阶段一只声明真正被运行时使用的依赖。
+# akshare 只用于 tools/ 取数与构建快照；engine 运行时不 import akshare。
+dependencies = []
+
+[project.optional-dependencies]
+# 数据采集（工具链）依赖，锁定版本见 requirements-data.txt
+data = [
+    "akshare==1.20.35",
+    "pandas==3.1.1",
+    "numpy==2.5.4",
+    "requests>=2.31",
+    "openpyxl>=3.1",
+    "xlrd==2.0.2",
+]
+dev = [
+    "pytest==9.2.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["engine*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+filterwarnings = [
+    "error::RuntimeWarning",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

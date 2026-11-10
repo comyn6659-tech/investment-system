@@ -1,0 +1,103 @@
+"""业务载荷：个股 / 指数 / ETF 各自不同的结构。
+
+共用身份、来源与日期，但不强迫指数填写公司 EPS，也不要求 ETF 有公司 ROE。
+每种载荷都有明确的 `payload_type`，出口校验会核对它与 asset_class 是否匹配。
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+# 单位约定：
+# - index_point：指数点位，不允许带币种；
+# - CNY / CNY_per_share：金额，必须带币种；
+# - percent：百分数（3.03 表示 3.03%）；
+# - shares / count / ratio / per_share。
+INDEX_POINT_UNIT = "index_point"
+MONEY_UNITS = frozenset({"CNY", "CNY_per_share", "USD", "HKD"})
+ALLOWED_UNITS = frozenset(
+    {"index_point", "CNY", "CNY_per_share", "USD", "HKD", "percent", "shares", "count", "ratio", "per_share"}
+)
+
+
+def amount(value: float | int | None, unit: str, currency: str | None = None) -> dict[str, Any]:
+    """构造规范金额/数值对象。"""
+    if unit not in ALLOWED_UNITS:
+        raise ValueError(f"未定义的单位: {unit}")
+    if unit == INDEX_POINT_UNIT:
+        if currency is not None:
+            raise ValueError("指数点位不允许携带币种")
+    elif unit in MONEY_UNITS:
+        if not currency:
+            raise ValueError(f"金额单位 {unit} 必须携带币种")
+    return {"value": value, "unit": unit, "currency": currency}
+
+
+PAYLOAD_SCHEMAS: dict[str, set[str]] = {
+    "equity": {
+        "payload_type",
+        "company_facts",
+        "financial_periods",
+        "dividend_records",
+        "model_applicability",
+        "valuation",
+    },
+    "index": {
+        "payload_type",
+        "index_class",
+        "level",
+        "valuation_facts",
+        "history_coverage",
+        "strategy_state",
+    },
+    "etf": {
+        "payload_type",
+        "underlying_index",
+        "price",
+        "nav",
+        "premium_discount",
+        "fees",
+        "trading",
+        "tracking",
+    },
+    "none": {"payload_type"},
+}
+
+
+def empty_equity_payload() -> dict[str, Any]:
+    return {
+        "payload_type": "equity",
+        "company_facts": {},
+        "financial_periods": [],
+        "dividend_records": [],
+        "model_applicability": {"status": "not_evaluated", "reason_code": None},
+        "valuation": None,
+    }
+
+
+def empty_index_payload() -> dict[str, Any]:
+    return {
+        "payload_type": "index",
+        "index_class": None,
+        "level": None,
+        "valuation_facts": {},
+        "history_coverage": {},
+        "strategy_state": {"status": "not_implemented", "model_status": "research"},
+    }
+
+
+def empty_etf_payload() -> dict[str, Any]:
+    return {
+        "payload_type": "etf",
+        "underlying_index": None,
+        "price": None,
+        "nav": None,
+        "premium_discount": None,
+        "fees": None,
+        "trading": None,
+        "tracking": None,
+    }
+
+
+def empty_payload() -> dict[str, Any]:
+    return {"payload_type": "none"}

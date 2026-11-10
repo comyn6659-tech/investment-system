@@ -1,0 +1,302 @@
+{
+  "schema_version": "analysis-result/1",
+  "analysis_id": "analysis-a1806e010ca55fe0",
+  "generated_at": "2026-11-11T02:42:42+08:00",
+  "instrument": {
+    "instrument_id": "ETF:510300.SH",
+    "display_name": "沪深300ETF华泰柏瑞",
+    "asset_class": "etf",
+    "code": "510300",
+    "market": "CN",
+    "venue": "SSE",
+    "venue_type": "exchange",
+    "currency": "CNY",
+    "aliases": [
+      "华泰柏瑞沪深300ETF",
+      "300ETF华泰柏瑞",
+      "510300"
+    ],
+    "vendor_codes": [],
+    "index_class": null,
+    "etf_strategy": "passive_plain",
+    "region": "domestic",
+    "underlying_index_id": "INDEX:000300.SH",
+    "scope": {
+      "status": "in_scope",
+      "reason_code": "PASSIVE_BROAD_ETF",
+      "detail": "普通被动 ETF，跟踪首批宽基沪深300"
+    },
+    "in_first_batch": true,
+    "data_coverage_verified": true,
+    "evidence": [
+      {
+        "evidence_id": "ev-fundf10-510300",
+        "kind": "fund_profile",
+        "publisher": "天天基金（基金概况页）",
+        "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
+        "retrieved_at": "2026-11-11T02:24:00+08:00",
+        "fields_cited": [
+          "基金全称",
+          "跟踪标的",
+          "业绩比较基准",
+          "管理费率",
+          "托管费率",
+          "成立日期"
+        ],
+        "note": "跟踪标的：沪深300指数；管理费率 0.15%/年；托管费率 0.05%/年；成立 2012-05-04"
+      },
+      {
+        "evidence_id": "ev-sse-etf-list",
+        "kind": "exchange_list",
+        "publisher": "上海证券交易所（经 AKShare fund_etf_scale_sse）",
+        "url": "https://www.sse.com.cn/assortment/fund/etf/list/scale/",
+        "retrieved_at": "2026-11-11T02:28:00+08:00",
+        "fields_cited": [
+          "基金代码",
+          "基金简称"
+        ],
+        "note": "上交所 ETF 列表中包含 510300；该接口返回的统计日期为 2025-01-15（数据陈旧）"
+      }
+    ],
+    "valid_from": null,
+    "valid_to": null,
+    "raw_input": "510300",
+    "identity_source": ""
+  },
+  "instrument_id": "ETF:510300.SH",
+  "intent": "buy_point_check",
+  "identity": {
+    "status": "resolved",
+    "raw_input": "510300",
+    "matched_by": "exact_code",
+    "candidates": [],
+    "reason_codes": [
+      "PASSIVE_BROAD_ETF"
+    ],
+    "clarification_question": null
+  },
+  "snapshot_id": "snap-23eaf5b0bfc82144",
+  "as_of": "2026-11-10",
+  "available_at": "2026-11-10T15:00:00+08:00",
+  "analysis_status": "unsupported",
+  "model_status": null,
+  "valuation_state": "unknown",
+  "decision": "undetermined",
+  "reason_codes": [
+    "MODEL_NOT_IMPLEMENTED_ETF",
+    "MODEL_NOT_IMPLEMENTED_INDEX"
+  ],
+  "model_plan": {
+    "primary_model": null,
+    "required_checks": [],
+    "selection_reason": "阶段一不实现模型适用性判断，因此不选主模型",
+    "not_selected": [
+      {
+        "model_id": "etf_execution_check",
+        "status": "planned",
+        "implemented": false,
+        "reason": "model_not_implemented"
+      }
+    ],
+    "candidate_models": [
+      {
+        "model_id": "etf_execution_check",
+        "version": "0.0.0-planned",
+        "applies_to": "etf",
+        "status": "planned",
+        "implemented": false,
+        "required_fields": [
+          "etf.price",
+          "etf.nav",
+          "etf.nav_disclosed_at",
+          "etf.premium_discount_pct",
+          "etf.management_fee_pct",
+          "etf.custody_fee_pct",
+          "etf.trading_status"
+        ],
+        "supports": [
+          "境内普通被动 ETF"
+        ],
+        "failure_status": "unsupported",
+        "notes": "阶段三实现；指数信号与产品执行判断必须分开输出。"
+      }
+    ]
+  },
+  "assumptions": [],
+  "model_results": [],
+  "conditions": [],
+  "invalidation": [
+    "若身份、跟踪关系或数据来源被更正，本结果需要重跑。",
+    "本结果不含估值结论，因此不存在「价格变化使买点失效」的情形。"
+  ],
+  "evidence_refs": [
+    {
+      "evidence_id": "ev-fundf10-510300",
+      "kind": "fund_profile",
+      "publisher": "天天基金（基金概况页）",
+      "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
+      "retrieved_at": "2026-11-11T02:24:00+08:00",
+      "fields_cited": [
+        "基金全称",
+        "跟踪标的",
+        "业绩比较基准",
+        "管理费率",
+        "托管费率",
+        "成立日期"
+      ],
+      "note": "跟踪标的：沪深300指数；管理费率 0.15%/年；托管费率 0.05%/年；成立 2012-05-04"
+    },
+    {
+      "evidence_id": "ev-sse-etf-list",
+      "kind": "exchange_list",
+      "publisher": "上海证券交易所（经 AKShare fund_etf_scale_sse）",
+      "url": "https://www.sse.com.cn/assortment/fund/etf/list/scale/",
+      "retrieved_at": "2026-11-11T02:28:00+08:00",
+      "fields_cited": [
+        "基金代码",
+        "基金简称"
+      ],
+      "note": "上交所 ETF 列表中包含 510300；该接口返回的统计日期为 2025-01-15（数据陈旧）"
+    },
+    {
+      "evidence_id": "eastmoney.fund_profile",
+      "kind": "vendor_api",
+      "publisher": "天天基金（基金概况页）",
+      "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
+      "retrieved_at": "2026-11-11T02:40:59+08:00",
+      "fields_cited": [],
+      "note": "HTTP 抓取基金概况页面"
+    },
+    {
+      "evidence_id": "em.etf_spot",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://quote.eastmoney.com/center/gridlist.html#fund_etf",
+      "retrieved_at": "2026-11-11T02:40:59+08:00",
+      "fields_cited": [],
+      "note": "AKShare fund_etf_spot_em"
+    },
+    {
+      "evidence_id": "em.etf_nav",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "http://fundf10.eastmoney.com/jjzq_510300.html",
+      "retrieved_at": "2026-11-11T02:40:59+08:00",
+      "fields_cited": [],
+      "note": "AKShare fund_etf_fund_info_em"
+    }
+  ],
+  "missing_data": [
+    {
+      "fact_id": "etf.nav_disclosed_at",
+      "metric": "nav_disclosure_time",
+      "status": "missing",
+      "note": "所有已核实免费接口都不提供净值披露时间，无法确认收盘时是否已知当日净值",
+      "period": "2026-11-10"
+    },
+    {
+      "fact_id": "etf.premium_discount_pct",
+      "metric": "premium_discount_pct",
+      "status": "missing",
+      "note": "净值披露时间缺失，按设计书要求不计算日终折溢价（不能用不知何时公布的净值对收盘价）",
+      "period": "2026-11-10"
+    },
+    {
+      "fact_id": "etf.trading_status",
+      "metric": "trading_status",
+      "status": "missing",
+      "note": "未取得交易所停复牌状态字段；仅能确认当日有行情",
+      "period": "2026-11-10"
+    }
+  ],
+  "warnings": [
+    "阶段一未实现任何估值/策略模型：本结果只覆盖身份、契约与数据可用性。",
+    "「不适用/未实现」不等于「该标的没有投资价值」。"
+  ],
+  "clarification": null,
+  "payload": {
+    "payload_type": "etf",
+    "underlying_index": {
+      "instrument_id": "INDEX:000300.SH",
+      "display_name": "沪深300",
+      "code": "000300",
+      "index_class": "broad_based",
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "FIRST_BATCH_BROAD_INDEX",
+        "detail": "首批研究样本：境内A股宽基指数"
+      }
+    },
+    "price": {
+      "value": 4.135,
+      "unit": "CNY_per_share",
+      "currency": "CNY"
+    },
+    "nav": {
+      "value": 4.1361,
+      "unit": "CNY_per_share",
+      "currency": "CNY",
+      "status": "known",
+      "nav_date": "2026-11-10",
+      "disclosed_at": null,
+      "source": {
+        "source_id": "em.etf_nav",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_fund_info_em",
+        "url": "http://fundf10.eastmoney.com/jjzq_510300.html",
+        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "notes": "单位净值/累计净值；接口不含净值披露时间"
+      }
+    },
+    "premium_discount": null,
+    "fees": {
+      "management": {
+        "value": 0.15,
+        "unit": "percent",
+        "currency": null
+      },
+      "custody": {
+        "value": 0.05,
+        "unit": "percent",
+        "currency": null
+      },
+      "source": {
+        "source_id": "eastmoney.fund_profile",
+        "publisher": "天天基金（基金概况页）",
+        "interface": "HTTP 抓取基金概况页面",
+        "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
+        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
+      }
+    },
+    "trading": {
+      "status": null,
+      "status_code": "missing",
+      "as_of": "2026-11-10",
+      "source": {
+        "source_id": "em.etf_spot",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_spot_em",
+        "url": "https://quote.eastmoney.com/center/gridlist.html#fund_etf",
+        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "notes": "含最新价、IOPV 实时估值、折价率、数据日期与更新时间"
+      }
+    },
+    "tracking": {
+      "note": "跟踪标的：沪深300指数；业绩比较基准：沪深300指数",
+      "status": "known",
+      "source": {
+        "source_id": "eastmoney.fund_profile",
+        "publisher": "天天基金（基金概况页）",
+        "interface": "HTTP 抓取基金概况页面",
+        "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
+        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
+      }
+    },
+    "_etf_strategy": "passive_plain"
+  },
+  "code_version": "phase1-0.1.0",
+  "policy_version": "unapproved-phase1",
+  "model_version": "none"
+}
