@@ -43,6 +43,20 @@ from engine.version import CODE_VERSION, MODEL_VERSION, POLICY_VERSION
 TZ = ZoneInfo("Asia/Singapore")
 DEFAULT_INTENT = "buy_point_check"
 
+# 快照失败原因 → 结果里的专用原因码
+_SNAPSHOT_ERROR_CODES = {
+    "SNAPSHOT_NOT_FOUND": rc.SNAPSHOT_NOT_FOUND,
+    "SNAPSHOT_HASH_MISMATCH": rc.SNAPSHOT_HASH_MISMATCH,
+    "SNAPSHOT_ID_MISMATCH": rc.SNAPSHOT_ID_MISMATCH,
+    "SNAPSHOT_INSTRUMENT_MISMATCH": rc.SNAPSHOT_INSTRUMENT_MISMATCH,
+    "SNAPSHOT_ASSET_CLASS_MISMATCH": rc.SNAPSHOT_ASSET_CLASS_MISMATCH,
+    "SNAPSHOT_INVALID_STRUCTURE": rc.SNAPSHOT_INVALID_STRUCTURE,
+    "SNAPSHOT_LEGACY_QUARANTINED": rc.SNAPSHOT_LEGACY_QUARANTINED,
+}
+
+# 历史复现样例前缀：只允许用于复现审计，不允许进入分析
+LEGACY_MARKER = "LEGACY-REPRODUCTION"
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_REGISTRY = PROJECT_ROOT / "data" / "registry" / "instruments.json"
 DEFAULT_EQUITY_LIST = PROJECT_ROOT / "data" / "registry" / "cn_a_equities.json"
@@ -80,6 +94,8 @@ class Analyzer:
             return self._invalid_result(resolution, intent=intent, generated_at=generated_at)
         if resolution.status == ResolutionStatus.AMBIGUOUS.value:
             return self._ambiguous_result(resolution, intent=intent, generated_at=generated_at)
+        if resolution.status == ResolutionStatus.OUT_OF_SCOPE.value and resolution.instrument is None:
+            return self._scope_only_result(resolution, intent=intent, generated_at=generated_at)
 
         instrument = resolution.instrument
         assert instrument is not None
@@ -88,7 +104,12 @@ class Analyzer:
             snapshot = self._load_snapshot(instrument, snapshot_id)
         except SnapshotError as exc:
             return self._engine_error_result(
-                instrument, resolution, str(exc), intent=intent, generated_at=generated_at
+                instrument,
+                resolution,
+                str(exc),
+                code=getattr(exc, "code", "SNAPSHOT_INVALID_STRUCTURE"),
+                intent=intent,
+                generated_at=generated_at,
             )
 
         scope_status = instrument.scope.status if instrument.scope else ScopeStatus.UNVERIFIED
@@ -106,12 +127,37 @@ class Analyzer:
 
     # --- 快照 -----------------------------------------------------------
     def _load_snapshot(self, instrument: InstrumentRef, snapshot_id: str | None) -> Snapshot | None:
+        """取快照并强制校验它与请求标的、资产类别一致。
+
+        不允许「拿另一只标的的快照继续算」：身份与数据必须同源，
+        否则价格会挂到错误的基金上。
+        """
         if snapshot_id:
-            return self.store.load(snapshot_id)
-        latest = self.store.latest_for(instrument.instrument_id)
-        if latest is None:
-            return None
-        return self.store.load(latest)
+            snapshot = self.store.load(snapshot_id)
+        else:
+            latest = self.store.latest_for(instrument.instrument_id)
+            if latest is None:
+                return None
+            snapshot = self.store.load(latest)
+
+        if str(snapshot.notes).startswith(LEGACY_MARKER):
+            raise SnapshotError(
+                f"快照 {snapshot.snapshot_id} 被标记为历史复现样例，禁止用于分析",
+                code="SNAPSHOT_LEGACY_QUARANTINED",
+            )
+        if snapshot.instrument_id != instrument.instrument_id:
+            raise SnapshotError(
+                f"快照 {snapshot.snapshot_id} 属于 {snapshot.instrument_id}，"
+                f"与请求标的 {instrument.instrument_id} 不一致",
+                code="SNAPSHOT_INSTRUMENT_MISMATCH",
+            )
+        if snapshot.asset_class != instrument.asset_class.value:
+            raise SnapshotError(
+                f"快照 {snapshot.snapshot_id} 的资产类别为 {snapshot.asset_class}，"
+                f"与请求标的 {instrument.asset_class.value} 不一致",
+                code="SNAPSHOT_ASSET_CLASS_MISMATCH",
+            )
+        return snapshot
 
     # --- 结果构造 -------------------------------------------------------
     def _base_result(
@@ -171,12 +217,45 @@ class Analyzer:
         result.warnings = ["存在多个候选标的，引擎不做猜测，也不对任一候选给出买点结论。"]
         return apply_guards(result)
 
+    def _scope_only_result(
+        self, resolution: Resolution, *, intent: str, generated_at: str
+    ) -> AnalysisResult:
+        """身份未知但可按名称规则排除：给出结构化范围说明，不伪造身份。
+
+        这类结果必须仍然是合法契约（instrument=null + payload none），
+        不能因为缺少 instrument 就抛异常变成 engine_error。
+        """
+        result = self._base_result(
+            intent=intent,
+            generated_at=generated_at,
+            instrument=None,
+            resolution=resolution,
+            snapshot=None,
+        )
+        result.analysis_status = AnalysisStatus.UNSUPPORTED.value
+        result.valuation_state = ValuationState.NOT_APPLICABLE.value
+        result.reason_codes = list(resolution.reason_codes)
+        result.model_plan = _no_model_plan("标的未取得具体身份，不进入模型环节")
+        result.payload = {"payload_type": "none"}
+        result.evidence_refs = []
+        result.invalidation = ["若取得该产品真实身份并核实跟踪对象，本结论需要重跑。"]
+        result.warnings = [
+            "该输入按名称规则被排除在第一版范围之外，未取得可核实的证券身份。",
+            "范围外只代表「本版不建模」，不代表对其投资价值的判断。",
+        ]
+        result.clarification = (
+            f"「{resolution.raw_input.strip()}」被识别为范围外对象，未做身份登记。"
+            "如需精确核对，请提供 6 位证券代码。"
+        )
+        return apply_guards(result)
+
     def _engine_error_result(
         self,
         instrument: InstrumentRef,
         resolution: Resolution,
         message: str,
         *,
+        code: str,
         intent: str,
         generated_at: str,
     ) -> AnalysisResult:
@@ -190,9 +269,7 @@ class Analyzer:
         )
         result.analysis_status = AnalysisStatus.ENGINE_ERROR.value
         result.valuation_state = ValuationState.UNKNOWN.value
-        reason = (
-            rc.SNAPSHOT_HASH_MISMATCH if ("校验失败" in message or "哈希" in message) else rc.SNAPSHOT_NOT_FOUND
-        )
+        reason = _SNAPSHOT_ERROR_CODES.get(code, rc.SNAPSHOT_INVALID_STRUCTURE)
         result.reason_codes = [rc.ENGINE_ERROR, reason]
         result.model_plan = _no_model_plan("数据快照不可用，未进入模型环节")
         result.payload = self._build_payload(instrument, None)

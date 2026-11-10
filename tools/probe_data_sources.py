@@ -24,6 +24,9 @@ import pandas as pd
 import requests
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from engine.data.timeutil import infer_frequency  # noqa: E402
 OUT_DIR = ROOT / "data" / "coverage"
 CACHE_DIR = ROOT / "data" / "cache"
 TZ = ZoneInfo("Asia/Singapore")
@@ -51,6 +54,8 @@ def record(
     verdict: str = "",
     sample: dict | None = None,
     error: str | None = None,
+    called: bool = True,
+    parameters: dict | None = None,
 ) -> None:
     PROBES.append(
         {
@@ -71,6 +76,8 @@ def record(
             "verdict": verdict,
             "sample": sample or {},
             "error": error,
+            "called": called,
+            "parameters": parameters or {},
             "fetched_at": NOW,
         }
     )
@@ -262,11 +269,15 @@ def _legulegu(name: str, code: str) -> None:
         fields=list(pe.columns) + list(pb.columns),
         date_range=_range(pe, "日期"),
         rows=int(len(pe)),
-        frequency="实测为月度采样（非日频/周频）",
+        frequency=infer_frequency([pd.to_datetime(v).date() for v in pe["日期"]]),
         update_time="未披露",
         availability="未披露",
         missing_rate=_missing_rate(pe, ["滚动市盈率", "静态市盈率"]) or 0.0,
-        verdict="可提供长历史，但只有月度频率，无法满足「5 年周度」要求；聚合方法与亏损股处理无官方说明，且未标注回溯编制情况",
+        verdict=(
+            "可提供长历史；本次缓存的观测间隔为上面推断出的频率，"
+            "不足以当作连续周度样本。该结论只针对本次调用与参数，"
+            "不代表所有来源都只有该频率；聚合方法与回溯编制情况未标注"
+        ),
         sample={"last_date": str(pe["日期"].iloc[-1]), "last_pe_ttm": float(pe["滚动市盈率"].iloc[-1])},
     )
 
@@ -304,27 +315,63 @@ def probe_index_daily() -> None:
 
 
 def probe_index_total_return() -> None:
-    errors = []
-    for code in ("H00300", "H00905", "H00852"):
+    """逐个实际调用全收益/净收益指数代码，按返回结果分类，不写死结论。"""
+    codes = ("H00300", "H00905", "H00852")
+    details: list[dict] = []
+    frames: list[pd.DataFrame] = []
+    errors: list[str] = []
+
+    for code in codes:
         try:
             df = ak.stock_zh_index_daily_em(symbol=code)
-            if df.empty:
-                errors.append(f"{code}: 空表")
+            rows = int(len(df)) if df is not None else 0
+            detail = {"code": code, "rows": rows, "status": "empty" if rows == 0 else "ok"}
+            if rows:
+                frames.append(df)
+                detail["date_range"] = _range(df, "date")
+            details.append(detail)
         except Exception as exc:
-            errors.append(f"{code}: {type(exc).__name__}")
+            errors.append(f"{code}: {type(exc).__name__}: {exc}")
+            details.append({"code": code, "rows": 0, "status": "error"})
+
+    total_rows = sum(d["rows"] for d in details)
+    available = [d for d in details if d["status"] == "ok"]
+    if not any(d["status"] == "error" for d in details) and not available:
+        status = "failed"
+        verdict = "已测的这三个代码均返回空表；不能据此推断所有免费来源都没有全收益数据"
+    elif available and not errors:
+        status = "ok"
+        verdict = f"实际取得 {len(available)} 个全收益/净收益序列，需进一步核对口径与编制方式"
+    elif available:
+        status = "partial"
+        verdict = f"部分代码可取（{len(available)}/{len(codes)}），部分调用异常"
+    else:
+        status = "failed"
+        verdict = "全部调用异常，无法判断是否可得"
+
+    date_range = None
+    if frames:
+        ranges = [_range(frame, "date") for frame in frames if _range(frame, "date")]
+        if ranges:
+            date_range = [min(r[0] for r in ranges), max(r[1] for r in ranges)]
+
     record(
         probe_id="index.total_return",
         scope="指数",
-        question="全收益指数是否可得？",
-        interface="stock_zh_index_daily_em(H00300/H00905/H00852) / index_zh_a_hist",
+        question="全收益/净收益指数是否可得？",
+        interface="stock_zh_index_daily_em",
         provider="东方财富",
-        status="failed",
-        fields=[],
-        rows=0,
-        frequency="—",
-        availability="—",
-        verdict="免费源未提供全收益/净收益指数行情；只能使用价格指数，回测需明确说明不含股息",
-        error="; ".join(errors),
+        status=status,
+        fields=list(frames[0].columns) if frames else [],
+        date_range=date_range,
+        rows=total_rows,
+        frequency=infer_frequency([pd.to_datetime(f["date"]).dt.date.iloc[-1] for f in frames]) if frames else None,
+        update_time="收盘后",
+        availability="收盘后",
+        verdict=verdict,
+        sample={"per_code": details},
+        error="; ".join(errors) if errors else ("; ".join(f"{d['code']} 空表" for d in details if d["status"] == "empty") or None),
+        parameters={"symbols": list(codes)},
     )
 
 
@@ -528,16 +575,21 @@ def probe_etf_dividend() -> None:
 
 
 def probe_etf_tracking_error() -> None:
+    """本项没有实际调用任何接口，因此不计入「已实测」数量。"""
     record(
         probe_id="etf.tracking_error",
         scope="ETF",
         question="跟踪偏离/跟踪误差序列是否可得？",
-        interface="（无可用免费接口）",
+        interface="（尚未选定并调用接口）",
         provider="—",
-        status="failed",
-        rows=0,
-        verdict="免费接口未提供跟踪误差序列，只能由净值与指数自行计算，且需注意费用已在净值中扣除",
-        error="未找到提供跟踪误差时间序列的免费接口",
+        status="not_tested",
+        rows=None,
+        called=False,
+        verdict=(
+            "尚未找到并调用提供跟踪误差时间序列的接口；"
+            "如需该指标，应由净值与指数自行计算，并注意费用已在净值中扣除"
+        ),
+        error=None,
     )
 
 
@@ -642,6 +694,8 @@ def main() -> int:
     ok = sum(1 for p in PROBES if p["status"] == "ok")
     partial = sum(1 for p in PROBES if p["status"] == "partial")
     failed = sum(1 for p in PROBES if p["status"] == "failed")
+    not_tested = sum(1 for p in PROBES if p["status"] == "not_tested")
+    called = sum(1 for p in PROBES if p.get("called"))
 
     report = {
         "schema_version": "data-coverage/1",
@@ -652,13 +706,23 @@ def main() -> int:
             "pandas": pd.__version__,
             "note": "全部为免费接口，未购买数据、未申请账号",
         },
-        "summary": {"total": len(PROBES), "ok": ok, "partial": partial, "failed": failed},
+        "summary": {
+            "total": len(PROBES),
+            "actually_called": called,
+            "ok": ok,
+            "partial": partial,
+            "failed": failed,
+            "not_tested": not_tested,
+            "note": "只有 called=true 的项算「已实测」；not_tested 的接口不计入实测数量",
+        },
         "probes": PROBES,
         "gaps": GAPS,
     }
     out = OUT_DIR / "coverage-report.json"
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"\n写入 {out}: ok={ok} partial={partial} failed={failed}")
+    print(
+        f"\n写入 {out}: 已调用={called} ok={ok} partial={partial} failed={failed} not_tested={not_tested}"
+    )
     return 0
 
 

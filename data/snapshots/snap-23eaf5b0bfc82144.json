@@ -284,5 +284,5 @@
     "akshare",
     "tools/build_snapshots.py"
   ],
-  "notes": "阶段一固定快照：展示指数判断与 ETF 执行判断必须分开所需的数据状态"
+  "notes": "LEGACY-REPRODUCTION: 由第一版采集器生成（固定旧日期 + 实时最新价），仅用于复现审计脚本 R8 的两项检查，禁止用于任何分析。"
 }

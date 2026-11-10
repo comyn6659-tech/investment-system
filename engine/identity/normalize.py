@@ -20,6 +20,17 @@ class NormalizedInput:
     code: str | None  # 仅当整体形如证券代码
     venue_hint: str | None  # SH / SZ / BJ / CSI
     is_plausible_name: bool
+    prefix_venue: str | None = None
+    suffix_venue: str | None = None
+
+    @property
+    def venue_conflict(self) -> bool:
+        """前缀与后缀指向不同交易所（如 SZ601398.SH）。"""
+        return bool(
+            self.prefix_venue
+            and self.suffix_venue
+            and self.prefix_venue != self.suffix_venue
+        )
 
     @property
     def is_empty(self) -> bool:
@@ -54,4 +65,6 @@ def normalize(text: str | None) -> NormalizedInput:
         code=code,
         venue_hint=venue,
         is_plausible_name=plausible,
+        prefix_venue=match.group(1) if match else None,
+        suffix_venue=match.group(3) if match else None,
     )

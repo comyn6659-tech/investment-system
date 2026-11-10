@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 REPORT = ROOT / "data" / "coverage" / "coverage-report.json"
 OUTPUT = ROOT / "docs" / "data-coverage.md"
 
-STATUS_LABEL = {"ok": "可用", "partial": "部分可用", "failed": "不可用"}
+STATUS_LABEL = {"ok": "可用", "partial": "部分可用", "failed": "不可用", "not_tested": "未测试"}
 
 
 def _target(probe: dict) -> str:
@@ -45,9 +45,16 @@ def main() -> int:
         f"pandas {report['environment']['pandas']}"
     )
     lines.append(f"- 访问限制：{report['environment']['note']}")
+    called = summary.get("actually_called", summary["total"])
+    not_tested = summary.get("not_tested", 0)
     lines.append(
-        f"- 探针结果：共 {summary['total']} 项，可用 {summary['ok']}，部分可用 "
-        f"{summary['partial']}，不可用 {summary['failed']}"
+        f"- 探针结果：共 {summary['total']} 项，**实际调用 {called} 项**"
+        f"（可用 {summary['ok']}，部分可用 {summary['partial']}，不可用 {summary['failed']}），"
+        f"未测试 {not_tested} 项不计入实测数量"
+    )
+    lines.append(
+        "- 频率由观测日期计算（相邻间隔中位数），不是写死的结论；每条记录的"
+        "「参数」与「错误」见 coverage-report.json"
     )
     lines.append("")
     lines.append("> 本表只记录「接口实际返回了什么」。可用不等于口径已核实；")
@@ -60,14 +67,17 @@ def main() -> int:
             continue
         lines.append(f"## {scope}")
         lines.append("")
-        lines.append("| 探针对象 | 接口 | 提供方 | 状态 | 字段 | 日期区间 | 行数 | 频率 | 可获得时间 | 缺失率 | 结论 |")
-        lines.append("|---|---|---|---|---|---|---|---|---|---|---|")
+        lines.append(
+            "| 探针对象 | 接口 | 提供方 | 已调用 | 状态 | 字段 | 日期区间 | 行数 | 频率 | 可获得时间 | 缺失率 | 结论 |"
+        )
+        lines.append("|---|---|---|---|---|---|---|---|---|---|---|---|")
         for p in rows:
             lines.append(
-                "| {target} | {iface} | {provider} | {status} | {fields} | {range} | {rows} | {freq} | {avail} | {miss} | {verdict} |".format(
+                "| {target} | {iface} | {provider} | {called} | {status} | {fields} | {range} | {rows} | {freq} | {avail} | {miss} | {verdict} |".format(
                     target=cell(_target(p)),
                     iface=cell(p["interface"]),
                     provider=cell(p["provider"]),
+                    called="是" if p.get("called") else "否",
                     status=STATUS_LABEL.get(p["status"], p["status"]),
                     fields=cell(p["fields"][:6]) + (" 等" if len(p["fields"]) > 6 else ""),
                     range=cell(p["date_range"]),

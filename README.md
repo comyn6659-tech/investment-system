@@ -5,7 +5,8 @@ A 股个股 / 境内 A 股宽基指数 / 境内普通被动 ETF 的分析引擎�
 建设方式：独立新项目，从零搭建，不读取、不导入、不依赖旧项目
 `../valuation/` 的代码、缓存或投资政策。旧目录仅作可选的只读查证资料。
 
-**当前阶段：阶段一（身份、结果契约与数据可用性）。**
+**当前阶段：阶段一（身份、结果契约与数据可用性）—— 已按 R1–R10 返工。**
+返工说明见 [docs/phase1-rework.md](docs/phase1-rework.md)。
 本阶段不实现任何估值模型或指数策略，因此所有结果都不会给出买点；
 `unsupported` 表示「本版不建模 / 模型尚未实现」，不代表对该标的投资价值的判断。
 
@@ -17,7 +18,9 @@ A 股个股 / 境内 A 股宽基指数 / 境内普通被动 ETF 的分析引擎�
 | ETF → 跟踪指数的核实映射 | 已实现（5 只有来源的 ETF） |
 | 统一结果契约（analysis_status / model_status / valuation_state / decision / reason_codes） | 已实现，文本与 JSON 共用一套出口校验 |
 | 研究护栏（research 模型不能产生正式 candidate） | 已实现 |
-| 固定快照、内容哈希、离线重放 | 已实现 |
+| 固定快照、内容哈希、离线重放 | 已实现（快照绑定请求标的/资产类别，加载即校验） |
+| 时点语义（带时区比较、日期精度按当日结束） | 已实现 |
+| 硬规则出口校验（research/未完成不得给正式价格判断） | 已实现，文本与 JSON 共用 |
 | 数据可用性调查（个股 / 三只宽基 / ETF） | 已实现，见 `data/coverage/coverage-report.json` |
 | 个股估值、指数估值画像、候选策略回测、ETF 执行结论 | **未实现**（阶段二 / 阶段三） |
 
@@ -91,8 +94,14 @@ $PY -m engine.cli --json --out examples/outputs/index_000300.json '沪深300'
 - **快照 id 由内容决定**：`snap-` + 规范化 JSON 的 SHA-256 前 16 位。读取时重新计算并比对，
   不一致即报错（`analysis_status=engine_error`），不降级成更宽松的结论。
 - **重建快照会改变 id**：抓取时间进入内容哈希。同一份已提交快照的重放完全一致。
-- **可获得时间**：每条事实单独记录 `available_at`。无法确定发布时点的事实保持 `None`，
-  不伪造成「当时已知」；快照 `coverage.point_in_time_safe` 会标出这一点。
+- **可获得时间**：每条事实单独记录 `available_at`，并解析为带时区时刻后比较；
+  只有日期的公告按「当日结束」处理（精度 `date`），不会被当成当天 00:00 已知；
+  无法确定发布时点的事实保持 `None`，不伪造成「当时已知」。
+  快照 `coverage.point_in_time_granularity` / `availability_precision_counts` 记录精度分布。
+- **同日多版本**：`latest_for` 按 `(as_of, fetched_at, snapshot_id)` 取最新，哈希只作身份与完整性校验；
+  指定旧 ID 仍可精确重放。
+- **快照绑定**：加载时核对请求 ID、文件声明 ID 与内容哈希，并校验快照所属标的与资产类别；
+  串号直接报 `engine_error`，不会把别的标的价格挂到当前标的。
 - **零与缺失分离**：`known_zero` / `missing` / `not_applicable` / `stale` / `conflict` 是不同状态，
   缺失不会变成 0，NaN/Infinity 会在构造与出口两次被拒绝。
 
@@ -101,7 +110,7 @@ $PY -m engine.cli --json --out examples/outputs/index_000300.json '沪深300'
 | 字段 | 值 | 含义 |
 |---|---|---|
 | `schema_version` | `analysis-result/1` | 结果契约版本 |
-| `code_version` | `phase1-0.1.0` | 代码语义版本 |
+| `code_version` | `phase1-0.1.1` | 代码语义版本（R1–R10 返工） |
 | `policy_version` | `unapproved-phase1` | 阶段一没有任何投资门槛获批 |
 | `model_version` | `none` | 没有任何已验证模型 |
 

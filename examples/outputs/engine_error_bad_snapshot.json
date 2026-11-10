@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-41ce26382b3ce294",
-  "generated_at": "2026-11-11T02:42:42+08:00",
+  "analysis_id": "analysis-825dacc23a74bfae",
+  "generated_at": "2026-11-11T03:16:15+08:00",
   "instrument": {
     "instrument_id": "INDEX:000300.SH",
     "display_name": "沪深300",
@@ -137,7 +137,7 @@
       "note": "阶段一不计算任何分位或信号；候选策略规则留待阶段三固定后回测。"
     }
   },
-  "code_version": "phase1-0.1.0",
+  "code_version": "phase1-0.1.1",
   "policy_version": "unapproved-phase1",
   "model_version": "none"
 }

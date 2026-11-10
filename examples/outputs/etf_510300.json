@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-a1806e010ca55fe0",
-  "generated_at": "2026-11-11T02:42:42+08:00",
+  "analysis_id": "analysis-f0d616465b3371a1",
+  "generated_at": "2026-11-11T03:16:15+08:00",
   "instrument": {
     "instrument_id": "ETF:510300.SH",
     "display_name": "沪深300ETF华泰柏瑞",
@@ -75,7 +75,7 @@
     ],
     "clarification_question": null
   },
-  "snapshot_id": "snap-23eaf5b0bfc82144",
+  "snapshot_id": "snap-aef6f29159c9d182",
   "as_of": "2026-11-10",
   "available_at": "2026-11-10T15:00:00+08:00",
   "analysis_status": "unsupported",
@@ -163,27 +163,27 @@
       "kind": "vendor_api",
       "publisher": "天天基金（基金概况页）",
       "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
-      "retrieved_at": "2026-11-11T02:40:59+08:00",
+      "retrieved_at": "2026-11-11T03:09:53+08:00",
       "fields_cited": [],
       "note": "HTTP 抓取基金概况页面"
-    },
-    {
-      "evidence_id": "em.etf_spot",
-      "kind": "vendor_api",
-      "publisher": "东方财富",
-      "url": "https://quote.eastmoney.com/center/gridlist.html#fund_etf",
-      "retrieved_at": "2026-11-11T02:40:59+08:00",
-      "fields_cited": [],
-      "note": "AKShare fund_etf_spot_em"
     },
     {
       "evidence_id": "em.etf_nav",
       "kind": "vendor_api",
       "publisher": "东方财富",
       "url": "http://fundf10.eastmoney.com/jjzq_510300.html",
-      "retrieved_at": "2026-11-11T02:40:59+08:00",
+      "retrieved_at": "2026-11-11T03:09:53+08:00",
       "fields_cited": [],
       "note": "AKShare fund_etf_fund_info_em"
+    },
+    {
+      "evidence_id": "em.etf_hist",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://quote.eastmoney.com/",
+      "retrieved_at": "2026-11-11T03:09:53+08:00",
+      "fields_cited": [],
+      "note": "AKShare fund_etf_hist_em"
     }
   ],
   "missing_data": [
@@ -198,7 +198,7 @@
       "fact_id": "etf.premium_discount_pct",
       "metric": "premium_discount_pct",
       "status": "missing",
-      "note": "净值披露时间缺失，按设计书要求不计算日终折溢价（不能用不知何时公布的净值对收盘价）",
+      "note": "净值披露时间缺失，按设计书要求不计算日终折溢价",
       "period": "2026-11-10"
     },
     {
@@ -244,7 +244,7 @@
         "publisher": "东方财富",
         "interface": "AKShare fund_etf_fund_info_em",
         "url": "http://fundf10.eastmoney.com/jjzq_510300.html",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:09:53+08:00",
         "notes": "单位净值/累计净值；接口不含净值披露时间"
       }
     },
@@ -265,7 +265,7 @@
         "publisher": "天天基金（基金概况页）",
         "interface": "HTTP 抓取基金概况页面",
         "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:09:53+08:00",
         "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
       }
     },
@@ -274,12 +274,12 @@
       "status_code": "missing",
       "as_of": "2026-11-10",
       "source": {
-        "source_id": "em.etf_spot",
+        "source_id": "em.etf_hist",
         "publisher": "东方财富",
-        "interface": "AKShare fund_etf_spot_em",
-        "url": "https://quote.eastmoney.com/center/gridlist.html#fund_etf",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
-        "notes": "含最新价、IOPV 实时估值、折价率、数据日期与更新时间"
+        "interface": "AKShare fund_etf_hist_em",
+        "url": "https://quote.eastmoney.com/",
+        "retrieved_at": "2026-11-11T03:09:53+08:00",
+        "notes": "ETF 日线行情，用于取已收盘的收盘价"
       }
     },
     "tracking": {
@@ -290,13 +290,12 @@
         "publisher": "天天基金（基金概况页）",
         "interface": "HTTP 抓取基金概况页面",
         "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:09:53+08:00",
         "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
       }
-    },
-    "_etf_strategy": "passive_plain"
+    }
   },
-  "code_version": "phase1-0.1.0",
+  "code_version": "phase1-0.1.1",
   "policy_version": "unapproved-phase1",
   "model_version": "none"
 }

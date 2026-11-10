@@ -108,9 +108,6 @@ def build_etf_payload(
             "index_class": underlying.index_class.value if underlying.index_class else None,
             "scope": underlying.scope.to_dict() if underlying.scope else None,
         }
-    if instrument.etf_strategy is not None:
-        payload["_etf_strategy"] = instrument.etf_strategy.value
-
     if snapshot is None:
         return payload
 

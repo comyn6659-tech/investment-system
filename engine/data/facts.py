@@ -17,6 +17,7 @@ from typing import Any
 
 from engine.contracts.enums import DataStatus
 from engine.data.numeric import require_finite
+from engine.data.timeutil import parse_instant
 
 
 class FactError(ValueError):
@@ -71,6 +72,12 @@ class Fact:
     conflict_values: tuple[Any, ...] = ()
 
     def __post_init__(self) -> None:
+        # 直接构造时也允许传字符串状态（如从 JSON 读入），统一转成枚举
+        if not isinstance(self.status, DataStatus):
+            try:
+                object.__setattr__(self, "status", DataStatus(self.status))
+            except ValueError as exc:
+                raise FactError(f"{self.fact_id}: 未知的数据状态 {self.status!r}") from exc
         problems = self.validate()
         if problems:
             raise FactError("; ".join(problems))
@@ -165,25 +172,57 @@ class Fact:
             conflict_values=tuple(data.get("conflict_values", ())),
         )
 
+    # --- 校验 -----------------------------------------------------------
+    VALUE_BEARING_STATUSES = (DataStatus.KNOWN, DataStatus.KNOWN_ZERO, DataStatus.STALE)
+
     def validate(self) -> list[str]:
-        """返回违规说明列表（空表示通过）。"""
+        """返回违规说明列表（空表示通过）。
+
+        直接构造、便捷构造器与 from_dict 反序列化都必须经过这里，
+        否则「缺失值 / NaN / Infinity」可以绕过检查进入有效事实。
+        """
         problems: list[str] = []
         if not self.fact_id:
             problems.append("fact_id 为空")
+        if not self.metric:
+            problems.append(f"{self.fact_id}: metric 为空")
+
         if self.status in (DataStatus.MISSING, DataStatus.NOT_APPLICABLE):
             if self.value is not None:
                 problems.append(f"{self.fact_id}: {self.status.value} 状态必须 value=None")
-        if self.status == DataStatus.KNOWN_ZERO:
-            if self.value != 0:
-                problems.append(f"{self.fact_id}: known_zero 状态 value 必须为 0")
-        if self.status == DataStatus.CONFLICT:
+        elif self.status in (DataStatus.KNOWN, DataStatus.KNOWN_ZERO, DataStatus.STALE):
+            if self.value is None:
+                problems.append(f"{self.fact_id}: {self.status.value} 状态必须有值（缺失请用 missing）")
+            elif isinstance(self.value, float) and self.value != self.value:
+                problems.append(f"{self.fact_id}: 不接受 NaN")
+            elif isinstance(self.value, float) and self.value in (float("inf"), float("-inf")):
+                problems.append(f"{self.fact_id}: 不接受 Infinity")
+            elif isinstance(self.value, bool):
+                problems.append(f"{self.fact_id}: 布尔值不能当作数值事实")
+        elif self.status == DataStatus.CONFLICT:
             if self.value is not None:
                 problems.append(f"{self.fact_id}: conflict 状态 value 必须为 None")
             if len(self.conflict_values) < 2:
                 problems.append(f"{self.fact_id}: conflict 状态需要至少两个来源取值")
+
+        if self.status == DataStatus.KNOWN_ZERO and self.value not in (0, 0.0):
+            problems.append(f"{self.fact_id}: known_zero 状态 value 必须为 0")
+
+        if self.available_at is not None and parse_instant(self.available_at) is None:
+            problems.append(f"{self.fact_id}: available_at 无法解析为时间: {self.available_at!r}")
         if self.correlation_hint():
             problems.append(f"{self.fact_id}: 禁止把指数点位标成人民币金额")
         return problems
+
+    @property
+    def availability_instant(self):
+        """可获得时间的解析结果；无法解析或未提供时为 None。"""
+        return parse_instant(self.available_at)
+
+    @property
+    def availability_precision(self) -> str | None:
+        instant = self.availability_instant
+        return instant.precision if instant else None
 
     def correlation_hint(self) -> bool:
         return (self.unit or "").startswith("index_point") and bool(self.currency)

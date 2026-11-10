@@ -33,6 +33,12 @@ INPUT_INVALID_CHARS = _register("INPUT_INVALID_CHARS", "identity", "输入包含
 INPUT_UNRECOGNIZED = _register("INPUT_UNRECOGNIZED", "identity", "输入无法匹配到任何已登记标的")
 IDENTITY_AMBIGUOUS = _register("IDENTITY_AMBIGUOUS", "identity", "输入对应多个候选标的，需要澄清")
 IDENTITY_MULTI_MARKET = _register("IDENTITY_MULTI_MARKET", "identity", "同一代码在不同市场分别对应不同标的")
+IDENTITY_VENUE_CONFLICT = _register(
+    "IDENTITY_VENUE_CONFLICT", "identity", "用户给出的交易所与已核实标的的交易所不一致"
+)
+IDENTITY_VENUE_SYNTAX_CONFLICT = _register(
+    "IDENTITY_VENUE_SYNTAX_CONFLICT", "identity", "代码前缀与后缀指向不同交易所"
+)
 IDENTITY_CODE_NAME_CONFLICT = _register("IDENTITY_CODE_NAME_CONFLICT", "identity", "代码与名称指向不同标的")
 IDENTITY_NOT_VERIFIED = _register("IDENTITY_NOT_VERIFIED", "identity", "标的已识别但身份来源未核实")
 ETF_TRACKING_TARGET_UNVERIFIED = _register(
@@ -90,6 +96,21 @@ DATA_NOT_APPLICABLE = _register("DATA_NOT_APPLICABLE", "data", "该字段对当�
 DATA_AVAILABILITY_UNKNOWN = _register("DATA_AVAILABILITY_UNKNOWN", "data", "数据可获得时间未知")
 DATA_SOURCE_UNAVAILABLE = _register("DATA_SOURCE_UNAVAILABLE", "data", "必要数据源当前不可用")
 SNAPSHOT_NOT_FOUND = _register("SNAPSHOT_NOT_FOUND", "data", "找不到对应的固定快照")
+SNAPSHOT_ID_MISMATCH = _register(
+    "SNAPSHOT_ID_MISMATCH", "data", "请求的快照 id 与文件声明的内容 id 不一致"
+)
+SNAPSHOT_INSTRUMENT_MISMATCH = _register(
+    "SNAPSHOT_INSTRUMENT_MISMATCH", "data", "快照所属标的与请求标的不是同一个"
+)
+SNAPSHOT_ASSET_CLASS_MISMATCH = _register(
+    "SNAPSHOT_ASSET_CLASS_MISMATCH", "data", "快照的资产类别与请求标的资产类别不一致"
+)
+SNAPSHOT_INVALID_STRUCTURE = _register(
+    "SNAPSHOT_INVALID_STRUCTURE", "data", "快照结构或取值不合法（重复事实、非法状态或值）"
+)
+SNAPSHOT_LEGACY_QUARANTINED = _register(
+    "SNAPSHOT_LEGACY_QUARANTINED", "data", "快照被标记为历史复现样例，禁止用于分析"
+)
 SNAPSHOT_HASH_MISMATCH = _register("SNAPSHOT_HASH_MISMATCH", "data", "快照内容与其 snapshot_id 不匹配")
 
 # --- 引擎 -------------------------------------------------------------------

@@ -1,0 +1,5 @@
+{
+  "query": "全球ETF",
+  "intent": "buy_point_check",
+  "note": "无实体身份的范围排除：instrument=null，但仍输出合法契约而非 engine_error"
+}

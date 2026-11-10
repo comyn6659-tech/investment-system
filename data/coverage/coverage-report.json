@@ -1,6 +1,6 @@
 {
   "schema_version": "data-coverage/1",
-  "generated_at": "2026-11-11T02:35:54+08:00",
+  "generated_at": "2026-11-11T03:11:34+08:00",
   "environment": {
     "python": "3.12.16",
     "akshare": "1.20.35",
@@ -9,9 +9,12 @@
   },
   "summary": {
     "total": 23,
+    "actually_called": 22,
     "ok": 12,
     "partial": 8,
-    "failed": 3
+    "failed": 2,
+    "not_tested": 1,
+    "note": "只有 called=true 的项算「已实测」；not_tested 的接口不计入实测数量"
   },
   "probes": [
     {
@@ -48,7 +51,9 @@
         "流通股": "269612212539.0"
       },
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "stock.cash_flow_sheet",
@@ -80,7 +85,9 @@
         "latest_report": "2026-09-30"
       },
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "stock.balance_sheet",
@@ -109,7 +116,9 @@
       "verdict": "可得；但银行没有普通企业口径的「有息负债/现金」，净债务需专用口径",
       "sample": {},
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "stock.dividend_detail",
@@ -141,7 +150,9 @@
       "verdict": "有实施状态与除权日，但没有所属财年字段，不能单靠除息月份猜财年",
       "sample": {},
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "stock.dividend_cninfo",
@@ -178,7 +189,9 @@
         "latest": "{'实施方案公告日期': datetime.date(2026, 10, 15), '分红类型': '中期分红', '送股比例': nan, '转增比例': nan, '派息比例': 1.511, '股权登记日': datetime.date(2026, 10, 20), '除权日': datetime.date(2026, 10, 21), '派息日': datetime.date(2026, "
       },
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "index.official_valuation.000300",
@@ -212,7 +225,9 @@
       "verdict": "官方口径最可信，但历史只有 20 个交易日，不能用于 5 年分位；文件未说明整体法/加权法与亏损股处理",
       "sample": {},
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "index.official_valuation.000905",
@@ -246,7 +261,9 @@
       "verdict": "官方口径最可信，但历史只有 20 个交易日，不能用于 5 年分位；文件未说明整体法/加权法与亏损股处理",
       "sample": {},
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "index.official_valuation.000852",
@@ -280,7 +297,9 @@
       "verdict": "官方口径最可信，但历史只有 20 个交易日，不能用于 5 年分位；文件未说明整体法/加权法与亏损股处理",
       "sample": {},
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "index.vendor_valuation.000300",
@@ -309,18 +328,20 @@
         "2026-11-10"
       ],
       "rows": 260,
-      "frequency": "实测为月度采样（非日频/周频）",
+      "frequency": "monthly",
       "update_time": "未披露",
       "availability": "未披露",
       "missing_rate": 0.0,
       "access": "免费、无需登录",
-      "verdict": "可提供长历史，但只有月度频率，无法满足「5 年周度」要求；聚合方法与亏损股处理无官方说明，且未标注回溯编制情况",
+      "verdict": "可提供长历史；本次缓存的观测间隔为上面推断出的频率，不足以当作连续周度样本。该结论只针对本次调用与参数，不代表所有来源都只有该频率；聚合方法与回溯编制情况未标注",
       "sample": {
         "last_date": "2026-11-10",
         "last_pe_ttm": 12.65
       },
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "index.vendor_valuation.000905",
@@ -349,18 +370,20 @@
         "2026-11-10"
       ],
       "rows": 239,
-      "frequency": "实测为月度采样（非日频/周频）",
+      "frequency": "monthly",
       "update_time": "未披露",
       "availability": "未披露",
       "missing_rate": 0.0,
       "access": "免费、无需登录",
-      "verdict": "可提供长历史，但只有月度频率，无法满足「5 年周度」要求；聚合方法与亏损股处理无官方说明，且未标注回溯编制情况",
+      "verdict": "可提供长历史；本次缓存的观测间隔为上面推断出的频率，不足以当作连续周度样本。该结论只针对本次调用与参数，不代表所有来源都只有该频率；聚合方法与回溯编制情况未标注",
       "sample": {
         "last_date": "2026-11-10",
         "last_pe_ttm": 22.72
       },
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "index.vendor_valuation.000852",
@@ -389,18 +412,20 @@
         "2026-11-10"
       ],
       "rows": 146,
-      "frequency": "实测为月度采样（非日频/周频）",
+      "frequency": "monthly",
       "update_time": "未披露",
       "availability": "未披露",
       "missing_rate": 0.0,
       "access": "免费、无需登录",
-      "verdict": "可提供长历史，但只有月度频率，无法满足「5 年周度」要求；聚合方法与亏损股处理无官方说明，且未标注回溯编制情况",
+      "verdict": "可提供长历史；本次缓存的观测间隔为上面推断出的频率，不足以当作连续周度样本。该结论只针对本次调用与参数，不代表所有来源都只有该频率；聚合方法与回溯编制情况未标注",
       "sample": {
         "last_date": "2026-11-10",
         "last_pe_ttm": 25.58
       },
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "index.daily_history",
@@ -431,27 +456,55 @@
       "verdict": "点位日线可得且历史足够；但只有价格指数，没有全收益指数",
       "sample": {},
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "index.total_return",
       "scope": "指数",
-      "question": "全收益指数是否可得？",
-      "interface": "stock_zh_index_daily_em(H00300/H00905/H00852) / index_zh_a_hist",
+      "question": "全收益/净收益指数是否可得？",
+      "interface": "stock_zh_index_daily_em",
       "provider": "东方财富",
       "status": "failed",
       "fields": [],
       "date_range": null,
       "rows": 0,
-      "frequency": "—",
-      "update_time": null,
-      "availability": "—",
+      "frequency": null,
+      "update_time": "收盘后",
+      "availability": "收盘后",
       "missing_rate": null,
       "access": "免费、无需登录",
-      "verdict": "免费源未提供全收益/净收益指数行情；只能使用价格指数，回测需明确说明不含股息",
-      "sample": {},
-      "error": "H00300: 空表; H00905: 空表; H00852: 空表",
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "verdict": "已测的这三个代码均返回空表；不能据此推断所有免费来源都没有全收益数据",
+      "sample": {
+        "per_code": [
+          {
+            "code": "H00300",
+            "rows": 0,
+            "status": "empty"
+          },
+          {
+            "code": "H00905",
+            "rows": 0,
+            "status": "empty"
+          },
+          {
+            "code": "H00852",
+            "rows": 0,
+            "status": "empty"
+          }
+        ]
+      },
+      "error": "H00300 空表; H00905 空表; H00852 空表",
+      "called": true,
+      "parameters": {
+        "symbols": [
+          "H00300",
+          "H00905",
+          "H00852"
+        ]
+      },
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "index.spot",
@@ -492,7 +545,9 @@
         ]
       },
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "etf.spot",
@@ -553,7 +608,9 @@
         "time": "2026-11-10 16:11:36+08:00"
       },
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "etf.nav_history",
@@ -583,7 +640,9 @@
       "verdict": "净值数值可得，但披露时间缺失，无法确认收盘时是否已知当日净值（影响日终折溢价）",
       "sample": {},
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "etf.price_history",
@@ -618,7 +677,9 @@
       "verdict": "价格历史可得；可用于可执行回测的成交价，但需与净值/信号时点对齐",
       "sample": {},
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "etf.profile",
@@ -645,7 +706,9 @@
       "verdict": "跟踪标的与费率可核实；但这是基金销售平台的概况页，正式引用仍应以基金合同/招募说明书为准",
       "sample": {},
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "etf.pcf",
@@ -682,7 +745,9 @@
       "verdict": "PCF 提供申赎单位净值与成分，可作为折溢价核对的补充；但 PCF 净值为估算口径，不等于披露的单位净值",
       "sample": {},
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "etf.exchange_list.sse",
@@ -708,7 +773,9 @@
       "verdict": "上交所 ETF 列表可得，但统计日期为 2025-01-15（明显滞后）",
       "sample": {},
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "etf.exchange_list.szse",
@@ -727,8 +794,10 @@
       "access": "免费、无需登录",
       "verdict": "接口当前不可用；深市 ETF 的交易所归属只能用代码段与行情清单推断，属于证据缺口",
       "sample": {},
-      "error": "TypeError: Expected file path name or file-like object, got <class 'bytes'> type",
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "error": "ConnectionError: ('Connection aborted.', ConnectionResetError(54, 'Connection reset by peer'))",
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "etf.dividend",
@@ -754,27 +823,31 @@
       "verdict": "可得累计分红，可用于复权/持有收益核对",
       "sample": {},
       "error": null,
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "called": true,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     },
     {
       "probe_id": "etf.tracking_error",
       "scope": "ETF",
       "question": "跟踪偏离/跟踪误差序列是否可得？",
-      "interface": "（无可用免费接口）",
+      "interface": "（尚未选定并调用接口）",
       "provider": "—",
-      "status": "failed",
+      "status": "not_tested",
       "fields": [],
       "date_range": null,
-      "rows": 0,
+      "rows": null,
       "frequency": null,
       "update_time": null,
       "availability": null,
       "missing_rate": null,
       "access": "免费、无需登录",
-      "verdict": "免费接口未提供跟踪误差序列，只能由净值与指数自行计算，且需注意费用已在净值中扣除",
+      "verdict": "尚未找到并调用提供跟踪误差时间序列的接口；如需该指标，应由净值与指数自行计算，并注意费用已在净值中扣除",
       "sample": {},
-      "error": "未找到提供跟踪误差时间序列的免费接口",
-      "fetched_at": "2026-11-11T02:35:54+08:00"
+      "error": null,
+      "called": false,
+      "parameters": {},
+      "fetched_at": "2026-11-11T03:11:34+08:00"
     }
   ],
   "gaps": [

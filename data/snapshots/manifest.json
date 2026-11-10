@@ -1,12 +1,13 @@
 {
   "snapshots": [
     {
-      "snapshot_id": "snap-f9f0d2c00e8c1fd5",
+      "snapshot_id": "snap-decfda2d8866e9cf",
       "instrument_id": "EQUITY:601398.SH",
       "asset_class": "equity",
       "as_of": "2026-09-30",
-      "available_at": "2026-11-10T15:00:00+08:00",
-      "file": "snap-f9f0d2c00e8c1fd5.json"
+      "available_at": "2026-10-31",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
+      "file": "snap-decfda2d8866e9cf.json"
     },
     {
       "snapshot_id": "snap-23eaf5b0bfc82144",
@@ -14,47 +15,62 @@
       "asset_class": "etf",
       "as_of": "2026-11-10",
       "available_at": "2026-11-10T15:00:00+08:00",
+      "fetched_at": "2026-11-11T02:40:59+08:00",
       "file": "snap-23eaf5b0bfc82144.json"
     },
     {
-      "snapshot_id": "snap-1f84eed253a4d726",
+      "snapshot_id": "snap-aef6f29159c9d182",
+      "instrument_id": "ETF:510300.SH",
+      "asset_class": "etf",
+      "as_of": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
+      "file": "snap-aef6f29159c9d182.json"
+    },
+    {
+      "snapshot_id": "snap-d76db31ce212b446",
       "instrument_id": "ETF:510500.SH",
       "asset_class": "etf",
       "as_of": "2026-11-10",
       "available_at": "2026-11-10T15:00:00+08:00",
-      "file": "snap-1f84eed253a4d726.json"
+      "fetched_at": "2026-11-11T03:09:30+08:00",
+      "file": "snap-d76db31ce212b446.json"
     },
     {
-      "snapshot_id": "snap-a3a962265466a536",
+      "snapshot_id": "snap-2ab47bf9fbfc5199",
       "instrument_id": "ETF:512100.SH",
       "asset_class": "etf",
       "as_of": "2026-11-10",
       "available_at": "2026-11-10T15:00:00+08:00",
-      "file": "snap-a3a962265466a536.json"
+      "fetched_at": "2026-11-11T03:09:30+08:00",
+      "file": "snap-2ab47bf9fbfc5199.json"
     },
     {
-      "snapshot_id": "snap-efb00dcacf4c74c8",
+      "snapshot_id": "snap-9f0fbdb86c70b66e",
       "instrument_id": "INDEX:000300.SH",
       "asset_class": "index",
       "as_of": "2026-11-10",
       "available_at": "2026-11-10T15:00:00+08:00",
-      "file": "snap-efb00dcacf4c74c8.json"
+      "fetched_at": "2026-11-11T03:09:30+08:00",
+      "file": "snap-9f0fbdb86c70b66e.json"
     },
     {
-      "snapshot_id": "snap-fd346de1c14562ec",
+      "snapshot_id": "snap-56e7c688ea35a45c",
       "instrument_id": "INDEX:000852.SH",
       "asset_class": "index",
       "as_of": "2026-11-10",
       "available_at": "2026-11-10T15:00:00+08:00",
-      "file": "snap-fd346de1c14562ec.json"
+      "fetched_at": "2026-11-11T03:09:30+08:00",
+      "file": "snap-56e7c688ea35a45c.json"
     },
     {
-      "snapshot_id": "snap-549f2af3917da603",
+      "snapshot_id": "snap-fffadc4bca3ed918",
       "instrument_id": "INDEX:000905.SH",
       "asset_class": "index",
       "as_of": "2026-11-10",
       "available_at": "2026-11-10T15:00:00+08:00",
-      "file": "snap-549f2af3917da603.json"
+      "fetched_at": "2026-11-11T03:09:30+08:00",
+      "file": "snap-fffadc4bca3ed918.json"
     }
   ]
 }

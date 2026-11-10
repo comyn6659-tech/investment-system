@@ -3,7 +3,7 @@
   "instrument_id": "EQUITY:601398.SH",
   "asset_class": "equity",
   "as_of": "2026-09-30",
-  "available_at": "2026-11-10T15:00:00+08:00",
+  "available_at": "2026-10-31",
   "facts": [
     {
       "fact_id": "div.2019年报.年度分红",
@@ -14,13 +14,13 @@
       "currency": "CNY",
       "period": "2019年报",
       "available_at": "2020-06-20",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "cninfo.dividend",
         "publisher": "巨潮资讯",
         "interface": "AKShare stock_dividend_cninfo",
         "url": "https://webapi.cninfo.com.cn/#/company",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "含分红类型、派息比例（每 10 股）、报告时间（所属财年）、实施方案公告日期"
       },
       "transform": "巨潮『派息比例』（每 10 股，税前）",
@@ -37,13 +37,13 @@
       "currency": "CNY",
       "period": "2020年报",
       "available_at": "2021-06-29",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "cninfo.dividend",
         "publisher": "巨潮资讯",
         "interface": "AKShare stock_dividend_cninfo",
         "url": "https://webapi.cninfo.com.cn/#/company",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "含分红类型、派息比例（每 10 股）、报告时间（所属财年）、实施方案公告日期"
       },
       "transform": "巨潮『派息比例』（每 10 股，税前）",
@@ -60,13 +60,13 @@
       "currency": "CNY",
       "period": "2021年报",
       "available_at": "2022-07-05",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "cninfo.dividend",
         "publisher": "巨潮资讯",
         "interface": "AKShare stock_dividend_cninfo",
         "url": "https://webapi.cninfo.com.cn/#/company",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "含分红类型、派息比例（每 10 股）、报告时间（所属财年）、实施方案公告日期"
       },
       "transform": "巨潮『派息比例』（每 10 股，税前）",
@@ -83,13 +83,13 @@
       "currency": "CNY",
       "period": "2022年报",
       "available_at": "2023-07-11",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "cninfo.dividend",
         "publisher": "巨潮资讯",
         "interface": "AKShare stock_dividend_cninfo",
         "url": "https://webapi.cninfo.com.cn/#/company",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "含分红类型、派息比例（每 10 股）、报告时间（所属财年）、实施方案公告日期"
       },
       "transform": "巨潮『派息比例』（每 10 股，税前）",
@@ -106,13 +106,13 @@
       "currency": "CNY",
       "period": "2023年报",
       "available_at": "2024-07-09",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "cninfo.dividend",
         "publisher": "巨潮资讯",
         "interface": "AKShare stock_dividend_cninfo",
         "url": "https://webapi.cninfo.com.cn/#/company",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "含分红类型、派息比例（每 10 股）、报告时间（所属财年）、实施方案公告日期"
       },
       "transform": "巨潮『派息比例』（每 10 股，税前）",
@@ -129,13 +129,13 @@
       "currency": "CNY",
       "period": "2024半年报",
       "available_at": "2024-12-31",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "cninfo.dividend",
         "publisher": "巨潮资讯",
         "interface": "AKShare stock_dividend_cninfo",
         "url": "https://webapi.cninfo.com.cn/#/company",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "含分红类型、派息比例（每 10 股）、报告时间（所属财年）、实施方案公告日期"
       },
       "transform": "巨潮『派息比例』（每 10 股，税前）",
@@ -152,13 +152,13 @@
       "currency": "CNY",
       "period": "2024年报",
       "available_at": "2025-07-08",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "cninfo.dividend",
         "publisher": "巨潮资讯",
         "interface": "AKShare stock_dividend_cninfo",
         "url": "https://webapi.cninfo.com.cn/#/company",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "含分红类型、派息比例（每 10 股）、报告时间（所属财年）、实施方案公告日期"
       },
       "transform": "巨潮『派息比例』（每 10 股，税前）",
@@ -175,13 +175,13 @@
       "currency": "CNY",
       "period": "2025半年报",
       "available_at": "2025-12-09",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "cninfo.dividend",
         "publisher": "巨潮资讯",
         "interface": "AKShare stock_dividend_cninfo",
         "url": "https://webapi.cninfo.com.cn/#/company",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "含分红类型、派息比例（每 10 股）、报告时间（所属财年）、实施方案公告日期"
       },
       "transform": "巨潮『派息比例』（每 10 股，税前）",
@@ -198,13 +198,13 @@
       "currency": "CNY",
       "period": "2025年报",
       "available_at": "2026-05-07",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "cninfo.dividend",
         "publisher": "巨潮资讯",
         "interface": "AKShare stock_dividend_cninfo",
         "url": "https://webapi.cninfo.com.cn/#/company",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "含分红类型、派息比例（每 10 股）、报告时间（所属财年）、实施方案公告日期"
       },
       "transform": "巨潮『派息比例』（每 10 股，税前）",
@@ -221,13 +221,13 @@
       "currency": "CNY",
       "period": "2026半年报",
       "available_at": "2026-10-15",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "cninfo.dividend",
         "publisher": "巨潮资讯",
         "interface": "AKShare stock_dividend_cninfo",
         "url": "https://webapi.cninfo.com.cn/#/company",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "含分红类型、派息比例（每 10 股）、报告时间（所属财年）、实施方案公告日期"
       },
       "transform": "巨潮『派息比例』（每 10 股，税前）",
@@ -244,18 +244,18 @@
       "currency": "CNY",
       "period": "2024-12-31",
       "available_at": "2025-03-29",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产等支付的现金）",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -267,18 +267,18 @@
       "currency": null,
       "period": "2024-12-31",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.balance_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_balance_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期资产负债表，含 NOTICE_DATE（公告日期）"
       },
       "transform": "",
       "restated": false,
-      "notes": "银行以存款/同业负债为主，普通企业净债务（有息负债-现金）口径不适用，需银行专用口径",
+      "notes": "银行以存款/同业负债为主，普通企业净债务口径不适用，需银行专用口径",
       "conflict_values": []
     },
     {
@@ -290,16 +290,16 @@
       "currency": null,
       "period": "2024-12-31",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
-      "transform": "现金流量表『NOTICE_DATE』（公告日期）",
+      "transform": "现金流量表『NOTICE_DATE』（公告日期，日精度）",
       "restated": false,
       "notes": "",
       "conflict_values": []
@@ -313,18 +313,18 @@
       "currency": "CNY",
       "period": "2024-12-31",
       "available_at": "2025-03-29",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『NETCASH_OPERATE』",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -336,18 +336,18 @@
       "currency": "CNY",
       "period": "2025-03-31",
       "available_at": "2025-04-30",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产等支付的现金）",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -359,18 +359,18 @@
       "currency": null,
       "period": "2025-03-31",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.balance_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_balance_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期资产负债表，含 NOTICE_DATE（公告日期）"
       },
       "transform": "",
       "restated": false,
-      "notes": "银行以存款/同业负债为主，普通企业净债务（有息负债-现金）口径不适用，需银行专用口径",
+      "notes": "银行以存款/同业负债为主，普通企业净债务口径不适用，需银行专用口径",
       "conflict_values": []
     },
     {
@@ -382,16 +382,16 @@
       "currency": null,
       "period": "2025-03-31",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
-      "transform": "现金流量表『NOTICE_DATE』（公告日期）",
+      "transform": "现金流量表『NOTICE_DATE』（公告日期，日精度）",
       "restated": false,
       "notes": "",
       "conflict_values": []
@@ -405,18 +405,18 @@
       "currency": "CNY",
       "period": "2025-03-31",
       "available_at": "2025-04-30",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『NETCASH_OPERATE』",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -428,18 +428,18 @@
       "currency": "CNY",
       "period": "2025-06-30",
       "available_at": "2025-08-30",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产等支付的现金）",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -451,18 +451,18 @@
       "currency": null,
       "period": "2025-06-30",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.balance_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_balance_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期资产负债表，含 NOTICE_DATE（公告日期）"
       },
       "transform": "",
       "restated": false,
-      "notes": "银行以存款/同业负债为主，普通企业净债务（有息负债-现金）口径不适用，需银行专用口径",
+      "notes": "银行以存款/同业负债为主，普通企业净债务口径不适用，需银行专用口径",
       "conflict_values": []
     },
     {
@@ -474,16 +474,16 @@
       "currency": null,
       "period": "2025-06-30",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
-      "transform": "现金流量表『NOTICE_DATE』（公告日期）",
+      "transform": "现金流量表『NOTICE_DATE』（公告日期，日精度）",
       "restated": false,
       "notes": "",
       "conflict_values": []
@@ -497,18 +497,18 @@
       "currency": "CNY",
       "period": "2025-06-30",
       "available_at": "2025-08-30",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『NETCASH_OPERATE』",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -520,18 +520,18 @@
       "currency": "CNY",
       "period": "2025-09-30",
       "available_at": "2025-10-31",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产等支付的现金）",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -543,18 +543,18 @@
       "currency": null,
       "period": "2025-09-30",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.balance_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_balance_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期资产负债表，含 NOTICE_DATE（公告日期）"
       },
       "transform": "",
       "restated": false,
-      "notes": "银行以存款/同业负债为主，普通企业净债务（有息负债-现金）口径不适用，需银行专用口径",
+      "notes": "银行以存款/同业负债为主，普通企业净债务口径不适用，需银行专用口径",
       "conflict_values": []
     },
     {
@@ -566,16 +566,16 @@
       "currency": null,
       "period": "2025-09-30",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
-      "transform": "现金流量表『NOTICE_DATE』（公告日期）",
+      "transform": "现金流量表『NOTICE_DATE』（公告日期，日精度）",
       "restated": false,
       "notes": "",
       "conflict_values": []
@@ -589,18 +589,18 @@
       "currency": "CNY",
       "period": "2025-09-30",
       "available_at": "2025-10-31",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『NETCASH_OPERATE』",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -612,18 +612,18 @@
       "currency": "CNY",
       "period": "2025-12-31",
       "available_at": "2026-03-28",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产等支付的现金）",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -635,18 +635,18 @@
       "currency": null,
       "period": "2025-12-31",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.balance_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_balance_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期资产负债表，含 NOTICE_DATE（公告日期）"
       },
       "transform": "",
       "restated": false,
-      "notes": "银行以存款/同业负债为主，普通企业净债务（有息负债-现金）口径不适用，需银行专用口径",
+      "notes": "银行以存款/同业负债为主，普通企业净债务口径不适用，需银行专用口径",
       "conflict_values": []
     },
     {
@@ -658,16 +658,16 @@
       "currency": null,
       "period": "2025-12-31",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
-      "transform": "现金流量表『NOTICE_DATE』（公告日期）",
+      "transform": "现金流量表『NOTICE_DATE』（公告日期，日精度）",
       "restated": false,
       "notes": "",
       "conflict_values": []
@@ -681,18 +681,18 @@
       "currency": "CNY",
       "period": "2025-12-31",
       "available_at": "2026-03-28",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『NETCASH_OPERATE』",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -704,18 +704,18 @@
       "currency": "CNY",
       "period": "2026-03-31",
       "available_at": "2026-04-30",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产等支付的现金）",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -727,18 +727,18 @@
       "currency": null,
       "period": "2026-03-31",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.balance_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_balance_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期资产负债表，含 NOTICE_DATE（公告日期）"
       },
       "transform": "",
       "restated": false,
-      "notes": "银行以存款/同业负债为主，普通企业净债务（有息负债-现金）口径不适用，需银行专用口径",
+      "notes": "银行以存款/同业负债为主，普通企业净债务口径不适用，需银行专用口径",
       "conflict_values": []
     },
     {
@@ -750,16 +750,16 @@
       "currency": null,
       "period": "2026-03-31",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
-      "transform": "现金流量表『NOTICE_DATE』（公告日期）",
+      "transform": "现金流量表『NOTICE_DATE』（公告日期，日精度）",
       "restated": false,
       "notes": "",
       "conflict_values": []
@@ -773,18 +773,18 @@
       "currency": "CNY",
       "period": "2026-03-31",
       "available_at": "2026-04-30",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『NETCASH_OPERATE』",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -796,18 +796,18 @@
       "currency": "CNY",
       "period": "2026-06-30",
       "available_at": "2026-08-29",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产等支付的现金）",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -819,18 +819,18 @@
       "currency": null,
       "period": "2026-06-30",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.balance_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_balance_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期资产负债表，含 NOTICE_DATE（公告日期）"
       },
       "transform": "",
       "restated": false,
-      "notes": "银行以存款/同业负债为主，普通企业净债务（有息负债-现金）口径不适用，需银行专用口径",
+      "notes": "银行以存款/同业负债为主，普通企业净债务口径不适用，需银行专用口径",
       "conflict_values": []
     },
     {
@@ -842,16 +842,16 @@
       "currency": null,
       "period": "2026-06-30",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
-      "transform": "现金流量表『NOTICE_DATE』（公告日期）",
+      "transform": "现金流量表『NOTICE_DATE』（公告日期，日精度）",
       "restated": false,
       "notes": "",
       "conflict_values": []
@@ -865,18 +865,18 @@
       "currency": "CNY",
       "period": "2026-06-30",
       "available_at": "2026-08-29",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『NETCASH_OPERATE』",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -888,18 +888,18 @@
       "currency": "CNY",
       "period": "2026-09-30",
       "available_at": "2026-10-31",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产等支付的现金）",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -911,18 +911,18 @@
       "currency": null,
       "period": "2026-09-30",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.balance_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_balance_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期资产负债表，含 NOTICE_DATE（公告日期）"
       },
       "transform": "",
       "restated": false,
-      "notes": "银行以存款/同业负债为主，普通企业净债务（有息负债-现金）口径不适用，需银行专用口径",
+      "notes": "银行以存款/同业负债为主，普通企业净债务口径不适用，需银行专用口径",
       "conflict_values": []
     },
     {
@@ -934,16 +934,16 @@
       "currency": null,
       "period": "2026-09-30",
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
-      "transform": "现金流量表『NOTICE_DATE』（公告日期）",
+      "transform": "现金流量表『NOTICE_DATE』（公告日期，日精度）",
       "restated": false,
       "notes": "",
       "conflict_values": []
@@ -957,18 +957,18 @@
       "currency": "CNY",
       "period": "2026-09-30",
       "available_at": "2026-10-31",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.cash_flow_sheet",
         "publisher": "东方财富",
         "interface": "AKShare stock_cash_flow_sheet_by_report_em",
         "url": "https://data.eastmoney.com/bbsj/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
         "notes": "按报告期现金流量表，含 NOTICE_DATE（公告日期）与 UPDATE_DATE"
       },
       "transform": "现金流量表『NETCASH_OPERATE』",
       "restated": false,
-      "notes": "",
+      "notes": "公告日期只有日期精度，按当日结束才视为已知",
       "conflict_values": []
     },
     {
@@ -978,64 +978,41 @@
       "value": "银行Ⅱ",
       "unit": null,
       "currency": null,
-      "period": "2026-11-10",
+      "period": null,
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.stock_individual_info",
         "publisher": "东方财富",
         "interface": "AKShare stock_individual_info_em",
         "url": "https://quote.eastmoney.com/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
-        "notes": "含最新价、总股本、流通股、行业、上市时间"
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
+        "notes": "含总股本、流通股、行业、上市时间"
       },
-      "transform": "",
+      "transform": "个股信息当前值",
       "restated": false,
-      "notes": "",
-      "conflict_values": []
-    },
-    {
-      "fact_id": "profile.latest_price",
-      "metric": "latest_price",
-      "status": "known",
-      "value": 8.6,
-      "unit": "CNY_per_share",
-      "currency": "CNY",
-      "period": "2026-11-10",
-      "available_at": "2026-11-10T15:00:00+08:00",
-      "fetched_at": "2026-11-11T02:40:59+08:00",
-      "source": {
-        "source_id": "em.stock_individual_info",
-        "publisher": "东方财富",
-        "interface": "AKShare stock_individual_info_em",
-        "url": "https://quote.eastmoney.com/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
-        "notes": "含最新价、总股本、流通股、行业、上市时间"
-      },
-      "transform": "个股信息『最新』（收盘价）",
-      "restated": false,
-      "notes": "",
+      "notes": "当前快照值，无历史版本、无报告期；可获得时间未知",
       "conflict_values": []
     },
     {
       "fact_id": "profile.listing_date",
       "metric": "listing_date",
       "status": "known",
-      "value": "20061027",
+      "value": "2006-10-27",
       "unit": null,
       "currency": null,
       "period": null,
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.stock_individual_info",
         "publisher": "东方财富",
         "interface": "AKShare stock_individual_info_em",
         "url": "https://quote.eastmoney.com/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
-        "notes": "含最新价、总股本、流通股、行业、上市时间"
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
+        "notes": "含总股本、流通股、行业、上市时间"
       },
-      "transform": "",
+      "transform": "个股信息『上市时间』，统一为 YYYY-MM-DD",
       "restated": false,
       "notes": "",
       "conflict_values": []
@@ -1047,20 +1024,20 @@
       "value": "工商银行",
       "unit": null,
       "currency": null,
-      "period": "2026-11-10",
+      "period": null,
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.stock_individual_info",
         "publisher": "东方财富",
         "interface": "AKShare stock_individual_info_em",
         "url": "https://quote.eastmoney.com/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
-        "notes": "含最新价、总股本、流通股、行业、上市时间"
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
+        "notes": "含总股本、流通股、行业、上市时间"
       },
-      "transform": "",
+      "transform": "个股信息当前值",
       "restated": false,
-      "notes": "",
+      "notes": "当前快照值，无历史版本、无报告期；可获得时间未知",
       "conflict_values": []
     },
     {
@@ -1070,29 +1047,35 @@
       "value": 356406257089.0,
       "unit": "shares",
       "currency": null,
-      "period": "2026-11-10",
+      "period": null,
       "available_at": null,
-      "fetched_at": "2026-11-11T02:40:59+08:00",
+      "fetched_at": "2026-11-11T03:09:30+08:00",
       "source": {
         "source_id": "em.stock_individual_info",
         "publisher": "东方财富",
         "interface": "AKShare stock_individual_info_em",
         "url": "https://quote.eastmoney.com/",
-        "retrieved_at": "2026-11-11T02:40:59+08:00",
-        "notes": "含最新价、总股本、流通股、行业、上市时间"
+        "retrieved_at": "2026-11-11T03:11:24+08:00",
+        "notes": "含总股本、流通股、行业、上市时间"
       },
       "transform": "个股信息『总股本』",
       "restated": false,
-      "notes": "",
+      "notes": "当前股本，未与财报期末股本核对；可获得时间未知",
       "conflict_values": []
     }
   ],
   "coverage": {
+    "build": {
+      "mode": "latest_report_period",
+      "report_period": "2026-09-30",
+      "built_at": "2026-11-11T03:09:30+08:00"
+    },
     "financial_statements": {
       "source_id": "em.cash_flow_sheet",
       "periods_available": 8,
       "has_notice_date": true,
-      "note": "公告日期字段可用；UPDATE_DATE 可识别后续更正"
+      "has_update_date": true,
+      "note": "公告日期只有日精度；UPDATE_DATE 可用于识别后续更正，但未逐条比对重述内容"
     },
     "dividend_records": {
       "source_id": "cninfo.dividend",
@@ -1109,7 +1092,17 @@
       "available": false,
       "note": "NPL 比率、拨备覆盖率、资本充足率需要银行专项报表接口，阶段二处理"
     },
-    "point_in_time_safe": true,
+    "price": {
+      "available": false,
+      "note": "阶段一未采集个股价格：实时接口无可靠收盘时刻标记，留待阶段二按已核实收盘源处理"
+    },
+    "point_in_time_safe": false,
+    "point_in_time_granularity": "mixed",
+    "availability_precision_counts": {
+      "second": 0,
+      "date": 26,
+      "unknown": 20
+    },
     "availability_unknown": [
       "fin.2024-12-31.net_debt",
       "fin.2024-12-31.notice_date",
@@ -1132,13 +1125,13 @@
       "profile.name",
       "profile.total_shares"
     ],
-    "availability_note": "每条事实都记录了公告日期；按 available_at 过滤可用于历史时点分析"
+    "availability_note": "只有全部事实都带秒级可获得时间，才标记 point_in_time_safe=true；仅日期精度按「当日结束时才可知」处理，不用于盘中历史判断。"
   },
-  "snapshot_id": "snap-f9f0d2c00e8c1fd5",
-  "fetched_at": "2026-11-11T02:40:59+08:00",
+  "snapshot_id": "snap-decfda2d8866e9cf",
+  "fetched_at": "2026-11-11T03:09:30+08:00",
   "producers": [
     "akshare",
     "tools/build_snapshots.py"
   ],
-  "notes": "阶段一固定快照：展示财报公告时点、现金流/资本开支可得性与分红按财年归集"
+  "notes": "阶段一固定快照：报告期与公告日均可追溯；公告只有日精度"
 }

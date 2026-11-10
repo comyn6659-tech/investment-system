@@ -52,12 +52,41 @@ def resolve(text: str | None, catalog: IdentityCatalog) -> Resolution:
 # --- 代码输入 ---------------------------------------------------------------
 def _resolve_code(n: NormalizedInput, catalog: IdentityCatalog) -> Resolution:
     assert n.code is not None
-    candidates = catalog.by_code(n.code)
+    all_candidates = catalog.by_code(n.code)
+
+    # 1) 前缀与后缀指向不同交易所：不允许静默改写，直接要求澄清
+    if n.venue_conflict:
+        return Resolution(
+            status=ResolutionStatus.AMBIGUOUS.value,
+            raw_input=n.raw,
+            candidates=tuple(sorted(all_candidates, key=lambda c: c.instrument_id)),
+            reason_codes=(rc.IDENTITY_VENUE_SYNTAX_CONFLICT,),
+            clarification_question=(
+                f"「{n.canonical}」同时给出 {n.prefix_venue} 前缀与 {n.suffix_venue} 后缀，"
+                "两者指向不同交易所。请只保留一种写法，或直接给出 6 位代码。"
+            ),
+        )
+
+    # 2) 显式交易所与已核实标的的交易所不一致：不解绑、不猜测
     if n.venue_hint:
         wanted = _VENUE_ALIASES.get(n.venue_hint, n.venue_hint)
-        filtered = [c for c in candidates if _venue_matches(c, wanted)]
-        if filtered:
-            candidates = filtered
+        matching = [c for c in all_candidates if _venue_matches(c, wanted)]
+        if not matching:
+            venues = sorted({f"{c.venue}({c.instrument_id})" for c in all_candidates})
+            return Resolution(
+                status=ResolutionStatus.AMBIGUOUS.value,
+                raw_input=n.raw,
+                candidates=tuple(sorted(all_candidates, key=lambda c: c.instrument_id)),
+                reason_codes=(rc.IDENTITY_VENUE_CONFLICT,),
+                clarification_question=(
+                    f"代码 {n.code} 被指定为「{n.venue_hint}」，但已核实记录中不存在该交易所的标的。"
+                    + (f"实际候选：{', '.join(venues)}。" if venues else "该代码未登记。")
+                    + "请确认交易所或代码。"
+                ),
+            )
+        candidates = matching
+    else:
+        candidates = all_candidates
 
     if len(candidates) == 1:
         return _resolved(candidates[0], n, matched_by="exact_code")

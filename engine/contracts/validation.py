@@ -36,6 +36,37 @@ _BLOCKED_ANALYSIS_STATUSES = {
 
 _ALLOWED_MODEL_RESULT_TYPES = {"equity_value", "index_signal", "etf_execution", "research_signal"}
 
+# 这些字段属于核心契约，缺失或为 null 一律视为违规（不允许「省略即通过」）
+_REQUIRED_KEYS = (
+    "schema_version",
+    "intent",
+    "analysis_status",
+    "valuation_state",
+    "decision",
+    "reason_codes",
+    "payload",
+    "model_plan",
+    "assumptions",
+    "model_results",
+    "conditions",
+    "invalidation",
+    "evidence_refs",
+    "missing_data",
+    "warnings",
+    "code_version",
+    "policy_version",
+    "model_version",
+)
+_NOT_NULL_KEYS = ("analysis_status", "valuation_state", "decision", "intent", "payload")
+
+# 只有 validated + complete 才允许出现的「正式价格判断」
+_FORMAL_DECISIONS = {Decision.CANDIDATE, Decision.WAIT, Decision.AVOID}
+
+# 这些载荷一旦非空，就等于给出了定价/信号结论
+# 只限制「模型输出」，不限制「已取得的数据事实」：
+# level / price / nav 是观测值，valuation / premium_discount / signal 才是模型结论。
+_PRICED_PAYLOAD_FIELDS = ("valuation", "premium_discount", "signal")
+
 
 class ContractViolation(RuntimeError):
     """结果不满足契约。禁止吞掉：这是硬性出口。"""
@@ -49,6 +80,14 @@ def validate_result(result: Any) -> list[str]:
     """返回违规项列表；空列表表示通过。接受 AnalysisResult 或 dict。"""
     data = result.to_dict() if hasattr(result, "to_dict") else dict(result)
     problems: list[str] = []
+
+    # --- 必填字段 -------------------------------------------------------
+    missing_keys = [key for key in _REQUIRED_KEYS if key not in data]
+    if missing_keys:
+        problems.append(f"缺少必填字段: {missing_keys}")
+    null_keys = [key for key in _NOT_NULL_KEYS if key in data and data.get(key) is None]
+    if null_keys:
+        problems.append(f"必填字段不能为 null: {null_keys}")
 
     # --- 基础字段 -------------------------------------------------------
     if data.get("schema_version") != RESULT_SCHEMA_VERSION:
@@ -86,6 +125,17 @@ def validate_result(result: Any) -> list[str]:
         problems.append("model_status=deprecated 时不得输出 candidate")
     if decision == Decision.CANDIDATE and guard_codes:
         problems.append(f"存在阻断性原因码时不得输出 candidate: {guard_codes}")
+    if decision in _FORMAL_DECISIONS:
+        if model_status != ModelStatus.VALIDATED:
+            problems.append(
+                f"decision={decision.value} 属于正式价格判断，要求 model_status=validated"
+                f"（当前 {model_status.value if model_status else None}）"
+            )
+        if analysis_status != AnalysisStatus.COMPLETE:
+            problems.append(
+                f"decision={decision.value} 属于正式价格判断，要求 analysis_status=complete"
+                f"（当前 {analysis_status.value if analysis_status else None}）"
+            )
     if decision == Decision.CANDIDATE:
         if analysis_status != AnalysisStatus.COMPLETE:
             problems.append("candidate 要求 analysis_status=complete")
@@ -134,6 +184,19 @@ def validate_result(result: Any) -> list[str]:
         missing = PAYLOAD_SCHEMAS[payload_type] - set(payload)
         if missing:
             problems.append(f"payload({payload_type}) 缺少字段: {sorted(missing)}")
+        extra = set(payload) - PAYLOAD_SCHEMAS[payload_type]
+        if extra:
+            problems.append(f"payload({payload_type}) 含未定义字段: {sorted(extra)}")
+        if analysis_status != AnalysisStatus.COMPLETE or model_status != ModelStatus.VALIDATED:
+            priced = [
+                field
+                for field in _PRICED_PAYLOAD_FIELDS
+                if payload.get(field) not in (None, {}, [], "")
+            ]
+            if priced:
+                problems.append(
+                    f"分析未完成或模型未 validated 时，payload 不得携带定价/信号载荷: {priced}"
+                )
         if instrument:
             expected = {
                 AssetClass.EQUITY: "equity",
@@ -152,6 +215,15 @@ def validate_result(result: Any) -> list[str]:
             continue
         if item["result_type"] not in _ALLOWED_MODEL_RESULT_TYPES:
             problems.append(f"未知的 model_results 类型: {item['result_type']!r}")
+        if item["result_type"] == "research_signal":
+            if not item.get("model_id"):
+                problems.append("research_signal 必须注明 model_id（真实模型来源）")
+            if item.get("model_status") != ModelStatus.RESEARCH.value:
+                problems.append("research_signal 必须标记 model_status=research")
+        elif analysis_status != AnalysisStatus.COMPLETE or model_status != ModelStatus.VALIDATED:
+            problems.append(
+                f"model_results 含 {item['result_type']}，但分析未完成或模型未 validated"
+            )
         if decision == Decision.CANDIDATE and item["result_type"] == "research_signal":
             problems.append("研究信号不得与 candidate 同时出现")
 

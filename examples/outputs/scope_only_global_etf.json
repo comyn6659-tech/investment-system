@@ -1,0 +1,54 @@
+{
+  "schema_version": "analysis-result/1",
+  "analysis_id": "analysis-61e4aa0eb62c2405",
+  "generated_at": "2026-11-11T03:16:15+08:00",
+  "instrument": null,
+  "instrument_id": null,
+  "intent": "buy_point_check",
+  "identity": {
+    "status": "out_of_scope",
+    "raw_input": "全球ETF",
+    "matched_by": "",
+    "candidates": [],
+    "reason_codes": [
+      "OUT_OF_SCOPE_CROSS_BORDER"
+    ],
+    "clarification_question": null
+  },
+  "snapshot_id": null,
+  "as_of": null,
+  "available_at": null,
+  "analysis_status": "unsupported",
+  "model_status": null,
+  "valuation_state": "not_applicable",
+  "decision": "undetermined",
+  "reason_codes": [
+    "OUT_OF_SCOPE_CROSS_BORDER"
+  ],
+  "model_plan": {
+    "primary_model": null,
+    "required_checks": [],
+    "selection_reason": "标的未取得具体身份，不进入模型环节",
+    "not_selected": [],
+    "candidate_models": []
+  },
+  "assumptions": [],
+  "model_results": [],
+  "conditions": [],
+  "invalidation": [
+    "若取得该产品真实身份并核实跟踪对象，本结论需要重跑。"
+  ],
+  "evidence_refs": [],
+  "missing_data": [],
+  "warnings": [
+    "该输入按名称规则被排除在第一版范围之外，未取得可核实的证券身份。",
+    "范围外只代表「本版不建模」，不代表对其投资价值的判断。"
+  ],
+  "clarification": "「全球ETF」被识别为范围外对象，未做身份登记。如需精确核对，请提供 6 位证券代码。",
+  "payload": {
+    "payload_type": "none"
+  },
+  "code_version": "phase1-0.1.1",
+  "policy_version": "unapproved-phase1",
+  "model_version": "none"
+}

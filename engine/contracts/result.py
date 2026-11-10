@@ -144,6 +144,12 @@ class AnalysisResult:
         return stable_digest(data, length=32)
 
     def dump_json(self, *, indent: int = 2) -> str:
+        """唯一的 JSON 字符串出口，必须与 export_json 走同一套校验。"""
         import json
 
-        return json.dumps(self.to_dict(), ensure_ascii=False, indent=indent)
+        from engine.contracts.validation import enforce
+
+        enforce(self)
+        text = json.dumps(self.to_dict(), ensure_ascii=False, indent=indent)
+        enforce(json.loads(text))
+        return text

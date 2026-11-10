@@ -15,11 +15,22 @@ from typing import Any
 
 from engine.data.facts import Fact
 from engine.data.numeric import sanitize_for_json
+from engine.data.timeutil import parse_instant
 from engine.version import SNAPSHOT_SCHEMA_VERSION
+
+_ALLOWED_ASSET_CLASSES = {"equity", "index", "etf"}
 
 
 class SnapshotError(RuntimeError):
-    """快照不可用（不存在、内容损坏、哈希不匹配）。"""
+    """快照不可用（不存在、内容损坏、哈希不符、结构与请求不匹配）。
+
+    `code` 用于把失败原因映射成结果里的专用原因码，
+    避免所有问题都写成「文件不存在」。
+    """
+
+    def __init__(self, message: str, *, code: str = "SNAPSHOT_INVALID_STRUCTURE") -> None:
+        self.code = code
+        super().__init__(message)
 
 
 def canonical_json(payload: Any) -> str:
@@ -77,23 +88,61 @@ class Snapshot:
         return payload
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Snapshot":
+    def from_dict(cls, data: dict[str, Any], *, expected_id: str | None = None) -> "Snapshot":
+        """反序列化并强制校验。
+
+        规则（缺一不可）：
+        1. 必须带 snapshot_id，不能「没有声明就算通过」；
+        2. 声明 ID 必须等于内容哈希；
+        3. 若调用方指定了请求 ID，声明 ID 必须与之相同（防止文件串号）；
+        4. 通过结构校验（重复事实、非法状态与值都要拒绝）。
+        """
+        for required in ("instrument_id", "asset_class", "as_of", "snapshot_id", "facts"):
+            if required not in data:
+                raise SnapshotError(
+                    f"快照缺少必填字段 {required}", code="SNAPSHOT_INVALID_STRUCTURE"
+                )
+
+        declared = data["snapshot_id"]
+        if not isinstance(declared, str) or not declared.startswith("snap-"):
+            raise SnapshotError(f"非法 snapshot_id: {declared!r}", code="SNAPSHOT_INVALID_STRUCTURE")
+
+        try:
+            facts = [Fact.from_dict(f) for f in data.get("facts", [])]
+        except Exception as exc:
+            raise SnapshotError(
+                f"快照事实不合法: {type(exc).__name__}: {exc}",
+                code="SNAPSHOT_INVALID_STRUCTURE",
+            ) from exc
+
         snap = cls(
             instrument_id=data["instrument_id"],
             asset_class=data["asset_class"],
             as_of=data["as_of"],
-            available_at=data["available_at"],
+            available_at=data.get("available_at", ""),
             fetched_at=data.get("fetched_at", ""),
-            facts=[Fact.from_dict(f) for f in data.get("facts", [])],
+            facts=facts,
             coverage=data.get("coverage", {}),
             producers=list(data.get("producers", [])),
             notes=data.get("notes", ""),
             schema_version=data.get("schema_version", SNAPSHOT_SCHEMA_VERSION),
         )
-        declared = data.get("snapshot_id")
-        if declared and declared != snap.snapshot_id:
+
+        if declared != snap.snapshot_id:
             raise SnapshotError(
-                f"快照 {declared} 内容校验失败：重算得到 {snap.snapshot_id}"
+                f"快照 {declared} 内容校验失败：重算得到 {snap.snapshot_id}",
+                code="SNAPSHOT_HASH_MISMATCH",
+            )
+        if expected_id is not None and expected_id != declared:
+            raise SnapshotError(
+                f"请求的快照 {expected_id} 与文件内容 {declared} 不一致",
+                code="SNAPSHOT_ID_MISMATCH",
+            )
+
+        problems = snap.validate()
+        if problems:
+            raise SnapshotError(
+                "快照结构校验失败: " + "; ".join(problems), code="SNAPSHOT_INVALID_STRUCTURE"
             )
         return snap
 
@@ -112,14 +161,21 @@ class Snapshot:
 
     def validate(self) -> list[str]:
         problems: list[str] = []
+        if str(self.asset_class) not in _ALLOWED_ASSET_CLASSES:
+            problems.append(f"未知的 asset_class: {self.asset_class!r}")
+        if not str(self.instrument_id).startswith(("EQUITY:", "INDEX:", "ETF:")):
+            problems.append(f"instrument_id 格式非法: {self.instrument_id!r}")
+        if not self.as_of:
+            problems.append("as_of 为空")
+        elif len(str(self.as_of)) != 10 or parse_instant(str(self.as_of)) is None:
+            problems.append(f"as_of 必须是 YYYY-MM-DD: {self.as_of!r}")
+
         ids = [f.fact_id for f in self.facts]
         dupes = {i for i in ids if ids.count(i) > 1}
         if dupes:
             problems.append(f"事实 id 重复: {sorted(dupes)}")
         for f in self.facts:
             problems.extend(f.validate())
-        if not self.as_of:
-            problems.append("as_of 为空")
         return problems
 
     def facts_by_category(self) -> dict[str, list[Fact]]:
@@ -142,22 +198,44 @@ class SnapshotStore:
             return []
         return json.loads(self.manifest_path.read_text(encoding="utf-8"))["snapshots"]
 
+    @staticmethod
+    def _version_key(entry: dict[str, Any]) -> tuple:
+        """版本排序：as_of → fetched_at → snapshot_id。
+
+        哈希只用于身份与校验，不能替代修订时间；同一 as_of 的多个版本
+        必须按抓取/修订时间排序，否则「数据补齐后仍选旧值」。
+        """
+        as_of = parse_instant(str(entry.get("as_of") or ""))
+        fetched = parse_instant(entry.get("fetched_at"))
+        return (
+            as_of.value if as_of else 0,
+            fetched.value if fetched else 0,
+            str(entry.get("snapshot_id", "")),
+        )
+
     def latest_for(self, instrument_id: str) -> str | None:
-        """按 as_of 倒序取该标的最新已固定快照。"""
+        """取该标的「最新一版」：先比 as_of，再比抓取时间。"""
         entries = [e for e in self.load_manifest() if e["instrument_id"] == instrument_id]
         if not entries:
             return None
-        entries.sort(key=lambda e: (e["as_of"], e["snapshot_id"]))
+        entries.sort(key=self._version_key)
         return entries[-1]["snapshot_id"]
 
     def load(self, snapshot_id: str) -> Snapshot:
+        if not isinstance(snapshot_id, str) or not snapshot_id.startswith("snap-"):
+            raise SnapshotError(f"非法 snapshot_id: {snapshot_id!r}", code="SNAPSHOT_INVALID_STRUCTURE")
         path = self.root / f"{snapshot_id}.json"
         if not path.exists():
-            raise SnapshotError(f"找不到快照文件: {path.name}")
+            raise SnapshotError(f"找不到快照文件: {path.name}", code="SNAPSHOT_NOT_FOUND")
         data = json.loads(path.read_text(encoding="utf-8"))
-        return Snapshot.from_dict(data)
+        return Snapshot.from_dict(data, expected_id=snapshot_id)
 
     def save(self, snapshot: Snapshot) -> Path:
+        problems = snapshot.validate()
+        if problems:
+            raise SnapshotError(
+                "拒绝写入不合法快照: " + "; ".join(problems), code="SNAPSHOT_INVALID_STRUCTURE"
+            )
         self.root.mkdir(parents=True, exist_ok=True)
         path = self.root / f"{snapshot.snapshot_id}.json"
         path.write_text(
@@ -177,6 +255,7 @@ class SnapshotStore:
                     "asset_class": data["asset_class"],
                     "as_of": data["as_of"],
                     "available_at": data["available_at"],
+                    "fetched_at": data.get("fetched_at", ""),
                     "file": path.name,
                 }
             )
@@ -191,11 +270,14 @@ class SnapshotStore:
 def facts_available_by(snapshot: Snapshot, cutoff: str) -> list[Fact]:
     """按可获得时间过滤事实：cutoff 之后才公开的数据不得出现在历史分析里。
 
-    无法确定可获得时间（available_at 为空）的事实不会被放行，
-    因为「不知道何时公布」不能当作「当时已经知道」。
+    - 先解析成带时区的时间再比较（不再逐字符比字符串）；
+    - 只有日期的公告按「当日结束」处理，因此不会被当成当天 00:00 已知；
+    - 无法确定可获得时间（available_at 为空或无法解析）的事实一律不放行。
     """
+    from engine.data.timeutil import is_available_by
+
     out: list[Fact] = []
     for fact in snapshot.facts:
-        if fact.available_at and fact.available_at <= cutoff:
+        if is_available_by(fact.available_at, cutoff):
             out.append(fact)
     return out

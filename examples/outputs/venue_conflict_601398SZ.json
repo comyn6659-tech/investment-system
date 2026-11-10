@@ -1,0 +1,95 @@
+{
+  "schema_version": "analysis-result/1",
+  "analysis_id": "analysis-2850689753de13d7",
+  "generated_at": "2026-11-11T03:16:15+08:00",
+  "instrument": null,
+  "instrument_id": null,
+  "intent": "buy_point_check",
+  "identity": {
+    "status": "ambiguous",
+    "raw_input": "601398.SZ",
+    "matched_by": "",
+    "candidates": [
+      {
+        "instrument_id": "EQUITY:601398.SH",
+        "display_name": "工商银行",
+        "asset_class": "equity",
+        "code": "601398",
+        "market": "CN",
+        "venue": "SSE",
+        "venue_type": "exchange",
+        "currency": "CNY",
+        "aliases": [],
+        "vendor_codes": [],
+        "index_class": null,
+        "etf_strategy": null,
+        "region": "domestic",
+        "underlying_index_id": null,
+        "scope": {
+          "status": "in_scope",
+          "reason_code": "DOMESTIC_A_SHARE",
+          "detail": "境内A股个股（交易所清单）"
+        },
+        "in_first_batch": false,
+        "data_coverage_verified": false,
+        "evidence": [
+          {
+            "evidence_id": "ev-cn-a-equity-list",
+            "kind": "exchange_list",
+            "publisher": "上海证券交易所 / 深圳证券交易所 / 北京证券交易所（经 AKShare 采集）",
+            "url": null,
+            "retrieved_at": "2026-11-11T02:24:42+08:00",
+            "fields_cited": [
+              "证券代码",
+              "证券简称",
+              "板块",
+              "上市日期"
+            ],
+            "note": "三个交易所清单均取到"
+          }
+        ],
+        "valid_from": "2006-10-27",
+        "valid_to": null,
+        "raw_input": "",
+        "identity_source": ""
+      }
+    ],
+    "reason_codes": [
+      "IDENTITY_VENUE_CONFLICT"
+    ],
+    "clarification_question": "代码 601398 被指定为「SZ」，但已核实记录中不存在该交易所的标的。实际候选：SSE(EQUITY:601398.SH)。请确认交易所或代码。"
+  },
+  "snapshot_id": null,
+  "as_of": null,
+  "available_at": null,
+  "analysis_status": "needs_clarification",
+  "model_status": null,
+  "valuation_state": "not_applicable",
+  "decision": "undetermined",
+  "reason_codes": [
+    "IDENTITY_VENUE_CONFLICT"
+  ],
+  "model_plan": {
+    "primary_model": null,
+    "required_checks": [],
+    "selection_reason": "身份存在多个候选，未进入模型环节",
+    "not_selected": [],
+    "candidate_models": []
+  },
+  "assumptions": [],
+  "model_results": [],
+  "conditions": [],
+  "invalidation": [],
+  "evidence_refs": [],
+  "missing_data": [],
+  "warnings": [
+    "存在多个候选标的，引擎不做猜测，也不对任一候选给出买点结论。"
+  ],
+  "clarification": "代码 601398 被指定为「SZ」，但已核实记录中不存在该交易所的标的。实际候选：SSE(EQUITY:601398.SH)。请确认交易所或代码。",
+  "payload": {
+    "payload_type": "none"
+  },
+  "code_version": "phase1-0.1.1",
+  "policy_version": "unapproved-phase1",
+  "model_version": "none"
+}
