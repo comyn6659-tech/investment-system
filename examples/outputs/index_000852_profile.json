@@ -1,0 +1,724 @@
+{
+  "schema_version": "analysis-result/1",
+  "analysis_id": "analysis-8f10a57aeeb22c3f",
+  "generated_at": "2026-11-11T17:00:13+08:00",
+  "instrument": {
+    "instrument_id": "INDEX:000852.SH",
+    "display_name": "中证1000",
+    "asset_class": "index",
+    "code": "000852",
+    "market": "CN",
+    "venue": "CSI",
+    "venue_type": "index_publisher",
+    "currency": null,
+    "aliases": [
+      "中证1000指数",
+      "CSI1000",
+      "CSI 1000"
+    ],
+    "vendor_codes": [],
+    "index_class": "broad_based",
+    "etf_strategy": null,
+    "region": "domestic",
+    "underlying_index_id": null,
+    "scope": {
+      "status": "in_scope",
+      "reason_code": "FIRST_BATCH_BROAD_INDEX",
+      "detail": "首批研究样本：境内A股宽基指数"
+    },
+    "in_first_batch": true,
+    "data_coverage_verified": true,
+    "evidence": [
+      {
+        "evidence_id": "ev-csi-indicator-000852",
+        "kind": "index_publisher",
+        "publisher": "中证指数有限公司",
+        "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000852indicator.xls",
+        "retrieved_at": "2026-11-11T02:20:00+08:00",
+        "fields_cited": [
+          "指数代码",
+          "指数中文全称",
+          "指数中文简称",
+          "指数英文全称"
+        ],
+        "note": "官方指标文件：中证1000指数，代码 000852"
+      }
+    ],
+    "valid_from": null,
+    "valid_to": null,
+    "raw_input": "中证1000",
+    "identity_source": ""
+  },
+  "instrument_id": "INDEX:000852.SH",
+  "intent": "buy_point_check",
+  "identity": {
+    "status": "resolved",
+    "raw_input": "中证1000",
+    "matched_by": "exact_name",
+    "candidates": [],
+    "reason_codes": [
+      "FIRST_BATCH_BROAD_INDEX"
+    ],
+    "clarification_question": null
+  },
+  "snapshot_id": "snap-5d60fe1e7fb6ed3b",
+  "as_of": "2026-11-10",
+  "available_at": "2026-11-10T15:00:00+08:00",
+  "analysis_status": "complete",
+  "model_status": "research",
+  "valuation_state": "unknown",
+  "decision": "undetermined",
+  "reason_codes": [
+    "INDEX_PROFILE_DESCRIPTIVE_ONLY",
+    "INDEX_STRATEGY_NOT_IMPLEMENTED",
+    "RESEARCH_PARAMETERS_UNAPPROVED",
+    "RESEARCH_SIGNAL_ONLY"
+  ],
+  "model_plan": {
+    "primary_model": "index_valuation_profile",
+    "model_version": "0.3.0-research",
+    "model_status": "research",
+    "cross_check_model": null,
+    "required_checks": [
+      "同源同列月度参考池，有效月份不少于 54/60",
+      "比较值不参与自己的历史排名",
+      "PE 与 PB 分别计算，不拼综合分"
+    ],
+    "selection_reason": "宽基指数用描述性估值画像：只给出当前值在历史分布中的位置，不产生波段信号",
+    "not_selected": [
+      {
+        "model_id": "index_strategy_a_valuation_reversion",
+        "reason_code": "INDEX_STRATEGY_NOT_IMPLEMENTED",
+        "reason": "分位进出规则与回测留待下一批；本轮不实现状态机，也不给入场/退出信号"
+      },
+      {
+        "model_id": "index_strategy_b_cross_confirmation",
+        "reason_code": "INDEX_STRATEGY_NOT_IMPLEMENTED",
+        "reason": "同上：交叉确认规则与回测留待下一批"
+      }
+    ],
+    "candidate_models": [],
+    "profile_status": "complete",
+    "window_rule": {
+      "months": 60,
+      "min_valid_months": 54,
+      "rule": "分析时点所在月份之前的 N 个完整自然月；每月至多一个观测，取该月内最后一个有效且有实际日期的同口径记录；比较值为该来源最新可用观测，若落在参考池中则移除"
+    },
+    "series_ids": {
+      "pe_rolling": "ser-34d9ea704da7b2c1",
+      "pb": "ser-0e3c14ff893c9985",
+      "official_pe_ratio_1": "ser-e532ae694a2bcbec"
+    }
+  },
+  "assumptions": [],
+  "model_results": [
+    {
+      "result_type": "index_profile",
+      "model_id": "index_valuation_profile",
+      "model_version": "0.3.0-research",
+      "model_status": "research",
+      "is_trading_signal": false,
+      "instrument_id": "INDEX:000852.SH",
+      "as_of": "2026-11-10",
+      "status": "complete",
+      "series_ids": {
+        "pe_rolling": "ser-34d9ea704da7b2c1",
+        "pb": "ser-0e3c14ff893c9985",
+        "official_pe_ratio_1": "ser-e532ae694a2bcbec"
+      },
+      "metrics": {
+        "pe_rolling": {
+          "percentile": 65.0,
+          "percentile_display": "65.0",
+          "valid_months": 60,
+          "pool_size": 60
+        },
+        "pb": {
+          "percentile": 34.166666666666664,
+          "percentile_display": "34.2",
+          "valid_months": 60,
+          "pool_size": 60
+        }
+      }
+    }
+  ],
+  "conditions": [
+    "画像只回答「当前值相对该供应商历史分布处于什么位置」，不是交易信号。",
+    "月度参考样本与官方短历史分开使用；官方最新值不参与第三方历史排名。"
+  ],
+  "invalidation": [
+    "供应商历史序列被修订或更换口径时，分位需要重算。",
+    "若窗口内有效月份少于 54 个，对应分位将不再给出。",
+    "若未来引入经批准的策略规则，本画像需要重新评估其用途（当前无策略结论）。"
+  ],
+  "evidence_refs": [
+    {
+      "evidence_id": "ev-csi-indicator-000852",
+      "kind": "index_publisher",
+      "publisher": "中证指数有限公司",
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000852indicator.xls",
+      "retrieved_at": "2026-11-11T02:20:00+08:00",
+      "fields_cited": [
+        "指数代码",
+        "指数中文全称",
+        "指数中文简称",
+        "指数英文全称"
+      ],
+      "note": "官方指标文件：中证1000指数，代码 000852"
+    },
+    {
+      "evidence_id": "csindex.indicator_file",
+      "kind": "vendor_api",
+      "publisher": "中证指数有限公司",
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000852indicator.xls",
+      "retrieved_at": "2026-11-11T13:37:20+08:00",
+      "fields_cited": [],
+      "note": "官方指数估值指标文件（.xls）"
+    },
+    {
+      "evidence_id": "em.index_daily_em",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://quote.eastmoney.com/",
+      "retrieved_at": "2026-11-11T13:37:20+08:00",
+      "fields_cited": [],
+      "note": "AKShare stock_zh_index_daily_em"
+    },
+    {
+      "evidence_id": "legulegu.index_pe",
+      "kind": "vendor_api",
+      "publisher": "乐咕乐股",
+      "url": "https://legulegu.com/stockdata/index-basic-pe",
+      "retrieved_at": "2026-11-11T13:37:20+08:00",
+      "fields_cited": [],
+      "note": "AKShare stock_index_pe_lg / stock_index_pb_lg"
+    }
+  ],
+  "missing_data": [],
+  "warnings": [
+    "本轮不实现分位进出策略、不生成波段买点，也不做回测。",
+    "PE/PB 的聚合方法与亏损样本处理在来源中未说明，只能作同源同列的描述性比较。"
+  ],
+  "clarification": null,
+  "payload": {
+    "payload_type": "index",
+    "index_class": "broad_based",
+    "level": {
+      "value": 6579.36,
+      "unit": "index_point",
+      "currency": null,
+      "as_of": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "source": {
+        "source_id": "em.index_daily_em",
+        "publisher": "东方财富",
+        "interface": "AKShare stock_zh_index_daily_em",
+        "url": "https://quote.eastmoney.com/",
+        "retrieved_at": "2026-11-11T13:37:20+08:00",
+        "notes": "指数日线（不复权），含开高低收与成交额"
+      }
+    },
+    "valuation_facts": {
+      "pe_ttm": {
+        "fact_id": "index.pe_ttm",
+        "metric": "pe_ttm",
+        "status": "known",
+        "value": 25.58,
+        "unit": "ratio",
+        "currency": null,
+        "period": "2026-11-10",
+        "available_at": null,
+        "fetched_at": "2026-11-11T13:36:56+08:00",
+        "source": {
+          "source_id": "legulegu.index_pe",
+          "publisher": "乐咕乐股",
+          "interface": "AKShare stock_index_pe_lg / stock_index_pb_lg",
+          "url": "https://legulegu.com/stockdata/index-basic-pe",
+          "retrieved_at": "2026-11-11T13:37:20+08:00",
+          "notes": "第三方聚合数据；实测按月采样；聚合方法与亏损股处理未获官方说明"
+        },
+        "transform": "乐咕乐股『滚动市盈率』列",
+        "restated": false,
+        "notes": "第三方口径，聚合方法与亏损股处理未获说明；可获得时间未披露",
+        "conflict_values": []
+      },
+      "pb": {
+        "fact_id": "index.pb",
+        "metric": "pb",
+        "status": "known",
+        "value": 2.06,
+        "unit": "ratio",
+        "currency": null,
+        "period": "2026-11-10",
+        "available_at": null,
+        "fetched_at": "2026-11-11T13:36:56+08:00",
+        "source": {
+          "source_id": "legulegu.index_pe",
+          "publisher": "乐咕乐股",
+          "interface": "AKShare stock_index_pe_lg / stock_index_pb_lg",
+          "url": "https://legulegu.com/stockdata/index-basic-pe",
+          "retrieved_at": "2026-11-11T13:37:20+08:00",
+          "notes": "第三方聚合数据；实测按月采样；聚合方法与亏损股处理未获官方说明"
+        },
+        "transform": "乐咕乐股『市净率』列",
+        "restated": false,
+        "notes": "第三方口径，可获得时间未披露",
+        "conflict_values": []
+      },
+      "pe_csindex_ratio_1": {
+        "fact_id": "index.pe_csindex_1",
+        "metric": "csindex_pe_ratio_1",
+        "status": "known",
+        "value": 29.58,
+        "unit": "ratio",
+        "currency": null,
+        "period": "2026-11-10",
+        "available_at": null,
+        "fetched_at": "2026-11-11T13:36:56+08:00",
+        "source": {
+          "source_id": "csindex.indicator_file",
+          "publisher": "中证指数有限公司",
+          "interface": "官方指数估值指标文件（.xls）",
+          "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000852indicator.xls",
+          "retrieved_at": "2026-11-11T13:37:20+08:00",
+          "notes": "文件仅包含最近 20 个交易日；市盈率/股息率口径未在文件内说明"
+        },
+        "transform": "官方指标文件列『市盈率1』；聚合方法与分母口径未在文件中说明",
+        "restated": false,
+        "notes": "发布时点未披露，可获得时间记为未知；该事实不参与盘中历史判断",
+        "conflict_values": []
+      },
+      "csindex_dividend_yield_1": {
+        "fact_id": "index.dividend_yield_csindex_1",
+        "metric": "csindex_dividend_yield_1",
+        "status": "known",
+        "value": 1.24,
+        "unit": "percent",
+        "currency": null,
+        "period": "2026-11-10",
+        "available_at": null,
+        "fetched_at": "2026-11-11T13:36:56+08:00",
+        "source": {
+          "source_id": "csindex.indicator_file",
+          "publisher": "中证指数有限公司",
+          "interface": "官方指数估值指标文件（.xls）",
+          "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000852indicator.xls",
+          "retrieved_at": "2026-11-11T13:37:20+08:00",
+          "notes": "文件仅包含最近 20 个交易日；市盈率/股息率口径未在文件内说明"
+        },
+        "transform": "官方指标文件列『股息率1』；聚合方法与分母口径未在文件中说明",
+        "restated": false,
+        "notes": "发布时点未披露，可获得时间记为未知；该事实不参与盘中历史判断",
+        "conflict_values": []
+      }
+    },
+    "history_coverage": {
+      "build": {
+        "mode": "historical_close_bar",
+        "market_date": "2026-11-10",
+        "bar_status": "closed",
+        "built_at": "2026-11-11T13:36:56+08:00",
+        "date_source": "按日期选行",
+        "rows_after_market_date_dropped": 1
+      },
+      "valuation_source_official": {
+        "source_id": "csindex.indicator_file",
+        "publisher": "中证指数有限公司",
+        "start": "2026-10-14",
+        "end": "2026-11-10",
+        "observations": 20,
+        "frequency": "daily",
+        "note": "官方指标文件只提供最近 20 个交易日，不能用于 5 年分位"
+      },
+      "valuation_source_monthly": {
+        "source_id": "legulegu.index_pe",
+        "publisher": "乐咕乐股",
+        "start": "2014-10-31",
+        "end": "2026-11-10",
+        "observations": 146,
+        "frequency": "monthly",
+        "note": "该缓存实测为月度采样，不足以构成连续周度样本；不能据此断言所有来源均无周度数据"
+      },
+      "price_series": {
+        "source_id": "em.index_daily_em",
+        "start": "2005-01-04",
+        "end": "2026-11-10",
+        "observations": 5306,
+        "frequency": "daily"
+      },
+      "total_return_series": {
+        "available": false,
+        "note": "本次未取得全收益指数行情；该结论只针对已测来源与参数，不代表所有免费来源"
+      },
+      "dividend_yield_history": {
+        "available": false,
+        "note": "官方文件仅覆盖 20 个交易日，第三方月度序列不含股息率"
+      },
+      "aggregation_method": "unknown",
+      "aggregation_note": "官方文件未说明整体法/加权法与亏损成分处理；两套来源口径不可直接拼接",
+      "supports_weekly_5y_history": false,
+      "supports_5y_window": true,
+      "index_identity_verified": true,
+      "point_in_time_safe": false,
+      "point_in_time_granularity": "mixed",
+      "availability_precision_counts": {
+        "second": 1,
+        "date": 0,
+        "unknown": 4
+      },
+      "availability_unknown": [
+        "index.dividend_yield_csindex_1",
+        "index.pb",
+        "index.pe_csindex_1",
+        "index.pe_ttm"
+      ],
+      "availability_note": "只有全部事实都带秒级可获得时间，才标记 point_in_time_safe=true；仅日期精度按「当日结束时才可知」处理，不用于盘中历史判断。",
+      "monthly_reference_window": {
+        "months": 60,
+        "min_valid_months": 54,
+        "rule": "分析时点所在月份之前的 N 个完整自然月；每月至多一个观测，取该月内最后一个有效且有实际日期的同口径记录；比较值为该来源最新可用观测，若落在参考池中则移除"
+      },
+      "profile_status": "complete",
+      "series_ids": {
+        "pe_rolling": "ser-34d9ea704da7b2c1",
+        "pb": "ser-0e3c14ff893c9985",
+        "official_pe_ratio_1": "ser-e532ae694a2bcbec"
+      }
+    },
+    "strategy_state": {
+      "status": "not_implemented",
+      "model_status": "research",
+      "candidates": [
+        {
+          "candidate": "A",
+          "name": "估值回归基线",
+          "model_id": "index_strategy_a_valuation_reversion",
+          "model_status": "research",
+          "entry": "PE-TTM 5年历史分位 ≤ 20",
+          "exit": "PE 分位 ≥ 60，或持有满 12 个日历月",
+          "implemented": false
+        },
+        {
+          "candidate": "B",
+          "name": "估值交叉确认",
+          "model_id": "index_strategy_b_cross_confirmation",
+          "model_status": "research",
+          "entry": "PE 分位 ≤ 20 且 PB 分位 ≤ 40",
+          "exit": "PE 分位 ≥ 60 或 PB 分位 ≥ 70，或持有满 12 个日历月",
+          "implemented": false
+        }
+      ],
+      "note": "分位进出策略与回测留待下一批；本轮只输出描述性画像，不产生入场/退出信号，也不给目标点位。"
+    },
+    "valuation_profile": {
+      "payload_version": "index-profile/1",
+      "instrument_id": "INDEX:000852.SH",
+      "as_of": "2026-11-10",
+      "status": "complete",
+      "window_rule": {
+        "months": 60,
+        "min_valid_months": 54,
+        "rule": "分析时点所在月份之前的 N 个完整自然月；每月至多一个观测，取该月内最后一个有效且有实际日期的同口径记录；比较值为该来源最新可用观测，若落在参考池中则移除"
+      },
+      "metrics": {
+        "pe_rolling": {
+          "metric": "pe_rolling",
+          "label": "滚动市盈率",
+          "field": "滚动市盈率",
+          "series_id": "ser-34d9ea704da7b2c1",
+          "source": {
+            "source_id": "legulegu.index_pe_pb",
+            "publisher": "乐咕乐股",
+            "interface": "AKShare stock_index_pe_lg / stock_index_pb_lg",
+            "url": "https://legulegu.com/stockdata/index-basic-pe",
+            "retrieved_at": "2026-11-11T16:53:05+08:00",
+            "definition_note": "第三方聚合数据；列名为供应商原始命名。整体法/加权方式、分母口径与亏损股处理未在来源中说明，记为 unknown；不与其他来源的同名指标拼接。"
+          },
+          "status": "computed",
+          "window": {
+            "metric": "pe_rolling",
+            "as_of": "2026-11-10",
+            "analysis_month": "2026-11",
+            "window": {
+              "months": 60,
+              "start_month": "2021-11",
+              "end_month": "2026-10",
+              "min_valid_months": 54
+            },
+            "expected_months": 60,
+            "valid_months": 60,
+            "valid_month_list": [
+              "2021-11",
+              "2021-12",
+              "2022-01",
+              "2022-02",
+              "2022-03",
+              "2022-04",
+              "2022-05",
+              "2022-06",
+              "2022-07",
+              "2022-08",
+              "2022-09",
+              "2022-10",
+              "2022-11",
+              "2022-12",
+              "2023-01",
+              "2023-02",
+              "2023-03",
+              "2023-04",
+              "2023-05",
+              "2023-06",
+              "2023-07",
+              "2023-08",
+              "2023-09",
+              "2023-10",
+              "2023-11",
+              "2023-12",
+              "2024-01",
+              "2024-02",
+              "2024-03",
+              "2024-04",
+              "2024-05",
+              "2024-06",
+              "2024-07",
+              "2024-08",
+              "2024-09",
+              "2024-10",
+              "2024-11",
+              "2024-12",
+              "2025-01",
+              "2025-02",
+              "2025-03",
+              "2025-04",
+              "2025-05",
+              "2025-06",
+              "2025-07",
+              "2025-08",
+              "2025-09",
+              "2025-10",
+              "2025-11",
+              "2025-12",
+              "2026-01",
+              "2026-02",
+              "2026-03",
+              "2026-04",
+              "2026-05",
+              "2026-06",
+              "2026-07",
+              "2026-08",
+              "2026-09",
+              "2026-10"
+            ],
+            "missing_months": [],
+            "coverage_start": "2021-11-30",
+            "coverage_end": "2026-10-30",
+            "comparison": {
+              "month": "2026-11",
+              "date": "2026-11-10",
+              "value": 25.58
+            },
+            "comparison_removed_from_pool": false,
+            "pool": {
+              "size": 60,
+              "min": 19.23,
+              "median": 24.35,
+              "max": 37.1
+            },
+            "percentile": 65.0,
+            "percentile_display": "65.0",
+            "sufficient": true,
+            "insufficient_reason": null,
+            "dropped_non_positive": [],
+            "dropped_future": [],
+            "dropped_duplicate_months": [],
+            "dropped_unparsable": [],
+            "notes": [
+              "分位是该来源历史样本中的相对位置，不是未来上涨概率，也不是内在价值折扣。",
+              "参考池只包含早于比较值日期的记录；比较值若落在参考池中已移除。"
+            ]
+          },
+          "percentile": 65.0,
+          "percentile_display": "65.0"
+        },
+        "pb": {
+          "metric": "pb",
+          "label": "市净率",
+          "field": "市净率",
+          "series_id": "ser-0e3c14ff893c9985",
+          "source": {
+            "source_id": "legulegu.index_pe_pb",
+            "publisher": "乐咕乐股",
+            "interface": "AKShare stock_index_pe_lg / stock_index_pb_lg",
+            "url": "https://legulegu.com/stockdata/index-basic-pe",
+            "retrieved_at": "2026-11-11T16:53:05+08:00",
+            "definition_note": "第三方聚合数据；列名为供应商原始命名。整体法/加权方式、分母口径与亏损股处理未在来源中说明，记为 unknown；不与其他来源的同名指标拼接。"
+          },
+          "status": "computed",
+          "window": {
+            "metric": "pb",
+            "as_of": "2026-11-10",
+            "analysis_month": "2026-11",
+            "window": {
+              "months": 60,
+              "start_month": "2021-11",
+              "end_month": "2026-10",
+              "min_valid_months": 54
+            },
+            "expected_months": 60,
+            "valid_months": 60,
+            "valid_month_list": [
+              "2021-11",
+              "2021-12",
+              "2022-01",
+              "2022-02",
+              "2022-03",
+              "2022-04",
+              "2022-05",
+              "2022-06",
+              "2022-07",
+              "2022-08",
+              "2022-09",
+              "2022-10",
+              "2022-11",
+              "2022-12",
+              "2023-01",
+              "2023-02",
+              "2023-03",
+              "2023-04",
+              "2023-05",
+              "2023-06",
+              "2023-07",
+              "2023-08",
+              "2023-09",
+              "2023-10",
+              "2023-11",
+              "2023-12",
+              "2024-01",
+              "2024-02",
+              "2024-03",
+              "2024-04",
+              "2024-05",
+              "2024-06",
+              "2024-07",
+              "2024-08",
+              "2024-09",
+              "2024-10",
+              "2024-11",
+              "2024-12",
+              "2025-01",
+              "2025-02",
+              "2025-03",
+              "2025-04",
+              "2025-05",
+              "2025-06",
+              "2025-07",
+              "2025-08",
+              "2025-09",
+              "2025-10",
+              "2025-11",
+              "2025-12",
+              "2026-01",
+              "2026-02",
+              "2026-03",
+              "2026-04",
+              "2026-05",
+              "2026-06",
+              "2026-07",
+              "2026-08",
+              "2026-09",
+              "2026-10"
+            ],
+            "missing_months": [],
+            "coverage_start": "2021-11-30",
+            "coverage_end": "2026-10-30",
+            "comparison": {
+              "month": "2026-11",
+              "date": "2026-11-10",
+              "value": 2.06
+            },
+            "comparison_removed_from_pool": false,
+            "pool": {
+              "size": 60,
+              "min": 1.59,
+              "median": 2.3049999999999997,
+              "max": 3.16
+            },
+            "percentile": 34.166666666666664,
+            "percentile_display": "34.2",
+            "sufficient": true,
+            "insufficient_reason": null,
+            "dropped_non_positive": [],
+            "dropped_future": [],
+            "dropped_duplicate_months": [],
+            "dropped_unparsable": [],
+            "notes": [
+              "分位是该来源历史样本中的相对位置，不是未来上涨概率，也不是内在价值折扣。",
+              "参考池只包含早于比较值日期的记录；比较值若落在参考池中已移除。"
+            ]
+          },
+          "percentile": 34.166666666666664,
+          "percentile_display": "34.2"
+        }
+      },
+      "official_short_history": {
+        "official_pe_ratio_1": {
+          "metric": "official_pe_ratio_1",
+          "label": "市盈率1",
+          "series_id": "ser-e532ae694a2bcbec",
+          "field": "市盈率1",
+          "source": {
+            "source_id": "csindex.indicator_file",
+            "publisher": "中证指数有限公司",
+            "interface": "官方指数估值指标文件（.xls）",
+            "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000852indicator.xls",
+            "retrieved_at": "2026-11-11T16:53:05+08:00",
+            "definition_note": "官方文件只提供最近约 20 个交易日；市盈率/股息率口径未在文件内说明。"
+          },
+          "latest": {
+            "date": "2026-11-10",
+            "value": 29.58
+          },
+          "observation_count": 20,
+          "coverage_start": "2026-10-14",
+          "coverage_end": "2026-11-10",
+          "usage": "仅作并列事实；样本过短，不参与长历史排名"
+        }
+      },
+      "missing": [],
+      "sources": [
+        {
+          "source_id": "legulegu.index_pe_pb",
+          "publisher": "乐咕乐股",
+          "interface": "AKShare stock_index_pe_lg / stock_index_pb_lg",
+          "url": "https://legulegu.com/stockdata/index-basic-pe",
+          "retrieved_at": "2026-11-11T16:53:05+08:00",
+          "definition_note": "第三方聚合数据；列名为供应商原始命名。整体法/加权方式、分母口径与亏损股处理未在来源中说明，记为 unknown；不与其他来源的同名指标拼接。"
+        },
+        {
+          "source_id": "csindex.indicator_file",
+          "publisher": "中证指数有限公司",
+          "interface": "官方指数估值指标文件（.xls）",
+          "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000852indicator.xls",
+          "retrieved_at": "2026-11-11T16:53:05+08:00",
+          "definition_note": "官方文件只提供最近约 20 个交易日；市盈率/股息率口径未在文件内说明。"
+        }
+      ],
+      "series_ids": {
+        "pe_rolling": "ser-34d9ea704da7b2c1",
+        "pb": "ser-0e3c14ff893c9985",
+        "official_pe_ratio_1": "ser-e532ae694a2bcbec"
+      },
+      "limitations": [
+        "PE/PB 为供应商同一列的月度参考样本；聚合方法、分母口径与亏损样本处理未在来源中说明，记为 unknown。",
+        "分位是该供应商历史样本中的相对位置，不是未来上涨概率，也不是内在价值折扣。",
+        "历史发布时间与修订版本未知，因此这些数字不能当作严格可交易信号，也不能用于回测的当时可得数据。",
+        "官方指标文件只覆盖最近若干交易日，仅作并列事实，不参与长历史排名。"
+      ],
+      "decision_note": "本轮只回答「当前值相对该历史口径处于什么位置」；尚无经过验证的波段交易结论，不输出目标点位，也不据此给出买点。",
+      "is_trading_signal": false
+    }
+  },
+  "code_version": "phase3-0.3.0",
+  "policy_version": "unapproved-phase2",
+  "model_version": "research-0.3.0"
+}

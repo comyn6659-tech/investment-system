@@ -579,6 +579,100 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
         )
     )
 
+    # 2) 成交额与成交量（第三阶段：产品资料完整性检查需要）
+    stamp = now.isoformat(timespec="seconds")
+    for column, fact_id, metric, unit in (
+        ("成交额", "etf.turnover_cny", "turnover_amount", "CNY"),
+        ("成交量", "etf.volume_shares", "turnover_volume", "shares"),
+    ):
+        raw = hist[column].iloc[-1] if column in hist.columns else None
+        if raw is None or pd.isna(raw):
+            facts.append(
+                Fact.missing(
+                    fact_id=fact_id,
+                    metric=metric,
+                    period=market_date_str,
+                    fetched_at=stamp,
+                    source=src["etf_hist"],
+                    notes=f"行情接口未返回『{column}』",
+                )
+            )
+        else:
+            facts.append(
+                Fact.known(
+                    fact_id=fact_id,
+                    metric=metric,
+                    value=float(raw),
+                    unit=unit,
+                    currency="CNY" if unit == "CNY" else None,
+                    period=market_date_str,
+                    available_at=(
+                        f"{market_date_str}T15:00:00+08:00" if status == "closed" else None
+                    ),
+                    fetched_at=stamp,
+                    source=src["etf_hist"],
+                    transform=f"不复权日线『{column}』（bar_status={status}）",
+                    notes="已收盘交易日的日成交数据" if status == "closed" else "当日未收盘，成交数据不完整",
+                )
+            )
+
+    # 近 20 个交易日平均成交额：必须按实际取得的有效天数报告，不足 20 天不标成 20 日均值
+    if "成交额" in hist.columns:
+        window = hist["成交额"].dropna().tail(20)
+        days_used = int(len(window))
+        if days_used == 0:
+            facts.append(
+                Fact.missing(
+                    fact_id="etf.turnover_avg_20d_cny",
+                    metric="turnover_avg_20d",
+                    period=market_date_str,
+                    fetched_at=stamp,
+                    source=src["etf_hist"],
+                    notes="没有可用的成交额观测",
+                )
+            )
+        else:
+            facts.append(
+                Fact.known(
+                    fact_id="etf.turnover_avg_20d_cny",
+                    metric="turnover_avg_20d",
+                    value=float(window.mean()),
+                    unit="CNY",
+                    currency="CNY",
+                    period=market_date_str,
+                    available_at=(
+                        f"{market_date_str}T15:00:00+08:00" if status == "closed" else None
+                    ),
+                    fetched_at=stamp,
+                    source=src["etf_hist"],
+                    transform=f"末尾 {days_used} 个交易日成交额算术平均（最多取 20 个）",
+                    notes=f"实际使用 {days_used} 个交易日；不足 20 天时不称『20 日均值』",
+                )
+            )
+            facts.append(
+                Fact.known(
+                    fact_id="etf.turnover_avg_days_used",
+                    metric="turnover_avg_days_used",
+                    value=days_used,
+                    unit="count",
+                    period=market_date_str,
+                    fetched_at=stamp,
+                    source=src["etf_hist"],
+                    transform="参与平均的实际交易日数",
+                )
+            )
+
+    facts.append(
+        Fact.missing(
+            fact_id="etf.bid_ask_spread_cny",
+            metric="bid_ask_spread",
+            period=market_date_str,
+            fetched_at=stamp,
+            source=src["etf_hist"],
+            notes="日线行情不含买卖盘口，未取得价差；不因有收盘价就断言可交易",
+        )
+    )
+
     nav_df = ak.fund_etf_fund_info_em(fund=code, start_date="20260101", end_date="20261231")
     nav_df.to_csv(CACHE_DIR / f"etf_nav_{code}.csv", index=False)
     if not nav_df.empty:
@@ -620,6 +714,66 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
                 notes="所有已核实免费接口都不提供净值披露时间，无法确认收盘时是否已知当日净值",
             )
         )
+
+        # 事后同日折溢价：价格与净值对应同一估值日期且都已实际取得时才计算
+        nav_value = float(nav_latest["单位净值"])
+        if nav_date.isoformat() == market_date_str and nav_value > 0 and status == "closed":
+            facts.append(
+                Fact.known(
+                    fact_id="etf.premium_discount_same_day_pct",
+                    metric="same_day_premium_discount_pct",
+                    value=(close / nav_value - 1.0) * 100.0,
+                    unit="percent",
+                    currency=None,
+                    period=market_date_str,
+                    available_at=None,
+                    fetched_at=now.isoformat(timespec="seconds"),
+                    source=src["etf_nav"],
+                    transform="事后同日折溢价 = 市场收盘价 / 同日单位净值 − 1",
+                    notes=(
+                        "价格与净值对应同一估值日期；净值披露时刻未知，"
+                        "不能据此证明当日收盘前已可交易，也不用于回测的当日成交"
+                    ),
+                )
+            )
+        else:
+            reason_parts = []
+            if nav_date.isoformat() != market_date_str:
+                reason_parts.append(f"净值日期 {nav_date.isoformat()} 与价格日期 {market_date_str} 不一致")
+            if nav_value <= 0:
+                reason_parts.append(f"单位净值 {nav_value} 非正")
+            if status != "closed":
+                reason_parts.append("价格不是已收盘价")
+            facts.append(
+                Fact.missing(
+                    fact_id="etf.premium_discount_same_day_pct",
+                    metric="same_day_premium_discount_pct",
+                    period=market_date_str,
+                    fetched_at=now.isoformat(timespec="seconds"),
+                    source=src["etf_nav"],
+                    notes="不计算同日折溢价：" + "；".join(reason_parts),
+                )
+            )
+
+        for column, fact_id, metric in (
+            ("申购状态", "etf.subscription_status", "subscription_status"),
+            ("赎回状态", "etf.redemption_status", "redemption_status"),
+        ):
+            if column in nav_df.columns:
+                text = str(nav_latest[column])
+                if text and text not in ("nan", "None", "--"):
+                    facts.append(
+                        Fact.known(
+                            fact_id=fact_id,
+                            metric=metric,
+                            value=text,
+                            period=nav_date.isoformat(),
+                            fetched_at=now.isoformat(timespec="seconds"),
+                            source=src["etf_nav"],
+                            transform=f"基金净值表『{column}』",
+                            notes="申购/赎回状态，不等于二级市场交易状态（停复牌另行核查）",
+                        )
+                    )
     else:
         facts.append(
             Fact.missing(

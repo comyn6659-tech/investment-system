@@ -1,0 +1,112 @@
+{
+  "series": [
+    {
+      "series_id": "ser-fb818db17e36a9a4",
+      "instrument_id": "INDEX:000300.SH",
+      "metric": "official_pe_ratio_1",
+      "frequency": "daily_short",
+      "source_id": "csindex.indicator_file",
+      "retrieved_at": "2026-11-11T16:53:05+08:00",
+      "start_date": "2026-10-14",
+      "end_date": "2026-11-10",
+      "observation_count": 20,
+      "file": "ser-fb818db17e36a9a4.json"
+    },
+    {
+      "series_id": "ser-370e315c2b1150f2",
+      "instrument_id": "INDEX:000300.SH",
+      "metric": "pb",
+      "frequency": "monthly_reference",
+      "source_id": "legulegu.index_pe_pb",
+      "retrieved_at": "2026-11-11T16:53:05+08:00",
+      "start_date": "2005-04-29",
+      "end_date": "2026-11-10",
+      "observation_count": 260,
+      "file": "ser-370e315c2b1150f2.json"
+    },
+    {
+      "series_id": "ser-8d315ba2ab78c6ec",
+      "instrument_id": "INDEX:000300.SH",
+      "metric": "pe_rolling",
+      "frequency": "monthly_reference",
+      "source_id": "legulegu.index_pe_pb",
+      "retrieved_at": "2026-11-11T16:53:05+08:00",
+      "start_date": "2005-04-29",
+      "end_date": "2026-11-10",
+      "observation_count": 260,
+      "file": "ser-8d315ba2ab78c6ec.json"
+    },
+    {
+      "series_id": "ser-e532ae694a2bcbec",
+      "instrument_id": "INDEX:000852.SH",
+      "metric": "official_pe_ratio_1",
+      "frequency": "daily_short",
+      "source_id": "csindex.indicator_file",
+      "retrieved_at": "2026-11-11T16:53:05+08:00",
+      "start_date": "2026-10-14",
+      "end_date": "2026-11-10",
+      "observation_count": 20,
+      "file": "ser-e532ae694a2bcbec.json"
+    },
+    {
+      "series_id": "ser-0e3c14ff893c9985",
+      "instrument_id": "INDEX:000852.SH",
+      "metric": "pb",
+      "frequency": "monthly_reference",
+      "source_id": "legulegu.index_pe_pb",
+      "retrieved_at": "2026-11-11T16:53:05+08:00",
+      "start_date": "2014-10-31",
+      "end_date": "2026-11-10",
+      "observation_count": 146,
+      "file": "ser-0e3c14ff893c9985.json"
+    },
+    {
+      "series_id": "ser-34d9ea704da7b2c1",
+      "instrument_id": "INDEX:000852.SH",
+      "metric": "pe_rolling",
+      "frequency": "monthly_reference",
+      "source_id": "legulegu.index_pe_pb",
+      "retrieved_at": "2026-11-11T16:53:05+08:00",
+      "start_date": "2014-10-31",
+      "end_date": "2026-11-10",
+      "observation_count": 146,
+      "file": "ser-34d9ea704da7b2c1.json"
+    },
+    {
+      "series_id": "ser-6e65fde212602766",
+      "instrument_id": "INDEX:000905.SH",
+      "metric": "official_pe_ratio_1",
+      "frequency": "daily_short",
+      "source_id": "csindex.indicator_file",
+      "retrieved_at": "2026-11-11T16:53:05+08:00",
+      "start_date": "2026-10-14",
+      "end_date": "2026-11-10",
+      "observation_count": 20,
+      "file": "ser-6e65fde212602766.json"
+    },
+    {
+      "series_id": "ser-90f582c9b5cb421b",
+      "instrument_id": "INDEX:000905.SH",
+      "metric": "pb",
+      "frequency": "monthly_reference",
+      "source_id": "legulegu.index_pe_pb",
+      "retrieved_at": "2026-11-11T16:53:05+08:00",
+      "start_date": "2007-01-31",
+      "end_date": "2026-11-10",
+      "observation_count": 239,
+      "file": "ser-90f582c9b5cb421b.json"
+    },
+    {
+      "series_id": "ser-06c78da3259c0e1d",
+      "instrument_id": "INDEX:000905.SH",
+      "metric": "pe_rolling",
+      "frequency": "monthly_reference",
+      "source_id": "legulegu.index_pe_pb",
+      "retrieved_at": "2026-11-11T16:53:05+08:00",
+      "start_date": "2007-01-31",
+      "end_date": "2026-11-10",
+      "observation_count": 239,
+      "file": "ser-06c78da3259c0e1d.json"
+    }
+  ]
+}

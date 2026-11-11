@@ -1,0 +1,106 @@
+{
+  "schema_version": "index-series/1",
+  "instrument_id": "INDEX:000905.SH",
+  "metric": "official_pe_ratio_1",
+  "field": "市盈率1",
+  "frequency": "daily_short",
+  "source": {
+    "source_id": "csindex.indicator_file",
+    "publisher": "中证指数有限公司",
+    "interface": "官方指数估值指标文件（.xls）",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000905indicator.xls",
+    "retrieved_at": "2026-11-11T16:53:05+08:00",
+    "definition_note": "官方文件只提供最近约 20 个交易日；市盈率/股息率口径未在文件内说明。"
+  },
+  "observations": [
+    {
+      "date": "2026-10-14",
+      "value": 26.94
+    },
+    {
+      "date": "2026-10-15",
+      "value": 26.15
+    },
+    {
+      "date": "2026-10-16",
+      "value": 26.19
+    },
+    {
+      "date": "2026-10-19",
+      "value": 26.41
+    },
+    {
+      "date": "2026-10-20",
+      "value": 26.52
+    },
+    {
+      "date": "2026-10-21",
+      "value": 26.47
+    },
+    {
+      "date": "2026-10-22",
+      "value": 25.77
+    },
+    {
+      "date": "2026-10-23",
+      "value": 26.32
+    },
+    {
+      "date": "2026-10-26",
+      "value": 26.0
+    },
+    {
+      "date": "2026-10-27",
+      "value": 25.28
+    },
+    {
+      "date": "2026-10-28",
+      "value": 25.76
+    },
+    {
+      "date": "2026-10-29",
+      "value": 25.12
+    },
+    {
+      "date": "2026-10-30",
+      "value": 24.47
+    },
+    {
+      "date": "2026-11-02",
+      "value": 25.05
+    },
+    {
+      "date": "2026-11-03",
+      "value": 24.76
+    },
+    {
+      "date": "2026-11-04",
+      "value": 25.78
+    },
+    {
+      "date": "2026-11-05",
+      "value": 26.18
+    },
+    {
+      "date": "2026-11-06",
+      "value": 25.69
+    },
+    {
+      "date": "2026-11-09",
+      "value": 25.61
+    },
+    {
+      "date": "2026-11-10",
+      "value": 25.8
+    }
+  ],
+  "unit": "ratio",
+  "transform": "官方指标文件列『市盈率1』，原样保留",
+  "aggregation_method": "unknown",
+  "denominator_basis": "unknown",
+  "loss_sample_handling": "unknown",
+  "revision_availability": "unknown",
+  "notes": "只覆盖最近 20 个交易日，仅作并列事实，不参与长历史排名。",
+  "series_id": "ser-6e65fde212602766",
+  "observation_count": 20
+}

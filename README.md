@@ -5,18 +5,22 @@ A 股个股 / 境内 A 股宽基指数 / 境内普通被动 ETF 的分析引擎�
 建设方式：独立新项目，从零搭建，不读取、不导入、不依赖旧项目
 `../valuation/` 的代码、缓存或投资政策。旧目录仅作可选的只读查证资料。
 
-**当前阶段：阶段二首轮（个股研究估值）。阶段一基础设施已签收，未重开。**
+**当前阶段：第三阶段首轮（宽基指数估值画像 + ETF 产品资料检查）。**
 
-- 阶段一交付：身份、结果契约、固定快照与数据可用性调查（已签收于 `5c4c1c9`）。
-- 阶段二首轮：三条个股研究路线（FCFF / 股息折现 / 银行专用），全部 `research`，
-  `decision` 恒为 `undetermined`。交付说明见
-  [docs/phase2-delivery.md](docs/phase2-delivery.md)，
-  模型规格见 [docs/equity-model-spec.md](docs/equity-model-spec.md)，
-  参数与敏感性见 [docs/assumptions-and-sensitivity.md](docs/assumptions-and-sensitivity.md)，
-  真实输出见 [docs/phase2-samples.md](docs/phase2-samples.md)。
+- 阶段一：身份、结果契约、固定快照与数据可用性调查（已签收 `5c4c1c9`）。
+- 阶段二：三条个股研究路线（FCFF / 股息折现 / 银行专用），全部 `research`
+  （已签收 `317506e`）。见 [docs/phase2-delivery.md](docs/phase2-delivery.md)。
+- 阶段三首轮：三只首批宽基指数的 5 年月度描述性画像 + 三只 ETF 的产品资料完整性检查。
+  见 [docs/phase3-delivery.md](docs/phase3-delivery.md)、
+  [docs/index-profile-spec.md](docs/index-profile-spec.md)、
+  [docs/phase3-samples.md](docs/phase3-samples.md)。
 
-研究估值**不是**买点、不是买入上限、不是已验证策略；参数未经设计方批准。
-`unsupported` 表示「本版未实现该企业族的路线」，不等于该标的没有投资价值。
+**交付入口：[DELIVERY.md](DELIVERY.md)。**
+
+所有研究结果 `decision=undetermined`、模型状态 `research`：
+研究估值与指数分位**不是**买点、不是目标价、不是已验证策略；参数未经设计方批准。
+`unsupported` 表示「本版未实现该路线」，`insufficient_data` 表示「数据不足」，
+都不等于对该标的投资价值的判断。
 
 ## 1. 阶段一做了什么
 
@@ -31,7 +35,9 @@ A 股个股 / 境内 A 股宽基指数 / 境内普通被动 ETF 的分析引擎�
 | 硬规则出口校验（research/未完成不得给正式价格判断） | 已实现，文本与 JSON 共用 |
 | 数据可用性调查（个股 / 三只宽基 / ETF） | 已实现，见 `data/coverage/coverage-report.json` |
 | 个股研究估值（FCFF / 股息折现 / 银行专用） | 已实现，`research`，见阶段二文档 |
-| 指数估值画像、候选策略回测、ETF 执行结论 | **未实现**（阶段三） |
+| 指数 5 年月度估值画像（PE/PB 分位） | 已实现，`research`，见阶段三文档 |
+| ETF 产品资料完整性检查 + 事后同日折溢价 | 已实现，`research`，见阶段三文档 |
+| 分位进出策略、状态机、历史回测 | **未实现**（下一批） |
 
 ## 2. 目录结构
 
@@ -44,6 +50,7 @@ engine/                 运行时代码（不 import akshare）
   decision/             决策护栏（唯一允许写 decision 的地方）
   reporting/            JSON 出口与文本摘要
   evidence/             结构化业务证据与模型适用性判定
+  series/               指数估值序列（内容哈希）、月度窗口与分位、画像组装
   financials/           报告期/TTM、FCFF 桥接、分红归集
   assumptions/          研究假设配置（内容哈希 + 未批准状态）
   valuation/            折现内核、FCFF、股息、银行约束、编排
@@ -54,6 +61,7 @@ engine/                 运行时代码（不 import akshare）
 data/registry/          已核实身份注册表 + 交易所A股清单（含来源与抓取时间）
 data/evidence/          结构化业务证据 + 宏观利率基准（含来源与抓取时间）
 data/assumptions/       研究假设配置（每组都带来源、推导与未批准状态）
+data/series/            版本化指数估值序列（series_id = 内容哈希）
 data/snapshots/         固定快照（小体量，入版本控制）
 data/cache/             大体积原始数据（不入版本控制）
 data/coverage/          数据可用性调查报告
@@ -90,6 +98,10 @@ $PY -m engine.cli '600519' \
 $PY -m engine.cli '600900' --assumptions data/assumptions/600900-ddm-base.json
 $PY -m engine.cli '601398'             # 银行：资本/资产质量证据缺失 → insufficient_data
 $PY -m engine.cli '601318'             # 保险：首版未实现 → unsupported
+
+# 阶段三：指数画像与 ETF 产品资料（无需额外参数）
+$PY -m engine.cli '沪深300'            # 5 年月度 PE/PB 分位
+$PY -m engine.cli '510300'             # ETF 产品资料 + 关联同一份指数画像
 ```
 
 退出码：`0` 正常产出结果 / `2` 需要澄清或输入非法 / `3` 引擎错误（快照不可用等）/
@@ -133,13 +145,14 @@ $PY -m engine.cli --evidence-dir data/evidence '600519' --assumptions <file>
 | 字段 | 值 | 含义 |
 |---|---|---|
 | `schema_version` | `analysis-result/1` | 结果契约版本 |
-| `code_version` | `phase2-0.2.0` | 代码语义版本（阶段二首轮） |
+| `code_version` | `phase3-0.3.0` | 代码语义版本（阶段三首轮） |
 | `policy_version` | `unapproved-phase2` | 研究与正式决策分离，没有任何投资门槛获批 |
-| `model_version` | `equity-research-0.2.0` | 三条个股模型均为 `research`，未 validated |
+| `model_version` | `research-0.3.0` | 个股 3 个 + 指数画像 1 个，全部 `research` |
 
-## 7. 明确不做（阶段二首轮）
+## 7. 明确不做（阶段三首轮）
 
-不做指数回测、不做网页、不做自动交易与仓位管理、不做每日任务、不接入新 skill；
+不做指数回测、不做 A/B 进出状态机、不生成正式波段买点、不给目标点位；
+不做网页、不做自动交易与仓位管理、不做每日任务、不接入新 skill；
 不替设计方批准折现率、股权风险溢价、终值增长或银行风险参数；
 不新增「低 ROE 一律不能估值」这类一刀切规则；不改旧系统、不购买数据、不申请账户。
 

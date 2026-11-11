@@ -28,8 +28,8 @@ def run_cli(*args: str) -> subprocess.CompletedProcess:
     "query,expected_status,expected_exit",
     [
         ("工商银行", "insufficient_data", 0),
-        ("沪深300", "unsupported", 0),
-        ("510300", "unsupported", 0),
+        ("沪深300", "complete", 0),
+        ("510300", "complete", 0),
         ("512880", "unsupported", 0),
         ("000001", "needs_clarification", 2),
         ("", "needs_clarification", 2),

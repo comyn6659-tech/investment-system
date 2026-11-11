@@ -165,3 +165,29 @@
 | G3 | 600519 两条路线差 24.3%，接近 25% 阈值 | 属终值增长与可持续增长口径问题，交设计方判断（P3） |
 | G4 | 非经营性资产按 0、受限资金未拆分、少数股东按账面扣除 | 已是逐项声明、可审计的已知近似；需要更细的报表科目后再收窄 |
 | G5 | 业务证据由脚本整理，未做自动化财报文本阅读 | 后续阶段 |
+
+---
+
+# 第三阶段首轮验收清单（指数画像 + ETF 资料检查）
+
+对应文件：`outputs/phase2-acceptance-and-phase3-instructions.md` §7 的六项冻结条件。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| I1 真实画像 | 三只首批指数都有真实运行报告；可计算的指标实际计算，缺失项明确说明；不能用 unsupported 代替已具备数据的实现 | `engine/series/profile.py`、`engine/pipeline.py::_index_result` | 三只指数均 `complete`：PE 分位 75.8/75.0/65.0，PB 分位 39.2/76.7/34.2，有效样本 60/60（`docs/phase3-samples.md`） | ✅ |
+| I2 分位正确 | 手算小样本、并列值、当前值排除、窗口边界、每月去重、覆盖不足、非正 PE、未来日期记录 | `engine/series/window.py` | `test_index_profile.py` 24 项（含 `test_percentile_counts_ties_as_half`、`test_comparison_inside_window_is_removed_from_pool`、`test_insufficient_coverage_gives_no_percentile`、`test_non_positive_pe_*`、`test_future_dated_records_are_dropped`） | ✅ |
+| I3 来源与重放 | 同源同列、无不同口径拼接；固定序列/快照/配置可复算；未填造历史公开时刻或版本 | `engine/series/models.py`（内容哈希）、`data/series/` | `test_series_id_is_content_addressed_and_stable`、`test_tampered_series_file_is_rejected`、`test_profile_is_deterministic_for_same_inputs`、`test_real_series_cover_the_60_month_window`；官方短序列单独成序列且不入池 | ✅ |
+| I4 ETF 分离 | 三只 ETF 对应指数正确；同一指数画像一致；同日有效折溢价、跨日拒算、NAV 缺失/非正、交易状态未知均按约定处理 | `engine/pipeline.py::_etf_result`、`engine/reporting/product_check.py` | `test_etf_maps_to_the_right_index`、`test_index_profile_is_identical_from_index_and_etf_entry`、`test_cross_day_premium_is_refused`、`test_missing_nav_blocks_premium`、`test_non_positive_nav_blocks_premium`、`test_trading_status_and_spread_are_explicitly_missing` | ✅ |
+| I5 输出与回归 | CLI 文本/JSON 同语义；全部研究决策为 undetermined；无目标点位/目标价/正式买点；个股及阶段一相关回归通过 | `engine/reporting/text_summary.py`、`engine/contracts/validation.py` | `test_etf_exports_validate_and_have_no_formal_decision`、`test_index_profile_cannot_be_a_trading_signal`、`test_index_profile_without_model_result_is_rejected`；个股 286 项回归全部通过 | ✅ |
+| I6 交付完整 | DELIVERY.md 汇总真实示例、测试结果、数据覆盖、口径与剩余缺口，并给出可复现命令 | `DELIVERY.md`、`docs/phase3-delivery.md`、`docs/index-profile-spec.md`、`docs/phase3-samples.md` | 入口文件 §1–§6；样例由 `tools/render_phase3_report.py` 自动生成 | ✅ |
+
+## 第三阶段遗留（不阻断本轮）
+
+| # | 事项 | 影响 |
+|---|---|---|
+| H1 | 历史发布时间/修订版本未知 | 允许描述性统计；**阻断**作为严格可交易信号与回测 |
+| H2 | 月度而非周度采样 | 周度策略与回测仍缺数据，禁止插值扩频 |
+| H3 | 供应商聚合方法/分母/亏损处理 unknown | 只能同源同列比较 |
+| H4 | 停复牌与盘口价差未取得 | 不能断言可交易 |
+| H5 | 净值披露时刻未知 | 同日折溢价只能事后计算 |
+| H6 | 非首批宽基无序列 | 返回 `insufficient_data` + 缺口 |

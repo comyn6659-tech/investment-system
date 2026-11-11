@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-2b4621d5f52a3697",
-  "generated_at": "2026-11-11T15:01:52+08:00",
+  "analysis_id": "analysis-9b203c417184add9",
+  "generated_at": "2026-11-11T17:00:13+08:00",
   "instrument": {
     "instrument_id": "EQUITY:600900.SH",
     "display_name": "长江电力",
@@ -4527,7 +4527,7 @@
       ]
     }
   },
-  "code_version": "phase2-0.2.1",
+  "code_version": "phase3-0.3.0",
   "policy_version": "unapproved-phase2",
-  "model_version": "equity-research-0.2.0"
+  "model_version": "research-0.3.0"
 }

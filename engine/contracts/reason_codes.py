@@ -213,3 +213,48 @@ TERMINAL_DISTRIBUTION_UNFUNDED = _register(
     "model",
     "末期分配超过当年盈利且没有持续资金来源证据，不能作为永续终值",
 )
+
+
+# --- 阶段三：指数画像与 ETF 产品资料 -----------------------------------------
+INDEX_PROFILE_DESCRIPTIVE_ONLY = _register(
+    "INDEX_PROFILE_DESCRIPTIVE_ONLY",
+    "model",
+    "指数画像只做描述性统计，未形成可交易信号",
+    blocks_candidate=False,
+)
+INDEX_STRATEGY_NOT_IMPLEMENTED = _register(
+    "INDEX_STRATEGY_NOT_IMPLEMENTED",
+    "model",
+    "分位进出策略与回测尚未实现，本轮不产生入场/退出信号",
+)
+INDEX_PROFILE_COVERAGE_INSUFFICIENT = _register(
+    "INDEX_PROFILE_COVERAGE_INSUFFICIENT",
+    "data",
+    "月度参考样本有效月份不足 90%，不给该指标的分位",
+)
+INDEX_PROFILE_SERIES_MISSING = _register(
+    "INDEX_PROFILE_SERIES_MISSING", "data", "缺少同源同列的历史估值序列，无法计算画像"
+)
+ETF_PRODUCT_FACTS_ONLY = _register(
+    "ETF_PRODUCT_FACTS_ONLY",
+    "model",
+    "ETF 只输出产品资料完整性检查，不构成买卖条件",
+    blocks_candidate=False,
+)
+ETF_TRADING_STATUS_UNKNOWN = _register(
+    "ETF_TRADING_STATUS_UNKNOWN",
+    "data",
+    "未取得停复牌与盘口数据，不能断言当前可交易",
+    blocks_candidate=False,
+)
+ETF_NAV_DISCLOSURE_TIME_UNKNOWN = _register(
+    "ETF_NAV_DISCLOSURE_TIME_UNKNOWN",
+    "data",
+    "净值披露时刻未知，同日折溢价只是事后计算，不能证明收盘前可交易",
+    blocks_candidate=False,
+)
+ETF_SAME_DAY_PREMIUM_UNAVAILABLE = _register(
+    "ETF_SAME_DAY_PREMIUM_UNAVAILABLE",
+    "data",
+    "价格与净值不满足同日同源条件，未计算同日折溢价",
+)

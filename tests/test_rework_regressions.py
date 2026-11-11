@@ -558,7 +558,8 @@ def test_f3_snapshot_directory_is_self_consistent(snapshot_dir):
 def test_f3_default_analysis_uses_registered_snapshot(analyzer, snapshot_dir):
     store = SnapshotStore(snapshot_dir)
     result = analyzer.analyze("510300")
-    assert result.analysis_status == AnalysisStatus.UNSUPPORTED.value
+    assert result.analysis_status == AnalysisStatus.COMPLETE.value
+    assert result.model_status == "research"
     assert result.snapshot_id in {e["snapshot_id"] for e in store.load_manifest()}
 
 
@@ -581,6 +582,8 @@ def _research_result(analyzer):
         "not_selected": [],
         "candidate_models": [],
     }
+    # 该样例只验证 research_signal 契约：清掉真实画像，避免与改写的 model_results 冲突
+    result.payload["valuation_profile"] = None
     result.model_results = [
         {
             "result_type": "research_signal",
@@ -626,6 +629,8 @@ def test_f1_research_signal_must_match_model_plan(analyzer):
 
 def test_f1_research_signal_not_allowed_on_unsupported(analyzer):
     result = analyzer.analyze("工商银行")
+    # 该样例只验证 research_signal 契约：清掉真实画像，避免与改写的 model_results 冲突
+    result.payload["valuation_profile"] = None
     result.model_results = [
         {
             "result_type": "research_signal",

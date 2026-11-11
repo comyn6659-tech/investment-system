@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-b80466fce266145f",
-  "generated_at": "2026-11-11T15:01:52+08:00",
+  "analysis_id": "analysis-cf6f2b2fbf7d13c9",
+  "generated_at": "2026-11-11T17:00:13+08:00",
   "instrument": {
     "instrument_id": "ETF:510300.SH",
     "display_name": "沪深300ETF华泰柏瑞",
@@ -75,59 +75,97 @@
     ],
     "clarification_question": null
   },
-  "snapshot_id": "snap-6938a7a7b2c868c4",
+  "snapshot_id": "snap-d6570cf8645d49e4",
   "as_of": "2026-11-10",
   "available_at": "2026-11-10T15:00:00+08:00",
-  "analysis_status": "unsupported",
-  "model_status": null,
+  "analysis_status": "complete",
+  "model_status": "research",
   "valuation_state": "unknown",
   "decision": "undetermined",
   "reason_codes": [
-    "MODEL_NOT_IMPLEMENTED_ETF",
-    "MODEL_NOT_IMPLEMENTED_INDEX"
+    "ETF_PRODUCT_FACTS_ONLY",
+    "RESEARCH_PARAMETERS_UNAPPROVED",
+    "INDEX_PROFILE_DESCRIPTIVE_ONLY",
+    "INDEX_STRATEGY_NOT_IMPLEMENTED",
+    "ETF_TRADING_STATUS_UNKNOWN",
+    "ETF_NAV_DISCLOSURE_TIME_UNKNOWN",
+    "RESEARCH_SIGNAL_ONLY"
   ],
   "model_plan": {
-    "primary_model": null,
-    "required_checks": [],
-    "selection_reason": "阶段一不实现模型适用性判断，因此不选主模型",
+    "primary_model": "index_valuation_profile",
+    "model_version": "0.3.0-research",
+    "model_status": "research",
+    "cross_check_model": null,
+    "required_checks": [
+      "同源同列月度参考池，有效月份不少于 54/60",
+      "比较值不参与自己的历史排名",
+      "PE 与 PB 分别计算，不拼综合分"
+    ],
+    "selection_reason": "ETF 本身不单独建模：产品资料单列，指数画像沿用其跟踪指数",
     "not_selected": [
       {
-        "model_id": "etf_execution_check",
-        "status": "planned",
-        "implemented": false,
-        "reason": "model_not_implemented"
+        "model_id": "index_strategy_a_valuation_reversion",
+        "reason_code": "INDEX_STRATEGY_NOT_IMPLEMENTED",
+        "reason": "分位进出规则与回测留待下一批；本轮不实现状态机，也不给入场/退出信号"
+      },
+      {
+        "model_id": "index_strategy_b_cross_confirmation",
+        "reason_code": "INDEX_STRATEGY_NOT_IMPLEMENTED",
+        "reason": "同上：交叉确认规则与回测留待下一批"
       }
     ],
-    "candidate_models": [
-      {
-        "model_id": "etf_execution_check",
-        "version": "0.0.0-planned",
-        "applies_to": "etf",
-        "status": "planned",
-        "implemented": false,
-        "required_fields": [
-          "etf.price",
-          "etf.nav",
-          "etf.nav_disclosed_at",
-          "etf.premium_discount_pct",
-          "etf.management_fee_pct",
-          "etf.custody_fee_pct",
-          "etf.trading_status"
-        ],
-        "supports": [
-          "境内普通被动 ETF"
-        ],
-        "failure_status": "unsupported",
-        "notes": "阶段三实现；指数信号与产品执行判断必须分开输出。"
-      }
-    ]
+    "candidate_models": [],
+    "profile_status": "complete",
+    "window_rule": {
+      "months": 60,
+      "min_valid_months": 54,
+      "rule": "分析时点所在月份之前的 N 个完整自然月；每月至多一个观测，取该月内最后一个有效且有实际日期的同口径记录；比较值为该来源最新可用观测，若落在参考池中则移除"
+    },
+    "series_ids": {
+      "pe_rolling": "ser-8d315ba2ab78c6ec",
+      "pb": "ser-370e315c2b1150f2",
+      "official_pe_ratio_1": "ser-fb818db17e36a9a4"
+    }
   },
   "assumptions": [],
-  "model_results": [],
-  "conditions": [],
+  "model_results": [
+    {
+      "result_type": "index_profile",
+      "model_id": "index_valuation_profile",
+      "model_version": "0.3.0-research",
+      "model_status": "research",
+      "is_trading_signal": false,
+      "instrument_id": "INDEX:000300.SH",
+      "as_of": "2026-11-10",
+      "status": "complete",
+      "series_ids": {
+        "pe_rolling": "ser-8d315ba2ab78c6ec",
+        "pb": "ser-370e315c2b1150f2",
+        "official_pe_ratio_1": "ser-fb818db17e36a9a4"
+      },
+      "metrics": {
+        "pe_rolling": {
+          "percentile": 75.83333333333333,
+          "percentile_display": "75.8",
+          "valid_months": 60,
+          "pool_size": 60
+        },
+        "pb": {
+          "percentile": 39.166666666666664,
+          "percentile_display": "39.2",
+          "valid_months": 60,
+          "pool_size": 60
+        }
+      }
+    }
+  ],
+  "conditions": [
+    "ETF 只输出产品资料完整性检查；资料齐备不等于满足买入条件。",
+    "指数估值位置与 ETF 产品资料不互相替代。"
+  ],
   "invalidation": [
-    "若身份、跟踪关系或数据来源被更正，本结果需要重跑。",
-    "本结果不含估值结论，因此不存在「价格变化使买点失效」的情形。"
+    "净值日期或披露口径变化时，同日折溢价需要重算。",
+    "若取得停复牌与盘口数据，交易状态相关结论需要更新。"
   ],
   "evidence_refs": [
     {
@@ -159,11 +197,20 @@
       "note": "上交所 ETF 列表中包含 510300；该接口返回的统计日期为 2025-01-15（数据陈旧）"
     },
     {
+      "evidence_id": "em.etf_hist",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://quote.eastmoney.com/",
+      "retrieved_at": "2026-11-11T16:53:53+08:00",
+      "fields_cited": [],
+      "note": "AKShare fund_etf_hist_em"
+    },
+    {
       "evidence_id": "eastmoney.fund_profile",
       "kind": "vendor_api",
       "publisher": "天天基金（基金概况页）",
       "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
-      "retrieved_at": "2026-11-11T13:37:31+08:00",
+      "retrieved_at": "2026-11-11T16:53:53+08:00",
       "fields_cited": [],
       "note": "HTTP 抓取基金概况页面"
     },
@@ -172,32 +219,34 @@
       "kind": "vendor_api",
       "publisher": "东方财富",
       "url": "http://fundf10.eastmoney.com/jjzq_510300.html",
-      "retrieved_at": "2026-11-11T13:37:31+08:00",
+      "retrieved_at": "2026-11-11T16:53:53+08:00",
       "fields_cited": [],
       "note": "AKShare fund_etf_fund_info_em"
-    },
-    {
-      "evidence_id": "em.etf_hist",
-      "kind": "vendor_api",
-      "publisher": "东方财富",
-      "url": "https://quote.eastmoney.com/",
-      "retrieved_at": "2026-11-11T13:37:31+08:00",
-      "fields_cited": [],
-      "note": "AKShare fund_etf_hist_em"
     }
   ],
   "missing_data": [
     {
-      "fact_id": "etf.premium_discount_pct",
-      "metric": "premium_discount_pct",
+      "item": "净值披露时刻",
+      "fact_id": "etf.nav_disclosed_at",
       "status": "missing",
-      "note": "净值披露时间缺失，按设计书要求不计算日终折溢价",
-      "period": "2026-11-10"
+      "note": "所有已核实免费接口都不提供净值披露时间，无法确认收盘时是否已知当日净值"
+    },
+    {
+      "item": "二级市场交易状态（停复牌）",
+      "fact_id": "etf.trading_status",
+      "status": "missing",
+      "note": "未取得交易所停复牌状态字段；仅能确认当日有行情"
+    },
+    {
+      "item": "买卖价差",
+      "fact_id": "etf.bid_ask_spread_cny",
+      "status": "missing",
+      "note": "日线行情不含买卖盘口，未取得价差；不因有收盘价就断言可交易"
     }
   ],
   "warnings": [
-    "阶段一未实现任何估值/策略模型：本结果只覆盖身份、契约与数据可用性。",
-    "「不适用/未实现」不等于「该标的没有投资价值」。"
+    "同日折溢价是事后计算，不能证明当日收盘前可交易，也不用于回测当日成交。",
+    "本轮不制定溢价、流动性或费率的买卖门槛，也不做基金之间的比较或推荐。"
   ],
   "clarification": null,
   "payload": {
@@ -230,7 +279,7 @@
         "publisher": "东方财富",
         "interface": "AKShare fund_etf_fund_info_em",
         "url": "http://fundf10.eastmoney.com/jjzq_510300.html",
-        "retrieved_at": "2026-11-11T13:37:31+08:00",
+        "retrieved_at": "2026-11-11T16:53:53+08:00",
         "notes": "单位净值/累计净值；接口不含净值披露时间"
       }
     },
@@ -251,7 +300,7 @@
         "publisher": "天天基金（基金概况页）",
         "interface": "HTTP 抓取基金概况页面",
         "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
-        "retrieved_at": "2026-11-11T13:37:31+08:00",
+        "retrieved_at": "2026-11-11T16:53:53+08:00",
         "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
       }
     },
@@ -264,7 +313,7 @@
         "publisher": "东方财富",
         "interface": "AKShare fund_etf_hist_em",
         "url": "https://quote.eastmoney.com/",
-        "retrieved_at": "2026-11-11T13:37:31+08:00",
+        "retrieved_at": "2026-11-11T16:53:53+08:00",
         "notes": "ETF 日线行情，用于取已收盘的收盘价"
       }
     },
@@ -276,12 +325,651 @@
         "publisher": "天天基金（基金概况页）",
         "interface": "HTTP 抓取基金概况页面",
         "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
-        "retrieved_at": "2026-11-11T13:37:31+08:00",
+        "retrieved_at": "2026-11-11T16:53:53+08:00",
         "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
+      }
+    },
+    "product_check": {
+      "payload_version": "etf-product-check/1",
+      "status": "complete",
+      "identity": {
+        "instrument_id": "ETF:510300.SH",
+        "display_name": "沪深300ETF华泰柏瑞",
+        "etf_strategy": "passive_plain",
+        "tracking_note": {
+          "value": "跟踪标的：沪深300指数；业绩比较基准：沪深300指数",
+          "status": "known",
+          "period": "2026-11-11",
+          "note": "来自基金销售平台概况页，正式引用应以基金合同为准",
+          "source": {
+            "source_id": "eastmoney.fund_profile",
+            "publisher": "天天基金（基金概况页）",
+            "interface": "HTTP 抓取基金概况页面",
+            "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
+          }
+        },
+        "underlying_index": {
+          "instrument_id": "INDEX:000300.SH",
+          "display_name": "沪深300"
+        },
+        "evidence": [
+          {
+            "evidence_id": "ev-fundf10-510300",
+            "kind": "fund_profile",
+            "publisher": "天天基金（基金概况页）",
+            "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
+            "retrieved_at": "2026-11-11T02:24:00+08:00",
+            "fields_cited": [
+              "基金全称",
+              "跟踪标的",
+              "业绩比较基准",
+              "管理费率",
+              "托管费率",
+              "成立日期"
+            ],
+            "note": "跟踪标的：沪深300指数；管理费率 0.15%/年；托管费率 0.05%/年；成立 2012-05-04"
+          },
+          {
+            "evidence_id": "ev-sse-etf-list",
+            "kind": "exchange_list",
+            "publisher": "上海证券交易所（经 AKShare fund_etf_scale_sse）",
+            "url": "https://www.sse.com.cn/assortment/fund/etf/list/scale/",
+            "retrieved_at": "2026-11-11T02:28:00+08:00",
+            "fields_cited": [
+              "基金代码",
+              "基金简称"
+            ],
+            "note": "上交所 ETF 列表中包含 510300；该接口返回的统计日期为 2025-01-15（数据陈旧）"
+          }
+        ]
+      },
+      "price": {
+        "price": {
+          "value": 4.135,
+          "status": "known",
+          "unit": "CNY_per_share",
+          "currency": "CNY",
+          "period": "2026-11-10",
+          "as_of": "2026-11-10",
+          "available_at": "2026-11-10T15:00:00+08:00",
+          "source": {
+            "source_id": "em.etf_hist",
+            "publisher": "东方财富",
+            "interface": "AKShare fund_etf_hist_em",
+            "url": "https://quote.eastmoney.com/",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "ETF 日线行情，用于取已收盘的收盘价"
+          },
+          "note": "已收盘交易日的收盘价"
+        },
+        "bar_status": {
+          "value": "closed",
+          "status": "known",
+          "period": "2026-11-10",
+          "note": "按交易所收盘时间判定；intraday 表示当日未收盘"
+        },
+        "price_type": "close_unadjusted"
+      },
+      "nav": {
+        "value": {
+          "value": 4.1361,
+          "status": "known",
+          "unit": "CNY_per_share",
+          "currency": "CNY",
+          "period": "2026-11-10",
+          "as_of": "2026-11-10",
+          "available_at": null,
+          "source": {
+            "source_id": "em.etf_nav",
+            "publisher": "东方财富",
+            "interface": "AKShare fund_etf_fund_info_em",
+            "url": "http://fundf10.eastmoney.com/jjzq_510300.html",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "单位净值/累计净值；接口不含净值披露时间"
+          },
+          "note": "净值日期存在，但披露时间未提供，可获得时间记为未知"
+        },
+        "nav_date": {
+          "value": "2026-11-10",
+          "status": "known",
+          "period": "2026-11-10",
+          "note": "",
+          "source": {
+            "source_id": "em.etf_nav",
+            "publisher": "东方财富",
+            "interface": "AKShare fund_etf_fund_info_em",
+            "url": "http://fundf10.eastmoney.com/jjzq_510300.html",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "单位净值/累计净值；接口不含净值披露时间"
+          }
+        },
+        "disclosed_at": {
+          "value": null,
+          "status": "missing",
+          "period": "2026-11-10",
+          "note": "所有已核实免费接口都不提供净值披露时间，无法确认收盘时是否已知当日净值",
+          "source": {
+            "source_id": "em.etf_nav",
+            "publisher": "东方财富",
+            "interface": "AKShare fund_etf_fund_info_em",
+            "url": "http://fundf10.eastmoney.com/jjzq_510300.html",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "单位净值/累计净值；接口不含净值披露时间"
+          }
+        },
+        "disclosure_time_known": false
+      },
+      "premium_discount_same_day": {
+        "value": -0.026595101665827237,
+        "status": "known",
+        "unit": "percent",
+        "currency": null,
+        "period": "2026-11-10",
+        "as_of": "2026-11-10",
+        "available_at": null,
+        "source": {
+          "source_id": "em.etf_nav",
+          "publisher": "东方财富",
+          "interface": "AKShare fund_etf_fund_info_em",
+          "url": "http://fundf10.eastmoney.com/jjzq_510300.html",
+          "retrieved_at": "2026-11-11T16:53:53+08:00",
+          "notes": "单位净值/累计净值；接口不含净值披露时间"
+        },
+        "note": "价格与净值对应同一估值日期；净值披露时刻未知，不能据此证明当日收盘前已可交易，也不用于回测的当日成交",
+        "label": "事后同日折溢价"
+      },
+      "fees": {
+        "management": {
+          "value": 0.15,
+          "status": "known",
+          "unit": "percent",
+          "currency": null,
+          "period": "2026-11-11",
+          "as_of": "2026-11-11",
+          "available_at": null,
+          "source": {
+            "source_id": "eastmoney.fund_profile",
+            "publisher": "天天基金（基金概况页）",
+            "interface": "HTTP 抓取基金概况页面",
+            "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
+          },
+          "note": "费率原文未标注生效日，可获得时间记为未知"
+        },
+        "custody": {
+          "value": 0.05,
+          "status": "known",
+          "unit": "percent",
+          "currency": null,
+          "period": "2026-11-11",
+          "as_of": "2026-11-11",
+          "available_at": null,
+          "source": {
+            "source_id": "eastmoney.fund_profile",
+            "publisher": "天天基金（基金概况页）",
+            "interface": "HTTP 抓取基金概况页面",
+            "url": "http://fundf10.eastmoney.com/jbgk_510300.html",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
+          },
+          "note": ""
+        },
+        "effective_date_known": false,
+        "note": "费率来自基金概况页，未标注生效日期；以基金合同为准"
+      },
+      "turnover": {
+        "latest": {
+          "value": 4983241125.0,
+          "status": "known",
+          "unit": "CNY",
+          "currency": "CNY",
+          "period": "2026-11-10",
+          "as_of": "2026-11-10",
+          "available_at": "2026-11-10T15:00:00+08:00",
+          "source": {
+            "source_id": "em.etf_hist",
+            "publisher": "东方财富",
+            "interface": "AKShare fund_etf_hist_em",
+            "url": "https://quote.eastmoney.com/",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "ETF 日线行情，用于取已收盘的收盘价"
+          },
+          "note": "已收盘交易日的日成交数据"
+        },
+        "average": {
+          "value": 8734312320.95,
+          "status": "known",
+          "unit": "CNY",
+          "currency": "CNY",
+          "period": "2026-11-10",
+          "as_of": "2026-11-10",
+          "available_at": "2026-11-10T15:00:00+08:00",
+          "source": {
+            "source_id": "em.etf_hist",
+            "publisher": "东方财富",
+            "interface": "AKShare fund_etf_hist_em",
+            "url": "https://quote.eastmoney.com/",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "ETF 日线行情，用于取已收盘的收盘价"
+          },
+          "note": "实际使用 20 个交易日；不足 20 天时不称『20 日均值』"
+        },
+        "average_label": "近 20 个交易日平均成交额",
+        "days_used": 20,
+        "is_full_20d": true,
+        "volume": {
+          "value": 12031067.0,
+          "status": "known",
+          "unit": "shares",
+          "currency": null,
+          "period": "2026-11-10",
+          "as_of": "2026-11-10",
+          "available_at": "2026-11-10T15:00:00+08:00",
+          "source": {
+            "source_id": "em.etf_hist",
+            "publisher": "东方财富",
+            "interface": "AKShare fund_etf_hist_em",
+            "url": "https://quote.eastmoney.com/",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "ETF 日线行情，用于取已收盘的收盘价"
+          },
+          "note": "已收盘交易日的日成交数据"
+        }
+      },
+      "trading": {
+        "secondary_market_status": {
+          "value": null,
+          "status": "missing",
+          "period": "2026-11-10",
+          "note": "未取得交易所停复牌状态字段；仅能确认当日有行情",
+          "source": {
+            "source_id": "em.etf_hist",
+            "publisher": "东方财富",
+            "interface": "AKShare fund_etf_hist_em",
+            "url": "https://quote.eastmoney.com/",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "ETF 日线行情，用于取已收盘的收盘价"
+          }
+        },
+        "bid_ask_spread": {
+          "value": null,
+          "status": "missing",
+          "period": "2026-11-10",
+          "note": "日线行情不含买卖盘口，未取得价差；不因有收盘价就断言可交易",
+          "source": {
+            "source_id": "em.etf_hist",
+            "publisher": "东方财富",
+            "interface": "AKShare fund_etf_hist_em",
+            "url": "https://quote.eastmoney.com/",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "ETF 日线行情，用于取已收盘的收盘价"
+          }
+        },
+        "subscription_status": {
+          "value": "场内买入",
+          "status": "known",
+          "period": "2026-11-10",
+          "note": "申购/赎回状态，不等于二级市场交易状态（停复牌另行核查）",
+          "source": {
+            "source_id": "em.etf_nav",
+            "publisher": "东方财富",
+            "interface": "AKShare fund_etf_fund_info_em",
+            "url": "http://fundf10.eastmoney.com/jjzq_510300.html",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "单位净值/累计净值；接口不含净值披露时间"
+          }
+        },
+        "redemption_status": {
+          "value": "场内卖出",
+          "status": "known",
+          "period": "2026-11-10",
+          "note": "申购/赎回状态，不等于二级市场交易状态（停复牌另行核查）",
+          "source": {
+            "source_id": "em.etf_nav",
+            "publisher": "东方财富",
+            "interface": "AKShare fund_etf_fund_info_em",
+            "url": "http://fundf10.eastmoney.com/jjzq_510300.html",
+            "retrieved_at": "2026-11-11T16:53:53+08:00",
+            "notes": "单位净值/累计净值；接口不含净值披露时间"
+          }
+        },
+        "note": "申购/赎回状态来自基金净值表，不等于二级市场交易状态；本轮没有取得停复牌与盘口数据，因此不断言当前可交易"
+      },
+      "missing": [
+        {
+          "item": "净值披露时刻",
+          "fact_id": "etf.nav_disclosed_at",
+          "status": "missing",
+          "note": "所有已核实免费接口都不提供净值披露时间，无法确认收盘时是否已知当日净值"
+        },
+        {
+          "item": "二级市场交易状态（停复牌）",
+          "fact_id": "etf.trading_status",
+          "status": "missing",
+          "note": "未取得交易所停复牌状态字段；仅能确认当日有行情"
+        },
+        {
+          "item": "买卖价差",
+          "fact_id": "etf.bid_ask_spread_cny",
+          "status": "missing",
+          "note": "日线行情不含买卖盘口，未取得价差；不因有收盘价就断言可交易"
+        }
+      ],
+      "missing_computable": [],
+      "usage_note": "本块只说明资料是否齐备，不构成买卖条件；「资料齐备」不等于「满足买入条件」，指数估值位置与 ETF 产品资料也不互相替代。",
+      "underlying_index_profile": {
+        "payload_version": "index-profile/1",
+        "instrument_id": "INDEX:000300.SH",
+        "as_of": "2026-11-10",
+        "status": "complete",
+        "window_rule": {
+          "months": 60,
+          "min_valid_months": 54,
+          "rule": "分析时点所在月份之前的 N 个完整自然月；每月至多一个观测，取该月内最后一个有效且有实际日期的同口径记录；比较值为该来源最新可用观测，若落在参考池中则移除"
+        },
+        "metrics": {
+          "pe_rolling": {
+            "metric": "pe_rolling",
+            "label": "滚动市盈率",
+            "field": "滚动市盈率",
+            "series_id": "ser-8d315ba2ab78c6ec",
+            "source": {
+              "source_id": "legulegu.index_pe_pb",
+              "publisher": "乐咕乐股",
+              "interface": "AKShare stock_index_pe_lg / stock_index_pb_lg",
+              "url": "https://legulegu.com/stockdata/index-basic-pe",
+              "retrieved_at": "2026-11-11T16:53:05+08:00",
+              "definition_note": "第三方聚合数据；列名为供应商原始命名。整体法/加权方式、分母口径与亏损股处理未在来源中说明，记为 unknown；不与其他来源的同名指标拼接。"
+            },
+            "status": "computed",
+            "window": {
+              "metric": "pe_rolling",
+              "as_of": "2026-11-10",
+              "analysis_month": "2026-11",
+              "window": {
+                "months": 60,
+                "start_month": "2021-11",
+                "end_month": "2026-10",
+                "min_valid_months": 54
+              },
+              "expected_months": 60,
+              "valid_months": 60,
+              "valid_month_list": [
+                "2021-11",
+                "2021-12",
+                "2022-01",
+                "2022-02",
+                "2022-03",
+                "2022-04",
+                "2022-05",
+                "2022-06",
+                "2022-07",
+                "2022-08",
+                "2022-09",
+                "2022-10",
+                "2022-11",
+                "2022-12",
+                "2023-01",
+                "2023-02",
+                "2023-03",
+                "2023-04",
+                "2023-05",
+                "2023-06",
+                "2023-07",
+                "2023-08",
+                "2023-09",
+                "2023-10",
+                "2023-11",
+                "2023-12",
+                "2024-01",
+                "2024-02",
+                "2024-03",
+                "2024-04",
+                "2024-05",
+                "2024-06",
+                "2024-07",
+                "2024-08",
+                "2024-09",
+                "2024-10",
+                "2024-11",
+                "2024-12",
+                "2025-01",
+                "2025-02",
+                "2025-03",
+                "2025-04",
+                "2025-05",
+                "2025-06",
+                "2025-07",
+                "2025-08",
+                "2025-09",
+                "2025-10",
+                "2025-11",
+                "2025-12",
+                "2026-01",
+                "2026-02",
+                "2026-03",
+                "2026-04",
+                "2026-05",
+                "2026-06",
+                "2026-07",
+                "2026-08",
+                "2026-09",
+                "2026-10"
+              ],
+              "missing_months": [],
+              "coverage_start": "2021-11-30",
+              "coverage_end": "2026-10-30",
+              "comparison": {
+                "month": "2026-11",
+                "date": "2026-11-10",
+                "value": 12.65
+              },
+              "comparison_removed_from_pool": false,
+              "pool": {
+                "size": 60,
+                "min": 9.61,
+                "median": 11.685,
+                "max": 13.85
+              },
+              "percentile": 75.83333333333333,
+              "percentile_display": "75.8",
+              "sufficient": true,
+              "insufficient_reason": null,
+              "dropped_non_positive": [],
+              "dropped_future": [],
+              "dropped_duplicate_months": [],
+              "dropped_unparsable": [],
+              "notes": [
+                "分位是该来源历史样本中的相对位置，不是未来上涨概率，也不是内在价值折扣。",
+                "参考池只包含早于比较值日期的记录；比较值若落在参考池中已移除。"
+              ]
+            },
+            "percentile": 75.83333333333333,
+            "percentile_display": "75.8"
+          },
+          "pb": {
+            "metric": "pb",
+            "label": "市净率",
+            "field": "市净率",
+            "series_id": "ser-370e315c2b1150f2",
+            "source": {
+              "source_id": "legulegu.index_pe_pb",
+              "publisher": "乐咕乐股",
+              "interface": "AKShare stock_index_pe_lg / stock_index_pb_lg",
+              "url": "https://legulegu.com/stockdata/index-basic-pe",
+              "retrieved_at": "2026-11-11T16:53:05+08:00",
+              "definition_note": "第三方聚合数据；列名为供应商原始命名。整体法/加权方式、分母口径与亏损股处理未在来源中说明，记为 unknown；不与其他来源的同名指标拼接。"
+            },
+            "status": "computed",
+            "window": {
+              "metric": "pb",
+              "as_of": "2026-11-10",
+              "analysis_month": "2026-11",
+              "window": {
+                "months": 60,
+                "start_month": "2021-11",
+                "end_month": "2026-10",
+                "min_valid_months": 54
+              },
+              "expected_months": 60,
+              "valid_months": 60,
+              "valid_month_list": [
+                "2021-11",
+                "2021-12",
+                "2022-01",
+                "2022-02",
+                "2022-03",
+                "2022-04",
+                "2022-05",
+                "2022-06",
+                "2022-07",
+                "2022-08",
+                "2022-09",
+                "2022-10",
+                "2022-11",
+                "2022-12",
+                "2023-01",
+                "2023-02",
+                "2023-03",
+                "2023-04",
+                "2023-05",
+                "2023-06",
+                "2023-07",
+                "2023-08",
+                "2023-09",
+                "2023-10",
+                "2023-11",
+                "2023-12",
+                "2024-01",
+                "2024-02",
+                "2024-03",
+                "2024-04",
+                "2024-05",
+                "2024-06",
+                "2024-07",
+                "2024-08",
+                "2024-09",
+                "2024-10",
+                "2024-11",
+                "2024-12",
+                "2025-01",
+                "2025-02",
+                "2025-03",
+                "2025-04",
+                "2025-05",
+                "2025-06",
+                "2025-07",
+                "2025-08",
+                "2025-09",
+                "2025-10",
+                "2025-11",
+                "2025-12",
+                "2026-01",
+                "2026-02",
+                "2026-03",
+                "2026-04",
+                "2026-05",
+                "2026-06",
+                "2026-07",
+                "2026-08",
+                "2026-09",
+                "2026-10"
+              ],
+              "missing_months": [],
+              "coverage_start": "2021-11-30",
+              "coverage_end": "2026-10-30",
+              "comparison": {
+                "month": "2026-11",
+                "date": "2026-11-10",
+                "value": 1.32
+              },
+              "comparison_removed_from_pool": false,
+              "pool": {
+                "size": 60,
+                "min": 1.16,
+                "median": 1.37,
+                "max": 1.69
+              },
+              "percentile": 39.166666666666664,
+              "percentile_display": "39.2",
+              "sufficient": true,
+              "insufficient_reason": null,
+              "dropped_non_positive": [],
+              "dropped_future": [],
+              "dropped_duplicate_months": [],
+              "dropped_unparsable": [],
+              "notes": [
+                "分位是该来源历史样本中的相对位置，不是未来上涨概率，也不是内在价值折扣。",
+                "参考池只包含早于比较值日期的记录；比较值若落在参考池中已移除。"
+              ]
+            },
+            "percentile": 39.166666666666664,
+            "percentile_display": "39.2"
+          }
+        },
+        "official_short_history": {
+          "official_pe_ratio_1": {
+            "metric": "official_pe_ratio_1",
+            "label": "市盈率1",
+            "series_id": "ser-fb818db17e36a9a4",
+            "field": "市盈率1",
+            "source": {
+              "source_id": "csindex.indicator_file",
+              "publisher": "中证指数有限公司",
+              "interface": "官方指数估值指标文件（.xls）",
+              "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000300indicator.xls",
+              "retrieved_at": "2026-11-11T16:53:05+08:00",
+              "definition_note": "官方文件只提供最近约 20 个交易日；市盈率/股息率口径未在文件内说明。"
+            },
+            "latest": {
+              "date": "2026-11-10",
+              "value": 13.82
+            },
+            "observation_count": 20,
+            "coverage_start": "2026-10-14",
+            "coverage_end": "2026-11-10",
+            "usage": "仅作并列事实；样本过短，不参与长历史排名"
+          }
+        },
+        "missing": [],
+        "sources": [
+          {
+            "source_id": "legulegu.index_pe_pb",
+            "publisher": "乐咕乐股",
+            "interface": "AKShare stock_index_pe_lg / stock_index_pb_lg",
+            "url": "https://legulegu.com/stockdata/index-basic-pe",
+            "retrieved_at": "2026-11-11T16:53:05+08:00",
+            "definition_note": "第三方聚合数据；列名为供应商原始命名。整体法/加权方式、分母口径与亏损股处理未在来源中说明，记为 unknown；不与其他来源的同名指标拼接。"
+          },
+          {
+            "source_id": "csindex.indicator_file",
+            "publisher": "中证指数有限公司",
+            "interface": "官方指数估值指标文件（.xls）",
+            "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/indicator/000300indicator.xls",
+            "retrieved_at": "2026-11-11T16:53:05+08:00",
+            "definition_note": "官方文件只提供最近约 20 个交易日；市盈率/股息率口径未在文件内说明。"
+          }
+        ],
+        "series_ids": {
+          "pe_rolling": "ser-8d315ba2ab78c6ec",
+          "pb": "ser-370e315c2b1150f2",
+          "official_pe_ratio_1": "ser-fb818db17e36a9a4"
+        },
+        "limitations": [
+          "PE/PB 为供应商同一列的月度参考样本；聚合方法、分母口径与亏损样本处理未在来源中说明，记为 unknown。",
+          "分位是该供应商历史样本中的相对位置，不是未来上涨概率，也不是内在价值折扣。",
+          "历史发布时间与修订版本未知，因此这些数字不能当作严格可交易信号，也不能用于回测的当时可得数据。",
+          "官方指标文件只覆盖最近若干交易日，仅作并列事实，不参与长历史排名。"
+        ],
+        "decision_note": "本轮只回答「当前值相对该历史口径处于什么位置」；尚无经过验证的波段交易结论，不输出目标点位，也不据此给出买点。",
+        "is_trading_signal": false
       }
     }
   },
-  "code_version": "phase2-0.2.1",
+  "code_version": "phase3-0.3.0",
   "policy_version": "unapproved-phase2",
-  "model_version": "equity-research-0.2.0"
+  "model_version": "research-0.3.0"
 }

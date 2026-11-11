@@ -112,14 +112,21 @@ MODELS: tuple[ModelDescriptor, ...] = (
     ),
     ModelDescriptor(
         model_id="index_valuation_profile",
-        version="0.0.0-planned",
+        version="0.3.0-research",
         applies_to="index",
-        status="planned",
-        implemented=False,
-        required_fields=("index.pe_ttm_series", "index.pb_series"),
-        supports=("境内 A 股宽基指数",),
-        failure_status="unsupported",
-        notes="阶段三实现；必须先核实历史估值序列口径与真实覆盖长度。",
+        status="research",
+        implemented=True,
+        required_fields=(
+            "series.pe_rolling.monthly",
+            "series.pb.monthly",
+            "index.level",
+        ),
+        supports=("境内 A 股宽基指数（首批沪深300 / 中证500 / 中证1000）",),
+        failure_status="insufficient_data",
+        notes=(
+            "研究版描述性画像：同源同列月度参考池 60 个月、有效月份≥54 才给分位；"
+            "PE 与 PB 分别计算，不拼综合分；不输出目标点位，不构成交易信号。参数未获批准。"
+        ),
     ),
     ModelDescriptor(
         model_id="index_strategy_a_valuation_reversion",

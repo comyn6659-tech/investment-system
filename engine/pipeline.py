@@ -33,11 +33,17 @@ from engine.identity.catalog import IdentityCatalog
 from engine.identity.models import InstrumentRef, Resolution
 from engine.identity.resolver import resolve
 from engine.models.registry import MODELS_BY_ID, planned_model_plan
+from engine.reporting.payload_builders import build_equity_payload, build_etf_payload, build_index_payload
+from engine.reporting.product_check import build_product_check
+from engine.series.models import (
+    FREQ_DAILY_SHORT,
+    FREQ_MONTHLY_REFERENCE,
+    METRIC_OFFICIAL_PE_1,
+    SeriesStore,
+)
+from engine.series.profile import POOL_METRICS, build_index_profile
 from engine.valuation.runner import run_research_valuation
 from engine.reporting.payload_builders import (
-    build_equity_payload,
-    build_etf_payload,
-    build_index_payload,
     collect_missing_data,
     strategy_candidates,
 )
@@ -62,6 +68,7 @@ DEFAULT_REGISTRY = PROJECT_ROOT / "data" / "registry" / "instruments.json"
 DEFAULT_EQUITY_LIST = PROJECT_ROOT / "data" / "registry" / "cn_a_equities.json"
 DEFAULT_SNAPSHOTS = PROJECT_ROOT / "data" / "snapshots"
 DEFAULT_EVIDENCE = PROJECT_ROOT / "data" / "evidence"
+DEFAULT_SERIES = PROJECT_ROOT / "data" / "series"
 
 
 @dataclass(frozen=True)
@@ -70,6 +77,7 @@ class AnalyzerConfig:
     equity_list_path: Path = DEFAULT_EQUITY_LIST
     snapshot_dir: Path = DEFAULT_SNAPSHOTS
     evidence_dir: Path = DEFAULT_EVIDENCE
+    series_dir: Path = DEFAULT_SERIES
     assumptions_path: Path | None = None
     cross_check_assumptions_path: Path | None = None
 
@@ -82,6 +90,7 @@ class Analyzer:
             self.catalog.merge_equity_list(Path(self.config.equity_list_path))
         self.store = SnapshotStore(self.config.snapshot_dir)
         self.evidence = EvidenceBook(Path(self.config.evidence_dir))
+        self.series = SeriesStore(Path(self.config.series_dir))
 
     # --- 主流程 ---------------------------------------------------------
     def analyze(
@@ -137,6 +146,14 @@ class Analyzer:
                 generated_at=generated_at,
                 assumptions=assumptions,
                 cross_check_assumptions=cross_check_assumptions,
+            )
+        if instrument.asset_class == AssetClass.INDEX:
+            return self._index_result(
+                instrument, resolution, snapshot, intent=intent, generated_at=generated_at
+            )
+        if instrument.asset_class == AssetClass.ETF:
+            return self._etf_result(
+                instrument, resolution, snapshot, intent=intent, generated_at=generated_at
             )
         return self._in_scope_result(
             instrument, resolution, snapshot, intent=intent, generated_at=generated_at
@@ -357,6 +374,216 @@ class Analyzer:
         result.invalidation = ["若身份核实结果变化，本结果需要重跑。"]
         return self._finalize(result, instrument)
 
+    # --- 指数：描述性估值画像 -------------------------------------------
+    def _index_profile(self, instrument: InstrumentRef, as_of: str) -> dict:
+        """同一指数无论从指数还是 ETF 进入，都必须走这一个函数。"""
+        series = {}
+        for metric in POOL_METRICS:
+            item = self.series.find(
+                instrument.instrument_id, metric, frequency=FREQ_MONTHLY_REFERENCE
+            )
+            if item is not None:
+                series[metric] = item
+        short = {}
+        official = self.series.find(
+            instrument.instrument_id, METRIC_OFFICIAL_PE_1, frequency=FREQ_DAILY_SHORT
+        )
+        if official is not None:
+            short[METRIC_OFFICIAL_PE_1] = official
+        return build_index_profile(
+            instrument_id=instrument.instrument_id,
+            as_of=as_of,
+            series=series,
+            short_series=short,
+        )
+
+    def _index_result(
+        self,
+        instrument: InstrumentRef,
+        resolution: Resolution,
+        snapshot: Snapshot | None,
+        *,
+        intent: str,
+        generated_at: str,
+    ) -> AnalysisResult:
+        as_of = snapshot.as_of if snapshot is not None else generated_at[:10]
+        profile = self._index_profile(instrument, as_of)
+        return self._compose_index_result(
+            instrument,
+            resolution,
+            snapshot,
+            profile,
+            intent=intent,
+            generated_at=generated_at,
+        )
+
+    def _compose_index_result(
+        self,
+        instrument: InstrumentRef,
+        resolution: Resolution,
+        snapshot: Snapshot | None,
+        profile: dict,
+        *,
+        intent: str,
+        generated_at: str,
+    ) -> AnalysisResult:
+        result = self._base_result(
+            intent=intent,
+            generated_at=generated_at,
+            instrument=instrument,
+            resolution=resolution,
+            snapshot=snapshot,
+        )
+        profile_status = profile.get("status")
+        status_map = {
+            "complete": AnalysisStatus.COMPLETE.value,
+            "partial": AnalysisStatus.PARTIAL.value,
+            "insufficient_data": AnalysisStatus.INSUFFICIENT_DATA.value,
+        }
+        result.analysis_status = status_map.get(
+            profile_status, AnalysisStatus.INSUFFICIENT_DATA.value
+        )
+        computed = result.analysis_status in (
+            AnalysisStatus.COMPLETE.value,
+            AnalysisStatus.PARTIAL.value,
+        )
+        result.model_status = "research" if computed else None
+        result.valuation_state = ValuationState.UNKNOWN.value
+        result.decision = Decision.UNDETERMINED.value
+
+        codes: list[str] = []
+        if not instrument.in_first_batch:
+            codes.append(rc.INDEX_NOT_IN_FIRST_BATCH)
+        if not profile.get("metrics"):
+            codes.append(rc.INDEX_PROFILE_SERIES_MISSING)
+        if profile.get("missing"):
+            codes.append(rc.INDEX_PROFILE_COVERAGE_INSUFFICIENT)
+        codes.extend(
+            [
+                rc.INDEX_PROFILE_DESCRIPTIVE_ONLY,
+                rc.INDEX_STRATEGY_NOT_IMPLEMENTED,
+                rc.RESEARCH_PARAMETERS_UNAPPROVED,
+            ]
+        )
+        if snapshot is None:
+            codes.append(rc.SNAPSHOT_NOT_FOUND)
+
+        result.reason_codes = codes
+        result.model_plan = _index_profile_plan(profile)
+        result.payload = self._build_payload(instrument, snapshot, index_profile=profile)
+        result.model_results = (
+            [_index_profile_result(profile, instrument)]
+            if computed
+            else []
+        )
+        result.missing_data = _profile_missing(profile) + collect_missing_data(
+            AssetClass.INDEX, snapshot
+        )
+        result.evidence_refs = self._evidence_refs(instrument, snapshot)
+        result.conditions = [
+            "画像只回答「当前值相对该供应商历史分布处于什么位置」，不是交易信号。",
+            "月度参考样本与官方短历史分开使用；官方最新值不参与第三方历史排名。",
+        ]
+        result.invalidation = [
+            "供应商历史序列被修订或更换口径时，分位需要重算。",
+            "若窗口内有效月份少于 54 个，对应分位将不再给出。",
+            "若未来引入经批准的策略规则，本画像需要重新评估其用途（当前无策略结论）。",
+        ]
+        result.warnings = [
+            "本轮不实现分位进出策略、不生成波段买点，也不做回测。",
+            "PE/PB 的聚合方法与亏损样本处理在来源中未说明，只能作同源同列的描述性比较。",
+        ]
+        if profile_status == "partial":
+            result.warnings.append("部分指标覆盖不足：对应分位未计算，已在缺失清单中说明。")
+        if profile_status == "insufficient_data":
+            result.warnings.append("没有足够的同源历史序列：本次不输出任何分位。")
+        return self._finalize(result, instrument)
+
+    # --- ETF：产品资料 + 关联同一份指数画像 ------------------------------
+    def _etf_result(
+        self,
+        instrument: InstrumentRef,
+        resolution: Resolution,
+        snapshot: Snapshot | None,
+        *,
+        intent: str,
+        generated_at: str,
+    ) -> AnalysisResult:
+        underlying = self.catalog.underlying(instrument)
+        as_of = snapshot.as_of if snapshot is not None else generated_at[:10]
+        profile = (
+            self._index_profile(underlying, as_of) if underlying is not None else None
+        )
+        product = build_product_check(instrument, underlying, snapshot)
+
+        result = self._base_result(
+            intent=intent,
+            generated_at=generated_at,
+            instrument=instrument,
+            resolution=resolution,
+            snapshot=snapshot,
+        )
+        profile_status = (profile or {}).get("status")
+        statuses = {profile_status, product.get("status")}
+        if "insufficient_data" in statuses or profile is None:
+            result.analysis_status = AnalysisStatus.INSUFFICIENT_DATA.value
+        elif "partial" in statuses:
+            result.analysis_status = AnalysisStatus.PARTIAL.value
+        else:
+            result.analysis_status = AnalysisStatus.COMPLETE.value
+        computed = result.analysis_status in (
+            AnalysisStatus.COMPLETE.value,
+            AnalysisStatus.PARTIAL.value,
+        )
+        result.model_status = "research" if computed else None
+        result.valuation_state = ValuationState.UNKNOWN.value
+        result.decision = Decision.UNDETERMINED.value
+
+        codes: list[str] = [rc.ETF_PRODUCT_FACTS_ONLY, rc.RESEARCH_PARAMETERS_UNAPPROVED]
+        if profile is None:
+            codes.append(rc.INDEX_PROFILE_SERIES_MISSING)
+        elif profile.get("missing"):
+            codes.append(rc.INDEX_PROFILE_COVERAGE_INSUFFICIENT)
+        codes.extend([rc.INDEX_PROFILE_DESCRIPTIVE_ONLY, rc.INDEX_STRATEGY_NOT_IMPLEMENTED])
+        if product.get("trading", {}).get("secondary_market_status", {}).get("status") != "known":
+            codes.append(rc.ETF_TRADING_STATUS_UNKNOWN)
+        if not product.get("nav", {}).get("disclosure_time_known"):
+            codes.append(rc.ETF_NAV_DISCLOSURE_TIME_UNKNOWN)
+        premium = product.get("premium_discount_same_day") or {}
+        if premium.get("value") is None:
+            codes.append(rc.ETF_SAME_DAY_PREMIUM_UNAVAILABLE)
+        if snapshot is None:
+            codes.append(rc.SNAPSHOT_NOT_FOUND)
+        result.reason_codes = codes
+
+        result.model_plan = _index_profile_plan(
+            profile or {"status": "insufficient_data", "metrics": {}, "missing": []},
+            note_asset="ETF 本身不单独建模：产品资料单列，指数画像沿用其跟踪指数",
+        )
+        result.payload = self._build_payload(
+            instrument, snapshot, index_profile=profile, product_check=product
+        )
+        result.model_results = (
+            [_index_profile_result(profile, underlying or instrument)]
+            if computed and profile
+            else []
+        )
+        result.missing_data = _profile_missing(profile) + list(product.get("missing") or [])
+        result.evidence_refs = self._evidence_refs(instrument, snapshot)
+        result.conditions = [
+            "ETF 只输出产品资料完整性检查；资料齐备不等于满足买入条件。",
+            "指数估值位置与 ETF 产品资料不互相替代。",
+        ]
+        result.invalidation = [
+            "净值日期或披露口径变化时，同日折溢价需要重算。",
+            "若取得停复牌与盘口数据，交易状态相关结论需要更新。",
+        ]
+        result.warnings = [
+            "同日折溢价是事后计算，不能证明当日收盘前可交易，也不用于回测当日成交。",
+            "本轮不制定溢价、流动性或费率的买卖门槛，也不做基金之间的比较或推荐。",
+        ]
+        return self._finalize(result, instrument)
+
     # --- 个股：研究估值 -------------------------------------------------
     def _equity_result(
         self,
@@ -562,6 +789,8 @@ class Analyzer:
         *,
         research_valuation: dict | None = None,
         model_applicability: dict | None = None,
+        index_profile: dict | None = None,
+        product_check: dict | None = None,
     ) -> dict:
         if instrument.asset_class == AssetClass.EQUITY:
             return build_equity_payload(
@@ -572,11 +801,20 @@ class Analyzer:
             )
         if instrument.asset_class == AssetClass.INDEX:
             return build_index_payload(
-                instrument, snapshot, strategy_candidates=strategy_candidates()
+                instrument,
+                snapshot,
+                strategy_candidates=strategy_candidates(),
+                profile=index_profile,
             )
         if instrument.asset_class == AssetClass.ETF:
             underlying = self.catalog.underlying(instrument)
-            return build_etf_payload(instrument, underlying, snapshot)
+            return build_etf_payload(
+                instrument,
+                underlying,
+                snapshot,
+                product_check=product_check,
+                index_profile=index_profile,
+            )
         return {"payload_type": "none"}
 
     def _evidence_refs(
@@ -638,6 +876,81 @@ class Analyzer:
             "policy_version": POLICY_VERSION,
             "model_version": MODEL_VERSION,
         }
+
+
+def _index_profile_plan(profile: dict, *, note_asset: str | None = None) -> dict:
+    metrics = profile.get("metrics") or {}
+    model = MODELS_BY_ID["index_valuation_profile"]
+    return {
+        "primary_model": "index_valuation_profile" if metrics else None,
+        "model_version": model.version,
+        "model_status": "research",
+        "cross_check_model": None,
+        "required_checks": [
+            "同源同列月度参考池，有效月份不少于 54/60",
+            "比较值不参与自己的历史排名",
+            "PE 与 PB 分别计算，不拼综合分",
+        ],
+        "selection_reason": note_asset
+        or "宽基指数用描述性估值画像：只给出当前值在历史分布中的位置，不产生波段信号",
+        "not_selected": [
+            {
+                "model_id": "index_strategy_a_valuation_reversion",
+                "reason_code": rc.INDEX_STRATEGY_NOT_IMPLEMENTED,
+                "reason": "分位进出规则与回测留待下一批；本轮不实现状态机，也不给入场/退出信号",
+            },
+            {
+                "model_id": "index_strategy_b_cross_confirmation",
+                "reason_code": rc.INDEX_STRATEGY_NOT_IMPLEMENTED,
+                "reason": "同上：交叉确认规则与回测留待下一批",
+            },
+        ],
+        "candidate_models": [],
+        "profile_status": profile.get("status"),
+        "window_rule": profile.get("window_rule"),
+        "series_ids": profile.get("series_ids"),
+    }
+
+
+def _index_profile_result(profile: dict, instrument: InstrumentRef) -> dict:
+    model = MODELS_BY_ID["index_valuation_profile"]
+    metrics = profile.get("metrics") or {}
+    return {
+        "result_type": "index_profile",
+        "model_id": "index_valuation_profile",
+        "model_version": model.version,
+        "model_status": "research",
+        "is_trading_signal": False,
+        "instrument_id": instrument.instrument_id,
+        "as_of": profile.get("as_of"),
+        "status": profile.get("status"),
+        "series_ids": profile.get("series_ids"),
+        "metrics": {
+            name: {
+                "percentile": block.get("percentile"),
+                "percentile_display": block.get("percentile_display"),
+                "valid_months": block["window"].get("valid_months"),
+                "pool_size": block["window"]["pool"].get("size"),
+            }
+            for name, block in metrics.items()
+        },
+    }
+
+
+def _profile_missing(profile: dict | None) -> list[dict]:
+    if not profile:
+        return []
+    out: list[dict] = []
+    for item in profile.get("missing") or []:
+        out.append(
+            {
+                "fact_id": f"series.{item.get('metric')}",
+                "metric": item.get("metric"),
+                "status": "insufficient_coverage",
+                "note": f"{item.get('label') or ''}：{item.get('reason')}".strip("："),
+            }
+        )
+    return out
 
 
 def _equity_model_plan(valuation) -> dict:

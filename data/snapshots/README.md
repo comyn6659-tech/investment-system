@@ -7,9 +7,9 @@
 | `snap-6e6d5c31a0371ee0` | INDEX:000300.SH | 2026-11-10 | 5 | 按 `--as-of` 选行，closed bar |
 | `snap-1a5ed1b1f7206c14` | INDEX:000905.SH | 2026-11-10 | 5 | 同上 |
 | `snap-5d60fe1e7fb6ed3b` | INDEX:000852.SH | 2026-11-10 | 5 | 同上 |
-| `snap-6938a7a7b2c868c4` | ETF:510300.SH | 2026-11-10 | 9 | ETF 日线按日期选行 |
-| `snap-ff2df2705d7e880f` | ETF:510500.SH | 2026-11-10 | 9 | 同上 |
-| `snap-4c1d2bfec2a65678` | ETF:512100.SH | 2026-11-10 | 9 | 同上 |
+| `snap-d6570cf8645d49e4` | ETF:510300.SH | 2026-11-10 | 19 | ETF 日线 + 成交额/20 日均额 + 同日折溢价 |
+| `snap-5a28f88d0e6bbf4f` | ETF:510500.SH | 2026-11-10 | 19 | 同上 |
+| `snap-429b5c94870b9db2` | ETF:512100.SH | 2026-11-10 | 19 | 同上 |
 | `snap-791670f4b3c68cab` | EQUITY:600519.SH | 2026-11-10 | 544 | 三张合并报表 × 12 期 + 分红 + 已收盘价 |
 | `snap-855281f9cc5afb1f` | EQUITY:600900.SH | 2026-11-10 | 528 | 同上 |
 | `snap-e701028693917737` | EQUITY:601398.SH | 2026-11-10 | 550 | 同上 + 银行专项缺口字段 |
@@ -39,6 +39,20 @@
    - 个股：`tools/build_equity_snapshots.py --as-of YYYY-MM-DD [--only 600519]`
    按日期选行，找不到该行即失败，不倒填；未指定 `--as-of` 时取最后一行并记录 `bar_status`。
    个股脚本对每个网络接口做 3 次重试，仍失败就整体报错，不写残缺快照。
+
+## ETF 快照新增字段（阶段三）
+
+- `etf.turnover_cny` / `etf.volume_shares`：当日成交额与成交量（不复权日线）；
+- `etf.turnover_avg_20d_cny` / `etf.turnover_avg_days_used`：末尾至多 20 个交易日的平均成交额
+  与**实际使用天数**（不足 20 天不称「20 日均值」）；
+- `etf.premium_discount_same_day_pct`：**事后同日折溢价**，只在价格与净值同一估值日期、
+  且都已实际取得时计算；不满足条件时记 `missing` 并写明原因；
+- `etf.subscription_status` / `etf.redemption_status`：基金净值表的申购/赎回状态，
+  **不等于**二级市场交易状态；
+- `etf.bid_ask_spread_cny` / `etf.trading_status`：未取得，记 `missing`。
+
+指数画像所需的长期序列不在快照里，而在 `data/series/`（`series_id` = 内容哈希），
+结果与 `docs/phase3-samples.md` 都引用这些 id。
 
 ## 个股快照的口径
 

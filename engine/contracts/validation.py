@@ -47,6 +47,8 @@ _ALLOWED_MODEL_RESULT_TYPES = {
     "research_signal",
     # 阶段二：研究估值结果（model_status=research，decision=undetermined）
     "research_valuation",
+    # 阶段三：指数估值画像（描述性统计，不是交易信号）
+    "index_profile",
 }
 
 # 这些字段属于核心契约，缺失或为 null 一律视为违规（不允许「省略即通过」）
@@ -206,6 +208,8 @@ def validate_result(result: Any) -> list[str]:
         if extra:
             problems.append(f"payload({payload_type}) 含未定义字段: {sorted(extra)}")
         problems.extend(_check_research_valuation_payload(payload, data, analysis_status, model_status))
+        problems.extend(_check_index_profile_payload(payload, data, analysis_status, model_status))
+        problems.extend(_check_product_check_payload(payload, data, model_status))
         if analysis_status != AnalysisStatus.COMPLETE or model_status != ModelStatus.VALIDATED:
             priced = [
                 field
@@ -241,6 +245,10 @@ def validate_result(result: Any) -> list[str]:
         elif item["result_type"] == "research_valuation":
             problems.extend(
                 _check_research_valuation(item, data, analysis_status, model_status, decision)
+            )
+        elif item["result_type"] == "index_profile":
+            problems.extend(
+                _check_index_profile(item, data, analysis_status, model_status, decision)
             )
         elif analysis_status != AnalysisStatus.COMPLETE or model_status != ModelStatus.VALIDATED:
             problems.append(
@@ -402,6 +410,98 @@ def _check_research_valuation_payload(payload, data, analysis_status, model_stat
         )
     if payload.get("valuation") not in (None, {}, [], ""):
         problems.append("研究估值不得写入正式 valuation 字段（该字段保留给 validated 模型）")
+    return problems
+
+
+def _check_index_profile(item, data, analysis_status, model_status, decision) -> list[str]:
+    """指数画像是描述性统计：必须可溯源到已实现的登记模型，且不得变成交易信号。"""
+    problems: list[str] = []
+    model_id = item.get("model_id")
+    plan = data.get("model_plan") or {}
+    if not model_id:
+        problems.append("index_profile 必须注明 model_id")
+        return problems
+    model = MODELS_BY_ID.get(model_id)
+    if model is None:
+        problems.append(f"index_profile 引用了未登记的模型: {model_id!r}")
+    else:
+        if not model.implemented:
+            problems.append(f"模型 {model_id} 未实现，不能输出指数画像")
+        if item.get("model_version") != model.version:
+            problems.append(
+                f"index_profile 的 model_version={item.get('model_version')!r} "
+                f"与登记版本 {model.version!r} 不一致"
+            )
+        if plan.get("primary_model") != model_id:
+            problems.append("index_profile 必须与 model_plan.primary_model 一致")
+    if item.get("model_status") != ModelStatus.RESEARCH.value:
+        problems.append("index_profile 必须标记 model_status=research")
+    if model_status != ModelStatus.RESEARCH:
+        problems.append("携带 index_profile 的结果，整体 model_status 必须为 research")
+    if analysis_status not in (AnalysisStatus.COMPLETE, AnalysisStatus.PARTIAL):
+        problems.append("指数画像只能在 complete/partial 的分析中出现")
+    if decision != Decision.UNDETERMINED:
+        problems.append("携带指数画像时 decision 必须为 undetermined")
+    if item.get("is_trading_signal") is not False:
+        problems.append("index_profile 必须显式声明 is_trading_signal=false")
+    return problems
+
+
+def _check_index_profile_payload(payload, data, analysis_status, model_status) -> list[str]:
+    problems: list[str] = []
+    profile = payload.get("valuation_profile")
+    if payload.get("payload_type") != "index":
+        if profile not in (None, {}, [], ""):
+            problems.append("valuation_profile 只能出现在指数载荷中")
+        return problems
+    if profile in (None, {}):
+        return problems
+    if not isinstance(profile, dict):
+        problems.append("valuation_profile 必须是对象或 null")
+        return problems
+    if not profile.get("payload_version"):
+        problems.append("valuation_profile 必须带 payload_version")
+    if profile.get("is_trading_signal") is not False:
+        problems.append("valuation_profile 必须显式声明 is_trading_signal=false")
+    if not profile.get("decision_note"):
+        problems.append("valuation_profile 必须说明它能回答什么问题")
+    results = [
+        item
+        for item in (data.get("model_results") or [])
+        if isinstance(item, dict) and item.get("result_type") == "index_profile"
+    ]
+    # 只有确实算出了指标才要求模型结果；覆盖不足时画像块只用于说明缺口
+    if profile.get("metrics") and not results:
+        problems.append("valuation_profile 含已计算指标，但 model_results 没有对应记录")
+    if profile.get("metrics") and model_status != ModelStatus.RESEARCH.value:
+        problems.append("载荷含已计算的指数画像时，整体 model_status 必须为 research")
+    if data.get("valuation_state") in ("attractive", "neutral", "expensive"):
+        problems.append("指数画像不能给出 attractive/neutral/expensive 的价格位置判断")
+    if payload.get("valuation_facts") and payload["valuation_facts"].get("signal"):
+        problems.append("指数画像不得写入 signal 字段")
+    return problems
+
+
+def _check_product_check_payload(payload, data, model_status) -> list[str]:
+    problems: list[str] = []
+    check = payload.get("product_check")
+    if payload.get("payload_type") != "etf":
+        if check not in (None, {}, [], ""):
+            problems.append("product_check 只能出现在 ETF 载荷中")
+        return problems
+    if check in (None, {}):
+        return problems
+    if not isinstance(check, dict):
+        problems.append("product_check 必须是对象或 null")
+        return problems
+    if not check.get("payload_version"):
+        problems.append("product_check 必须带 payload_version")
+    if not check.get("usage_note"):
+        problems.append("product_check 必须说明「资料齐备不等于满足买入条件」")
+    if payload.get("premium_discount") not in (None, {}, [], ""):
+        problems.append("同日折溢价只能写在 product_check，不得占用正式 premium_discount 字段")
+    if model_status not in (ModelStatus.RESEARCH.value, None):
+        problems.append("ETF 产品资料检查不得声称模型已 validated")
     return problems
 
 

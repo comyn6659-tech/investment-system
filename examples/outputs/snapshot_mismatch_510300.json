@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-5ba7e0509769e864",
-  "generated_at": "2026-11-11T15:01:52+08:00",
+  "analysis_id": "analysis-0a3ee1d76d948d23",
+  "generated_at": "2026-11-11T17:00:14+08:00",
   "instrument": {
     "instrument_id": "ETF:510300.SH",
     "display_name": "沪深300ETF华泰柏瑞",
@@ -84,7 +84,7 @@
   "decision": "undetermined",
   "reason_codes": [
     "ENGINE_ERROR",
-    "SNAPSHOT_INSTRUMENT_MISMATCH"
+    "SNAPSHOT_NOT_FOUND"
   ],
   "model_plan": {
     "primary_model": null,
@@ -102,7 +102,7 @@
   "evidence_refs": [],
   "missing_data": [],
   "warnings": [
-    "快照加载失败：快照 snap-ff2df2705d7e880f 属于 ETF:510500.SH，与请求标的 ETF:510300.SH 不一致"
+    "快照加载失败：找不到快照文件: snap-ff2df2705d7e880f.json"
   ],
   "clarification": null,
   "payload": {
@@ -123,9 +123,10 @@
     "premium_discount": null,
     "fees": null,
     "trading": null,
-    "tracking": null
+    "tracking": null,
+    "product_check": null
   },
-  "code_version": "phase2-0.2.1",
+  "code_version": "phase3-0.3.0",
   "policy_version": "unapproved-phase2",
-  "model_version": "equity-research-0.2.0"
+  "model_version": "research-0.3.0"
 }

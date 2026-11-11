@@ -142,23 +142,38 @@ def build_index_payload(
     snapshot: Snapshot | None,
     *,
     strategy_candidates: list[dict[str, Any]],
+    profile: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     payload = empty_index_payload()
+    if profile is not None:
+        payload["valuation_profile"] = profile
     payload["index_class"] = instrument.index_class.value if instrument.index_class else None
     payload["strategy_state"] = {
         "status": "not_implemented",
         "model_status": "research",
         "candidates": strategy_candidates,
-        "note": "阶段一不计算任何分位或信号；候选策略规则留待阶段三固定后回测。",
+        "note": (
+            "分位进出策略与回测留待下一批；本轮只输出描述性画像，"
+            "不产生入场/退出信号，也不给目标点位。"
+        ),
     }
     if snapshot is None:
         return payload
 
-    payload["history_coverage"] = snapshot.coverage
+    payload["history_coverage"] = dict(snapshot.coverage)
+    if profile is not None:
+        payload["history_coverage"]["monthly_reference_window"] = profile.get("window_rule")
+        payload["history_coverage"]["profile_status"] = profile.get("status")
+        payload["history_coverage"]["series_ids"] = profile.get("series_ids")
 
     level_fact = snapshot.fact("index.level")
     if level_fact is not None and level_fact.is_usable_number:
-        payload["level"] = amount(level_fact.value, "index_point", None)
+        payload["level"] = {
+            **amount(level_fact.value, "index_point", None),
+            "as_of": level_fact.period,
+            "available_at": level_fact.available_at,
+            "source": level_fact.source.to_dict() if level_fact.source else None,
+        }
 
     valuation_keys = {
         "index.pe_ttm": "pe_ttm",
@@ -181,8 +196,16 @@ def build_etf_payload(
     instrument: InstrumentRef,
     underlying: InstrumentRef | None,
     snapshot: Snapshot | None,
+    *,
+    product_check: dict[str, Any] | None = None,
+    index_profile: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     payload = empty_etf_payload()
+    if product_check is not None:
+        check = dict(product_check)
+        # 同一份指数画像原样嵌入，保证「从 ETF 进入」与「从指数进入」看到同样的数字
+        check["underlying_index_profile"] = index_profile
+        payload["product_check"] = check
     if underlying is not None:
         payload["underlying_index"] = {
             "instrument_id": underlying.instrument_id,

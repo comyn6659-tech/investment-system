@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-cb7ebb0a9394fe59",
-  "generated_at": "2026-11-11T15:01:51+08:00",
+  "analysis_id": "analysis-da3bf20345d4948b",
+  "generated_at": "2026-11-11T17:00:12+08:00",
   "instrument": {
     "instrument_id": "INDEX:000300.SH",
     "display_name": "沪深300",
@@ -134,10 +134,11 @@
           "implemented": false
         }
       ],
-      "note": "阶段一不计算任何分位或信号；候选策略规则留待阶段三固定后回测。"
-    }
+      "note": "分位进出策略与回测留待下一批；本轮只输出描述性画像，不产生入场/退出信号，也不给目标点位。"
+    },
+    "valuation_profile": null
   },
-  "code_version": "phase2-0.2.1",
+  "code_version": "phase3-0.3.0",
   "policy_version": "unapproved-phase2",
-  "model_version": "equity-research-0.2.0"
+  "model_version": "research-0.3.0"
 }

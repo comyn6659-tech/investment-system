@@ -4,8 +4,31 @@
   "asset_class": "etf",
   "as_of": "2026-11-10",
   "available_at": "2026-11-10T15:00:00+08:00",
-  "fetched_at": "2026-11-11T13:36:56+08:00",
+  "fetched_at": "2026-11-11T16:53:53+08:00",
   "facts": [
+    {
+      "fact_id": "etf.bid_ask_spread_cny",
+      "metric": "bid_ask_spread",
+      "status": "missing",
+      "value": null,
+      "unit": null,
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T16:53:53+08:00",
+      "source": {
+        "source_id": "em.etf_hist",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_hist_em",
+        "url": "https://quote.eastmoney.com/",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
+        "notes": "ETF 日线行情，用于取已收盘的收盘价"
+      },
+      "transform": "",
+      "restated": false,
+      "notes": "日线行情不含买卖盘口，未取得价差；不因有收盘价就断言可交易",
+      "conflict_values": []
+    },
     {
       "fact_id": "etf.custody_fee_pct",
       "metric": "custody_fee_pct",
@@ -15,13 +38,13 @@
       "currency": null,
       "period": "2026-11-11",
       "available_at": null,
-      "fetched_at": "2026-11-11T13:36:56+08:00",
+      "fetched_at": "2026-11-11T16:53:53+08:00",
       "source": {
         "source_id": "eastmoney.fund_profile",
         "publisher": "天天基金（基金概况页）",
         "interface": "HTTP 抓取基金概况页面",
         "url": "http://fundf10.eastmoney.com/jbgk_510500.html",
-        "retrieved_at": "2026-11-11T13:38:06+08:00",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
         "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
       },
       "transform": "基金概况页『托管费率』（每年）",
@@ -38,13 +61,13 @@
       "currency": null,
       "period": "2026-11-11",
       "available_at": null,
-      "fetched_at": "2026-11-11T13:36:56+08:00",
+      "fetched_at": "2026-11-11T16:53:53+08:00",
       "source": {
         "source_id": "eastmoney.fund_profile",
         "publisher": "天天基金（基金概况页）",
         "interface": "HTTP 抓取基金概况页面",
         "url": "http://fundf10.eastmoney.com/jbgk_510500.html",
-        "retrieved_at": "2026-11-11T13:38:06+08:00",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
         "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
       },
       "transform": "基金概况页『管理费率』（每年）",
@@ -61,13 +84,13 @@
       "currency": "CNY",
       "period": "2026-11-10",
       "available_at": null,
-      "fetched_at": "2026-11-11T13:36:56+08:00",
+      "fetched_at": "2026-11-11T16:53:53+08:00",
       "source": {
         "source_id": "em.etf_nav",
         "publisher": "东方财富",
         "interface": "AKShare fund_etf_fund_info_em",
         "url": "http://fundf10.eastmoney.com/jjzq_510500.html",
-        "retrieved_at": "2026-11-11T13:38:06+08:00",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
         "notes": "单位净值/累计净值；接口不含净值披露时间"
       },
       "transform": "基金净值序列『单位净值』",
@@ -84,13 +107,13 @@
       "currency": null,
       "period": "2026-11-10",
       "available_at": null,
-      "fetched_at": "2026-11-11T13:36:56+08:00",
+      "fetched_at": "2026-11-11T16:53:53+08:00",
       "source": {
         "source_id": "em.etf_nav",
         "publisher": "东方财富",
         "interface": "AKShare fund_etf_fund_info_em",
         "url": "http://fundf10.eastmoney.com/jjzq_510500.html",
-        "retrieved_at": "2026-11-11T13:38:06+08:00",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
         "notes": "单位净值/累计净值；接口不含净值披露时间"
       },
       "transform": "基金净值序列『净值日期』",
@@ -107,13 +130,13 @@
       "currency": null,
       "period": "2026-11-10",
       "available_at": null,
-      "fetched_at": "2026-11-11T13:36:56+08:00",
+      "fetched_at": "2026-11-11T16:53:53+08:00",
       "source": {
         "source_id": "em.etf_nav",
         "publisher": "东方财富",
         "interface": "AKShare fund_etf_fund_info_em",
         "url": "http://fundf10.eastmoney.com/jjzq_510500.html",
-        "retrieved_at": "2026-11-11T13:38:06+08:00",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
         "notes": "单位净值/累计净值；接口不含净值披露时间"
       },
       "transform": "",
@@ -130,18 +153,41 @@
       "currency": null,
       "period": "2026-11-10",
       "available_at": null,
-      "fetched_at": "2026-11-11T13:36:56+08:00",
+      "fetched_at": "2026-11-11T16:53:53+08:00",
       "source": {
         "source_id": "em.etf_nav",
         "publisher": "东方财富",
         "interface": "AKShare fund_etf_fund_info_em",
         "url": "http://fundf10.eastmoney.com/jjzq_510500.html",
-        "retrieved_at": "2026-11-11T13:38:06+08:00",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
         "notes": "单位净值/累计净值；接口不含净值披露时间"
       },
       "transform": "",
       "restated": false,
       "notes": "净值披露时间缺失，按设计书要求不计算日终折溢价",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.premium_discount_same_day_pct",
+      "metric": "same_day_premium_discount_pct",
+      "status": "known",
+      "value": -0.22289039477030315,
+      "unit": "percent",
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T16:53:53+08:00",
+      "source": {
+        "source_id": "em.etf_nav",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_fund_info_em",
+        "url": "http://fundf10.eastmoney.com/jjzq_510500.html",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
+        "notes": "单位净值/累计净值；接口不含净值披露时间"
+      },
+      "transform": "事后同日折溢价 = 市场收盘价 / 同日单位净值 − 1",
+      "restated": false,
+      "notes": "价格与净值对应同一估值日期；净值披露时刻未知，不能据此证明当日收盘前已可交易，也不用于回测的当日成交",
       "conflict_values": []
     },
     {
@@ -153,18 +199,64 @@
       "currency": "CNY",
       "period": "2026-11-10",
       "available_at": "2026-11-10T15:00:00+08:00",
-      "fetched_at": "2026-11-11T13:36:56+08:00",
+      "fetched_at": "2026-11-11T16:53:53+08:00",
       "source": {
         "source_id": "em.etf_hist",
         "publisher": "东方财富",
         "interface": "AKShare fund_etf_hist_em",
         "url": "https://quote.eastmoney.com/",
-        "retrieved_at": "2026-11-11T13:38:06+08:00",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
         "notes": "ETF 日线行情，用于取已收盘的收盘价"
       },
       "transform": "ETF 日线最后一行收盘价（bar_status=closed）",
       "restated": false,
       "notes": "已收盘交易日的收盘价",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.redemption_status",
+      "metric": "redemption_status",
+      "status": "known",
+      "value": "场内卖出",
+      "unit": null,
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T16:53:53+08:00",
+      "source": {
+        "source_id": "em.etf_nav",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_fund_info_em",
+        "url": "http://fundf10.eastmoney.com/jjzq_510500.html",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
+        "notes": "单位净值/累计净值；接口不含净值披露时间"
+      },
+      "transform": "基金净值表『赎回状态』",
+      "restated": false,
+      "notes": "申购/赎回状态，不等于二级市场交易状态（停复牌另行核查）",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.subscription_status",
+      "metric": "subscription_status",
+      "status": "known",
+      "value": "场内买入",
+      "unit": null,
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T16:53:53+08:00",
+      "source": {
+        "source_id": "em.etf_nav",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_fund_info_em",
+        "url": "http://fundf10.eastmoney.com/jjzq_510500.html",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
+        "notes": "单位净值/累计净值；接口不含净值披露时间"
+      },
+      "transform": "基金净值表『申购状态』",
+      "restated": false,
+      "notes": "申购/赎回状态，不等于二级市场交易状态（停复牌另行核查）",
       "conflict_values": []
     },
     {
@@ -176,13 +268,13 @@
       "currency": null,
       "period": "2026-11-11",
       "available_at": null,
-      "fetched_at": "2026-11-11T13:36:56+08:00",
+      "fetched_at": "2026-11-11T16:53:53+08:00",
       "source": {
         "source_id": "eastmoney.fund_profile",
         "publisher": "天天基金（基金概况页）",
         "interface": "HTTP 抓取基金概况页面",
         "url": "http://fundf10.eastmoney.com/jbgk_510500.html",
-        "retrieved_at": "2026-11-11T13:38:06+08:00",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
         "notes": "基金全称、跟踪标的、业绩比较基准、管理费率、托管费率、成立日期"
       },
       "transform": "基金概况页文本",
@@ -199,18 +291,110 @@
       "currency": null,
       "period": "2026-11-10",
       "available_at": null,
-      "fetched_at": "2026-11-11T13:36:56+08:00",
+      "fetched_at": "2026-11-11T16:53:53+08:00",
       "source": {
         "source_id": "em.etf_hist",
         "publisher": "东方财富",
         "interface": "AKShare fund_etf_hist_em",
         "url": "https://quote.eastmoney.com/",
-        "retrieved_at": "2026-11-11T13:38:06+08:00",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
         "notes": "ETF 日线行情，用于取已收盘的收盘价"
       },
       "transform": "",
       "restated": false,
       "notes": "未取得交易所停复牌状态字段；仅能确认当日有行情",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.turnover_avg_20d_cny",
+      "metric": "turnover_avg_20d",
+      "status": "known",
+      "value": 5166593804.5,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "fetched_at": "2026-11-11T16:53:53+08:00",
+      "source": {
+        "source_id": "em.etf_hist",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_hist_em",
+        "url": "https://quote.eastmoney.com/",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
+        "notes": "ETF 日线行情，用于取已收盘的收盘价"
+      },
+      "transform": "末尾 20 个交易日成交额算术平均（最多取 20 个）",
+      "restated": false,
+      "notes": "实际使用 20 个交易日；不足 20 天时不称『20 日均值』",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.turnover_avg_days_used",
+      "metric": "turnover_avg_days_used",
+      "status": "known",
+      "value": 20,
+      "unit": "count",
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": null,
+      "fetched_at": "2026-11-11T16:53:53+08:00",
+      "source": {
+        "source_id": "em.etf_hist",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_hist_em",
+        "url": "https://quote.eastmoney.com/",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
+        "notes": "ETF 日线行情，用于取已收盘的收盘价"
+      },
+      "transform": "参与平均的实际交易日数",
+      "restated": false,
+      "notes": "",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.turnover_cny",
+      "metric": "turnover_amount",
+      "status": "known",
+      "value": 3349548641.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "fetched_at": "2026-11-11T16:53:53+08:00",
+      "source": {
+        "source_id": "em.etf_hist",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_hist_em",
+        "url": "https://quote.eastmoney.com/",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
+        "notes": "ETF 日线行情，用于取已收盘的收盘价"
+      },
+      "transform": "不复权日线『成交额』（bar_status=closed）",
+      "restated": false,
+      "notes": "已收盘交易日的日成交数据",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "etf.volume_shares",
+      "metric": "turnover_volume",
+      "status": "known",
+      "value": 5003452.0,
+      "unit": "shares",
+      "currency": null,
+      "period": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "fetched_at": "2026-11-11T16:53:53+08:00",
+      "source": {
+        "source_id": "em.etf_hist",
+        "publisher": "东方财富",
+        "interface": "AKShare fund_etf_hist_em",
+        "url": "https://quote.eastmoney.com/",
+        "retrieved_at": "2026-11-11T16:54:23+08:00",
+        "notes": "ETF 日线行情，用于取已收盘的收盘价"
+      },
+      "transform": "不复权日线『成交量』（bar_status=closed）",
+      "restated": false,
+      "notes": "已收盘交易日的日成交数据",
       "conflict_values": []
     }
   ],
@@ -219,7 +403,7 @@
       "mode": "historical_close_bar",
       "market_date": "2026-11-10",
       "bar_status": "closed",
-      "built_at": "2026-11-11T13:36:56+08:00",
+      "built_at": "2026-11-11T16:53:53+08:00",
       "date_source": "按日期选行",
       "rows_after_market_date_dropped": 1
     },
@@ -253,19 +437,24 @@
     "point_in_time_safe": false,
     "point_in_time_granularity": "mixed",
     "availability_precision_counts": {
-      "second": 1,
+      "second": 4,
       "date": 0,
-      "unknown": 8
+      "unknown": 13
     },
     "availability_unknown": [
+      "etf.bid_ask_spread_cny",
       "etf.custody_fee_pct",
       "etf.management_fee_pct",
       "etf.nav",
       "etf.nav_date",
       "etf.nav_disclosed_at",
       "etf.premium_discount_pct",
+      "etf.premium_discount_same_day_pct",
+      "etf.redemption_status",
+      "etf.subscription_status",
       "etf.tracking_note",
-      "etf.trading_status"
+      "etf.trading_status",
+      "etf.turnover_avg_days_used"
     ],
     "availability_note": "只有全部事实都带秒级可获得时间，才标记 point_in_time_safe=true；仅日期精度按「当日结束时才可知」处理，不用于盘中历史判断。"
   },
@@ -274,5 +463,5 @@
     "tools/build_snapshots.py"
   ],
   "notes": "阶段一固定快照：价格取自已收盘日线，净值与披露时间缺口如实记录；bar_status=closed",
-  "snapshot_id": "snap-ff2df2705d7e880f"
+  "snapshot_id": "snap-5a28f88d0e6bbf4f"
 }

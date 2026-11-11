@@ -57,34 +57,49 @@ def test_equity_dividends_carry_fiscal_year_and_status(analyzer):
 
 def test_index_result_carries_level_without_currency(analyzer):
     result = analyzer.analyze("沪深300")
-    assert result.analysis_status == AnalysisStatus.UNSUPPORTED.value
-    assert "MODEL_NOT_IMPLEMENTED_INDEX" in result.reason_codes
+    assert result.analysis_status == AnalysisStatus.COMPLETE.value
+    assert result.decision == Decision.UNDETERMINED.value
     level = result.payload["level"]
     assert level["unit"] == "index_point"
     assert level["currency"] is None
     assert level["value"] > 0
-    assert result.payload["history_coverage"]["supports_weekly_5y_history"] is False
+    # 阶段三：月度画像已实现，周度候选仍未实现
+    profile = result.payload["valuation_profile"]
+    assert profile["status"] == "complete"
+    assert profile["metrics"]["pe_rolling"]["percentile_display"] is not None
 
 
-def test_index_history_shortfall_is_reported(analyzer):
-    result = analyzer.analyze("中证1000")
-    assert "MISSING_VALUATION_HISTORY" in result.reason_codes
-    coverage = result.payload["history_coverage"]
-    assert coverage["valuation_source_monthly"]["frequency"] == "monthly"
-    assert coverage["valuation_source_official"]["observations"] <= 20
+def test_index_without_series_reports_gap_instead_of_guessing(analyzer):
+    """上证指数不在首批、也没有序列：明确报缺口，不偷用别的来源。"""
+    result = analyzer.analyze("上证指数")
+    assert result.analysis_status == AnalysisStatus.INSUFFICIENT_DATA.value
+    assert "INDEX_NOT_IN_FIRST_BATCH" in result.reason_codes
+    assert "INDEX_PROFILE_SERIES_MISSING" in result.reason_codes
+    assert result.payload["valuation_profile"]["metrics"] == {}
+    assert result.model_results == []
 
 
 def test_etf_result_separates_index_and_product(analyzer):
     result = analyzer.analyze("510300")
-    assert result.analysis_status == AnalysisStatus.UNSUPPORTED.value
-    assert "MODEL_NOT_IMPLEMENTED_ETF" in result.reason_codes
-    assert "MODEL_NOT_IMPLEMENTED_INDEX" in result.reason_codes
+    assert result.analysis_status == AnalysisStatus.COMPLETE.value
     payload = result.payload
     assert payload["underlying_index"]["instrument_id"] == "INDEX:000300.SH"
     assert payload["price"]["unit"] == "CNY_per_share"
     assert payload["price"]["currency"] == "CNY"
-    missing_ids = {item["fact_id"] for item in result.missing_data}
-    assert "etf.premium_discount_pct" in missing_ids
+    # 正式折溢价字段仍保留给已验证模型，同日折溢价只写在产品资料里
+    assert payload["premium_discount"] is None
+    check = payload["product_check"]
+    assert check["premium_discount_same_day"]["value"] is not None
+    assert check["underlying_index_profile"]["metrics"]["pe_rolling"]["percentile_display"]
+    # 取不到的字段必须明确列出，不能因为「有价格」就默认可交易
+    missing_ids = {item.get("fact_id") for item in result.missing_data}
+    assert {
+        "etf.trading_status",
+        "etf.bid_ask_spread_cny",
+        "etf.nav_disclosed_at",
+    } <= missing_ids
+    items = {item.get("item") for item in check["missing"]}
+    assert "买卖价差" in items
 
 
 def test_out_of_scope_does_not_enter_broad_index_flow(analyzer):
@@ -103,8 +118,9 @@ def test_strategy_index_is_out_of_scope(analyzer):
 
 def test_run_of_the_mill_broad_index_is_flagged_not_silently_modelled(analyzer):
     result = analyzer.analyze("中证A500")
-    assert result.analysis_status == AnalysisStatus.UNSUPPORTED.value
+    assert result.analysis_status == AnalysisStatus.INSUFFICIENT_DATA.value
     assert "INDEX_NOT_IN_FIRST_BATCH" in result.reason_codes
+    assert result.model_results == []
 
 
 def test_ambiguous_input_asks_and_stops(analyzer):

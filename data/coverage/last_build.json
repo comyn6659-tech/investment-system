@@ -1,42 +1,22 @@
 {
-  "built_at": "2026-11-11T13:36:56+08:00",
+  "built_at": "2026-11-11T16:53:53+08:00",
   "expected_as_of": "2026-11-10",
   "snapshots": [
     {
-      "snapshot_id": "snap-6e6d5c31a0371ee0",
-      "instrument_id": "INDEX:000300.SH",
-      "as_of": "2026-11-10"
-    },
-    {
-      "snapshot_id": "snap-1a5ed1b1f7206c14",
-      "instrument_id": "INDEX:000905.SH",
-      "as_of": "2026-11-10"
-    },
-    {
-      "snapshot_id": "snap-5d60fe1e7fb6ed3b",
-      "instrument_id": "INDEX:000852.SH",
-      "as_of": "2026-11-10"
-    },
-    {
-      "snapshot_id": "snap-6938a7a7b2c868c4",
+      "snapshot_id": "snap-d6570cf8645d49e4",
       "instrument_id": "ETF:510300.SH",
       "as_of": "2026-11-10"
     },
     {
-      "snapshot_id": "snap-ff2df2705d7e880f",
+      "snapshot_id": "snap-5a28f88d0e6bbf4f",
       "instrument_id": "ETF:510500.SH",
       "as_of": "2026-11-10"
     },
     {
-      "snapshot_id": "snap-4c1d2bfec2a65678",
+      "snapshot_id": "snap-429b5c94870b9db2",
       "instrument_id": "ETF:512100.SH",
       "as_of": "2026-11-10"
-    },
-    {
-      "snapshot_id": "snap-fac0481bd5f7d1b5",
-      "instrument_id": "EQUITY:601398.SH",
-      "as_of": "2026-09-30"
     }
   ],
-  "manifest_entries": 14
+  "manifest_entries": 13
 }

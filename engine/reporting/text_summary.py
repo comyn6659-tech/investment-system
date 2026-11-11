@@ -220,10 +220,13 @@ def _render_payload(payload: dict[str, Any]) -> list[str]:
             lines.append("【历史覆盖】")
             for key, value in coverage.items():
                 lines.append(f"  - {key}：{_coverage_text(value)}")
+        profile = payload.get("valuation_profile")
+        if profile:
+            lines.extend(_render_index_profile(profile))
         lines.append("")
         lines.append(
-            "【策略状态】候选 A/B 均为 research 且未实现；"
-            "阶段一不计算分位、不产生任何入场/退出信号。"
+            "【策略状态】分位进出策略与回测留待下一批：本轮只输出描述性画像，"
+            "不产生入场/退出信号，也不给目标点位。"
         )
     elif ptype == "etf":
         underlying = payload.get("underlying_index") or {}
@@ -241,6 +244,9 @@ def _render_payload(payload: dict[str, Any]) -> list[str]:
         tracking = payload.get("tracking") or {}
         if tracking.get("note"):
             lines.append(f"  - 跟踪信息：{tracking['note']}")
+        check = payload.get("product_check")
+        if check:
+            lines.extend(_render_product_check(check))
     return lines
 
 
@@ -305,6 +311,161 @@ def _render_dividend_summary(summary: dict[str, Any]) -> list[str]:
             + "：与「某财年对应分配」不是同一指标"
         )
     return lines
+
+
+def _pct_text(value: Any) -> str:
+    if value is None:
+        return "—"
+    try:
+        return f"{float(value):.2f}%"
+    except (TypeError, ValueError):
+        return str(value)
+
+
+def _ratio_text(value: Any) -> str:
+    if value is None:
+        return "—"
+    try:
+        return f"{float(value):.4f}".rstrip("0").rstrip(".")
+    except (TypeError, ValueError):
+        return str(value)
+
+
+def _render_index_profile(profile: dict[str, Any]) -> list[str]:
+    lines: list[str] = ["", "【5 年月度估值画像（描述性统计，不是交易信号）】"]
+    rule = profile.get("window_rule") or {}
+    lines.append(
+        f"  窗口：分析时点所在月份之前 {rule.get('months')} 个完整自然月"
+        f"（有效月份门槛 {rule.get('min_valid_months')} 个）"
+    )
+    for metric in ("pe_rolling", "pb"):
+        block = (profile.get("metrics") or {}).get(metric)
+        if not block:
+            continue
+        window = block.get("window") or {}
+        comparison = window.get("comparison") or {}
+        pool = window.get("pool") or {}
+        lines.append(
+            f"  - {block.get('label')}（{metric}）：当前 {_ratio_text(comparison.get('value'))}"
+            f"（{comparison.get('date') or '日期未知'}）"
+            f" ｜ 分位 {(str(block.get('percentile_display')) + '%') if block.get('percentile_display') is not None else '未计算'}"
+            f" ｜ 有效样本 {pool.get('size')} 个（有效月份 {window.get('valid_months')}/{window.get('expected_months')}）"
+            f" ｜ 参考区间 {_ratio_text(pool.get('min'))} – {_ratio_text(pool.get('max'))}"
+            f" ｜ 中位数 {_ratio_text(pool.get('median'))}"
+        )
+        if block.get("status") != "computed":
+            reason = window.get("insufficient_reason")
+            if reason:
+                lines.append(f"      不计算分位：{reason}")
+        missing_months = window.get("missing_months") or []
+        if missing_months:
+            lines.append(f"      缺失月份：{'、'.join(missing_months[:6])}" + ("…" if len(missing_months) > 6 else ""))
+        if window.get("comparison_removed_from_pool"):
+            lines.append("      比较值落在参考池中，已从池内移除（不参与自己的排名）")
+    official = profile.get("official_short_history") or {}
+    for metric, block in official.items():
+        latest = block.get("latest") or {}
+        lines.append(
+            f"  官方短历史（并列事实，不参与长历史排名）：{block.get('label')}"
+            f" {_ratio_text(latest.get('value'))}（{latest.get('date')}），"
+            f"仅 {block.get('observation_count')} 个交易日"
+        )
+    for item in profile.get("limitations") or []:
+        lines.append(f"  · 限制：{item}")
+    note = profile.get("decision_note")
+    if note:
+        lines.append(f"  · 用途：{note}")
+    return lines
+
+
+def _render_product_check(check: dict[str, Any]) -> list[str]:
+    lines: list[str] = ["", "【ETF 产品资料完整性检查】"]
+    identity = check.get("identity") or {}
+    underlying = identity.get("underlying_index") or {}
+    if underlying:
+        lines.append(
+            f"  跟踪对象：{underlying.get('display_name')}（{underlying.get('instrument_id')}）"
+            f" ｜ 产品性质：{identity.get('etf_strategy')}"
+        )
+    price_block = check.get("price") or {}
+    price = price_block.get("price") or {}
+    bar = price_block.get("bar_status") or {}
+    lines.append(
+        f"  市场价格：{_ratio_text(price.get('value'))} 元/份"
+        f"（交易日 {price.get('period') or price.get('as_of')}，状态 {bar.get('value') or '未知'}）"
+    )
+    nav = check.get("nav") or {}
+    nav_value = nav.get("value") or {}
+    nav_date = nav.get("nav_date") or {}
+    lines.append(
+        f"  单位净值：{_ratio_text(nav_value.get('value'))}（净值日期 {nav_date.get('value') or '未知'}）"
+        f" ｜ 披露时刻：{'已知' if nav.get('disclosure_time_known') else '未知'}"
+    )
+    premium = check.get("premium_discount_same_day") or {}
+    if premium.get("value") is not None:
+        lines.append(
+            f"  事后同日折溢价：{_pct_text(premium.get('value'))}"
+            "（价格与净值同一估值日期；披露时刻未知，不能证明收盘前可交易）"
+        )
+    else:
+        lines.append(f"  事后同日折溢价：未计算（{premium.get('note') or '条件不满足'}）")
+    fees = check.get("fees") or {}
+    if fees:
+        mgmt = (fees.get("management") or {}).get("value")
+        custody = (fees.get("custody") or {}).get("value")
+        lines.append(
+            f"  费率：管理费 {_pct_text(mgmt)}/年，托管费 {_pct_text(custody)}/年"
+            f"（{fees.get('note')}）"
+        )
+    turnover = check.get("turnover") or {}
+    if turnover:
+        latest = (turnover.get("latest") or {}).get("value")
+        average = (turnover.get("average") or {}).get("value")
+        lines.append(
+            f"  成交：最新 {_fmt_cny(latest)} ｜ {turnover.get('average_label')} {_fmt_cny(average)}"
+            f"（实际 {turnover.get('days_used')} 个交易日"
+            f"{'，未标成完整 20 日均值' if not turnover.get('is_full_20d') else ''}）"
+        )
+    trading = check.get("trading") or {}
+    status = (trading.get("secondary_market_status") or {}).get("value")
+    spread = (trading.get("bid_ask_spread") or {}).get("value")
+    lines.append(
+        f"  交易状态：{'已知 ' + str(status) if status else '未取得停复牌字段'}"
+        f" ｜ 买卖价差：{'已知 ' + str(spread) if spread else '未取得盘口数据'}"
+    )
+    subscription = (trading.get("subscription_status") or {}).get("value")
+    redemption = (trading.get("redemption_status") or {}).get("value")
+    if subscription or redemption:
+        lines.append(
+            f"  申购/赎回状态：{subscription or '未知'} / {redemption or '未知'}"
+            "（来自基金净值表，不等于二级市场交易状态）"
+        )
+    profile = check.get("underlying_index_profile")
+    if profile:
+        lines.append("")
+        lines.append("  【对应指数画像（与从指数进入时同源同算法）】")
+        for line in _render_index_profile(profile):
+            if line.strip():
+                lines.append("  " + line)
+    for item in check.get("missing") or []:
+        lines.append(f"  · 缺失：{item.get('item')}（{item.get('status')}）{item.get('note') or ''}")
+    if check.get("usage_note"):
+        lines.append(f"  · 用途：{check['usage_note']}")
+    return lines
+
+
+def _fmt_cny(value: Any) -> str:
+    if value is None:
+        return "未取得"
+    try:
+        amount = float(value)
+    except (TypeError, ValueError):
+        return str(value)
+    if abs(amount) >= 1e8:
+        return f"{amount / 1e8:,.2f} 亿元"
+    if abs(amount) >= 1e4:
+        return f"{amount / 1e4:,.2f} 万元"
+    return f"{amount:,.0f} 元"
 
 
 def _render_research_valuation(

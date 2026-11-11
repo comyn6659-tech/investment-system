@@ -37,31 +37,31 @@
       "file": "snap-e701028693917737.json"
     },
     {
-      "snapshot_id": "snap-6938a7a7b2c868c4",
+      "snapshot_id": "snap-d6570cf8645d49e4",
       "instrument_id": "ETF:510300.SH",
       "asset_class": "etf",
       "as_of": "2026-11-10",
       "available_at": "2026-11-10T15:00:00+08:00",
-      "fetched_at": "2026-11-11T13:36:56+08:00",
-      "file": "snap-6938a7a7b2c868c4.json"
+      "fetched_at": "2026-11-11T16:53:53+08:00",
+      "file": "snap-d6570cf8645d49e4.json"
     },
     {
-      "snapshot_id": "snap-ff2df2705d7e880f",
+      "snapshot_id": "snap-5a28f88d0e6bbf4f",
       "instrument_id": "ETF:510500.SH",
       "asset_class": "etf",
       "as_of": "2026-11-10",
       "available_at": "2026-11-10T15:00:00+08:00",
-      "fetched_at": "2026-11-11T13:36:56+08:00",
-      "file": "snap-ff2df2705d7e880f.json"
+      "fetched_at": "2026-11-11T16:53:53+08:00",
+      "file": "snap-5a28f88d0e6bbf4f.json"
     },
     {
-      "snapshot_id": "snap-4c1d2bfec2a65678",
+      "snapshot_id": "snap-429b5c94870b9db2",
       "instrument_id": "ETF:512100.SH",
       "asset_class": "etf",
       "as_of": "2026-11-10",
       "available_at": "2026-11-10T15:00:00+08:00",
-      "fetched_at": "2026-11-11T13:36:56+08:00",
-      "file": "snap-4c1d2bfec2a65678.json"
+      "fetched_at": "2026-11-11T16:53:53+08:00",
+      "file": "snap-429b5c94870b9db2.json"
     },
     {
       "snapshot_id": "snap-6e6d5c31a0371ee0",

@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-00302ac54f617552",
-  "generated_at": "2026-11-11T15:01:52+08:00",
+  "analysis_id": "analysis-73bfd4550a37ac20",
+  "generated_at": "2026-11-11T17:00:13+08:00",
   "instrument": {
     "instrument_id": "ETF:512880.SH",
     "display_name": "证券ETF国泰",
@@ -111,9 +111,10 @@
     "premium_discount": null,
     "fees": null,
     "trading": null,
-    "tracking": null
+    "tracking": null,
+    "product_check": null
   },
-  "code_version": "phase2-0.2.1",
+  "code_version": "phase3-0.3.0",
   "policy_version": "unapproved-phase2",
-  "model_version": "equity-research-0.2.0"
+  "model_version": "research-0.3.0"
 }

@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-a501f1f9ee5af287",
-  "generated_at": "2026-11-11T15:01:52+08:00",
+  "analysis_id": "analysis-904356f1960524c3",
+  "generated_at": "2026-11-11T17:00:13+08:00",
   "instrument": {
     "instrument_id": "EQUITY:601398.SH",
     "display_name": "工商银行",
@@ -3291,7 +3291,7 @@
       ]
     }
   },
-  "code_version": "phase2-0.2.1",
+  "code_version": "phase3-0.3.0",
   "policy_version": "unapproved-phase2",
-  "model_version": "equity-research-0.2.0"
+  "model_version": "research-0.3.0"
 }
