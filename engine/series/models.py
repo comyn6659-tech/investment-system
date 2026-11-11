@@ -17,13 +17,17 @@ from engine.data.timeutil import parse_instant
 
 SERIES_SCHEMA_VERSION = "index-series/1"
 
-# 序列频率标记：本轮画像只用 monthly_reference；官方短历史单独存放
+# 序列频率标记：画像用 monthly_reference；官方短历史用 daily_short；
+# 事后诊断用的价格指数日线用 daily
 FREQ_MONTHLY_REFERENCE = "monthly_reference"
 FREQ_DAILY_SHORT = "daily_short"
+FREQ_DAILY = "daily"
 
 METRIC_PE_ROLLING = "pe_rolling"
 METRIC_PB = "pb"
 METRIC_OFFICIAL_PE_1 = "official_pe_ratio_1"
+# 价格指数收盘（不含分红），只用于事后价格收益诊断
+METRIC_PRICE_INDEX_CLOSE = "price_index_close"
 
 
 class SeriesError(RuntimeError):
@@ -87,7 +91,7 @@ class IndexSeries:
     def __post_init__(self) -> None:
         if not self.observations:
             raise SeriesError(f"{self.instrument_id} {self.metric} 序列为空")
-        if self.frequency not in (FREQ_MONTHLY_REFERENCE, FREQ_DAILY_SHORT):
+        if self.frequency not in (FREQ_MONTHLY_REFERENCE, FREQ_DAILY_SHORT, FREQ_DAILY):
             raise SeriesError(f"未知的序列频率 {self.frequency!r}")
         seen: set[str] = set()
         cleaned: list[tuple[str, float]] = []
@@ -271,16 +275,19 @@ def metric_label(metric: str) -> str:
         METRIC_PE_ROLLING: "滚动市盈率",
         METRIC_PB: "市净率",
         METRIC_OFFICIAL_PE_1: "官方市盈率1",
+        METRIC_PRICE_INDEX_CLOSE: "价格指数收盘",
     }.get(metric, metric)
 
 
 __all__ = [
+    "FREQ_DAILY",
     "FREQ_DAILY_SHORT",
     "FREQ_MONTHLY_REFERENCE",
     "IndexSeries",
     "METRIC_OFFICIAL_PE_1",
     "METRIC_PB",
     "METRIC_PE_ROLLING",
+    "METRIC_PRICE_INDEX_CLOSE",
     "SERIES_SCHEMA_VERSION",
     "SeriesError",
     "SeriesSource",

@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-c7173fea6c91249c",
-  "generated_at": "2026-11-11T22:59:59+08:00",
+  "analysis_id": "analysis-6ce86cd0758bd380",
+  "generated_at": "2026-11-11T23:47:53+08:00",
   "instrument": {
     "instrument_id": "ETF:510500.SH",
     "display_name": "中证500ETF南方",
@@ -966,7 +966,7 @@
       }
     }
   },
-  "code_version": "phase3-0.3.1",
+  "code_version": "phase3-0.4.0",
   "policy_version": "unapproved-phase2",
   "model_version": "research-0.3.0"
 }

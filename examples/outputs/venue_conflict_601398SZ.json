@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-e91ee14d72bac769",
-  "generated_at": "2026-11-11T22:59:59+08:00",
+  "analysis_id": "analysis-ff5f5b4b3a4933c1",
+  "generated_at": "2026-11-11T23:47:53+08:00",
   "instrument": null,
   "instrument_id": null,
   "intent": "buy_point_check",
@@ -89,7 +89,7 @@
   "payload": {
     "payload_type": "none"
   },
-  "code_version": "phase3-0.3.1",
+  "code_version": "phase3-0.4.0",
   "policy_version": "unapproved-phase2",
   "model_version": "research-0.3.0"
 }

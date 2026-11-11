@@ -1,0 +1,963 @@
+{
+  "schema_version": "strategy-data-feasibility/1",
+  "generated_at": "2026-11-11T23:47:14+08:00",
+  "last_attempt_at": "2026-11-11T23:47:14+08:00",
+  "scope": "免费、无需账号的已测接口；不购买、不注册、不爬登录页",
+  "caveat": "结论只针对已测接口与参数，不代表所有免费来源",
+  "probes": [
+    {
+      "probe_id": "d1_lg_pe_300",
+      "requirement": "D1",
+      "purpose": "第三方指数市盈率历史（供应商原始列）",
+      "interface": "stock_index_pe_lg",
+      "params": {
+        "symbol": "沪深300"
+      },
+      "status": "ok",
+      "rows": 260,
+      "fields": [
+        "日期",
+        "指数",
+        "等权静态市盈率",
+        "静态市盈率",
+        "静态市盈率中位数",
+        "等权滚动市盈率",
+        "滚动市盈率",
+        "滚动市盈率中位数"
+      ],
+      "date_range": [
+        "2005-04-29",
+        "2026-11-11"
+      ],
+      "frequency": "monthly",
+      "error": null,
+      "elapsed_s": 4.26,
+      "note": ""
+    },
+    {
+      "probe_id": "d1_lg_pb_300",
+      "requirement": "D1",
+      "purpose": "第三方指数市净率历史（供应商原始列）",
+      "interface": "stock_index_pb_lg",
+      "params": {
+        "symbol": "沪深300"
+      },
+      "status": "ok",
+      "rows": 260,
+      "fields": [
+        "日期",
+        "指数",
+        "市净率",
+        "等权市净率",
+        "市净率中位数"
+      ],
+      "date_range": [
+        "2005-04-29",
+        "2026-11-11"
+      ],
+      "frequency": "monthly",
+      "error": null,
+      "elapsed_s": 3.14,
+      "note": ""
+    },
+    {
+      "probe_id": "d1_csindex_value_300",
+      "requirement": "D1",
+      "purpose": "中证官方估值指标文件（市盈率/股息率）",
+      "interface": "stock_zh_index_value_csindex",
+      "params": {
+        "symbol": "000300"
+      },
+      "status": "ok",
+      "rows": 20,
+      "fields": [
+        "日期",
+        "指数代码",
+        "指数中文全称",
+        "指数中文简称",
+        "指数英文全称",
+        "指数英文简称",
+        "市盈率1",
+        "市盈率2",
+        "股息率1",
+        "股息率2"
+      ],
+      "date_range": [
+        "2026-10-15",
+        "2026-11-11"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 1.49,
+      "note": ""
+    },
+    {
+      "probe_id": "d1_csindex_hist_pe_300",
+      "requirement": "D1",
+      "purpose": "中证官方历史行情文件里的『滚动市盈率』列",
+      "interface": "stock_zh_index_hist_csindex",
+      "params": {
+        "symbol": "000300",
+        "start_date": "20100101",
+        "end_date": "20261110"
+      },
+      "status": "ok",
+      "rows": 4092,
+      "fields": [
+        "日期",
+        "指数代码",
+        "指数中文全称",
+        "指数中文简称",
+        "指数英文全称",
+        "指数英文简称",
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ],
+      "date_range": [
+        "2010-01-01",
+        "2026-11-10"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 7.32,
+      "note": "",
+      "identity": {
+        "指数中文全称": "沪深300指数",
+        "指数中文简称": "沪深300"
+      },
+      "value_columns": [
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ]
+    },
+    {
+      "probe_id": "d1_csindex_hist_pe_905",
+      "requirement": "D1",
+      "purpose": "中证官方历史行情文件里的『滚动市盈率』列",
+      "interface": "stock_zh_index_hist_csindex",
+      "params": {
+        "symbol": "000905",
+        "start_date": "20100101",
+        "end_date": "20261110"
+      },
+      "status": "ok",
+      "rows": 4093,
+      "fields": [
+        "日期",
+        "指数代码",
+        "指数中文全称",
+        "指数中文简称",
+        "指数英文全称",
+        "指数英文简称",
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ],
+      "date_range": [
+        "2010-01-01",
+        "2026-11-10"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 5.46,
+      "note": "",
+      "identity": {
+        "指数中文全称": "中证小盘500指数",
+        "指数中文简称": "中证500"
+      },
+      "value_columns": [
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ]
+    },
+    {
+      "probe_id": "d1_csindex_hist_pe_852",
+      "requirement": "D1",
+      "purpose": "中证官方历史行情文件里的『滚动市盈率』列",
+      "interface": "stock_zh_index_hist_csindex",
+      "params": {
+        "symbol": "000852",
+        "start_date": "20100101",
+        "end_date": "20261110"
+      },
+      "status": "ok",
+      "rows": 4093,
+      "fields": [
+        "日期",
+        "指数代码",
+        "指数中文全称",
+        "指数中文简称",
+        "指数英文全称",
+        "指数英文简称",
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ],
+      "date_range": [
+        "2010-01-01",
+        "2026-11-10"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 4.56,
+      "note": "",
+      "identity": {
+        "指数中文全称": "中证1000指数",
+        "指数中文简称": "中证1000"
+      },
+      "value_columns": [
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ]
+    },
+    {
+      "probe_id": "d1_market_pe_lg",
+      "requirement": "D1",
+      "purpose": "全市场市盈率（非单只指数，用于确认口径不可替代）",
+      "interface": "stock_market_pe_lg",
+      "params": {
+        "symbol": "上证"
+      },
+      "status": "ok",
+      "rows": 336,
+      "fields": [
+        "日期",
+        "指数",
+        "平均市盈率"
+      ],
+      "date_range": [
+        "1999-01-29",
+        "2026-11-11"
+      ],
+      "frequency": "monthly",
+      "error": null,
+      "elapsed_s": 2.81,
+      "note": ""
+    },
+    {
+      "probe_id": "d2_csindex_value_fields",
+      "requirement": "D2",
+      "purpose": "官方估值文件的字段里是否含公布时刻",
+      "interface": "stock_zh_index_value_csindex",
+      "params": {
+        "symbol": "000300"
+      },
+      "status": "ok",
+      "rows": 20,
+      "fields": [
+        "日期",
+        "指数代码",
+        "指数中文全称",
+        "指数中文简称",
+        "指数英文全称",
+        "指数英文简称",
+        "市盈率1",
+        "市盈率2",
+        "股息率1",
+        "股息率2"
+      ],
+      "date_range": [
+        "2026-10-15",
+        "2026-11-11"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 1.25,
+      "note": "只检查返回字段是否包含公布时间；不追登录页",
+      "identity": {
+        "指数中文全称": "沪深300指数",
+        "指数中文简称": "沪深300"
+      },
+      "value_columns": [
+        "指数代码",
+        "市盈率1",
+        "市盈率2",
+        "股息率1",
+        "股息率2"
+      ]
+    },
+    {
+      "probe_id": "d2_csindex_hist_fields",
+      "requirement": "D2",
+      "purpose": "官方历史行情文件的字段里是否含公布时刻",
+      "interface": "stock_zh_index_hist_csindex",
+      "params": {
+        "symbol": "000300",
+        "start_date": "20100101",
+        "end_date": "20261110"
+      },
+      "status": "ok",
+      "rows": 4092,
+      "fields": [
+        "日期",
+        "指数代码",
+        "指数中文全称",
+        "指数中文简称",
+        "指数英文全称",
+        "指数英文简称",
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ],
+      "date_range": [
+        "2010-01-01",
+        "2026-11-10"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 2.79,
+      "note": "只检查返回字段；文件不含发布时间戳",
+      "identity": {
+        "指数中文全称": "沪深300指数",
+        "指数中文简称": "沪深300"
+      },
+      "value_columns": [
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ]
+    },
+    {
+      "probe_id": "d3_tr_shH00300",
+      "requirement": "D3",
+      "purpose": "全收益指数（沪市前缀，东财行情）",
+      "interface": "stock_zh_index_daily_em",
+      "params": {
+        "symbol": "shH00300"
+      },
+      "status": "error",
+      "rows": null,
+      "fields": null,
+      "date_range": null,
+      "frequency": null,
+      "error": "Push2RateLimitError: 东方财富 push2 行情服务器断开了连接，通常是短时间内请求过多，当前 IP 被临时限流。首次限流一般约 5 分钟后恢复，反复触发后可能需要 40 分钟以上；等待期间不要重复调用东方财富的行情接口，否则会延长限流。",
+      "elapsed_s": 1.21,
+      "note": ""
+    },
+    {
+      "probe_id": "d3_tr_H00300",
+      "requirement": "D3",
+      "purpose": "全收益指数（裸代码）",
+      "interface": "stock_zh_index_daily_em",
+      "params": {
+        "symbol": "H00300"
+      },
+      "status": "empty",
+      "rows": 0,
+      "fields": [],
+      "date_range": null,
+      "frequency": null,
+      "error": null,
+      "elapsed_s": 0.0,
+      "note": ""
+    },
+    {
+      "probe_id": "d3_csindex_tr_300",
+      "requirement": "D3",
+      "purpose": "中证官方全收益指数历史（H00300）",
+      "interface": "stock_zh_index_hist_csindex",
+      "params": {
+        "symbol": "H00300",
+        "start_date": "20100101",
+        "end_date": "20261110"
+      },
+      "status": "ok",
+      "rows": 4093,
+      "fields": [
+        "日期",
+        "指数代码",
+        "指数中文全称",
+        "指数中文简称",
+        "指数英文全称",
+        "指数英文简称",
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ],
+      "date_range": [
+        "2010-01-01",
+        "2026-11-10"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 8.77,
+      "note": "",
+      "identity": {
+        "指数中文全称": "沪深300全收益指数",
+        "指数中文简称": "300收益"
+      },
+      "value_columns": [
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ]
+    },
+    {
+      "probe_id": "d3_csindex_tr_905",
+      "requirement": "D3",
+      "purpose": "中证官方全收益指数历史（H00905）",
+      "interface": "stock_zh_index_hist_csindex",
+      "params": {
+        "symbol": "H00905",
+        "start_date": "20100101",
+        "end_date": "20261110"
+      },
+      "status": "ok",
+      "rows": 4093,
+      "fields": [
+        "日期",
+        "指数代码",
+        "指数中文全称",
+        "指数中文简称",
+        "指数英文全称",
+        "指数英文简称",
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ],
+      "date_range": [
+        "2010-01-01",
+        "2026-11-10"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 4.73,
+      "note": "",
+      "identity": {
+        "指数中文全称": "中证小盘500全收益指数",
+        "指数中文简称": "500收益"
+      },
+      "value_columns": [
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ]
+    },
+    {
+      "probe_id": "d3_csindex_tr_852",
+      "requirement": "D3",
+      "purpose": "中证官方全收益指数历史（H00852）",
+      "interface": "stock_zh_index_hist_csindex",
+      "params": {
+        "symbol": "H00852",
+        "start_date": "20100101",
+        "end_date": "20261110"
+      },
+      "status": "ok",
+      "rows": 4093,
+      "fields": [
+        "日期",
+        "指数代码",
+        "指数中文全称",
+        "指数中文简称",
+        "指数英文全称",
+        "指数英文简称",
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ],
+      "date_range": [
+        "2010-01-01",
+        "2026-11-10"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 5.11,
+      "note": "",
+      "identity": {
+        "指数中文全称": "中证1000全收益指数",
+        "指数中文简称": "中证1000全收益"
+      },
+      "value_columns": [
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ]
+    },
+    {
+      "probe_id": "d3_csindex_yield_300",
+      "requirement": "D3",
+      "purpose": "官方股息率（若足以重建总收益则需要长历史）",
+      "interface": "stock_zh_index_value_csindex",
+      "params": {
+        "symbol": "000300"
+      },
+      "status": "ok",
+      "rows": 20,
+      "fields": [
+        "日期",
+        "指数代码",
+        "指数中文全称",
+        "指数中文简称",
+        "指数英文全称",
+        "指数英文简称",
+        "市盈率1",
+        "市盈率2",
+        "股息率1",
+        "股息率2"
+      ],
+      "date_range": [
+        "2026-10-15",
+        "2026-11-11"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 1.42,
+      "note": ""
+    },
+    {
+      "probe_id": "d4_etf_price_510300",
+      "requirement": "D4",
+      "purpose": "ETF 历史日线价格",
+      "interface": "fund_etf_hist_em",
+      "params": {
+        "symbol": "510300",
+        "period": "daily",
+        "adjust": ""
+      },
+      "status": "error",
+      "rows": null,
+      "fields": null,
+      "date_range": null,
+      "frequency": null,
+      "error": "Push2RateLimitError: 东方财富 push2 行情服务器断开了连接，通常是短时间内请求过多，当前 IP 被临时限流。首次限流一般约 5 分钟后恢复，反复触发后可能需要 40 分钟以上；等待期间不要重复调用东方财富的行情接口，否则会延长限流。",
+      "elapsed_s": 1.32,
+      "note": ""
+    },
+    {
+      "probe_id": "d4_etf_price_510500",
+      "requirement": "D4",
+      "purpose": "ETF 历史日线价格",
+      "interface": "fund_etf_hist_em",
+      "params": {
+        "symbol": "510500",
+        "period": "daily",
+        "adjust": ""
+      },
+      "status": "error",
+      "rows": null,
+      "fields": null,
+      "date_range": null,
+      "frequency": null,
+      "error": "Push2RateLimitError: 东方财富 push2 行情服务器断开了连接，通常是短时间内请求过多，当前 IP 被临时限流。首次限流一般约 5 分钟后恢复，反复触发后可能需要 40 分钟以上；等待期间不要重复调用东方财富的行情接口，否则会延长限流。",
+      "elapsed_s": 1.02,
+      "note": ""
+    },
+    {
+      "probe_id": "d4_etf_price_512100",
+      "requirement": "D4",
+      "purpose": "ETF 历史日线价格",
+      "interface": "fund_etf_hist_em",
+      "params": {
+        "symbol": "512100",
+        "period": "daily",
+        "adjust": ""
+      },
+      "status": "error",
+      "rows": null,
+      "fields": null,
+      "date_range": null,
+      "frequency": null,
+      "error": "Push2RateLimitError: 东方财富 push2 行情服务器断开了连接，通常是短时间内请求过多，当前 IP 被临时限流。首次限流一般约 5 分钟后恢复，反复触发后可能需要 40 分钟以上；等待期间不要重复调用东方财富的行情接口，否则会延长限流。",
+      "elapsed_s": 2.56,
+      "note": ""
+    },
+    {
+      "probe_id": "d4_etf_price_sina_510300",
+      "requirement": "D4",
+      "purpose": "ETF 历史日线价格（备用来源：新浪）",
+      "interface": "fund_etf_hist_sina",
+      "params": {
+        "symbol": "sh510300"
+      },
+      "status": "ok",
+      "rows": 3513,
+      "fields": [
+        "date",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "amount",
+        "postVol",
+        "postAmt"
+      ],
+      "date_range": [
+        "2012-05-28",
+        "2026-11-11"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 0.18,
+      "note": "",
+      "value_columns": [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "amount",
+        "postVol",
+        "postAmt"
+      ]
+    },
+    {
+      "probe_id": "d4_etf_price_sina_510500",
+      "requirement": "D4",
+      "purpose": "ETF 历史日线价格（备用来源：新浪）",
+      "interface": "fund_etf_hist_sina",
+      "params": {
+        "symbol": "sh510500"
+      },
+      "status": "ok",
+      "rows": 3316,
+      "fields": [
+        "date",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "amount",
+        "postVol",
+        "postAmt"
+      ],
+      "date_range": [
+        "2013-03-15",
+        "2026-11-11"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 0.11,
+      "note": "",
+      "value_columns": [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "amount",
+        "postVol",
+        "postAmt"
+      ]
+    },
+    {
+      "probe_id": "d4_etf_price_sina_512100",
+      "requirement": "D4",
+      "purpose": "ETF 历史日线价格（备用来源：新浪）",
+      "interface": "fund_etf_hist_sina",
+      "params": {
+        "symbol": "sh512100"
+      },
+      "status": "ok",
+      "rows": 2432,
+      "fields": [
+        "date",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "amount",
+        "postVol",
+        "postAmt"
+      ],
+      "date_range": [
+        "2016-11-04",
+        "2026-11-11"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 0.11,
+      "note": "",
+      "value_columns": [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "amount",
+        "postVol",
+        "postAmt"
+      ]
+    },
+    {
+      "probe_id": "d4_etf_nav_510300",
+      "requirement": "D4",
+      "purpose": "ETF 历史单位净值",
+      "interface": "fund_etf_fund_info_em",
+      "params": {
+        "fund": "510300",
+        "start_date": "20100101",
+        "end_date": "20261110"
+      },
+      "status": "error",
+      "rows": null,
+      "fields": null,
+      "date_range": null,
+      "frequency": null,
+      "error": "ReadTimeout: HTTPSConnectionPool(host='api.fund.eastmoney.com', port=443): Read timed out. (read timeout=10)",
+      "elapsed_s": 12.81,
+      "note": ""
+    },
+    {
+      "probe_id": "d4_etf_nav_510500",
+      "requirement": "D4",
+      "purpose": "ETF 历史单位净值",
+      "interface": "fund_etf_fund_info_em",
+      "params": {
+        "fund": "510500",
+        "start_date": "20100101",
+        "end_date": "20261110"
+      },
+      "status": "error",
+      "rows": null,
+      "fields": null,
+      "date_range": null,
+      "frequency": null,
+      "error": "ConnectTimeout: HTTPSConnectionPool(host='api.fund.eastmoney.com', port=443): Max retries exceeded with url: /f10/lsjz?fundCode=510500&pageIndex=1&pageSize=20&startDate=2010-01-01&endDate=2026-11-10&_=1794411971976 (Caused by ConnectTimeoutError(<HTTPSConnection(host='api.fund.eastmoney.com', port=443) at 0x10cfa6b",
+      "elapsed_s": 10.01,
+      "note": ""
+    },
+    {
+      "probe_id": "d4_etf_nav_512100",
+      "requirement": "D4",
+      "purpose": "ETF 历史单位净值",
+      "interface": "fund_etf_fund_info_em",
+      "params": {
+        "fund": "512100",
+        "start_date": "20100101",
+        "end_date": "20261110"
+      },
+      "status": "error",
+      "rows": null,
+      "fields": null,
+      "date_range": null,
+      "frequency": null,
+      "error": "ReadTimeout: HTTPSConnectionPool(host='api.fund.eastmoney.com', port=443): Read timed out. (read timeout=10)",
+      "elapsed_s": 28.6,
+      "note": ""
+    },
+    {
+      "probe_id": "d3_tr_csiH00300",
+      "requirement": "D3",
+      "purpose": "全收益指数（中证前缀）",
+      "interface": "stock_zh_index_daily_em",
+      "params": {
+        "symbol": "csiH00300"
+      },
+      "status": "error",
+      "rows": null,
+      "fields": null,
+      "date_range": null,
+      "frequency": null,
+      "error": "Push2RateLimitError: 东方财富 push2 行情服务器断开了连接，通常是短时间内请求过多，当前 IP 被临时限流。首次限流一般约 5 分钟后恢复，反复触发后可能需要 40 分钟以上；等待期间不要重复调用东方财富的行情接口，否则会延长限流。",
+      "elapsed_s": 0.32,
+      "note": ""
+    },
+    {
+      "probe_id": "d3_csindex_hist_H00300",
+      "requirement": "D3",
+      "purpose": "中证官方历史行情接口能否给全收益指数",
+      "interface": "stock_zh_index_hist_csindex",
+      "params": {
+        "symbol": "H00300",
+        "start_date": "20190101",
+        "end_date": "20261110"
+      },
+      "status": "ok",
+      "rows": 1905,
+      "fields": [
+        "日期",
+        "指数代码",
+        "指数中文全称",
+        "指数中文简称",
+        "指数英文全称",
+        "指数英文简称",
+        "开盘",
+        "最高",
+        "最低",
+        "收盘",
+        "涨跌",
+        "涨跌幅",
+        "成交量",
+        "成交金额",
+        "样本数量",
+        "滚动市盈率"
+      ],
+      "date_range": [
+        "2019-01-01",
+        "2026-11-10"
+      ],
+      "frequency": "daily",
+      "error": null,
+      "elapsed_s": 2.28,
+      "note": ""
+    }
+  ],
+  "verdicts": {
+    "D1": {
+      "status": "部分",
+      "summary": "日频长历史已可取到 PE（d1_csindex_hist_pe_300、d1_csindex_hist_pe_905、d1_csindex_hist_pe_852）；另一项仍只有月度采样，原周度策略所需的双指标同频历史未齐备。",
+      "evidence": [
+        "d1_csindex_hist_pe_300",
+        "d1_csindex_hist_pe_852",
+        "d1_csindex_hist_pe_905",
+        "d1_csindex_value_300",
+        "d1_lg_pb_300",
+        "d1_lg_pe_300",
+        "d1_market_pe_lg"
+      ]
+    },
+    "D2": {
+      "status": "未解锁",
+      "summary": "所有已测返回字段里都没有公布时刻或发布时间戳，因此无法在不额外假设的前提下确定信号在当时的可得时点。",
+      "evidence": [
+        "d2_csindex_hist_fields",
+        "d2_csindex_value_fields"
+      ]
+    },
+    "D3": {
+      "status": "已解锁",
+      "summary": "已测来源中存在官方全收益指数日频历史（d3_csindex_tr_300 2010-01-01~2026-11-10、d3_csindex_tr_905 2010-01-01~2026-11-10、d3_csindex_tr_852 2010-01-01~2026-11-10），可直接作为全收益口径使用；仍需注意它来自官方文件、与价格指数分属不同序列。",
+      "evidence": [
+        "d3_csindex_hist_H00300",
+        "d3_csindex_tr_300",
+        "d3_csindex_tr_852",
+        "d3_csindex_tr_905",
+        "d3_csindex_yield_300",
+        "d3_tr_H00300",
+        "d3_tr_csiH00300",
+        "d3_tr_shH00300"
+      ]
+    },
+    "D4": {
+      "status": "部分",
+      "summary": "已实测到价格 3/3、净值 0/3 满足 ≥5 年日频（有的来自早前一次成功调用）；其余 6 条本次调用失败：d4_etf_price_510300、d4_etf_price_510500、d4_etf_price_512100、d4_etf_nav_510300、d4_etf_nav_510500、d4_etf_nav_512100。失败原因是接口限流/超时，属于本次调用环境问题，不是「数据不存在」，需择时重测后才能定论。",
+      "evidence": [
+        "d4_etf_nav_510300",
+        "d4_etf_nav_510500",
+        "d4_etf_nav_512100",
+        "d4_etf_price_510300",
+        "d4_etf_price_510500",
+        "d4_etf_price_512100",
+        "d4_etf_price_sina_510300",
+        "d4_etf_price_sina_510500",
+        "d4_etf_price_sina_512100"
+      ]
+    }
+  },
+  "environment": {
+    "rate_limit_observed": true,
+    "affected_hosts": [
+      "push2.eastmoney.com",
+      "push2his.eastmoney.com",
+      "api.fund.eastmoney.com"
+    ],
+    "note": "东方财富系列接口在本次调查期间返回限流或读超时（首次限流提示约需 5 分钟，反复触发可能 40 分钟以上）。失败记录属于本次调用环境问题，**不代表数据不存在**。同一批接口在 2026-11-11T16:53 的采集任务中成功：data/snapshots/ 的三只 ETF 快照即由 fund_etf_hist_em 与 fund_etf_fund_info_em 构建。",
+    "retry_policy": "每条候选单次调用；失败后按 probe_id 重测，重测失败不会抹掉早前的成功记录（见 previous_success）。"
+  }
+}
