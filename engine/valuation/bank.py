@@ -179,7 +179,6 @@ def value_bank_dividend(
     net_profit = drivers.base_net_profit_parent
     net_profit_path: list[float] = []
     dps_path: list[float] = []
-    eps_path: list[float] = []
     capital_checks: list[dict[str, object]] = []
     for index, growth in enumerate(drivers.net_profit_growth):
         net_profit = net_profit * (1.0 + growth)
@@ -188,7 +187,6 @@ def value_bank_dividend(
         eps = net_profit / drivers.shares
         dps = eps * payout
         net_profit_path.append(net_profit)
-        eps_path.append(eps)
         dps_path.append(dps)
         ceiling = risk.capital_consistent_payout(net_profit)
         capital_checks.append(
@@ -229,11 +227,8 @@ def value_bank_dividend(
     expected = tuple(round(x, 9) for x in dps_path)
     actual = tuple(round(y.dps, 9) for y in valuation.years)
     if expected != actual:
-        raise ValuationError(
-            e.BANK_CAPITAL_BELOW_REQUIREMENT,
-            f"银行 DPS 路径与股息内核不一致：{expected} != {actual}",
-        )
-    _ = eps_path
+        # 这是实现内部一致性自检失败（不是数据不足），必须作为引擎缺陷暴露
+        raise RuntimeError(f"银行 DPS 路径与股息内核不一致：{expected} != {actual}")
     return BankValuation(
         dps_path=tuple(dps_path),
         net_profit_path=tuple(net_profit_path),

@@ -252,7 +252,6 @@ def _fcff_scenario(
     scenario_name: str,
     *,
     overrides: dict[str, Any] | None = None,
-    bridge_tolerance: float,
     absent_as_zero: bool,
     shares: float,
 ) -> ScenarioOutcome:
@@ -488,7 +487,6 @@ def _run_scenario(
             assumptions,
             name,
             overrides=overrides,
-            bridge_tolerance=float(assumptions.extras.get("bridge_tolerance", 0.15)),
             absent_as_zero=bool(assumptions.extras.get("absent_as_zero", False)),
             shares=shares,
         )
