@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 # 代码版本：契约结构或判定逻辑任何语义变化都要升版本
-CODE_VERSION = "phase3-0.4.0"
+CODE_VERSION = "phase3-0.5.0"
 
 # 政策版本：投资政策（范围、模型适用性、门槛）变化才升版本。
 # 阶段一尚未批准任何新的投资门槛，因此这里只标记"未批准"状态。

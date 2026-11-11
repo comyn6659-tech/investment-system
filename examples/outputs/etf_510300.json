@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-4070d0362d183870",
-  "generated_at": "2026-11-11T23:47:53+08:00",
+  "analysis_id": "analysis-e6192ea23dc16f8c",
+  "generated_at": "2026-11-12T00:16:32+08:00",
   "instrument": {
     "instrument_id": "ETF:510300.SH",
     "display_name": "沪深300ETF华泰柏瑞",
@@ -966,7 +966,7 @@
       }
     }
   },
-  "code_version": "phase3-0.4.0",
+  "code_version": "phase3-0.5.0",
   "policy_version": "unapproved-phase2",
   "model_version": "research-0.3.0"
 }

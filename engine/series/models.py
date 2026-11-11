@@ -28,6 +28,11 @@ METRIC_PB = "pb"
 METRIC_OFFICIAL_PE_1 = "official_pe_ratio_1"
 # 价格指数收盘（不含分红），只用于事后价格收益诊断
 METRIC_PRICE_INDEX_CLOSE = "price_index_close"
+# 中证官方历史行情文件：指数日频收盘与日频滚动市盈率（候选 A 回测的输入）
+METRIC_OFFICIAL_CLOSE = "official_close"
+METRIC_OFFICIAL_PE_ROLLING = "official_pe_rolling"
+# 中证官方全收益指数日频收盘（主收益口径）
+METRIC_TOTAL_RETURN_CLOSE = "total_return_close"
 
 
 class SeriesError(RuntimeError):
@@ -276,6 +281,9 @@ def metric_label(metric: str) -> str:
         METRIC_PB: "市净率",
         METRIC_OFFICIAL_PE_1: "官方市盈率1",
         METRIC_PRICE_INDEX_CLOSE: "价格指数收盘",
+        METRIC_OFFICIAL_CLOSE: "官方指数收盘",
+        METRIC_OFFICIAL_PE_ROLLING: "官方滚动市盈率",
+        METRIC_TOTAL_RETURN_CLOSE: "全收益指数收盘",
     }.get(metric, metric)
 
 
@@ -287,7 +295,10 @@ __all__ = [
     "METRIC_OFFICIAL_PE_1",
     "METRIC_PB",
     "METRIC_PE_ROLLING",
+    "METRIC_OFFICIAL_CLOSE",
+    "METRIC_OFFICIAL_PE_ROLLING",
     "METRIC_PRICE_INDEX_CLOSE",
+    "METRIC_TOTAL_RETURN_CLOSE",
     "SERIES_SCHEMA_VERSION",
     "SeriesError",
     "SeriesSource",

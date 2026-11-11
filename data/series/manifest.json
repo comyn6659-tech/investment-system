@@ -1,6 +1,18 @@
 {
   "series": [
     {
+      "series_id": "ser-0a043ec0defae285",
+      "instrument_id": "INDEX:000300.SH",
+      "metric": "official_close",
+      "frequency": "daily",
+      "source_id": "csindex.indicators",
+      "retrieved_at": "2026-11-12T00:12:50+08:00",
+      "start_date": "2005-04-08",
+      "end_date": "2026-11-11",
+      "observation_count": 5246,
+      "file": "ser-0a043ec0defae285.json"
+    },
+    {
       "series_id": "ser-fb818db17e36a9a4",
       "instrument_id": "INDEX:000300.SH",
       "metric": "official_pe_ratio_1",
@@ -11,6 +23,18 @@
       "end_date": "2026-11-10",
       "observation_count": 20,
       "file": "ser-fb818db17e36a9a4.json"
+    },
+    {
+      "series_id": "ser-cbbf2d714e0e8c2a",
+      "instrument_id": "INDEX:000300.SH",
+      "metric": "official_pe_rolling",
+      "frequency": "daily",
+      "source_id": "csindex.indicators",
+      "retrieved_at": "2026-11-12T00:12:50+08:00",
+      "start_date": "2011-06-28",
+      "end_date": "2026-11-11",
+      "observation_count": 3668,
+      "file": "ser-cbbf2d714e0e8c2a.json"
     },
     {
       "series_id": "ser-370e315c2b1150f2",
@@ -49,6 +73,30 @@
       "file": "ser-d14c05e091de9c01.json"
     },
     {
+      "series_id": "ser-a1211121f5c38cfa",
+      "instrument_id": "INDEX:000300.SH",
+      "metric": "total_return_close",
+      "frequency": "daily",
+      "source_id": "csindex.indicators",
+      "retrieved_at": "2026-11-12T00:12:50+08:00",
+      "start_date": "2005-04-08",
+      "end_date": "2026-11-11",
+      "observation_count": 5247,
+      "file": "ser-a1211121f5c38cfa.json"
+    },
+    {
+      "series_id": "ser-72878a74548eb9d0",
+      "instrument_id": "INDEX:000852.SH",
+      "metric": "official_close",
+      "frequency": "daily",
+      "source_id": "csindex.indicators",
+      "retrieved_at": "2026-11-12T00:12:50+08:00",
+      "start_date": "2014-10-17",
+      "end_date": "2026-11-11",
+      "observation_count": 2935,
+      "file": "ser-72878a74548eb9d0.json"
+    },
+    {
       "series_id": "ser-e532ae694a2bcbec",
       "instrument_id": "INDEX:000852.SH",
       "metric": "official_pe_ratio_1",
@@ -59,6 +107,18 @@
       "end_date": "2026-11-10",
       "observation_count": 20,
       "file": "ser-e532ae694a2bcbec.json"
+    },
+    {
+      "series_id": "ser-6a18097aa17a9fa6",
+      "instrument_id": "INDEX:000852.SH",
+      "metric": "official_pe_rolling",
+      "frequency": "daily",
+      "source_id": "csindex.indicators",
+      "retrieved_at": "2026-11-12T00:12:50+08:00",
+      "start_date": "2014-10-17",
+      "end_date": "2026-11-11",
+      "observation_count": 2935,
+      "file": "ser-6a18097aa17a9fa6.json"
     },
     {
       "series_id": "ser-0e3c14ff893c9985",
@@ -97,6 +157,30 @@
       "file": "ser-28caf9643ab189b3.json"
     },
     {
+      "series_id": "ser-13845103862bf524",
+      "instrument_id": "INDEX:000852.SH",
+      "metric": "total_return_close",
+      "frequency": "daily",
+      "source_id": "csindex.indicators",
+      "retrieved_at": "2026-11-12T00:12:50+08:00",
+      "start_date": "2014-10-17",
+      "end_date": "2026-11-11",
+      "observation_count": 2935,
+      "file": "ser-13845103862bf524.json"
+    },
+    {
+      "series_id": "ser-97a7306364847e2e",
+      "instrument_id": "INDEX:000905.SH",
+      "metric": "official_close",
+      "frequency": "daily",
+      "source_id": "csindex.indicators",
+      "retrieved_at": "2026-11-12T00:12:50+08:00",
+      "start_date": "2007-01-15",
+      "end_date": "2026-11-11",
+      "observation_count": 4818,
+      "file": "ser-97a7306364847e2e.json"
+    },
+    {
       "series_id": "ser-6e65fde212602766",
       "instrument_id": "INDEX:000905.SH",
       "metric": "official_pe_ratio_1",
@@ -107,6 +191,18 @@
       "end_date": "2026-11-10",
       "observation_count": 20,
       "file": "ser-6e65fde212602766.json"
+    },
+    {
+      "series_id": "ser-1273dc466b80a8a7",
+      "instrument_id": "INDEX:000905.SH",
+      "metric": "official_pe_rolling",
+      "frequency": "daily",
+      "source_id": "csindex.indicators",
+      "retrieved_at": "2026-11-12T00:12:50+08:00",
+      "start_date": "2011-06-28",
+      "end_date": "2026-11-11",
+      "observation_count": 3669,
+      "file": "ser-1273dc466b80a8a7.json"
     },
     {
       "series_id": "ser-90f582c9b5cb421b",
@@ -143,6 +239,18 @@
       "end_date": "2026-11-11",
       "observation_count": 5307,
       "file": "ser-caf4924a40523148.json"
+    },
+    {
+      "series_id": "ser-5ab1aa6a153cf8bf",
+      "instrument_id": "INDEX:000905.SH",
+      "metric": "total_return_close",
+      "frequency": "daily",
+      "source_id": "csindex.indicators",
+      "retrieved_at": "2026-11-12T00:12:50+08:00",
+      "start_date": "2007-01-15",
+      "end_date": "2026-11-11",
+      "observation_count": 4818,
+      "file": "ser-5ab1aa6a153cf8bf.json"
     }
   ]
 }

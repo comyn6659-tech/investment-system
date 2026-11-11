@@ -227,7 +227,15 @@ def main(argv: list[str] | None = None) -> int:
     md_path = Path(args.md_out)
     md_path.parent.mkdir(parents=True, exist_ok=True)
     md_path.write_text(render_markdown(payload), encoding="utf-8")
-    print(f"written {json_path.relative_to(ROOT)} and {md_path.relative_to(ROOT)}")
+
+    def _display(path: Path) -> str:
+        """输出目录可能在项目之外：先试相对路径，失败就用绝对路径。"""
+        try:
+            return str(path.resolve().relative_to(ROOT))
+        except ValueError:
+            return str(path.resolve())
+
+    print(f"written {_display(json_path)} and {_display(md_path)}")
     for code, label in INDICES:
         entry = indices[code]
         print(f"  {label}: evaluable={entry['evaluable_months']} not={entry['not_evaluable_months']}")
