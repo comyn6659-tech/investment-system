@@ -9,7 +9,7 @@
 | 代码版本 | `phase3-0.5.0` |
 | 政策版本 | `unapproved-phase2`（没有任何模型或参数升级为 `validated`） |
 | 模型版本 | `research-0.3.0`（个股 3 个 + 指数画像 1 个，全部 `research`） |
-| 本轮提交 | `PENDING`（见 §7） |
+| 本轮提交 | `698bd50` |
 | 工作区 | 干净（`git status --short` 为空） |
 | 上一轮已签收 | `a5620ae`（事后诊断 + 数据可行性）、`76e2480`（交付入口） |
 
@@ -94,7 +94,7 @@ PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
 
 | 提交 | 内容 |
 |---|---|
-| `PENDING` | **本轮**：候选 A 周度研究回测 + 21 项新回归 + 文档与入口 |
+| `698bd50` | **本轮**：候选 A 周度研究回测 + 21 项新回归 + 文档与入口 |
 | `a5620ae` | 阶段三批二：事后诊断 + 数据可行性调查 |
 | `2f824df` | 阶段三首轮收尾：W1/W2/E1 修复 |
 | `1bb379c` | 阶段三首轮：指数画像 + ETF 产品资料检查 |
