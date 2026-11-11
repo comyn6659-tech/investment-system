@@ -1,6 +1,6 @@
 {
   "schema_version": "data-coverage/1",
-  "generated_at": "2026-11-11T03:11:34+08:00",
+  "generated_at": "2026-11-11T13:40:57+08:00",
   "environment": {
     "python": "3.12.16",
     "akshare": "1.20.35",
@@ -44,7 +44,7 @@
       "access": "免费、无需登录",
       "verdict": "基础信息可得，但只有当前值，没有历史版本（无法回放历史时点的股本/行业）",
       "sample": {
-        "最新": "8.6",
+        "最新": "8.58",
         "股票代码": "601398",
         "股票简称": "工商银行",
         "总股本": "356406257089.0",
@@ -53,7 +53,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "stock.cash_flow_sheet",
@@ -87,7 +87,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "stock.balance_sheet",
@@ -118,7 +118,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "stock.dividend_detail",
@@ -152,7 +152,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "stock.dividend_cninfo",
@@ -191,7 +191,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "index.official_valuation.000300",
@@ -227,7 +227,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "index.official_valuation.000905",
@@ -263,7 +263,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "index.official_valuation.000852",
@@ -299,7 +299,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "index.vendor_valuation.000300",
@@ -341,7 +341,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "index.vendor_valuation.000905",
@@ -383,7 +383,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "index.vendor_valuation.000852",
@@ -425,7 +425,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "index.daily_history",
@@ -445,9 +445,9 @@
       ],
       "date_range": [
         "2005-01-04",
-        "2026-11-10"
+        "2026-11-11"
       ],
-      "rows": 5306,
+      "rows": 5307,
       "frequency": "日频",
       "update_time": "收盘后",
       "availability": "收盘后",
@@ -458,16 +458,24 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "index.total_return",
       "scope": "指数",
       "question": "全收益/净收益指数是否可得？",
-      "interface": "stock_zh_index_daily_em",
+      "interface": "stock_zh_index_daily_em（带市场前缀 symbol）",
       "provider": "东方财富",
       "status": "failed",
-      "fields": [],
+      "fields": [
+        "date",
+        "open",
+        "close",
+        "high",
+        "low",
+        "volume",
+        "amount"
+      ],
       "date_range": null,
       "rows": 0,
       "frequency": null,
@@ -475,36 +483,113 @@
       "availability": "收盘后",
       "missing_rate": null,
       "access": "免费、无需登录",
-      "verdict": "已测的这三个代码均返回空表；不能据此推断所有免费来源都没有全收益数据",
+      "verdict": "已按市场前缀实际发出请求，远端对这些代码没有返回数据（HTTP 已发出）；这不等于所有免费来源都没有全收益序列",
       "sample": {
-        "per_code": [
+        "targets": [
           {
             "code": "H00300",
-            "rows": 0,
-            "status": "empty"
+            "label": "沪深300全收益",
+            "outcome": "remote_empty"
           },
           {
             "code": "H00905",
-            "rows": 0,
-            "status": "empty"
+            "label": "中证500全收益",
+            "outcome": "remote_empty"
           },
           {
             "code": "H00852",
-            "rows": 0,
-            "status": "empty"
+            "label": "中证1000全收益",
+            "outcome": "remote_empty"
           }
-        ]
+        ],
+        "attempts": [
+          {
+            "symbol": "shH00300",
+            "http_calls": 1,
+            "rows": 0,
+            "outcome": "remote_empty_payload",
+            "error": "TypeError: 'NoneType' object is not subscriptable"
+          },
+          {
+            "symbol": "csiH00300",
+            "http_calls": 1,
+            "rows": 0,
+            "outcome": "remote_empty_payload",
+            "error": "TypeError: 'NoneType' object is not subscriptable"
+          },
+          {
+            "symbol": "H00300",
+            "http_calls": 0,
+            "rows": 0,
+            "outcome": "local_rejected"
+          },
+          {
+            "symbol": "shH00905",
+            "http_calls": 1,
+            "rows": 0,
+            "outcome": "remote_empty_payload",
+            "error": "TypeError: 'NoneType' object is not subscriptable"
+          },
+          {
+            "symbol": "csiH00905",
+            "http_calls": 1,
+            "rows": 0,
+            "outcome": "remote_empty_payload",
+            "error": "TypeError: 'NoneType' object is not subscriptable"
+          },
+          {
+            "symbol": "H00905",
+            "http_calls": 0,
+            "rows": 0,
+            "outcome": "local_rejected"
+          },
+          {
+            "symbol": "shH00852",
+            "http_calls": 1,
+            "rows": 0,
+            "outcome": "remote_empty_payload",
+            "error": "TypeError: 'NoneType' object is not subscriptable"
+          },
+          {
+            "symbol": "csiH00852",
+            "http_calls": 1,
+            "rows": 0,
+            "outcome": "remote_empty_payload",
+            "error": "TypeError: 'NoneType' object is not subscriptable"
+          },
+          {
+            "symbol": "H00852",
+            "http_calls": 0,
+            "rows": 0,
+            "outcome": "local_rejected"
+          }
+        ],
+        "per_series": [],
+        "http_attempts": 6
       },
-      "error": "H00300 空表; H00905 空表; H00852 空表",
+      "error": "shH00300: TypeError; csiH00300: TypeError; shH00905: TypeError; csiH00905: TypeError; shH00852: TypeError; csiH00852: TypeError",
       "called": true,
       "parameters": {
-        "symbols": [
-          "H00300",
-          "H00905",
-          "H00852"
-        ]
+        "targets": {
+          "H00300": [
+            "shH00300",
+            "csiH00300",
+            "H00300"
+          ],
+          "H00905": [
+            "shH00905",
+            "csiH00905",
+            "H00905"
+          ],
+          "H00852": [
+            "shH00852",
+            "csiH00852",
+            "H00852"
+          ]
+        },
+        "note": "每个代码依次尝试 sh/csi 前缀与无前缀写法，逐次记录是否发出 HTTP"
       },
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "index.spot",
@@ -547,7 +632,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "etf.spot",
@@ -596,7 +681,7 @@
         "更新时间"
       ],
       "date_range": null,
-      "rows": 1666,
+      "rows": 1667,
       "frequency": "实时/收盘",
       "update_time": "页面更新时间（非交易所披露时间）",
       "availability": "收盘后；更新时间字段可用",
@@ -605,12 +690,12 @@
       "verdict": "价格与 IOPV 参考值可得；折价率是行情商计算值，不能替代「同日收盘价 vs 同日已公布净值」的核对",
       "sample": {
         "code": "510300",
-        "time": "2026-11-10 16:11:36+08:00"
+        "time": "2026-11-11 13:42:04+08:00"
       },
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "etf.nav_history",
@@ -642,7 +727,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "etf.price_history",
@@ -666,9 +751,9 @@
       ],
       "date_range": [
         "2024-01-02",
-        "2026-11-10"
+        "2026-11-11"
       ],
-      "rows": 690,
+      "rows": 691,
       "frequency": "日频",
       "update_time": "收盘后",
       "availability": "收盘后",
@@ -679,7 +764,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "etf.profile",
@@ -708,7 +793,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "etf.pcf",
@@ -747,7 +832,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "etf.exchange_list.sse",
@@ -775,7 +860,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "etf.exchange_list.szse",
@@ -797,7 +882,7 @@
       "error": "ConnectionError: ('Connection aborted.', ConnectionResetError(54, 'Connection reset by peer'))",
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "etf.dividend",
@@ -825,7 +910,7 @@
       "error": null,
       "called": true,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     },
     {
       "probe_id": "etf.tracking_error",
@@ -847,21 +932,21 @@
       "error": null,
       "called": false,
       "parameters": {},
-      "fetched_at": "2026-11-11T03:11:34+08:00"
+      "fetched_at": "2026-11-11T13:40:57+08:00"
     }
   ],
   "gaps": [
     {
       "gap_id": "GAP-WEEKLY-VALUATION-HISTORY",
       "scope": "指数",
-      "impact": "阶段三的 5 年周度分位无法用免费数据完成",
-      "detail": "官方指标文件只有最近 20 个交易日；第三方仅有月度序列。需要设计方决定：接受月度降频，或另行取得日频历史"
+      "impact": "阶段三的 5 年周度分位无法用本次已测来源完成",
+      "detail": "官方指标文件只提供最近 20 个交易日；本次采到的第三方缓存为月度序列。这是已测来源与参数的覆盖结论，不代表所有免费来源都没有周度数据"
     },
     {
       "gap_id": "GAP-TOTAL-RETURN-INDEX",
       "scope": "指数/ETF",
-      "impact": "回测无法使用全收益指数，股息收益会缺失",
-      "detail": "免费源未提供 H00300/H00905/H00852 等全收益指数行情"
+      "impact": "本次未能取得全收益指数，回测缺少股息收益口径",
+      "detail": "已按市场前缀（shH00300 / csiH00300）实际调用东方财富接口，远端未返回数据（HTTP 已发出）；未穷举其他供应商，也未购买数据"
     },
     {
       "gap_id": "GAP-AGGREGATION-METHOD",
@@ -885,13 +970,13 @@
       "gap_id": "GAP-ETF-TRACKING-ERROR",
       "scope": "ETF",
       "impact": "跟踪偏离只能自行计算，缺少官方序列",
-      "detail": "无免费跟踪误差时间序列接口"
+      "detail": "尚未找到并调用提供跟踪误差时间序列的接口（本项标记为未测试，未计入实测数量）"
     },
     {
       "gap_id": "GAP-SZSE-ETF-LIST",
       "scope": "ETF",
       "impact": "深市 ETF 交易所归属缺少官方清单证据",
-      "detail": "深交所 ETF 份额接口当前报错（TypeError: bytes）"
+      "detail": "深交所 ETF 份额接口实际调用时报错（ConnectionError/TypeError），未能取得官方清单"
     },
     {
       "gap_id": "GAP-BANK-CAPITAL-QUALITY",

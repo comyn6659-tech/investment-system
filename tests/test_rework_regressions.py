@@ -223,8 +223,6 @@ def test_r5_snapshot_records_precision(snapshot_dir):
     store = SnapshotStore(snapshot_dir)
     for entry in store.load_manifest():
         snap = store.load(entry["snapshot_id"])
-        if str(snap.notes).startswith("LEGACY-REPRODUCTION"):
-            continue  # 历史复现样例不参与分析，也不承诺新的 coverage 字段
         coverage = snap.coverage
         assert "point_in_time_granularity" in coverage
         assert "availability_precision_counts" in coverage
@@ -333,8 +331,9 @@ def test_r7_total_return_probe_reflects_actual_result(monkeypatch):
     probe.probe_index_total_return()
     record = probe.PROBES[-1]
     assert record["status"] == "ok"
-    assert record["rows"] == 3
+    assert record["rows"] > 0
     assert record["called"] is True
+    assert record["parameters"]["targets"]["H00300"][0] == "shH00300"
 
 
 def test_r7_total_return_probe_marks_empty_and_errors(monkeypatch):
@@ -346,8 +345,11 @@ def test_r7_total_return_probe_marks_empty_and_errors(monkeypatch):
         probe.ak, "stock_zh_index_daily_em", lambda symbol: pd.DataFrame({"date": [], "close": []})
     )
     probe.probe_index_total_return()
-    assert probe.PROBES[-1]["status"] == "failed"
-    assert "空表" in (probe.PROBES[-1]["error"] or "")
+    record = probe.PROBES[-1]
+    assert record["status"] == "failed"
+    # 三条目标都没有数据；不再把「空表」写成笼统的接口错误
+    assert record["sample"]["per_series"] == []
+    assert all(t["outcome"] != "data" for t in record["sample"]["targets"])
 
 
 def test_r7_untested_tracking_error_is_not_counted(monkeypatch):
@@ -484,25 +486,155 @@ def test_snapshot_save_refuses_invalid_snapshot(tmp_path):
         SnapshotStore(tmp_path).save(snap)
 
 
-# --- 历史复现样例：保留可复现，但禁止进入分析 --------------------------------
-def test_legacy_reproduction_snapshot_is_quarantined(analyzer, snapshot_dir):
+# --- F3：隔离与版本元信息必须受完整性约束 ------------------------------------
+def test_f3_metadata_changes_are_caught_by_content_hash(snapshot_dir):
+    """notes / fetched_at / producers 都进入内容哈希，改动即身份不符。"""
     store = SnapshotStore(snapshot_dir)
-    legacy = [
-        entry
-        for entry in store.load_manifest()
-        if str(store.load(entry["snapshot_id"]).notes).startswith("LEGACY-REPRODUCTION")
-    ]
-    assert legacy, "应保留一个明确标记的历史复现样例"
-    snapshot_id = legacy[0]["snapshot_id"]
-    result = analyzer.analyze("510300", snapshot_id=snapshot_id)
+    snap = store.load(store.latest_for("ETF:510300.SH"))
+    base = snap.to_dict()
+
+    for field, value in (
+        ("notes", "被改过的备注"),
+        ("fetched_at", "2026-11-11T23:59:59+08:00"),
+        ("producers", ["someone-else"]),
+    ):
+        tampered = dict(base)
+        tampered[field] = value
+        with pytest.raises(SnapshotError) as exc:
+            Snapshot.from_dict(tampered, expected_id=snap.snapshot_id)
+        assert exc.value.code == "SNAPSHOT_HASH_MISMATCH", field
+
+
+def test_f3_retired_sample_is_out_of_production(analyzer, snapshot_dir):
+    """作废样例已移出生产快照目录：按旧 ID 取数只能得到明确的缺失错误。"""
+    store = SnapshotStore(snapshot_dir)
+    old_id = "snap-23eaf5b0bfc82144"
+    assert old_id not in {e["snapshot_id"] for e in store.load_manifest()}
+    result = analyzer.analyze("510300", snapshot_id=old_id)
     assert result.analysis_status == AnalysisStatus.ENGINE_ERROR.value
-    assert "SNAPSHOT_LEGACY_QUARANTINED" in result.reason_codes
+    assert "SNAPSHOT_NOT_FOUND" in result.reason_codes
     assert result.snapshot_id is None
 
 
-def test_default_analysis_never_selects_legacy_snapshot(analyzer, snapshot_dir):
+def test_f3_manifest_must_match_snapshot(tmp_path, snapshot_dir):
+    """manifest 记录的版本时间被改动时，加载必须报不一致。"""
+    source = SnapshotStore(snapshot_dir)
+    sid = source.latest_for("ETF:510300.SH")
+    snap = source.load(sid)
+
+    target = SnapshotStore(tmp_path)
+    (tmp_path / f"{sid}.json").write_text(
+        json.dumps(snap.to_dict(), ensure_ascii=False), encoding="utf-8"
+    )
+    (tmp_path / "manifest.json").write_text(
+        json.dumps(
+            {
+                "snapshots": [
+                    {
+                        "snapshot_id": sid,
+                        "instrument_id": snap.instrument_id,
+                        "asset_class": snap.asset_class,
+                        "as_of": snap.as_of,
+                        "available_at": snap.available_at,
+                        "fetched_at": "2026-01-01T00:00:00+08:00",
+                        "file": f"{sid}.json",
+                    }
+                ]
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(SnapshotError) as exc:
+        target.load(sid)
+    assert exc.value.code == "SNAPSHOT_MANIFEST_MISMATCH"
+
+
+def test_f3_snapshot_directory_is_self_consistent(snapshot_dir):
+    store = SnapshotStore(snapshot_dir)
+    assert store.check_consistency() == []
+
+
+def test_f3_default_analysis_uses_registered_snapshot(analyzer, snapshot_dir):
     store = SnapshotStore(snapshot_dir)
     result = analyzer.analyze("510300")
     assert result.analysis_status == AnalysisStatus.UNSUPPORTED.value
-    selected = store.load(result.snapshot_id)
-    assert not str(selected.notes).startswith("LEGACY-REPRODUCTION")
+    assert result.snapshot_id in {e["snapshot_id"] for e in store.load_manifest()}
+
+
+# --- F1：合法研究结果必须仍可输出（正例） ------------------------------------
+def _research_result(analyzer):
+    from engine.contracts.enums import AnalysisStatus as AS
+    from engine.contracts.enums import Decision as D
+    from engine.contracts.enums import ModelStatus as MS
+
+    result = analyzer.analyze("沪深300")
+    result.analysis_status = AS.PARTIAL.value
+    result.model_status = MS.RESEARCH.value
+    result.valuation_state = ValuationState.UNKNOWN.value
+    result.decision = D.UNDETERMINED.value
+    result.reason_codes = ["RESEARCH_SIGNAL_ONLY", "MISSING_VALUATION_HISTORY"]
+    result.model_plan = {
+        "primary_model": "index_strategy_a_valuation_reversion",
+        "required_checks": [],
+        "selection_reason": "研究测算：仅用于验证契约与展示，不构成买点",
+        "not_selected": [],
+        "candidate_models": [],
+    }
+    result.model_results = [
+        {
+            "result_type": "research_signal",
+            "model_id": "index_strategy_a_valuation_reversion",
+            "model_version": "0.0.0-research",
+            "model_status": "research",
+            "pe_percentile_5y": 18.2,
+            "note": "研究测算，不是买点",
+        }
+    ]
+    return result
+
+
+def test_f1_legitimate_research_result_is_allowed(analyzer):
+    result = _research_result(analyzer)
+    text = export_json(result)  # 不抛异常
+    assert "research_signal" in text
+    render_text(result.to_dict())
+    assert result.decision == "undetermined"
+
+
+def test_f1_research_signal_requires_registered_model(analyzer):
+    result = _research_result(analyzer)
+    result.model_results[0]["model_id"] = "nonexistent_model"
+    result.model_plan["primary_model"] = "nonexistent_model"
+    with pytest.raises(ContractViolation):
+        export_json(result)
+
+
+def test_f1_research_signal_requires_matching_version(analyzer):
+    result = _research_result(analyzer)
+    result.model_results[0]["model_version"] = "9.9.9"
+    with pytest.raises(ContractViolation):
+        export_json(result)
+
+
+def test_f1_research_signal_must_match_model_plan(analyzer):
+    result = _research_result(analyzer)
+    result.model_plan["primary_model"] = "index_valuation_profile"
+    with pytest.raises(ContractViolation):
+        export_json(result)
+
+
+def test_f1_research_signal_not_allowed_on_unsupported(analyzer):
+    result = analyzer.analyze("工商银行")
+    result.model_results = [
+        {
+            "result_type": "research_signal",
+            "model_id": "index_strategy_a_valuation_reversion",
+            "model_version": "0.0.0-research",
+            "model_status": "research",
+            "value": 1,
+        }
+    ]
+    result.model_plan["primary_model"] = "index_strategy_a_valuation_reversion"
+    with pytest.raises(ContractViolation):
+        export_json(result)

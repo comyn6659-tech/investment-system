@@ -23,6 +23,7 @@ from engine.contracts.enums import (
 )
 from engine.contracts.payloads import INDEX_POINT_UNIT, MONEY_UNITS, PAYLOAD_SCHEMAS
 from engine.data.numeric import is_finite_number
+from engine.models.registry import MODELS_BY_ID
 from engine.version import RESULT_SCHEMA_VERSION
 
 _INSTRUMENT_ID_RE = re.compile(r"^(EQUITY|INDEX|ETF):[0-9A-Z]+(\.[0-9A-Z]+)?$")
@@ -123,8 +124,11 @@ def validate_result(result: Any) -> list[str]:
         problems.append("model_status=research 时不得输出 candidate（研究结果不能进入正式买点）")
     if model_status == ModelStatus.DEPRECATED and decision == Decision.CANDIDATE:
         problems.append("model_status=deprecated 时不得输出 candidate")
-    if decision == Decision.CANDIDATE and guard_codes:
-        problems.append(f"存在阻断性原因码时不得输出 candidate: {guard_codes}")
+    # 阻断性原因码对所有正式价格判断一视同仁：candidate / wait / avoid 都不允许
+    if decision in _FORMAL_DECISIONS and guard_codes:
+        problems.append(
+            f"存在阻断性原因码时不得输出 {decision.value} 这类正式价格判断: {guard_codes}"
+        )
     if decision in _FORMAL_DECISIONS:
         if model_status != ModelStatus.VALIDATED:
             problems.append(
@@ -216,10 +220,9 @@ def validate_result(result: Any) -> list[str]:
         if item["result_type"] not in _ALLOWED_MODEL_RESULT_TYPES:
             problems.append(f"未知的 model_results 类型: {item['result_type']!r}")
         if item["result_type"] == "research_signal":
-            if not item.get("model_id"):
-                problems.append("research_signal 必须注明 model_id（真实模型来源）")
-            if item.get("model_status") != ModelStatus.RESEARCH.value:
-                problems.append("research_signal 必须标记 model_status=research")
+            problems.extend(
+                _check_research_signal(item, data, analysis_status, model_status, decision)
+            )
         elif analysis_status != AnalysisStatus.COMPLETE or model_status != ModelStatus.VALIDATED:
             problems.append(
                 f"model_results 含 {item['result_type']}，但分析未完成或模型未 validated"
@@ -238,6 +241,61 @@ def enforce(result: Any) -> None:
     problems = validate_result(result)
     if problems:
         raise ContractViolation(problems)
+
+
+# --- 研究结果的来源约束 ------------------------------------------------------
+def _check_research_signal(item, data, analysis_status, model_status, decision) -> list[str]:
+    """研究结果必须能追到「真实登记过、且确实被执行」的模型。
+
+    仅凭一个非空字符串 model_id 不算有来源：
+    - 模型必须在模型登记表中；
+    - 版本必须与登记版本一致；
+    - 必须与 model_plan.primary_model 一致（说明确实是这次分析选用的模型）；
+    - 整体状态必须是 research，且分析确实执行过（complete/partial）；
+    - 决策必须仍是 undetermined。
+    """
+    problems: list[str] = []
+    model_id = item.get("model_id")
+    plan = data.get("model_plan") or {}
+
+    if not model_id:
+        problems.append("research_signal 必须注明 model_id（真实模型来源）")
+        return problems
+
+    model = MODELS_BY_ID.get(model_id)
+    if model is None:
+        problems.append(f"research_signal 引用了未登记的模型: {model_id!r}")
+    else:
+        if model.status != ModelStatus.RESEARCH.value:
+            problems.append(
+                f"模型 {model_id} 的登记状态为 {model.status}，不能作为 research_signal 来源"
+            )
+        if item.get("model_version") != model.version:
+            problems.append(
+                f"research_signal 的 model_version={item.get('model_version')!r} "
+                f"与登记版本 {model.version!r} 不一致"
+            )
+        if plan.get("primary_model") != model_id:
+            problems.append(
+                "research_signal 必须与 model_plan.primary_model 一致"
+                "（说明该模型确实是本次分析选用的模型）"
+            )
+
+    if item.get("model_status") != ModelStatus.RESEARCH.value:
+        problems.append("research_signal 必须标记 model_status=research")
+    if model_status != ModelStatus.RESEARCH:
+        problems.append(
+            "携带 research_signal 的结果，整体 model_status 必须为 research"
+            f"（当前 {model_status.value if model_status else None}）"
+        )
+    if analysis_status not in (AnalysisStatus.COMPLETE, AnalysisStatus.PARTIAL):
+        problems.append(
+            "研究结果只能在 complete/partial 的分析中出现"
+            "（未建模或未执行的结果不能夹带模型计算价格）"
+        )
+    if decision != Decision.UNDETERMINED:
+        problems.append("携带研究结果时 decision 必须为 undetermined")
+    return problems
 
 
 # --- 内部工具 ---------------------------------------------------------------

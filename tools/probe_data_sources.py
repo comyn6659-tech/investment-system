@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import sys
 import traceback
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -310,69 +311,211 @@ def probe_index_daily() -> None:
         update_time="收盘后",
         availability="收盘后",
         missing_rate=_missing_rate(df, ["close"]),
-        verdict="点位日线可得且历史足够；但只有价格指数，没有全收益指数",
+        verdict="点位日线可得且历史足够；本条只验证价格指数（sh000300），全收益序列另见 total_return 探针",
     )
 
 
+TOTAL_RETURN_TARGETS = [
+    {
+        "label": "沪深300全收益",
+        "alt_code": "H00300",
+        "symbols": ["shH00300", "csiH00300", "H00300"],
+    },
+    {
+        "label": "中证500全收益",
+        "alt_code": "H00905",
+        "symbols": ["shH00905", "csiH00905", "H00905"],
+    },
+    {
+        "label": "中证1000全收益",
+        "alt_code": "H00852",
+        "symbols": ["shH00852", "csiH00852", "H00852"],
+    },
+]
+
+_MARKET_PREFIXES = ("sz", "sh", "csi", "bj")
+
+
+@contextmanager
+def _count_http_gets():
+    """临时包一层 AKShare 使用的 `http.get`，记录是否真的发出了请求。
+
+    只包装不替代：真实适配器仍照常执行，计数后原样调用。
+    """
+    transport = None
+    try:
+        from akshare.index import index_stock_zh as index_module
+
+        transport = getattr(index_module, "http", None)
+    except Exception:  # pragma: no cover - 环境差异
+        transport = None
+
+    counter = {"calls": 0}
+    if transport is None or not hasattr(transport, "get"):
+        yield counter
+        return
+
+    original = transport.get
+
+    def wrapper(*args, **kwargs):
+        counter["calls"] += 1
+        return original(*args, **kwargs)
+
+    transport.get = wrapper
+    try:
+        yield counter
+    finally:
+        transport.get = original
+
+
+def _classify_attempt(symbol: str, http_calls: int, rows: int, error: Exception | None) -> str:
+    """把一次调用归入互斥的类别，避免把「参数不被支持」当成「远端无数据」。"""
+    has_prefix = symbol.startswith(_MARKET_PREFIXES)
+    if not has_prefix:
+        return "local_rejected"  # 适配器在本地直接返回空表，未发出请求
+    if error is not None:
+        if http_calls > 0 and isinstance(error, (TypeError, KeyError, AttributeError)):
+            return "remote_empty_payload"  # 请求已发出，响应无数据体
+        return "remote_error" if http_calls > 0 else "adapter_error"
+    if rows > 0:
+        return "data"
+    if http_calls == 0:
+        return "empty_without_http"
+    return "remote_empty"
+
+
 def probe_index_total_return() -> None:
-    """逐个实际调用全收益/净收益指数代码，按返回结果分类，不写死结论。"""
-    codes = ("H00300", "H00905", "H00852")
-    details: list[dict] = []
-    frames: list[pd.DataFrame] = []
+    """逐个代码、逐个市场前缀实际调用，并区分四种真实结果。
+
+    背景：AKShare 的 `stock_zh_index_daily_em` 要求带市场前缀（sh/sz/csi/bj），
+    不带前缀会**在本地**返回空表而不发请求。上一版直接把 H00300 传进去，
+    于是把「参数格式错误」错写成「远端没有数据」。
+    """
+    attempts: list[dict] = []
+    series: list[dict] = []
     errors: list[str] = []
+    total_rows = 0
 
-    for code in codes:
-        try:
-            df = ak.stock_zh_index_daily_em(symbol=code)
-            rows = int(len(df)) if df is not None else 0
-            detail = {"code": code, "rows": rows, "status": "empty" if rows == 0 else "ok"}
-            if rows:
-                frames.append(df)
-                detail["date_range"] = _range(df, "date")
-            details.append(detail)
-        except Exception as exc:
-            errors.append(f"{code}: {type(exc).__name__}: {exc}")
-            details.append({"code": code, "rows": 0, "status": "error"})
+    for target in TOTAL_RETURN_TARGETS:
+        outcomes: list[str] = []
+        for symbol in target["symbols"]:
+            error: Exception | None = None
+            rows = 0
+            frame: pd.DataFrame | None = None
+            with _count_http_gets() as counter:
+                try:
+                    frame = ak.stock_zh_index_daily_em(symbol=symbol)
+                    rows = int(len(frame)) if frame is not None else 0
+                except Exception as exc:  # 记录后继续下一个候选，不伪造结果
+                    error = exc
+            outcome = _classify_attempt(symbol, counter["calls"], rows, error)
+            outcomes.append(outcome)
+            attempt = {
+                "symbol": symbol,
+                "http_calls": counter["calls"],
+                "rows": rows,
+                "outcome": outcome,
+            }
+            if error is not None:
+                attempt["error"] = f"{type(error).__name__}: {error}"
+                errors.append(f"{symbol}: {type(error).__name__}")
+            if rows > 0 and frame is not None:
+                dates = [pd.to_datetime(v).date() for v in frame["date"]]
+                attempt["date_range"] = [str(min(dates)), str(max(dates))]
+                attempt["frequency"] = infer_frequency(dates)
+                attempt["observations"] = len(dates)
+                total_rows += rows
+                series.append(
+                    {
+                        "code": target["alt_code"],
+                        "symbol": symbol,
+                        "observations": len(dates),
+                        "start": str(min(dates)),
+                        "end": str(max(dates)),
+                        "frequency": infer_frequency(dates),
+                    }
+                )
+            attempts.append(attempt)
+        target["outcome"] = _aggregate_outcome(outcomes)
 
-    total_rows = sum(d["rows"] for d in details)
-    available = [d for d in details if d["status"] == "ok"]
-    if not any(d["status"] == "error" for d in details) and not available:
-        status = "failed"
-        verdict = "已测的这三个代码均返回空表；不能据此推断所有免费来源都没有全收益数据"
-    elif available and not errors:
-        status = "ok"
-        verdict = f"实际取得 {len(available)} 个全收益/净收益序列，需进一步核对口径与编制方式"
-    elif available:
+    outcomes_all = [t["outcome"] for t in TOTAL_RETURN_TARGETS]
+    data_targets = [o for o in outcomes_all if o == "data"]
+    remote_missing = [o for o in outcomes_all if o in ("remote_empty", "remote_empty_payload")]
+    http_attempts = sum(a["http_calls"] for a in attempts)
+
+    if not outcomes_all or all(o == "data" for o in outcomes_all):
+        status = "ok" if data_targets else "failed"
+    elif data_targets:
         status = "partial"
-        verdict = f"部分代码可取（{len(available)}/{len(codes)}），部分调用异常"
     else:
         status = "failed"
-        verdict = "全部调用异常，无法判断是否可得"
 
-    date_range = None
-    if frames:
-        ranges = [_range(frame, "date") for frame in frames if _range(frame, "date")]
-        if ranges:
-            date_range = [min(r[0] for r in ranges), max(r[1] for r in ranges)]
+    if status == "ok":
+        verdict = "所有已测代码均取得数据；需进一步核对口径与编制方式"
+    elif status == "partial":
+        verdict = (
+            f"{len(data_targets)}/{len(outcomes_all)} 个代码取得数据，其余无数据或异常；"
+            "结论只覆盖这些代码与参数"
+        )
+    elif remote_missing:
+        verdict = (
+            "已按市场前缀实际发出请求，远端对这些代码没有返回数据（HTTP 已发出）；"
+            "这不等于所有免费来源都没有全收益序列"
+        )
+    else:
+        verdict = "调用未进入远端或全部异常，无法判断是否可得"
 
     record(
         probe_id="index.total_return",
         scope="指数",
         question="全收益/净收益指数是否可得？",
-        interface="stock_zh_index_daily_em",
+        interface="stock_zh_index_daily_em（带市场前缀 symbol）",
         provider="东方财富",
         status=status,
-        fields=list(frames[0].columns) if frames else [],
-        date_range=date_range,
+        fields=["date", "open", "close", "high", "low", "volume", "amount"],
+        date_range=(
+            [min(s["start"] for s in series), max(s["end"] for s in series)] if series else None
+        ),
         rows=total_rows,
-        frequency=infer_frequency([pd.to_datetime(f["date"]).dt.date.iloc[-1] for f in frames]) if frames else None,
+        frequency=(
+            ", ".join(f"{s['code']}:{s['frequency']}" for s in series) if series else None
+        ),
         update_time="收盘后",
         availability="收盘后",
         verdict=verdict,
-        sample={"per_code": details},
-        error="; ".join(errors) if errors else ("; ".join(f"{d['code']} 空表" for d in details if d["status"] == "empty") or None),
-        parameters={"symbols": list(codes)},
+        sample={
+            "targets": [
+                {
+                    "code": t["alt_code"],
+                    "label": t["label"],
+                    "outcome": t["outcome"],
+                }
+                for t in TOTAL_RETURN_TARGETS
+            ],
+            "attempts": attempts,
+            "per_series": series,
+            "http_attempts": http_attempts,
+        },
+        error="; ".join(errors) if errors else None,
+        parameters={
+            "targets": {t["alt_code"]: t["symbols"] for t in TOTAL_RETURN_TARGETS},
+            "note": "每个代码依次尝试 sh/csi 前缀与无前缀写法，逐次记录是否发出 HTTP",
+        },
     )
+
+
+def _aggregate_outcome(outcomes: list[str]) -> str:
+    if "data" in outcomes:
+        return "data"
+    if any(o in ("remote_empty", "remote_empty_payload") for o in outcomes):
+        return "remote_empty"
+    if "remote_error" in outcomes:
+        return "remote_error"
+    if "adapter_error" in outcomes:
+        return "adapter_error"
+    if "empty_without_http" in outcomes:
+        return "empty_without_http"
+    return "local_rejected"
 
 
 def probe_index_spot() -> None:
@@ -623,14 +766,14 @@ GAPS = [
     {
         "gap_id": "GAP-WEEKLY-VALUATION-HISTORY",
         "scope": "指数",
-        "impact": "阶段三的 5 年周度分位无法用免费数据完成",
-        "detail": "官方指标文件只有最近 20 个交易日；第三方仅有月度序列。需要设计方决定：接受月度降频，或另行取得日频历史",
+        "impact": "阶段三的 5 年周度分位无法用本次已测来源完成",
+        "detail": "官方指标文件只提供最近 20 个交易日；本次采到的第三方缓存为月度序列。这是已测来源与参数的覆盖结论，不代表所有免费来源都没有周度数据",
     },
     {
         "gap_id": "GAP-TOTAL-RETURN-INDEX",
         "scope": "指数/ETF",
-        "impact": "回测无法使用全收益指数，股息收益会缺失",
-        "detail": "免费源未提供 H00300/H00905/H00852 等全收益指数行情",
+        "impact": "本次未能取得全收益指数，回测缺少股息收益口径",
+        "detail": "已按市场前缀（shH00300 / csiH00300）实际调用东方财富接口，远端未返回数据（HTTP 已发出）；未穷举其他供应商，也未购买数据",
     },
     {
         "gap_id": "GAP-AGGREGATION-METHOD",
@@ -654,13 +797,13 @@ GAPS = [
         "gap_id": "GAP-ETF-TRACKING-ERROR",
         "scope": "ETF",
         "impact": "跟踪偏离只能自行计算，缺少官方序列",
-        "detail": "无免费跟踪误差时间序列接口",
+        "detail": "尚未找到并调用提供跟踪误差时间序列的接口（本项标记为未测试，未计入实测数量）",
     },
     {
         "gap_id": "GAP-SZSE-ETF-LIST",
         "scope": "ETF",
         "impact": "深市 ETF 交易所归属缺少官方清单证据",
-        "detail": "深交所 ETF 份额接口当前报错（TypeError: bytes）",
+        "detail": "深交所 ETF 份额接口实际调用时报错（ConnectionError/TypeError），未能取得官方清单",
     },
     {
         "gap_id": "GAP-BANK-CAPITAL-QUALITY",

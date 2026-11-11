@@ -7,6 +7,18 @@
 ⬜ 明确留到后续阶段。
 
 
+## 0-A. 第二轮返工（F1–F3）新增检查项
+
+| # | 检查项 | 实现位置 | 测试 | 状态 |
+|---|---|---|---|---|
+| C14 | 阻断性原因码对所有正式价格判断（candidate/wait/avoid）一票否决 | `contracts/validation.py` | `test_f1_research_cannot_export_formal_price_decision`、复验脚本 `blocked_decision` | ✅ |
+| C15 | research_signal 必须可追到已登记模型 + 版本一致 + 与 model_plan 一致 + 分析确实执行 | `validation._check_research_signal` + `models/registry.py` | `test_f1_research_signal_requires_registered_model` 等 4 项 | ✅ |
+| C16 | 合法研究结果仍可输出（不因修约束而禁绝研究数字） | 同一校验器 | `test_f1_legitimate_research_result_is_allowed` | ✅ |
+| C17 | 数据调查按真实市场前缀调用，并区分本地提前返回/远端空/远端异常/取到数据 | `tools/probe_data_sources.py::_classify_attempt` | 复验脚本 `real_adapter_routing`、`partial_probe`；`test_r7_*` | ✅ |
+| C18 | 快照内容哈希覆盖所有字段（含 fetched_at / notes / producers），元信息不能绕开身份 | `data/snapshot.py::_content_payload` | `test_f3_metadata_changes_are_caught_by_content_hash` | ✅ |
+| C19 | manifest 与实际快照交叉核对，目录可自检 | `SnapshotStore._check_manifest_entry` / `check_consistency` | `test_f3_manifest_must_match_snapshot`、`test_f3_snapshot_directory_is_self_consistent` | ✅ |
+| C20 | 作废样例不进入生产数据目录，不用备注文字控制准入 | `data/snapshots/` 目录 + 移除 notes 隔离逻辑 | `test_f3_retired_sample_is_out_of_production` | ✅ |
+
 ## 0. 返工撤回与恢复（2026-11-11）
 
 第一版清单里的下列 ✅ 被证明是**过头了**：机制存在，但可以被旁路绕过。
@@ -104,8 +116,12 @@
 
 | # | 问题 | 影响 | 处理建议 |
 |---|---|---|---|
-| F1 | 官方指数估值历史只有 20 个交易日，第三方只有月度 | 阶段三「5 年周度分位」无法用现有免费数据完成 | 请设计方决定：降频到月度、放宽周度要求，或另找数据源 |
-| F2 | 全收益指数行情不可得 | 回测缺少股息收益 | 阶段三前确认是否接受价格指数 + 显式股息调整 |
-| F3 | 净值披露时间不可得 | 日终折溢价无法严格成立 | 阶段三改为「净值日期对齐 + 明确标注时点不确定性」 |
-| F4 | 深交所 ETF 清单接口报错 | 深市 ETF 上市地缺少官方清单证据 | 以代码段 + 行情清单标注为推断，并在报告中写明 |
+| F1 | 官方指数估值历史只有 20 个交易日，本次第三方缓存为月度 | 阶段三「5 年周度分位」无法用**本次已测来源**完成 | 请设计方按 Q1 决定研究规格；本轮不降频、不插值 |
+| F2 | 已测的东方财富接口对 H00300/H00905/H00852（带市场前缀）返回无数据 | 回测缺少股息口径 | 未穷举其他供应商；需要时另行调查，不购买数据 |
+| F3 | 净值披露时间不可得 | 日终折溢价无法严格成立 | 阶段三改为「净值日期对齐 + 标注时点不确定性」 |
+| F4 | 深交所 ETF 清单接口调用报错 | 深市 ETF 上市地缺少官方清单证据 | 以代码段 + 行情清单标注为推断，并在报告中写明 |
 | F5 | 银行资本/资产质量字段未采集 | 阶段二银行模型前置数据不足 | 阶段二单独核实接口并补快照 |
+| F6 | 个股价格未采集 | 阶段一不展示价格 | 设计方已答复接受；阶段二接入有日期与币种的价格事实 |
+| F7 | ETF 跟踪误差序列未测试 | 暂无官方序列 | 需要时由净值与指数自行计算，并单列测试 |
+
+> 以上缺口都限定在「本次已测来源与参数」范围内；不写成「所有免费数据均不可得」。

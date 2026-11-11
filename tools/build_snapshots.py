@@ -208,6 +208,28 @@ def _assert_expected(market_date: str, expected: str | None, label: str) -> None
         )
 
 
+def _select_bar(df: pd.DataFrame, date_column: str, expected: str | None, label: str):
+    """选出要使用的那一根行情。
+
+    - 给了 --as-of：**按日期选行**（历史取数必须落到具体那一行），找不到即失败；
+    - 没给：取最后一行，但会记录它是不是当日未收盘的 bar。
+    返回 (截断后的 DataFrame, 市场日期, 被丢弃的后续行数)。
+    """
+    dates = [_as_date(v) for v in df[date_column]]
+    if expected is not None:
+        targets = [i for i, day in enumerate(dates) if day.isoformat() == expected]
+        if not targets:
+            raise BuildError(
+                f"{label} 中没有 {expected} 这一行：不做倒填，请确认 --as-of 或数据源"
+            )
+        index = targets[0]
+    else:
+        index = len(dates) - 1
+    dropped = len(dates) - index - 1
+    selected = df.iloc[: index + 1].reset_index(drop=True)
+    return selected, dates[index], dropped
+
+
 def _normalize_date_text(value) -> str:
     """把 20061027 / 2006-10-27 统一成 YYYY-MM-DD；无法识别时原样返回。"""
     text = str(value)[:10] if value is not None else "未知"
@@ -265,9 +287,8 @@ def build_index_snapshot(code: str, *, expected_as_of: str | None = None, now: d
     if daily.empty:
         raise BuildError(f"{code} 日线为空，无法确定市场日期")
     daily.to_csv(CACHE_DIR / f"index_daily_{code}.csv", index=False)
-    market_date = _as_date(daily["date"].iloc[-1])
+    daily, market_date, dropped = _select_bar(daily, "date", expected_as_of, f"{code} 日线")
     market_date_str = market_date.isoformat()
-    _assert_expected(market_date_str, expected_as_of, f"{code} 日线")
     status = _bar_status(market_date, now)
 
     close = float(daily["close"].iloc[-1])
@@ -297,12 +318,12 @@ def build_index_snapshot(code: str, *, expected_as_of: str | None = None, now: d
     csi = ak.stock_zh_index_value_csindex(symbol=code)
     csi.to_csv(CACHE_DIR / f"csindex_indicator_{code}.csv", index=False)
     csi_dates = [_as_date(v) for v in csi["日期"]]
-    csi_latest_date = csi_dates[0]
-    if csi_latest_date != market_date:
+    matching = [i for i, day in enumerate(csi_dates) if day == market_date]
+    if not matching:
         raise BuildError(
-            f"{code} 官方估值日期 {csi_latest_date} 与市场日期 {market_date} 不一致：不做拼接"
+            f"{code} 官方估值文件中没有 {market_date} 这一行：不做跨日拼接"
         )
-    csi_latest = csi.iloc[0]
+    csi_latest = csi.iloc[matching[0]]
     for column, fact_id, metric, unit in (
         ("市盈率1", "index.pe_csindex_1", "csindex_pe_ratio_1", "ratio"),
         ("股息率1", "index.dividend_yield_csindex_1", "csindex_dividend_yield_1", "percent"),
@@ -388,7 +409,8 @@ def build_index_snapshot(code: str, *, expected_as_of: str | None = None, now: d
             "market_date": market_date_str,
             "bar_status": status,
             "built_at": now.isoformat(timespec="seconds"),
-            "date_source": "日线最后一行",
+            "date_source": "按日期选行" if expected_as_of else "日线最后一行",
+            "rows_after_market_date_dropped": dropped,
         },
         "valuation_source_official": {
             "source_id": src["csi"].source_id,
@@ -530,9 +552,8 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
     if hist.empty:
         raise BuildError(f"{code} 行情为空，无法确定市场日期")
     hist.to_csv(CACHE_DIR / f"etf_hist_{code}.csv", index=False)
-    market_date = _as_date(hist["日期"].iloc[-1])
+    hist, market_date, dropped = _select_bar(hist, "日期", expected_as_of, f"{code} 日线")
     market_date_str = market_date.isoformat()
-    _assert_expected(market_date_str, expected_as_of, f"{code} 日线")
     status = _bar_status(market_date, now)
     close = float(hist["收盘"].iloc[-1])
 
@@ -697,7 +718,8 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
             "market_date": market_date_str,
             "bar_status": status,
             "built_at": now.isoformat(timespec="seconds"),
-            "date_source": "ETF 日线最后一行",
+            "date_source": "按日期选行" if expected_as_of else "ETF 日线最后一行",
+            "rows_after_market_date_dropped": dropped,
         },
         "price_history": {"source_id": src["etf_hist"].source_id, "frequency": "daily"},
         "nav_history": {

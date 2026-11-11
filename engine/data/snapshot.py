@@ -62,29 +62,35 @@ class Snapshot:
     notes: str = ""
     schema_version: str = SNAPSHOT_SCHEMA_VERSION
 
-    # --- 身份 -----------------------------------------------------------
-    def _identity_payload(self) -> dict[str, Any]:
+    # --- 内容哈希 -------------------------------------------------------
+    def _content_payload(self) -> dict[str, Any]:
+        """参与内容哈希的全部字段。
+
+        规则：**文件里除了 snapshot_id 本身，其余字段全部纳入哈希**，
+        包括 fetched_at（版本排序依据）与 notes。这样任何影响准入、排序、
+        时点判断的元信息改动都会改变身份，无法在 ID 不变的情况下生效。
+        """
         return {
             "schema_version": self.schema_version,
             "instrument_id": self.instrument_id,
             "asset_class": self.asset_class,
             "as_of": self.as_of,
             "available_at": self.available_at,
+            "fetched_at": self.fetched_at,
             "facts": [f.to_dict() for f in sorted(self.facts, key=lambda f: f.fact_id)],
             "coverage": self.coverage,
+            "producers": sorted(self.producers),
+            "notes": self.notes,
         }
 
     @property
     def snapshot_id(self) -> str:
-        return "snap-" + stable_digest(self._identity_payload())
+        return "snap-" + stable_digest(self._content_payload())
 
     # --- 序列化 ---------------------------------------------------------
     def to_dict(self) -> dict[str, Any]:
-        payload = self._identity_payload()
+        payload = self._content_payload()
         payload["snapshot_id"] = self.snapshot_id
-        payload["fetched_at"] = self.fetched_at
-        payload["producers"] = sorted(self.producers)
-        payload["notes"] = self.notes
         return payload
 
     @classmethod
@@ -228,7 +234,55 @@ class SnapshotStore:
         if not path.exists():
             raise SnapshotError(f"找不到快照文件: {path.name}", code="SNAPSHOT_NOT_FOUND")
         data = json.loads(path.read_text(encoding="utf-8"))
-        return Snapshot.from_dict(data, expected_id=snapshot_id)
+        snapshot = Snapshot.from_dict(data, expected_id=snapshot_id)
+        self._check_manifest_entry(snapshot)
+        return snapshot
+
+    def _check_manifest_entry(self, snapshot: Snapshot) -> None:
+        """manifest 与实际快照必须一致（as_of / fetched_at / instrument_id）。"""
+        entries = [e for e in self.load_manifest() if e["snapshot_id"] == snapshot.snapshot_id]
+        if not entries:
+            return
+        entry = entries[0]
+        for field in ("instrument_id", "as_of", "fetched_at"):
+            declared = entry.get(field)
+            actual = getattr(snapshot, field)
+            if declared is not None and str(declared) != str(actual):
+                raise SnapshotError(
+                    f"manifest 中的 {field}={declared!r} 与快照实际值 {actual!r} 不一致",
+                    code="SNAPSHOT_MANIFEST_MISMATCH",
+                )
+
+    def check_consistency(self) -> list[str]:
+        """整目录一致性自检：manifest 条目、文件内容、ID、抓取时间是否互相对得上。"""
+        problems: list[str] = []
+        entries = self.load_manifest()
+        seen: set[str] = set()
+        for entry in entries:
+            sid = entry["snapshot_id"]
+            if sid in seen:
+                problems.append(f"manifest 中 snapshot_id 重复: {sid}")
+            seen.add(sid)
+            path = self.root / entry["file"]
+            if not path.exists():
+                problems.append(f"manifest 指向的文件不存在: {entry['file']}")
+                continue
+            try:
+                snap = Snapshot.from_dict(
+                    json.loads(path.read_text(encoding="utf-8")), expected_id=sid
+                )
+            except SnapshotError as exc:
+                problems.append(f"{sid}: {exc}")
+                continue
+            for field in ("instrument_id", "as_of", "fetched_at"):
+                declared = entry.get(field)
+                actual = getattr(snap, field)
+                if declared is not None and str(declared) != str(actual):
+                    problems.append(f"{sid}: manifest {field} 与快照不一致")
+        files = {p.name for p in self.root.glob("snap-*.json")}
+        for name in sorted(files - {e["file"] for e in entries}):
+            problems.append(f"快照文件未登记在 manifest: {name}")
+        return problems
 
     def save(self, snapshot: Snapshot) -> Path:
         problems = snapshot.validate()

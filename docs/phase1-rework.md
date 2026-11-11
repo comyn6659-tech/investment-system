@@ -1,5 +1,9 @@
 # 阶段一返工报告（R1–R10）
 
+> **后续**：本报告针对提交 `ef2ab38`。设计方复验后提出的 F1–F3 已在
+> [phase1-rework-f1f3.md](phase1-rework-f1f3.md) 中处理，快照 ID 与测试数量以该报告为准。
+
+
 - 项目：`/Users/comyn/Documents/deepseek-harness/投资/investment-system/`
 - 依据：《第一阶段独立验收与返工指令》（审查日期 2026-11-11，被审查提交 `b104138`）
 - 范围：**只修复 R1–R10，不进入第二阶段，不改变任何投资参数**

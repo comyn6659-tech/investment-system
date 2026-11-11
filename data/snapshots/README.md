@@ -2,27 +2,31 @@
 
 ## 当前快照（7 个）
 
-| snapshot_id | 标的 | as_of | 说明 |
+| snapshot_id | 标的 | as_of | 构建方式 |
 |---|---|---|---|
-| `snap-9f0fbdb86c70b66e` | INDEX:000300.SH | 2026-11-10 | 日线最后一行，bar_status=closed |
-| `snap-fffadc4bca3ed918` | INDEX:000905.SH | 2026-11-10 | 同上 |
-| `snap-56e7c688ea35a45c` | INDEX:000852.SH | 2026-11-10 | 同上 |
-| `snap-aef6f29159c9d182` | ETF:510300.SH | 2026-11-10 | ETF 日线收盘行 |
-| `snap-d76db31ce212b446` | ETF:510500.SH | 2026-11-10 | 同上 |
-| `snap-2ab47bf9fbfc5199` | ETF:512100.SH | 2026-11-10 | 同上 |
-| `snap-decfda2d8866e9cf` | EQUITY:601398.SH | 2026-09-30 | 最近报告期 |
+| `snap-6e6d5c31a0371ee0` | INDEX:000300.SH | 2026-11-10 | 按 `--as-of` 选行，closed bar |
+| `snap-1a5ed1b1f7206c14` | INDEX:000905.SH | 2026-11-10 | 同上 |
+| `snap-5d60fe1e7fb6ed3b` | INDEX:000852.SH | 2026-11-10 | 同上 |
+| `snap-6938a7a7b2c868c4` | ETF:510300.SH | 2026-11-10 | ETF 日线按日期选行 |
+| `snap-ff2df2705d7e880f` | ETF:510500.SH | 2026-11-10 | 同上 |
+| `snap-4c1d2bfec2a65678` | ETF:512100.SH | 2026-11-10 | 同上 |
+| `snap-fac0481bd5f7d1b5` | EQUITY:601398.SH | 2026-09-30 | 最近报告期 |
 
-## 历史复现样例（1 个，禁止用于分析）
-
-| snapshot_id | 说明 |
-|---|---|
-| `snap-23eaf5b0bfc82144` | 第一版采集器生成（固定旧日期 + 实时最新价）。`notes` 以 `LEGACY-REPRODUCTION` 开头，仅用于复现审计脚本 R8 的两项检查。分析入口遇到该标记会返回 `engine_error` + `SNAPSHOT_LEGACY_QUARANTINED` |
+本目录**只放当前有效快照**。作废样例已移出（见 `docs/phase1-rework-f1f3.md` 的迁移说明），
+不再用备注文字控制数据准入。
 
 ## 规则
 
-1. **内容寻址**：`snapshot_id` = 规范化内容的 SHA-256 前 16 位，加载时重算比对。
-2. **绑定**：加载时必须提供请求 ID，且声明 ID、内容哈希、请求 ID 三者一致；分析入口还会核对
+1. **内容寻址**：`snapshot_id` = 文件内容（除 `snapshot_id` 自身外的全部字段）规范化后的
+   SHA-256 前 16 位。`fetched_at`、`notes`、`producers`、`coverage` 都在哈希范围内，
+   改动其中任何一项都会改变身份。
+2. **绑定**：加载必须提供请求 ID，且声明 ID、内容哈希、请求 ID 三者一致；分析入口还核对
    `instrument_id` 与 `asset_class`。
-3. **版本排序**：`latest_for` 按 `(as_of, fetched_at, snapshot_id)` 取最新；哈希不参与新旧判断。
-4. **时点**：每条事实记录 `available_at` 与精度；只有日期时按「当日结束」处理；未知不放行。
-5. **重建**：`tools/build_snapshots.py` 以真实行情日期为准，与 `--as-of` 不符即失败，不倒填。
+3. **版本排序**：`latest_for` 按 `(as_of, fetched_at, snapshot_id)` 取最新；`fetched_at`
+   受内容哈希保护，不能在不换 ID 的情况下修改。
+4. **manifest 一致性**：`SnapshotStore.load` 会把 manifest 里的 `instrument_id / as_of /
+   fetched_at` 与快照实际值比对，不一致即 `SNAPSHOT_MANIFEST_MISMATCH`；
+   `check_consistency()` 可对整个目录做自检。
+5. **时点**：每条事实记录 `available_at` 与精度；只有日期时按「当日结束」处理；未知不放行。
+6. **重建**：`tools/build_snapshots.py --as-of YYYY-MM-DD` 按日期选行，找不到该行即失败，
+   不倒填；未指定 `--as-of` 时取最后一行并记录 `bar_status`。

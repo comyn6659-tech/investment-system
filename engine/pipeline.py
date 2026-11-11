@@ -51,11 +51,8 @@ _SNAPSHOT_ERROR_CODES = {
     "SNAPSHOT_INSTRUMENT_MISMATCH": rc.SNAPSHOT_INSTRUMENT_MISMATCH,
     "SNAPSHOT_ASSET_CLASS_MISMATCH": rc.SNAPSHOT_ASSET_CLASS_MISMATCH,
     "SNAPSHOT_INVALID_STRUCTURE": rc.SNAPSHOT_INVALID_STRUCTURE,
-    "SNAPSHOT_LEGACY_QUARANTINED": rc.SNAPSHOT_LEGACY_QUARANTINED,
 }
 
-# 历史复现样例前缀：只允许用于复现审计，不允许进入分析
-LEGACY_MARKER = "LEGACY-REPRODUCTION"
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_REGISTRY = PROJECT_ROOT / "data" / "registry" / "instruments.json"
@@ -140,11 +137,6 @@ class Analyzer:
                 return None
             snapshot = self.store.load(latest)
 
-        if str(snapshot.notes).startswith(LEGACY_MARKER):
-            raise SnapshotError(
-                f"快照 {snapshot.snapshot_id} 被标记为历史复现样例，禁止用于分析",
-                code="SNAPSHOT_LEGACY_QUARANTINED",
-            )
         if snapshot.instrument_id != instrument.instrument_id:
             raise SnapshotError(
                 f"快照 {snapshot.snapshot_id} 属于 {snapshot.instrument_id}，"

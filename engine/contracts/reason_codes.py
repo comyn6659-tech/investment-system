@@ -108,8 +108,8 @@ SNAPSHOT_ASSET_CLASS_MISMATCH = _register(
 SNAPSHOT_INVALID_STRUCTURE = _register(
     "SNAPSHOT_INVALID_STRUCTURE", "data", "快照结构或取值不合法（重复事实、非法状态或值）"
 )
-SNAPSHOT_LEGACY_QUARANTINED = _register(
-    "SNAPSHOT_LEGACY_QUARANTINED", "data", "快照被标记为历史复现样例，禁止用于分析"
+SNAPSHOT_MANIFEST_MISMATCH = _register(
+    "SNAPSHOT_MANIFEST_MISMATCH", "data", "manifest 记录的版本信息与实际快照不一致"
 )
 SNAPSHOT_HASH_MISMATCH = _register("SNAPSHOT_HASH_MISMATCH", "data", "快照内容与其 snapshot_id 不匹配")
 

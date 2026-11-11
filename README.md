@@ -6,7 +6,7 @@ A 股个股 / 境内 A 股宽基指数 / 境内普通被动 ETF 的分析引擎�
 `../valuation/` 的代码、缓存或投资政策。旧目录仅作可选的只读查证资料。
 
 **当前阶段：阶段一（身份、结果契约与数据可用性）—— 已按 R1–R10 返工。**
-返工说明见 [docs/phase1-rework.md](docs/phase1-rework.md)。
+返工说明见 [docs/phase1-rework.md](docs/phase1-rework.md) 与 [docs/phase1-rework-f1f3.md](docs/phase1-rework-f1f3.md)。
 本阶段不实现任何估值模型或指数策略，因此所有结果都不会给出买点；
 `unsupported` 表示「本版不建模 / 模型尚未实现」，不代表对该标的投资价值的判断。
 
@@ -110,7 +110,7 @@ $PY -m engine.cli --json --out examples/outputs/index_000300.json '沪深300'
 | 字段 | 值 | 含义 |
 |---|---|---|
 | `schema_version` | `analysis-result/1` | 结果契约版本 |
-| `code_version` | `phase1-0.1.1` | 代码语义版本（R1–R10 返工） |
+| `code_version` | `phase1-0.1.2` | 代码语义版本（R1–R10、F1–F3 返工） |
 | `policy_version` | `unapproved-phase1` | 阶段一没有任何投资门槛获批 |
 | `model_version` | `none` | 没有任何已验证模型 |
 
