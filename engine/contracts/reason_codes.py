@@ -151,3 +151,60 @@ def blocking_codes(codes: list[str]) -> list[str]:
 def describe(code: str) -> str:
     rc = _REGISTRY.get(code)
     return rc.description if rc else f"未登记的说明码: {code}"
+
+
+# --- 阶段二：个股研究估值 ---------------------------------------------------
+MODEL_FAMILY_NOT_IMPLEMENTED = _register(
+    "MODEL_FAMILY_NOT_IMPLEMENTED",
+    "model",
+    "该企业族首版未实现估值路线，已给出适用模型类别与本版不能处理的原因",
+)
+MODEL_NOT_APPLICABLE_TO_BANK = _register(
+    "MODEL_NOT_APPLICABLE_TO_BANK", "model", "普通企业现金流/股息口径不适用于银行"
+)
+MODEL_CROSS_CHECK_ONLY = _register(
+    "MODEL_CROSS_CHECK_ONLY", "model", "该模型在本标的上只作交叉检查，不作主模型"
+)
+MODEL_RESEARCH_VALUATION = _register(
+    "MODEL_RESEARCH_VALUATION", "model", "研究估值已计算，但参数与模型未获正式使用批准"
+)
+RESEARCH_PARAMETERS_UNAPPROVED = _register(
+    "RESEARCH_PARAMETERS_UNAPPROVED", "model", "研究参数候选未获设计方批准，不能作为正式买点依据"
+)
+TERMINAL_VALUE_NOT_APPLIED = _register(
+    "TERMINAL_VALUE_NOT_APPLIED", "model", "本次未启用终值，价值只来自明确预测期"
+)
+MISSING_BUSINESS_EVIDENCE = _register(
+    "MISSING_BUSINESS_EVIDENCE", "data", "缺少结构化业务证据，无法判断模型适用性"
+)
+MISSING_MODEL_INPUT = _register("MISSING_MODEL_INPUT", "data", "模型必要数据缺失或状态不可用")
+MISSING_BANK_RISK_EVIDENCE = _register(
+    "MISSING_BANK_RISK_EVIDENCE", "data", "银行资本充足率/不良率/拨备覆盖率等证据缺失"
+)
+BRIDGE_RECONCILIATION_GAP = _register(
+    "BRIDGE_RECONCILIATION_GAP", "data", "FCFF 与经营现金流勾稽差额超出容差，存在未解释项"
+)
+PRICE_UNAVAILABLE_FOR_COMPARISON = _register(
+    "PRICE_UNAVAILABLE_FOR_COMPARISON", "data", "缺少可核实的收盘价，不能做现价比较", blocks_candidate=False
+)
+SHARE_COUNT_DIVERGENCE = _register(
+    "SHARE_COUNT_DIVERGENCE", "data", "当前股本与报告期加权股数差异较大，需说明稀释影响", blocks_candidate=False
+)
+DIVIDEND_FISCAL_YEAR_MISSING = _register(
+    "DIVIDEND_FISCAL_YEAR_MISSING", "data", "部分分红记录缺少所属财年，未并入任何财年合计", blocks_candidate=False
+)
+SPECIAL_DIVIDEND_SEPARATED = _register(
+    "SPECIAL_DIVIDEND_SEPARATED", "data", "特别分红单列，未进入可持续 DPS 序列", blocks_candidate=False
+)
+EXCESS_DISTRIBUTION = _register(
+    "EXCESS_DISTRIBUTION", "model", "派息超过当年盈利，需以存量现金或融资支撑", blocks_candidate=False
+)
+GROWTH_NOT_FUNDED_BY_RETENTION = _register(
+    "GROWTH_NOT_FUNDED_BY_RETENTION", "model", "终值增长超过留存收益可支撑的可持续增长"
+)
+BANK_CAPITAL_CONSTRAINT = _register(
+    "BANK_CAPITAL_CONSTRAINT", "model", "资本充足率或分配路径触及资本约束"
+)
+CROSS_CHECK_DIVERGENCE = _register(
+    "CROSS_CHECK_DIVERGENCE", "model", "两条路线的研究估值差异较大，需解释差异来源", blocks_candidate=False
+)

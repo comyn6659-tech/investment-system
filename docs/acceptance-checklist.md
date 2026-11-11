@@ -125,3 +125,29 @@
 | F7 | ETF 跟踪误差序列未测试 | 暂无官方序列 | 需要时由净值与指数自行计算，并单列测试 |
 
 > 以上缺口都限定在「本次已测来源与参数」范围内；不写成「所有免费数据均不可得」。
+
+---
+
+# 阶段二首轮验收清单（个股研究估值）
+
+对应文件：`outputs/phase1-acceptance-and-phase2-instructions.md` §4 的六项冻结条件。
+本轮只按这六项交付，不回头扩大阶段一审计。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| P2-1 模型适用性 | 三条路线有模型规格、必需数据和选择解释；未实现路线不被默认送入 DCF；选择不随当前股价改变 | `engine/evidence/applicability.py`、`docs/equity-model-spec.md` §1/§6 | `test_applicability.py`（25 项，含 `test_cyclical_needs_industry_and_volatility_together`、`test_unimplemented_families_are_not_sent_to_dcf`、`test_selection_does_not_depend_on_price`）；`docs/phase2-samples.md` 的 601318/601088/600030 三例 | ✅ |
+| P2-2 数学与口径 | FCFF 与股息内核可运行；银行专用约束可测试；折现恒等式、期数、单位与股权价值桥接有独立验证 | `engine/valuation/{discounting,fcff,ddm,bank}.py`、`engine/financials/bridge.py` | `test_valuation_kernel.py`（48 项：单期/多期手算、零增长终值退化为永续年金、折现率单调性、负现金流保留、终值边界、桥接符号/单位/重复计数、每 10 股转换、银行资本与拨备约束）；`docs/equity-model-spec.md` §0/§2/§3/§4 | ✅ |
+| P2-3 真实样本 | 至少一只真实非金融公司完成「证据→适用性→计算→研究报告」；同时交银行及股息路线的样本或具体缺口 | `engine/valuation/runner.py`、`data/snapshots/`、`data/evidence/`、`data/assumptions/` | `test_phase2_pipeline.py::test_real_non_financial_company_completes_full_chain`、`test_second_real_company_completes_dividend_route`；600519（FCFF+股息交叉检查）与 600900（股息）均 `complete`；601398 银行路线交具体缺口表 | ✅ |
+| P2-4 反例 | 覆盖低 ROE、超额/特别分红、亏损或周期不适用、关键字段缺失；验证理由与处理而非一律拒绝 | `engine/valuation/ddm.py`、`engine/financials/dividends.py`、`engine/valuation/bank.py`、`engine/evidence/applicability.py` | `test_low_roe_with_positive_growth_is_refused_with_explanation`、`test_low_roe_with_zero_growth_is_still_valued_and_flagged`、`test_payout_above_earnings_*`、`test_special_dividend_never_enters_ordinary_dps`、`test_loss_making_company_is_distressed_not_fcff`、`test_bank_route_stops_with_concrete_data_gap`；`docs/phase2-delivery.md` §4.2 | ✅ |
+| P2-5 研究与正式决策分离 | 本轮生产输出没有 candidate/wait/avoid；真实研究结果可导出；未运行模型、必要数据缺失不能夹带价格；原阶段一回归通过 | `contracts/validation.py::_check_research_valuation*`、`decision/policy.py`、`pipeline._equity_result` | `test_no_equity_or_product_output_is_ever_candidate`（9 个标的）、`test_research_payload_cannot_claim_a_price_position`、`test_research_payload_requires_research_model_status`、`test_bank_route_stops_with_concrete_data_gap`（`research_valuation is None`）、原阶段一 142 项全部保留通过 | ✅ |
+| P2-6 可复现与交付 | 固定数据、假设及版本可复现；提交参数来源与敏感性表、示例、测试输出和未解决事项 | `data/assumptions/`（内容哈希）、`docs/assumptions-and-sensitivity.md`、`docs/phase2-samples.md`、`examples/outputs/`、`docs/phase2-delivery.md` | `test_same_inputs_replay_identical_values`、`test_assumption_id_is_content_addressed_and_stable`、`test_changed_one_number_changes_the_assumption_id`；`tools/render_phase2_report.py` 与 `tools/render_examples.py` 从真实运行生成 | ✅ |
+
+## 阶段二遗留（不阻断本轮）
+
+| # | 事项 | 处理建议 |
+|---|---|---|
+| G1 | 银行资本充足率/不良率/拨备覆盖率/风险加权资产无免费来源 | 需年报原文或持牌数据源；数学与约束已实现并有测试 |
+| G2 | 600900 缺 FCFF 交叉检查（目标资本结构假设未批准） | 待 P11 政策决定 |
+| G3 | 600519 两条路线差 24.3%，接近 25% 阈值 | 属终值增长与可持续增长口径问题，交设计方判断（P3） |
+| G4 | 非经营性资产按 0、受限资金未拆分、少数股东按账面扣除 | 需要更细的报表科目后再收窄 |
+| G5 | 业务证据由脚本整理，未做自动化财报文本阅读 | 后续阶段 |

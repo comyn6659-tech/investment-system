@@ -1,0 +1,132 @@
+{
+  "schema_version": "assumption-set/1",
+  "instrument_id": "EQUITY:600900.SH",
+  "model_id": "equity_dividend_discount",
+  "model_version": "0.2.0-research",
+  "applicable_as_of": "2026-11-10",
+  "base_fiscal_year": 2025,
+  "horizon_years": 5,
+  "discount_rate": {
+    "value": 0.066,
+    "provenance": {
+      "kind": "derivation",
+      "source": "股权成本 = 无风险利率 1.5965% + 股权风险溢价 4.6% + 公司特定溢价 0.4% = 6.6%；受监管水电资产、现金分配承诺明确，风险溢价低于主模型样本",
+      "detail": "股权风险溢价与特定溢价为研究假设候选",
+      "evidence_ids": []
+    },
+    "build_up": {
+      "risk_free_pct": 1.5965,
+      "equity_risk_premium_pct": 4.6,
+      "company_specific_premium_pct": 0.4
+    }
+  },
+  "terminal": {
+    "method": "growing_perpetuity",
+    "growth": 0.02,
+    "basis": "末期（2030 年）每股分配 × (1+g)；g 不高于可持续增长 ROE×留存率（约 4.5%）",
+    "provenance": {
+      "kind": "research_hypothesis",
+      "source": "长期名义增长参照 2.0%，低于可持续增长上限",
+      "detail": "",
+      "evidence_ids": []
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "note": "来水偏枯叠加电价承压，每股收益不增长",
+      "drivers": {
+        "eps_growth": [
+          -0.1,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "payout": [
+          0.7,
+          0.7,
+          0.7,
+          0.7,
+          0.7
+        ],
+        "roe": 0.138
+      },
+      "terminal_growth": 0.015
+    },
+    "base": {
+      "note": "2026 年按已披露前三季度归母净利润同比（−6.6%）起步，之后恢复低速增长",
+      "drivers": {
+        "eps_growth": [
+          -0.066,
+          0.03,
+          0.03,
+          0.03,
+          0.025
+        ],
+        "payout": [
+          0.71,
+          0.71,
+          0.71,
+          0.71,
+          0.71
+        ],
+        "roe": 0.1559
+      },
+      "terminal_growth": 0.02
+    },
+    "bull": {
+      "note": "来水改善 + 新机组投产贡献增量",
+      "drivers": {
+        "eps_growth": [
+          -0.03,
+          0.05,
+          0.05,
+          0.04,
+          0.03
+        ],
+        "payout": [
+          0.72,
+          0.72,
+          0.72,
+          0.72,
+          0.72
+        ],
+        "roe": 0.17
+      },
+      "terminal_growth": 0.025
+    }
+  },
+  "provenance": {
+    "eps_growth": {
+      "kind": "derivation",
+      "source": "2026 年取已披露前三季度归母净利润同比 −6.56%；其后年份为本轮研究假设的低速增长",
+      "detail": "水电出力受来水影响，增长率假设已低于历史均值",
+      "evidence_ids": []
+    },
+    "payout": {
+      "kind": "observed_data",
+      "source": "2025 财年归属分配 = 年度分红 7.90 元/10 股 + 季度分红 2.10 元/10 股 = 1.00 元/股；除以每股收益 1.410 元（归母净利润 345.03 亿 / 当前总股本 244.68 亿股）= 70.9%；2024 财年同口径为 71.2%（0.943/1.325），分配比例稳定",
+      "detail": "中期/季度分配与年度分配按财年相加，不重复计入",
+      "evidence_ids": []
+    },
+    "roe": {
+      "kind": "observed_data",
+      "source": "2025 年归母净利润 345.03 亿 / 归母权益 2213.38 亿 = 15.59%",
+      "detail": "用于校验终值增长上限：15.59% × 留存率 29% ≈ 4.5%",
+      "evidence_ids": []
+    }
+  },
+  "extras": {
+    "growth_consistency_tolerance": 0.0,
+    "sensitivity": {
+      "eps_growth": 0.01,
+      "payout": 0.03,
+      "discount_rate": 0.005,
+      "terminal_growth": 0.005
+    }
+  },
+  "status": "research_pending_approval",
+  "policy_version": "unapproved-phase2",
+  "created_at": "2026-11-11T14:20:00+08:00",
+  "notes": "主模型：资本开支占收入约 21%（在建与技改持续），单年自由现金流受再投资节奏影响，股东回报主要由分配路径决定，因此以股息折现为主模型。本轮未提供 FCFF 交叉检查：该公司有息负债约 2880 亿元，FCFF→股权价值需要对目标资本结构作额外假设，该假设尚未获批准，故不强行给出第二套数字。"
+}

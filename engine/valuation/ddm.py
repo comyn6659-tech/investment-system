@@ -1,0 +1,207 @@
+"""股息折现路线：预测每股可持续现金分配，用股权回报要求折现。
+
+只做「归属于股东的直接分配」的现值，**不扣除企业净债务**——本模块的输入结构里
+根本没有债务字段，因此重复扣减在类型层面不可能发生。
+
+口径约定（施工指令 §3.2）：
+- DPS_t = EPS_t × 派息率_t，EPS 与派息率都必须来自显式研究假设；
+- 现金覆盖、盈利留存、再投资与预测增长必须互相解释：
+  终值增长不得超过「ROE × 留存率」，超额分红不得搭配正终值增长；
+- 特别分红不进入可持续 DPS 序列（由 financials/dividends.py 在取数层剥离）。
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+
+from engine.valuation import errors as e
+from engine.valuation.discounting import TerminalValue, discount_stream
+from engine.valuation.errors import ValuationError
+
+
+@dataclass(frozen=True)
+class DividendDrivers:
+    base_year: int
+    base_eps: float
+    eps_growth: tuple[float, ...]
+    payout: tuple[float, ...]
+    cost_of_equity: float
+    terminal_growth: float | None
+    roe: float | None = None
+    growth_consistency_tolerance: float = 0.0
+    eps_is_ordinary: bool = True
+
+    def __post_init__(self) -> None:
+        horizon = len(self.eps_growth)
+        if horizon <= 0:
+            raise ValuationError(e.HORIZON_INVALID, "预测期必须至少 1 年")
+        if len(self.payout) != horizon:
+            raise ValuationError(
+                e.HORIZON_INVALID,
+                f"payout 长度 {len(self.payout)} 与预测期 {horizon} 不一致",
+            )
+        if self.base_eps <= 0:
+            raise ValuationError(
+                e.MODEL_INPUT_MISSING,
+                f"基期每股收益必须为正，实际 {self.base_eps!r}；亏损期无法由盈利外推股息",
+            )
+
+
+@dataclass(frozen=True)
+class DividendYear:
+    year: int
+    eps: float
+    payout: float
+    dps: float
+    retained_eps: float
+
+    def to_dict(self) -> dict[str, float | int]:
+        return {
+            "year": self.year,
+            "eps": self.eps,
+            "payout": self.payout,
+            "dps": self.dps,
+            "retained_eps": self.retained_eps,
+        }
+
+
+@dataclass(frozen=True)
+class DividendIssue:
+    """一致性问题：解释原因与模型影响，不用「一律拒绝」代替分析。"""
+
+    code: str
+    message: str
+    blocking: bool
+
+    def to_dict(self) -> dict[str, object]:
+        return {"code": self.code, "message": self.message, "blocking": self.blocking}
+
+
+def project_dividends(drivers: DividendDrivers) -> tuple[DividendYear, ...]:
+    out: list[DividendYear] = []
+    eps = float(drivers.base_eps)
+    for index, growth in enumerate(drivers.eps_growth):
+        eps = eps * (1.0 + growth)
+        payout = drivers.payout[index]
+        if payout < 0:
+            raise ValuationError(
+                e.MODEL_INPUT_MISSING, f"{drivers.base_year + 1 + index} 年派息率不能为负"
+            )
+        dps = eps * payout
+        out.append(
+            DividendYear(
+                year=drivers.base_year + 1 + index,
+                eps=eps,
+                payout=payout,
+                dps=dps,
+                retained_eps=eps * (1.0 - payout),
+            )
+        )
+    return tuple(out)
+
+
+def check_growth_consistency(
+    drivers: DividendDrivers, years: tuple[DividendYear, ...]
+) -> list[DividendIssue]:
+    """盈利留存与预测增长是否互相解释。
+
+    - 终值增长 > ROE × 末期留存率（含容差）→ 增长没有资金来源，拒绝；
+    - 末期派息率 > 100%（超额分配）却要求正终值增长 → 拒绝；
+    - 超额分配本身不拒绝，但记录为非阻断问题并说明对终值的影响。
+    """
+    issues: list[DividendIssue] = []
+    last = years[-1]
+    if last.payout > 1.0:
+        issues.append(
+            DividendIssue(
+                code=e.DISTRIBUTION_NOT_COVERED_BY_EARNINGS,
+                message=(
+                    f"{last.year} 年派息率 {last.payout:.2%} 超过当年每股收益，"
+                    "属于超额分配：需要以存量现金或新增融资支撑，不能同时假设正终值增长"
+                ),
+                blocking=False,
+            )
+        )
+    growth = drivers.terminal_growth
+    if growth is not None and growth > 0:
+        if last.payout >= 1.0:
+            raise ValuationError(
+                e.GROWTH_NOT_FUNDED_BY_RETENTION,
+                f"末期派息率 {last.payout:.2%} 没有留存收益，却假设终值增长 {growth:.2%}",
+            )
+        if drivers.roe is not None:
+            sustainable = drivers.roe * (1.0 - last.payout)
+            if growth > sustainable + drivers.growth_consistency_tolerance:
+                raise ValuationError(
+                    e.GROWTH_NOT_FUNDED_BY_RETENTION,
+                    f"终值增长 {growth:.2%} 超过可持续增长 {sustainable:.2%}"
+                    f"（ROE {drivers.roe:.2%} × 留存率 {1 - last.payout:.2%}）",
+                )
+        elif growth > 0 and last.retained_eps <= 0:
+            raise ValuationError(
+                e.GROWTH_NOT_FUNDED_BY_RETENTION, "没有留存收益却假设正终值增长"
+            )
+    return issues
+
+
+@dataclass(frozen=True)
+class DividendValuation:
+    years: tuple[DividendYear, ...]
+    stream: object
+    value_per_share: float
+    issues: tuple[DividendIssue, ...] = field(default_factory=tuple)
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "model": "dividend_discount",
+            "years": [y.to_dict() for y in self.years],
+            "discounting": self.stream.to_dict(),
+            "value_per_share": self.value_per_share,
+            "issues": [i.to_dict() for i in self.issues],
+        }
+
+
+def value_dividend(
+    drivers: DividendDrivers,
+    *,
+    terminal_basis: str | None = None,
+    terminal_dps: float | None = None,
+    issues: list[DividendIssue] | None = None,
+) -> DividendValuation:
+    years = project_dividends(drivers)
+    found = list(issues or [])
+    found.extend(check_growth_consistency(drivers, years))
+
+    terminal: TerminalValue | None = None
+    if drivers.terminal_growth is not None:
+        growth = drivers.terminal_growth
+        next_dps = terminal_dps if terminal_dps is not None else years[-1].dps * (1.0 + growth)
+        if next_dps <= 0:
+            raise ValuationError(
+                e.TERMINAL_BASIS_MISSING,
+                f"终值期每股分配 {next_dps:.4f} 不为正，不能用永续增长终值",
+            )
+        if terminal_dps is not None and not terminal_basis:
+            raise ValuationError(
+                e.TERMINAL_BASIS_MISSING, "显式给出终值 DPS 时必须说明其口径来源"
+            )
+        terminal = TerminalValue(
+            method="zero_growth_perpetuity" if growth == 0.0 else "growing_perpetuity",
+            growth=growth,
+            next_period_cash_flow=next_dps,
+            basis=terminal_basis or "末期每股分配按终值增长率外推",
+            terminal_year=years[-1].year,
+        )
+
+    stream = discount_stream(
+        [y.dps for y in years],
+        drivers.cost_of_equity,
+        terminal=terminal,
+        last_period_year=years[-1].year,
+    )
+    return DividendValuation(
+        years=years,
+        stream=stream,
+        value_per_share=stream.total_present_value,
+        issues=tuple(found),
+    )

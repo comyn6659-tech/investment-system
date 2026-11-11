@@ -1,0 +1,133 @@
+{
+  "schema_version": "business-evidence/1",
+  "instrument_id": "EQUITY:600900.SH",
+  "display_name": "长江电力",
+  "as_of": "2026-11-10",
+  "prepared_at": "2026-11-11T14:18:41+08:00",
+  "version": "2026-11-10",
+  "industry_clue": "电力",
+  "business_mix": {
+    "report_date": "2026-03-31",
+    "by_product": [
+      {
+        "segment": "境内水电行业",
+        "revenue_share": 0.849082,
+        "revenue": 15378187800.0,
+        "gross_margin": 0.597747
+      },
+      {
+        "segment": "其他行业",
+        "revenue_share": 0.147676,
+        "revenue": 2674639900.0,
+        "gross_margin": 0.318981
+      },
+      {
+        "segment": "其他(补充)",
+        "revenue_share": 0.003242,
+        "revenue": 58713100.0,
+        "gross_margin": 0.56158
+      },
+      {
+        "segment": "其中:其他",
+        "revenue_share": 0.003242,
+        "revenue": 58713100.0,
+        "gross_margin": 0.56158
+      }
+    ],
+    "by_region": []
+  },
+  "annual_history": [
+    {
+      "fiscal_year": 2025,
+      "revenue": 86241940222.2,
+      "net_profit_parent": 34502809176.39
+    },
+    {
+      "fiscal_year": 2024,
+      "revenue": 84491870566.52,
+      "net_profit_parent": 32496172808.65
+    },
+    {
+      "fiscal_year": 2023,
+      "revenue": 78143535736.1,
+      "net_profit_parent": 27244616815.27
+    },
+    {
+      "fiscal_year": 2022,
+      "revenue": 68863128424.25,
+      "net_profit_parent": 23725915960.71
+    },
+    {
+      "fiscal_year": 2021,
+      "revenue": 55646253991.83,
+      "net_profit_parent": 26272998503.24
+    },
+    {
+      "fiscal_year": 2020,
+      "revenue": 57783367039.83,
+      "net_profit_parent": 26297890222.7
+    },
+    {
+      "fiscal_year": 2019,
+      "revenue": 49874086874.95,
+      "net_profit_parent": 21543493635.57
+    },
+    {
+      "fiscal_year": 2018,
+      "revenue": 51213965746.52,
+      "net_profit_parent": 22610936420.39
+    }
+  ],
+  "share_count_current": 24468217716.0,
+  "sources": [
+    {
+      "evidence_id": "ev-em-stock-info",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_individual_info_em",
+      "url": "https://quote.eastmoney.com/",
+      "retrieved_at": "2026-11-11T14:18:41+08:00",
+      "fields_cited": [
+        "股票简称",
+        "行业",
+        "上市时间",
+        "总股本"
+      ],
+      "note": "行业分类只是模型选择的线索之一，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_zygc_em（主营构成）",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-11T14:18:41+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_financial_abstract（关键指标）",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-11T14:18:41+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    }
+  ],
+  "notes": [
+    "本文件只记录可核实事实与出处；模型适用性判定见 engine/evidence/applicability.py。",
+    "行业分类只作为线索，不单独决定模型；判定不使用当前股价。"
+  ],
+  "evidence_id": "biz-32c29b087840c38e"
+}

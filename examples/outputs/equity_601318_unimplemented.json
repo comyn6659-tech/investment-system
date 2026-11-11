@@ -1,0 +1,300 @@
+{
+  "schema_version": "analysis-result/1",
+  "analysis_id": "analysis-50b95e1f4e6d8699",
+  "generated_at": "2026-11-11T14:40:36+08:00",
+  "instrument": {
+    "instrument_id": "EQUITY:601318.SH",
+    "display_name": "中国平安",
+    "asset_class": "equity",
+    "code": "601318",
+    "market": "CN",
+    "venue": "SSE",
+    "venue_type": "exchange",
+    "currency": "CNY",
+    "aliases": [],
+    "vendor_codes": [],
+    "index_class": null,
+    "etf_strategy": null,
+    "region": "domestic",
+    "underlying_index_id": null,
+    "scope": {
+      "status": "in_scope",
+      "reason_code": "DOMESTIC_A_SHARE",
+      "detail": "境内A股个股（交易所清单）"
+    },
+    "in_first_batch": false,
+    "data_coverage_verified": false,
+    "evidence": [
+      {
+        "evidence_id": "ev-cn-a-equity-list",
+        "kind": "exchange_list",
+        "publisher": "上海证券交易所 / 深圳证券交易所 / 北京证券交易所（经 AKShare 采集）",
+        "url": null,
+        "retrieved_at": "2026-11-11T02:24:42+08:00",
+        "fields_cited": [
+          "证券代码",
+          "证券简称",
+          "板块",
+          "上市日期"
+        ],
+        "note": "三个交易所清单均取到"
+      }
+    ],
+    "valid_from": "2007-03-01",
+    "valid_to": null,
+    "raw_input": "601318",
+    "identity_source": ""
+  },
+  "instrument_id": "EQUITY:601318.SH",
+  "intent": "buy_point_check",
+  "identity": {
+    "status": "resolved",
+    "raw_input": "601318",
+    "matched_by": "exact_code",
+    "candidates": [],
+    "reason_codes": [
+      "DOMESTIC_A_SHARE"
+    ],
+    "clarification_question": null
+  },
+  "snapshot_id": null,
+  "as_of": null,
+  "available_at": null,
+  "analysis_status": "unsupported",
+  "model_status": null,
+  "valuation_state": "not_applicable",
+  "decision": "undetermined",
+  "reason_codes": [
+    "MODEL_FAMILY_NOT_IMPLEMENTED",
+    "RESEARCH_PARAMETERS_UNAPPROVED"
+  ],
+  "model_plan": {
+    "primary_model": null,
+    "model_version": null,
+    "model_status": "research",
+    "cross_check_model": null,
+    "required_checks": [],
+    "selection_reason": "行业与主营构成同时指向保险业务",
+    "not_selected": [
+      {
+        "model_id": "equity_dcf_fcff",
+        "reason_code": "MODEL_FAMILY_NOT_IMPLEMENTED",
+        "reason": "保险公司利润与现金流受准备金假设、投资收益率与会计准则共同影响，普通企业 FCFF 与股息折现会把投资收益与准备金释放错当成经营现金流。本版未实现内含价值口径，因此不进任何估值模型。"
+      },
+      {
+        "model_id": "equity_dividend_discount",
+        "reason_code": "MODEL_FAMILY_NOT_IMPLEMENTED",
+        "reason": "保险公司利润与现金流受准备金假设、投资收益率与会计准则共同影响，普通企业 FCFF 与股息折现会把投资收益与准备金释放错当成经营现金流。本版未实现内含价值口径，因此不进任何估值模型。"
+      }
+    ],
+    "candidate_models": [
+      {
+        "model_id": "equity_dcf_fcff",
+        "reason_code": "MODEL_FAMILY_NOT_IMPLEMENTED",
+        "reason": "保险公司利润与现金流受准备金假设、投资收益率与会计准则共同影响，普通企业 FCFF 与股息折现会把投资收益与准备金释放错当成经营现金流。本版未实现内含价值口径，因此不进任何估值模型。"
+      },
+      {
+        "model_id": "equity_dividend_discount",
+        "reason_code": "MODEL_FAMILY_NOT_IMPLEMENTED",
+        "reason": "保险公司利润与现金流受准备金假设、投资收益率与会计准则共同影响，普通企业 FCFF 与股息折现会把投资收益与准备金释放错当成经营现金流。本版未实现内含价值口径，因此不进任何估值模型。"
+      }
+    ],
+    "family": "insurance",
+    "family_label": "保险（寿险/财险）",
+    "applicable_model_category": "内含价值（EV）+ 新业务价值（NBV）折现",
+    "evidence_id": "biz-38468d0f06d36929",
+    "evidence_version": "2026-11-10",
+    "selection_policy_version": "model-applicability/1",
+    "applicability": {
+      "status": "family_not_implemented",
+      "family": "insurance",
+      "family_label": "保险（寿险/财险）",
+      "primary_model": null,
+      "cross_check_model": null,
+      "applicable_model_category": "内含价值（EV）+ 新业务价值（NBV）折现",
+      "required_evidence_to_implement": [
+        "内含价值报告（EV）与其假设",
+        "新业务价值（NBV）与代理人/银保渠道拆分",
+        "投资资产久期与收益率假设"
+      ],
+      "reasons": [
+        {
+          "signal": "industry_and_segments",
+          "observed": {
+            "industry": "保险Ⅱ",
+            "top_segments": [
+              "寿险及健康险",
+              "财产保险"
+            ]
+          },
+          "conclusion": "financial_insurance",
+          "note": "行业与主营构成同时指向保险业务"
+        }
+      ],
+      "rejected_models": [
+        {
+          "model_id": "equity_dcf_fcff",
+          "reason_code": "MODEL_FAMILY_NOT_IMPLEMENTED",
+          "reason": "保险公司利润与现金流受准备金假设、投资收益率与会计准则共同影响，普通企业 FCFF 与股息折现会把投资收益与准备金释放错当成经营现金流。本版未实现内含价值口径，因此不进任何估值模型。"
+        },
+        {
+          "model_id": "equity_dividend_discount",
+          "reason_code": "MODEL_FAMILY_NOT_IMPLEMENTED",
+          "reason": "保险公司利润与现金流受准备金假设、投资收益率与会计准则共同影响，普通企业 FCFF 与股息折现会把投资收益与准备金释放错当成经营现金流。本版未实现内含价值口径，因此不进任何估值模型。"
+        }
+      ],
+      "indicators": {
+        "industry": "保险Ⅱ",
+        "top_segments": [
+          {
+            "segment": "寿险及健康险",
+            "revenue_share": 0.468401
+          },
+          {
+            "segment": "财产保险",
+            "revenue_share": 0.311301
+          },
+          {
+            "segment": "银行",
+            "revenue_share": 0.122783
+          }
+        ],
+        "revenue_growth_stdev": 0.1314998785974411,
+        "max_revenue_drawdown": 0.2773995231118389,
+        "loss_years": [],
+        "annual_years_observed": 8
+      },
+      "evidence_id": "biz-38468d0f06d36929",
+      "evidence_version": "2026-11-10",
+      "policy": {
+        "policy_version": "model-applicability/1",
+        "status": "research_candidate_pending_approval",
+        "revenue_volatility_cyclical": 0.08,
+        "revenue_drawdown_cyclical": 0.15,
+        "cyclical_industries": [
+          "煤炭",
+          "钢铁",
+          "有色",
+          "化工",
+          "航运",
+          "港口",
+          "房地产",
+          "水泥",
+          "建材",
+          "工程机械",
+          "养殖",
+          "石油",
+          "航空"
+        ],
+        "fcff_capex_intensity_max": 0.1,
+        "fcff_cash_conversion_min": 0.7,
+        "dividend_payout_min": 0.55,
+        "notes": [
+          "阈值是研究起点，不是已批准政策；提高或降低门槛会改变主模型但不改变已算出的价值。",
+          "判定只读业务证据与经营指标，不读当前股价。"
+        ]
+      }
+    }
+  },
+  "assumptions": [],
+  "model_results": [],
+  "conditions": [
+    "研究估值只在所附假设成立时成立；假设与参数未经设计方批准，不得当作正式买点。",
+    "估值以快照中的合并报表数据为基准，未经审计调整或重述核对。"
+  ],
+  "invalidation": [
+    "首版实现对应的模型类别后，本结论需要重跑（当前不是「无投资价值」的判断）。"
+  ],
+  "evidence_refs": [
+    {
+      "evidence_id": "ev-cn-a-equity-list",
+      "kind": "exchange_list",
+      "publisher": "上海证券交易所 / 深圳证券交易所 / 北京证券交易所（经 AKShare 采集）",
+      "url": null,
+      "retrieved_at": "2026-11-11T02:24:42+08:00",
+      "fields_cited": [
+        "证券代码",
+        "证券简称",
+        "板块",
+        "上市日期"
+      ],
+      "note": "三个交易所清单均取到"
+    },
+    {
+      "evidence_id": "ev-em-stock-info",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://quote.eastmoney.com/",
+      "retrieved_at": "2026-11-11T14:18:41+08:00",
+      "fields_cited": [
+        "股票简称",
+        "行业",
+        "上市时间",
+        "总股本"
+      ],
+      "note": "行业分类只是模型选择的线索之一，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-11T14:18:41+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-11T14:18:41+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    }
+  ],
+  "missing_data": [
+    {
+      "fact_id": "applicable_model_data",
+      "status": "not_applicable",
+      "note": "适用模型类别：内含价值（EV）+ 新业务价值（NBV）折现；所需证据见 applicability.required_evidence_to_implement"
+    }
+  ],
+  "warnings": [
+    "该企业族首版未实现估值路线，因此没有进入任何现金流折现模型。",
+    "没有可用快照：本结果不含任何财务事实或估值数字。"
+  ],
+  "clarification": null,
+  "payload": {
+    "payload_type": "equity",
+    "company_facts": {},
+    "financial_periods": [],
+    "dividend_records": [],
+    "model_applicability": {
+      "status": "family_not_implemented",
+      "family": "insurance",
+      "family_label": "保险（寿险/财险）",
+      "primary_model": null,
+      "cross_check_model": null,
+      "evidence_id": "biz-38468d0f06d36929",
+      "evidence_version": "2026-11-10",
+      "applicable_model_category": "内含价值（EV）+ 新业务价值（NBV）折现",
+      "policy_version": "model-applicability/1"
+    },
+    "valuation": null,
+    "research_valuation": null,
+    "dividend_summary": null
+  },
+  "code_version": "phase2-0.2.0",
+  "policy_version": "unapproved-phase2",
+  "model_version": "equity-research-0.2.0"
+}

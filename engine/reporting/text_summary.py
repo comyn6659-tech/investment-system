@@ -169,22 +169,28 @@ def _render_payload(payload: dict[str, Any]) -> list[str]:
         periods = payload.get("financial_periods") or []
         if periods:
             lines.append("")
-            lines.append("【报告期】")
-            for entry in periods[:6]:
+            lines.append("【报告期（合并口径，累计数）】")
+            for entry in periods[:5]:
                 notice = entry.get("notice_date") or "公告时间未知"
-                metrics = "、".join(sorted(entry.get("facts", {}).keys()))
-                lines.append(f"  - {entry['period']}（公告 {notice}）：{metrics}")
-            if len(periods) > 6:
-                lines.append(f"  - ……共 {len(periods)} 个报告期，完整数据见 JSON")
-        dividends = payload.get("dividend_records") or []
-        if dividends:
+                key_metrics = _period_highlights(entry.get("facts") or {})
+                lines.append(f"  - {entry['period']}（公告 {notice}）：{key_metrics}")
+            if len(periods) > 5:
+                lines.append(f"  - ……共 {len(periods)} 个报告期，完整科目见 JSON")
+        summary = payload.get("dividend_summary")
+        if summary:
+            lines.extend(_render_dividend_summary(summary))
+        elif payload.get("dividend_records"):
             lines.append("")
-            lines.append(f"【分红记录】{len(dividends)} 条（按所属财年与实施状态归集，明细见 JSON）")
-            for fact in dividends[:5]:
-                lines.append(f"  - {fact.get('period') or '财年未标注'}：{_fact_text(fact)}")
-        if not payload.get("valuation"):
+            lines.append(f"【分红记录】{len(payload['dividend_records'])} 条明细见 JSON")
+        research = payload.get("research_valuation")
+        if research:
+            lines.extend(_render_research_valuation(research, payload.get("model_applicability")))
+        elif not payload.get("valuation"):
             lines.append("")
-            lines.append("【估值情景】无。阶段一未实现个股模型，因此没有内在价值、安全边际或买点条件。")
+            lines.append(
+                "【估值情景】无。本次没有产出研究估值"
+                "（原因见上方结论与原因码），因此不存在内在价值、安全边际或买点条件。"
+            )
     elif ptype == "index":
         level = payload.get("level")
         if level and level.get("value") is not None:
@@ -227,6 +233,214 @@ def _render_payload(payload: dict[str, Any]) -> list[str]:
         if tracking.get("note"):
             lines.append(f"  - 跟踪信息：{tracking['note']}")
     return lines
+
+
+_PERIOD_HIGHLIGHT_KEYS = (
+    ("total_operating_revenue", "营业总收入"),
+    ("net_profit_parent", "归母净利润"),
+    ("operating_cash_flow", "经营现金流"),
+    ("capex", "资本开支"),
+)
+
+
+def _period_highlights(facts: dict[str, Any]) -> str:
+    parts: list[str] = []
+    for key, label in _PERIOD_HIGHLIGHT_KEYS:
+        fact = facts.get(key)
+        if not fact:
+            continue
+        if fact.get("status") in ("missing", "not_applicable", "conflict"):
+            parts.append(f"{label} {fact.get('status')}")
+            continue
+        value = fact.get("value")
+        if isinstance(value, (int, float)):
+            parts.append(f"{label} {value / 1e8:,.2f} 亿元")
+        else:
+            parts.append(f"{label} {value}")
+    return "、".join(parts) or "（无关键科目）"
+
+
+def _render_dividend_summary(summary: dict[str, Any]) -> list[str]:
+    lines: list[str] = ["", "【分红（按所属财年归集，每 10 股已换算为每股）】"]
+    years = summary.get("fiscal_years") or []
+    for entry in years[:5]:
+        text = (
+            f"  - {entry['fiscal_year']} 财年：普通分配 {entry['ordinary_dps']:.4f} 元/股"
+            f"（含年度末期分配：{'是' if entry.get('has_annual_final') else '否'}）"
+        )
+        if entry.get("special_dps"):
+            text += f"；特别分配 {entry['special_dps']:.4f} 元/股（单列，不永续）"
+        lines.append(text)
+        for item in entry.get("components") or []:
+            if item.get("bucket") != "ordinary":
+                continue
+            lines.append(
+                f"      · {item.get('kind')} {item.get('per_share', 0):.4f} 元/股"
+                f"，除权日 {item.get('ex_date') or '未知'}"
+                f"，状态 {item.get('status') or '未知'}"
+            )
+    if len(years) > 5:
+        lines.append(f"  - ……共 {len(years)} 个财年记录，完整明细见 JSON")
+    special = summary.get("unlabeled_special") or []
+    if special:
+        lines.append(
+            "  - 所属财年未标注的特别分配："
+            + "、".join(f"{item['per_share']:.4f} 元/股" for item in special)
+            + "（不并入任何财年，也不外推）"
+        )
+    if summary.get("ltm_paid_per_share") is not None:
+        window = summary.get("ltm_window") or []
+        lines.append(
+            f"  - 过去十二个月实际支付 {summary['ltm_paid_per_share']:.4f} 元/股"
+            + (f"（除权日 {window[0]} 之后至 {window[1]}）" if len(window) == 2 else "")
+            + "：与「某财年对应分配」不是同一指标"
+        )
+    return lines
+
+
+def _render_research_valuation(
+    research: dict[str, Any], applicability: dict[str, Any] | None
+) -> list[str]:
+    """研究估值报告：公司/模型选择、数据与缺口、价值范围与驱动、现价关系、失效条件。"""
+    lines: list[str] = []
+    applicability = applicability or research.get("applicability") or {}
+
+    # 1. 这是什么公司、为何选这个模型、哪些模型不适用
+    lines.append("")
+    lines.append("【模型选择】")
+    lines.append(
+        f"  企业族：{applicability.get('family_label') or applicability.get('family')}"
+        f" ｜ 主模型：{research.get('model_id')}（{research.get('model_status')}）"
+        f" ｜ 版本：{research.get('model_version')}"
+    )
+    for reason in (applicability.get("reasons") or [])[:4]:
+        note = reason.get("note")
+        if note:
+            lines.append(f"  - 依据（{reason.get('signal')}）：{note}")
+    rejected = applicability.get("rejected_models") or []
+    if rejected:
+        lines.append("  不用于主模型的路线：")
+        for item in rejected:
+            lines.append(
+                f"    · {item.get('model_id')}：{item.get('reason')}（{item.get('reason_code')}）"
+            )
+    if applicability.get("applicable_model_category"):
+        lines.append(f"  适用模型类别：{applicability.get('applicable_model_category')}")
+        for item in applicability.get("required_evidence_to_implement") or []:
+            lines.append(f"    - 补齐后可实现：{item}")
+
+    # 2. 用了哪些日期和口径的数据、缺什么
+    data = research.get("data_used") or {}
+    lines.append("")
+    lines.append("【数据与口径】")
+    lines.append(
+        f"  快照 {data.get('snapshot_id')} ｜ 数据截至 {data.get('as_of')}"
+        f" ｜ 现金流基准财年 {research.get('base_fiscal_year')}"
+        f" ｜ 年报期数 {len(data.get('annual_years') or [])}"
+    )
+    bridge = data.get("fcff_bridge")
+    if bridge:
+        lines.append(
+            f"  历史 FCFF 桥接（{bridge.get('period_end')}）：EBIT {_money(bridge.get('ebit'))}"
+            f" ｜ 实际税率 {bridge.get('effective_tax_rate', 0):.2%}"
+            f" ｜ 资本开支 {_money(bridge.get('capex'))}"
+            f" ｜ 营运资本增加 {_money(bridge.get('change_in_nwc'))}"
+            f" ｜ FCFF {_money(bridge.get('fcff'))}"
+        )
+        rel = bridge.get("reconciliation_relative")
+        lines.append(
+            f"  与经营现金流勾稽：差额 {_money(bridge.get('reconciliation_gap'))}"
+            + (f"（占经营现金流 {rel:.1%}）" if rel is not None else "")
+            + ("，在容差内" if bridge.get("reconciled") else "，超出容差（按部分完成处理）")
+        )
+    price = research.get("price")
+    if price:
+        lines.append(
+            f"  价格：{price['value']} 元/股（{price.get('price_type')}，交易日 {price.get('as_of')}，"
+            f"bar={price.get('bar_status')}）"
+        )
+
+    # 3. 研究假设下的价值范围与驱动变量
+    lines.append("")
+    lines.append("【研究估值（未获批准，不构成买点）】")
+    scenarios = research.get("scenarios") or []
+    for item in scenarios:
+        value = item.get("value_per_share")
+        terminal = item.get("terminal_share_of_value")
+        lines.append(
+            f"  - {item.get('name')}：{value:,.2f} 元/股"
+            + (f"（终值占 {terminal:.1%}）" if terminal is not None else "")
+            + (f"｜{item['note']}" if item.get("note") else "")
+        )
+    rng = research.get("valuation_range") or {}
+    if rng:
+        lines.append(
+            f"  情景范围 {rng['low']:,.2f} – {rng['high']:,.2f} 元/股："
+            "由输入情景定义，不是统计置信区间"
+        )
+    sensitivity = research.get("sensitivity") or []
+    if sensitivity:
+        lines.append("  主要驱动变量（单变量变动，其他假设不变）：")
+        for row in sensitivity:
+            if row.get("value_per_share") is None:
+                lines.append(f"    · {row['variable']} {row['delta']:+.4f}：{row.get('note')}")
+                continue
+            change = row.get("change_pct")
+            lines.append(
+                f"    · {row['variable']} {row['delta']:+.4f} → {row['value_per_share']:,.2f} 元/股"
+                + (f"（{change:+.1%}）" if change is not None else "")
+            )
+    cross = research.get("cross_check")
+    if cross:
+        lines.append("")
+        lines.append("【交叉检查】")
+        if cross.get("value_per_share") is None:
+            lines.append(f"  {cross.get('model_id')}：{cross.get('note')}")
+        else:
+            lines.append(
+                f"  {cross.get('model_id')}（{cross.get('model_version')}）："
+                f"{cross['value_per_share']:,.2f} 元/股，相对主模型 "
+                f"{cross['difference_pct']:+.1%}"
+            )
+            lines.append(f"  说明：{cross.get('note')}")
+
+    # 4. 现价与研究情景的关系
+    relationship = research.get("price_relationship")
+    lines.append("")
+    if relationship:
+        label = {
+            "research_value_above_price": "研究情景估值高于当前收盘价",
+            "research_value_below_price": "研究情景估值低于当前收盘价",
+            "research_value_in_line_with_price": "研究情景估值与当前收盘价大致相当",
+        }.get(relationship.get("relation"), relationship.get("relation"))
+        lines.append(
+            f"【与现价的关系】{label}，差距 {relationship.get('difference_pct', 0):+.1%}"
+            f"（展示带宽 ±{relationship.get('band', 0):.0%}）。"
+        )
+        lines.append(f"  {relationship.get('note')}")
+    else:
+        lines.append("【与现价的关系】没有可核实的收盘价，未做任何现价比较。")
+
+    # 5. 假设与证据
+    lines.append("")
+    lines.append("【研究假设状态】")
+    lines.append(
+        f"  假设 {research.get('assumption_id')} ｜ 状态 {research.get('assumption_status')}"
+        "：参数为研究候选，未经设计方批准，不得当作正式买入上限"
+    )
+    hypotheses = (data.get("research_hypothesis_parameters") or [])
+    if hypotheses:
+        lines.append("  属于研究假设（非观测值）的参数：" + "、".join(hypotheses))
+    return lines
+
+
+def _money(value: Any) -> str:
+    if value is None:
+        return "未取得"
+    try:
+        return f"{float(value):,.0f} 元"
+    except (TypeError, ValueError):
+        return str(value)
 
 
 def _fact_text(fact: dict[str, Any]) -> str:

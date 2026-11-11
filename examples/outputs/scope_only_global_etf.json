@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-7639ac888f9c976b",
-  "generated_at": "2026-11-11T13:44:57+08:00",
+  "analysis_id": "analysis-645ffb579d712846",
+  "generated_at": "2026-11-11T14:40:37+08:00",
   "instrument": null,
   "instrument_id": null,
   "intent": "buy_point_check",
@@ -48,7 +48,7 @@
   "payload": {
     "payload_type": "none"
   },
-  "code_version": "phase1-0.1.2",
-  "policy_version": "unapproved-phase1",
-  "model_version": "none"
+  "code_version": "phase2-0.2.0",
+  "policy_version": "unapproved-phase2",
+  "model_version": "equity-research-0.2.0"
 }

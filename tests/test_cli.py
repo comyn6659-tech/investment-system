@@ -27,7 +27,7 @@ def run_cli(*args: str) -> subprocess.CompletedProcess:
 @pytest.mark.parametrize(
     "query,expected_status,expected_exit",
     [
-        ("工商银行", "unsupported", 0),
+        ("工商银行", "insufficient_data", 0),
         ("沪深300", "unsupported", 0),
         ("510300", "unsupported", 0),
         ("512880", "unsupported", 0),

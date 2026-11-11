@@ -1,0 +1,5 @@
+{
+  "query": "601398",
+  "intent": "buy_point_check",
+  "note": "反例：银行路线数学已实现，但资本充足率/不良率/拨备覆盖率证据缺失 → insufficient_data"
+}

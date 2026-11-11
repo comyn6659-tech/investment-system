@@ -9,6 +9,7 @@ from typing import Any
 
 from engine.contracts.enums import AssetClass, DataStatus, EtfStrategy, IndexClass
 from engine.contracts.payloads import (
+    RESEARCH_VALUATION_PAYLOAD_VERSION,
     amount,
     empty_equity_payload,
     empty_etf_payload,
@@ -19,11 +20,49 @@ from engine.data.snapshot import Snapshot
 from engine.identity.models import InstrumentRef
 
 
+# 个股载荷只展示关键科目与最近若干报告期：完整三级科目以快照为准，
+# 避免把 12 个季度 × 37 个科目原样塞进报告而使真正结论被淹没。
+_EQUITY_PAYLOAD_METRICS = frozenset(
+    {
+        "total_operating_revenue",
+        "operating_profit",
+        "pretax_profit",
+        "income_tax",
+        "net_profit",
+        "net_profit_parent",
+        "operating_cash_flow",
+        "capex",
+        "depreciation",
+        "equity_parent",
+        "cash_and_equivalents",
+        "total_assets",
+        "basic_eps",
+    }
+)
+_EQUITY_PAYLOAD_PERIODS = 6
+
+
 # --- 个股 -------------------------------------------------------------------
 def build_equity_payload(
-    instrument: InstrumentRef, snapshot: Snapshot | None
+    instrument: InstrumentRef,
+    snapshot: Snapshot | None,
+    *,
+    research_valuation: dict[str, Any] | None = None,
+    model_applicability: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    """个股载荷。
+
+    市场事实（company_facts / financial_periods / dividend_records）与模型结论严格分开：
+    研究估值只进 `research_valuation`，正式 `valuation` 保留给 validated 模型。
+    """
     payload = empty_equity_payload()
+    if model_applicability is not None:
+        payload["model_applicability"] = model_applicability
+    if research_valuation is not None:
+        payload["research_valuation"] = {
+            "payload_version": RESEARCH_VALUATION_PAYLOAD_VERSION,
+            **research_valuation,
+        }
     if snapshot is None:
         return payload
 
@@ -40,17 +79,61 @@ def build_equity_payload(
         entry = periods.setdefault(
             key, {"period": key, "notice_date": None, "facts": {}}
         )
-        entry["facts"][f.metric] = f.to_dict()
+        if f.metric in _EQUITY_PAYLOAD_METRICS:
+            entry["facts"][f.metric] = f.to_dict()
         if f.metric == "notice_date" and f.value is not None:
             entry["notice_date"] = f.value
 
     payload["financial_periods"] = sorted(
         periods.values(), key=lambda e: e["period"], reverse=True
-    )
+    )[:_EQUITY_PAYLOAD_PERIODS]
     payload["dividend_records"] = [
-        f.to_dict() for f in facts if f.fact_id.startswith("div.")
+        f.to_dict()
+        for f in facts
+        if f.fact_id.startswith("div.") and f.fact_id.endswith(".per_10")
     ]
+    payload["dividend_summary"] = _dividend_summary(snapshot)
     return payload
+
+
+def _dividend_summary(snapshot: Snapshot) -> dict[str, Any] | None:
+    """按财年归集的分配摘要（特别分红单列，LTM 与财年合计分开标注）。"""
+    from engine.financials.annual import load_dividend_records
+    from engine.financials.dividends import build_dividend_book
+
+    try:
+        book = build_dividend_book(load_dividend_records(snapshot), as_of=snapshot.as_of)
+    except Exception:  # 数据异常时不阻断事实报告，摘要留空
+        return None
+    return {
+        "fiscal_years": [
+            {
+                "fiscal_year": y.fiscal_year,
+                "ordinary_dps": y.ordinary_per_share,
+                "special_dps": y.special_per_share,
+                "has_annual_final": y.has_annual_final,
+                "components": [
+                    {
+                        "kind": item.get("kind"),
+                        "per_share": item.get("per_share"),
+                        "ex_date": item.get("ex_date"),
+                        "status": item.get("status"),
+                        "bucket": item.get("bucket"),
+                        "fiscal_label": item.get("fiscal_label"),
+                    }
+                    for item in y.components
+                ],
+            }
+            for y in book.years
+        ],
+        "ltm_paid_per_share": book.ltm_paid_per_share,
+        "ltm_window": list(book.ltm_window) if book.ltm_window else None,
+        "unlabeled_special": [
+            {"per_share": r.per_share, "kind": r.kind, "announce_date": r.announce_date}
+            for r in book.unlabeled_special
+        ],
+        "notes": list(book.notes),
+    }
 
 
 # --- 指数 -------------------------------------------------------------------
@@ -171,25 +254,54 @@ def build_etf_payload(
 
 # --- 缺失数据清单 -----------------------------------------------------------
 _IMPORTANT_METRICS = {
-    "equity": ("fin.ocf", "fin.capex", "fin.net_debt", "fin.share_count"),
+    "equity": (
+        "fin.ocf",
+        "fin.capex",
+        "fin.revenue",
+        "fin.net_profit_parent",
+        "fin.equity_parent",
+        "bank.cet1_ratio",
+        "price",
+    ),
     "index": ("index.level", "index.pe_ttm", "index.pb", "index.dividend_yield"),
     "etf": ("etf.price", "etf.nav", "etf.management_fee_pct", "etf.premium_discount_pct"),
+}
+
+
+_WANTED_METRIC_NAMES = {
+    "equity": {
+        "operating_cash_flow",
+        "capex",
+        "total_operating_revenue",
+        "net_profit_parent",
+        "equity_parent",
+        "non_performing_loan_ratio",
+        "provision_coverage_ratio",
+        "cet1_capital_adequacy_ratio",
+        "risk_weighted_assets",
+        "regulatory_cet1_minimum",
+        "market_close_price",
+    },
+    "index": {"index_close_level", "pe_ttm", "pb", "dividend_yield"},
+    "etf": {"etf_close_price", "unit_nav", "management_fee_pct", "premium_discount_pct"},
 }
 
 
 def collect_missing_data(
     asset_class: AssetClass, snapshot: Snapshot | None
 ) -> list[dict[str, Any]]:
-    """收集缺失/不适用/过期/冲突的关键事实，供结果与摘要展示。"""
+    """收集缺失/不适用/过期/冲突的**关键**事实，供结果与摘要展示。
+
+    只按指标名过滤，不按前缀：否则每个季报的次要科目缺失都会淹没真正的缺口。
+    """
     if snapshot is None:
         return []
-    key = asset_class.value
-    wanted = _IMPORTANT_METRICS.get(key, ())
+    wanted = _WANTED_METRIC_NAMES.get(asset_class.value, set())
     out: list[dict[str, Any]] = []
     for fact in snapshot.facts:
-        if fact.status == DataStatus.KNOWN or fact.status == DataStatus.KNOWN_ZERO:
+        if fact.status in (DataStatus.KNOWN, DataStatus.KNOWN_ZERO):
             continue
-        if not fact.fact_id.startswith(tuple(w.split(".")[0] + "." for w in wanted)):
+        if fact.metric not in wanted:
             continue
         out.append(
             {

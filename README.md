@@ -5,10 +5,18 @@ A 股个股 / 境内 A 股宽基指数 / 境内普通被动 ETF 的分析引擎�
 建设方式：独立新项目，从零搭建，不读取、不导入、不依赖旧项目
 `../valuation/` 的代码、缓存或投资政策。旧目录仅作可选的只读查证资料。
 
-**当前阶段：阶段一（身份、结果契约与数据可用性）—— 已按 R1–R10 返工。**
-返工说明见 [docs/phase1-rework.md](docs/phase1-rework.md) 与 [docs/phase1-rework-f1f3.md](docs/phase1-rework-f1f3.md)。
-本阶段不实现任何估值模型或指数策略，因此所有结果都不会给出买点；
-`unsupported` 表示「本版不建模 / 模型尚未实现」，不代表对该标的投资价值的判断。
+**当前阶段：阶段二首轮（个股研究估值）。阶段一基础设施已签收，未重开。**
+
+- 阶段一交付：身份、结果契约、固定快照与数据可用性调查（已签收于 `5c4c1c9`）。
+- 阶段二首轮：三条个股研究路线（FCFF / 股息折现 / 银行专用），全部 `research`，
+  `decision` 恒为 `undetermined`。交付说明见
+  [docs/phase2-delivery.md](docs/phase2-delivery.md)，
+  模型规格见 [docs/equity-model-spec.md](docs/equity-model-spec.md)，
+  参数与敏感性见 [docs/assumptions-and-sensitivity.md](docs/assumptions-and-sensitivity.md)，
+  真实输出见 [docs/phase2-samples.md](docs/phase2-samples.md)。
+
+研究估值**不是**买点、不是买入上限、不是已验证策略；参数未经设计方批准。
+`unsupported` 表示「本版未实现该企业族的路线」，不等于该标的没有投资价值。
 
 ## 1. 阶段一做了什么
 
@@ -22,7 +30,8 @@ A 股个股 / 境内 A 股宽基指数 / 境内普通被动 ETF 的分析引擎�
 | 时点语义（带时区比较、日期精度按当日结束） | 已实现 |
 | 硬规则出口校验（research/未完成不得给正式价格判断） | 已实现，文本与 JSON 共用 |
 | 数据可用性调查（个股 / 三只宽基 / ETF） | 已实现，见 `data/coverage/coverage-report.json` |
-| 个股估值、指数估值画像、候选策略回测、ETF 执行结论 | **未实现**（阶段二 / 阶段三） |
+| 个股研究估值（FCFF / 股息折现 / 银行专用） | 已实现，`research`，见阶段二文档 |
+| 指数估值画像、候选策略回测、ETF 执行结论 | **未实现**（阶段三） |
 
 ## 2. 目录结构
 
@@ -34,12 +43,17 @@ engine/                 运行时代码（不 import akshare）
   models/               模型登记表（阶段一全部 implemented=false）
   decision/             决策护栏（唯一允许写 decision 的地方）
   reporting/            JSON 出口与文本摘要
-  assessment/           经营形态判断（阶段二）
+  evidence/             结构化业务证据与模型适用性判定
+  financials/           报告期/TTM、FCFF 桥接、分红归集
+  assumptions/          研究假设配置（内容哈希 + 未批准状态）
+  valuation/            折现内核、FCFF、股息、银行约束、编排
   execution/            ETF 执行检查（阶段三）
   research/             研究与上线边界
   pipeline.py           解析 → 快照 → 结果 → 护栏 → 校验
   cli.py                命令行入口
 data/registry/          已核实身份注册表 + 交易所A股清单（含来源与抓取时间）
+data/evidence/          结构化业务证据 + 宏观利率基准（含来源与抓取时间）
+data/assumptions/       研究假设配置（每组都带来源、推导与未批准状态）
 data/snapshots/         固定快照（小体量，入版本控制）
 data/cache/             大体积原始数据（不入版本控制）
 data/coverage/          数据可用性调查报告
@@ -68,6 +82,14 @@ $PY -m engine.cli --json '沪深300'
 $PY -m engine.cli --json '510300'
 $PY -m engine.cli --json '512880'      # 行业 ETF：范围外
 $PY -m engine.cli --json '000001'      # 代码冲突：需要澄清
+
+# 阶段二：个股研究估值（必须提供假设文件）
+$PY -m engine.cli '600519' \
+  --assumptions data/assumptions/600519-fcff-base.json \
+  --cross-check-assumptions data/assumptions/600519-ddm-crosscheck.json
+$PY -m engine.cli '600900' --assumptions data/assumptions/600900-ddm-base.json
+$PY -m engine.cli '601398'             # 银行：资本/资产质量证据缺失 → insufficient_data
+$PY -m engine.cli '601318'             # 保险：首版未实现 → unsupported
 ```
 
 退出码：`0` 正常产出结果 / `2` 需要澄清或输入非法 / `3` 引擎错误（快照不可用等）/
@@ -79,6 +101,7 @@ $PY -m engine.cli --json '000001'      # 代码冲突：需要澄清
 $PY -m engine.cli --snapshot snap-xxxxxxxxxxxxxxxx '中证500'   # 指定快照重放
 $PY -m engine.cli --request examples/requests/index_000300.json
 $PY -m engine.cli --json --out examples/outputs/index_000300.json '沪深300'
+$PY -m engine.cli --evidence-dir data/evidence '600519' --assumptions <file>
 ```
 
 ## 4. 测试
@@ -110,11 +133,20 @@ $PY -m engine.cli --json --out examples/outputs/index_000300.json '沪深300'
 | 字段 | 值 | 含义 |
 |---|---|---|
 | `schema_version` | `analysis-result/1` | 结果契约版本 |
-| `code_version` | `phase1-0.1.2` | 代码语义版本（R1–R10、F1–F3 返工） |
-| `policy_version` | `unapproved-phase1` | 阶段一没有任何投资门槛获批 |
-| `model_version` | `none` | 没有任何已验证模型 |
+| `code_version` | `phase2-0.2.0` | 代码语义版本（阶段二首轮） |
+| `policy_version` | `unapproved-phase2` | 研究与正式决策分离，没有任何投资门槛获批 |
+| `model_version` | `equity-research-0.2.0` | 三条个股模型均为 `research`，未 validated |
 
-## 7. 明确不做（阶段一）
+## 7. 明确不做（阶段二首轮）
 
-不实现或调优指数买卖阈值；不替设计方批准折现率、股息回报要求或银行风险参数；
-不新增低 ROE 一刀切规则；不改旧系统、不改已安装 skill；不做网页、自动交易、仓位管理或付费数据采购。
+不做指数回测、不做网页、不做自动交易与仓位管理、不做每日任务、不接入新 skill；
+不替设计方批准折现率、股权风险溢价、终值增长或银行风险参数；
+不新增「低 ROE 一律不能估值」这类一刀切规则；不改旧系统、不购买数据、不申请账户。
+
+## 8. 阶段一文档索引
+
+- [docs/phase1-delivery.md](docs/phase1-delivery.md)：阶段一交付
+- [docs/phase1-rework.md](docs/phase1-rework.md)：R1–R10 返工
+- [docs/phase1-rework-f1f3.md](docs/phase1-rework-f1f3.md)：F1–F3 收尾
+- [docs/data-coverage.md](docs/data-coverage.md)：数据覆盖表
+- [docs/acceptance-checklist.md](docs/acceptance-checklist.md)：历史风险验收清单

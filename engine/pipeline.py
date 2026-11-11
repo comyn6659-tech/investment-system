@@ -25,12 +25,15 @@ from engine.contracts.enums import (
 )
 from engine.contracts.result import AnalysisResult
 from engine.contracts.validation import enforce
+from engine.assumptions.schema import AssumptionSet, load_assumptions
 from engine.data.snapshot import Snapshot, SnapshotError, SnapshotStore
 from engine.decision.policy import apply_guards, assert_not_fabricated
+from engine.evidence.models import EvidenceBook
 from engine.identity.catalog import IdentityCatalog
 from engine.identity.models import InstrumentRef, Resolution
 from engine.identity.resolver import resolve
-from engine.models.registry import planned_model_plan
+from engine.models.registry import MODELS_BY_ID, planned_model_plan
+from engine.valuation.runner import run_research_valuation
 from engine.reporting.payload_builders import (
     build_equity_payload,
     build_etf_payload,
@@ -58,6 +61,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_REGISTRY = PROJECT_ROOT / "data" / "registry" / "instruments.json"
 DEFAULT_EQUITY_LIST = PROJECT_ROOT / "data" / "registry" / "cn_a_equities.json"
 DEFAULT_SNAPSHOTS = PROJECT_ROOT / "data" / "snapshots"
+DEFAULT_EVIDENCE = PROJECT_ROOT / "data" / "evidence"
 
 
 @dataclass(frozen=True)
@@ -65,6 +69,9 @@ class AnalyzerConfig:
     registry_path: Path = DEFAULT_REGISTRY
     equity_list_path: Path = DEFAULT_EQUITY_LIST
     snapshot_dir: Path = DEFAULT_SNAPSHOTS
+    evidence_dir: Path = DEFAULT_EVIDENCE
+    assumptions_path: Path | None = None
+    cross_check_assumptions_path: Path | None = None
 
 
 class Analyzer:
@@ -74,6 +81,7 @@ class Analyzer:
         if Path(self.config.equity_list_path).exists():
             self.catalog.merge_equity_list(Path(self.config.equity_list_path))
         self.store = SnapshotStore(self.config.snapshot_dir)
+        self.evidence = EvidenceBook(Path(self.config.evidence_dir))
 
     # --- 主流程 ---------------------------------------------------------
     def analyze(
@@ -83,6 +91,8 @@ class Analyzer:
         intent: str = DEFAULT_INTENT,
         snapshot_id: str | None = None,
         now: datetime | None = None,
+        assumptions: AssumptionSet | None = None,
+        cross_check_assumptions: AssumptionSet | None = None,
     ) -> AnalysisResult:
         generated_at = (now or datetime.now(TZ)).isoformat(timespec="seconds")
         resolution = resolve(query, self.catalog)
@@ -117,6 +127,16 @@ class Analyzer:
         if scope_status == ScopeStatus.UNVERIFIED:
             return self._unverified_result(
                 instrument, resolution, snapshot, intent=intent, generated_at=generated_at
+            )
+        if instrument.asset_class == AssetClass.EQUITY:
+            return self._equity_result(
+                instrument,
+                resolution,
+                snapshot,
+                intent=intent,
+                generated_at=generated_at,
+                assumptions=assumptions,
+                cross_check_assumptions=cross_check_assumptions,
             )
         return self._in_scope_result(
             instrument, resolution, snapshot, intent=intent, generated_at=generated_at
@@ -337,6 +357,141 @@ class Analyzer:
         result.invalidation = ["若身份核实结果变化，本结果需要重跑。"]
         return self._finalize(result, instrument)
 
+    # --- 个股：研究估值 -------------------------------------------------
+    def _equity_result(
+        self,
+        instrument: InstrumentRef,
+        resolution: Resolution,
+        snapshot: Snapshot | None,
+        *,
+        intent: str,
+        generated_at: str,
+        assumptions: AssumptionSet | None,
+        cross_check_assumptions: AssumptionSet | None,
+    ) -> AnalysisResult:
+        """个股走「证据 → 适用性 → 假设 → 计算 → 研究报告」链路。
+
+        无论走到哪一步，decision 都是 undetermined；模型只有 research 状态，
+        因此研究估值不会变成买点结论。
+        """
+        evidence = self.evidence.get(instrument.instrument_id)
+        primary_assumptions = assumptions or self._configured_assumptions()
+        alt_assumptions = cross_check_assumptions or self._configured_cross_check()
+
+        valuation = run_research_valuation(
+            instrument_id=instrument.instrument_id,
+            snapshot=snapshot,
+            evidence=evidence,
+            assumptions=primary_assumptions,
+            cross_check_assumptions=alt_assumptions,
+        )
+
+        result = self._base_result(
+            intent=intent,
+            generated_at=generated_at,
+            instrument=instrument,
+            resolution=resolution,
+            snapshot=snapshot,
+        )
+        status_map = {
+            "complete": AnalysisStatus.COMPLETE.value,
+            "partial": AnalysisStatus.PARTIAL.value,
+            "insufficient_data": AnalysisStatus.INSUFFICIENT_DATA.value,
+            "unsupported": AnalysisStatus.UNSUPPORTED.value,
+        }
+        result.analysis_status = status_map.get(
+            valuation.status, AnalysisStatus.INSUFFICIENT_DATA.value
+        )
+        computed = result.analysis_status in (
+            AnalysisStatus.COMPLETE.value,
+            AnalysisStatus.PARTIAL.value,
+        )
+        # 只有真正跑出研究估值才标记模型状态；未执行时不假装模型已运行
+        result.model_status = "research" if computed else None
+        result.valuation_state = (
+            ValuationState.NOT_APPLICABLE.value
+            if valuation.status == "unsupported"
+            else ValuationState.UNKNOWN.value
+        )
+        result.decision = Decision.UNDETERMINED.value
+        result.reason_codes = list(valuation.reason_codes)
+        result.model_plan = _equity_model_plan(valuation)
+        result.payload = self._build_payload(
+            instrument,
+            snapshot,
+            research_valuation=valuation.to_dict() if computed else None,
+            model_applicability={
+                "status": valuation.applicability.get("status"),
+                "family": valuation.applicability.get("family"),
+                "family_label": valuation.applicability.get("family_label"),
+                "primary_model": valuation.applicability.get("primary_model"),
+                "cross_check_model": valuation.applicability.get("cross_check_model"),
+                "evidence_id": valuation.applicability.get("evidence_id"),
+                "evidence_version": valuation.applicability.get("evidence_version"),
+                "applicable_model_category": valuation.applicability.get(
+                    "applicable_model_category"
+                ),
+                "policy_version": valuation.applicability.get("policy", {}).get(
+                    "policy_version"
+                ),
+            },
+        )
+        result.model_results = (
+            [
+                {
+                    "result_type": "research_valuation",
+                    "model_id": valuation.model_id,
+                    "model_version": valuation.model_version,
+                    "model_status": "research",
+                    "assumption_id": valuation.assumption_id,
+                    "headline_value_per_share": valuation.headline_value_per_share,
+                    "scenario_count": len(valuation.scenarios),
+                    "cross_check_model": (
+                        valuation.cross_check or {}
+                    ).get("model_id")
+                    if valuation.cross_check
+                    else None,
+                }
+            ]
+            if computed
+            else []
+        )
+        result.assumptions = _assumption_summary(primary_assumptions, alt_assumptions, valuation)
+        result.conditions = [
+            "研究估值只在所附假设成立时成立；假设与参数未经设计方批准，不得当作正式买点。",
+            "估值以快照中的合并报表数据为基准，未经审计调整或重述核对。",
+        ]
+        if valuation.status == "partial":
+            result.conditions.append("勾稽或交叉检查存在未解释差额，结论按部分完成处理。")
+        result.missing_data = _merge_missing(
+            list(valuation.missing), collect_missing_data(AssetClass.EQUITY, snapshot)
+        )
+        result.evidence_refs = self._evidence_refs(instrument, snapshot, evidence)
+        result.invalidation = list(valuation.invalidation)
+        result.warnings = list(valuation.warnings)
+        if snapshot is None:
+            result.warnings.append("没有可用快照：本结果不含任何财务事实或估值数字。")
+        return self._finalize(result, instrument)
+
+    # --- 已配置的假设 ---------------------------------------------------
+    def _configured_assumptions(self) -> AssumptionSet | None:
+        if not hasattr(self, "_assumption_cache"):
+            self._assumption_cache = (
+                load_assumptions(self.config.assumptions_path)
+                if self.config.assumptions_path
+                else None
+            )
+        return self._assumption_cache
+
+    def _configured_cross_check(self) -> AssumptionSet | None:
+        if not hasattr(self, "_cross_cache"):
+            self._cross_cache = (
+                load_assumptions(self.config.cross_check_assumptions_path)
+                if self.config.cross_check_assumptions_path
+                else None
+            )
+        return self._cross_cache
+
     def _in_scope_result(
         self,
         instrument: InstrumentRef,
@@ -400,9 +555,21 @@ class Analyzer:
         return self._finalize(result, instrument)
 
     # --- 载荷与证据 -----------------------------------------------------
-    def _build_payload(self, instrument: InstrumentRef, snapshot: Snapshot | None) -> dict:
+    def _build_payload(
+        self,
+        instrument: InstrumentRef,
+        snapshot: Snapshot | None,
+        *,
+        research_valuation: dict | None = None,
+        model_applicability: dict | None = None,
+    ) -> dict:
         if instrument.asset_class == AssetClass.EQUITY:
-            return build_equity_payload(instrument, snapshot)
+            return build_equity_payload(
+                instrument,
+                snapshot,
+                research_valuation=research_valuation,
+                model_applicability=model_applicability,
+            )
         if instrument.asset_class == AssetClass.INDEX:
             return build_index_payload(
                 instrument, snapshot, strategy_candidates=strategy_candidates()
@@ -412,8 +579,26 @@ class Analyzer:
             return build_etf_payload(instrument, underlying, snapshot)
         return {"payload_type": "none"}
 
-    def _evidence_refs(self, instrument: InstrumentRef, snapshot: Snapshot | None) -> list[dict]:
+    def _evidence_refs(
+        self,
+        instrument: InstrumentRef,
+        snapshot: Snapshot | None,
+        business_evidence=None,
+    ) -> list[dict]:
         refs: list[dict] = [e.to_dict() for e in instrument.evidence]
+        if business_evidence is not None:
+            for source in business_evidence.sources:
+                refs.append(
+                    {
+                        "evidence_id": source.get("evidence_id"),
+                        "kind": source.get("kind", "vendor_api"),
+                        "publisher": source.get("publisher"),
+                        "url": source.get("url"),
+                        "retrieved_at": source.get("retrieved_at"),
+                        "fields_cited": list(source.get("fields_cited") or []),
+                        "note": source.get("note", ""),
+                    }
+                )
         if snapshot is None:
             return refs
         seen = {r.get("evidence_id") for r in refs}
@@ -453,6 +638,110 @@ class Analyzer:
             "policy_version": POLICY_VERSION,
             "model_version": MODEL_VERSION,
         }
+
+
+def _equity_model_plan(valuation) -> dict:
+    applicability = valuation.applicability
+    conclusions = [
+        item.get("note") or item.get("conclusion")
+        for item in applicability.get("reasons") or []
+        if item.get("note") or item.get("conclusion")
+    ]
+    return {
+        "primary_model": valuation.model_id,
+        "model_version": valuation.model_version,
+        "model_status": "research",
+        "cross_check_model": (valuation.cross_check or {}).get("model_id")
+        if valuation.cross_check
+        else applicability.get("cross_check_model"),
+        "required_checks": _required_checks(valuation),
+        "selection_reason": "；".join(str(x) for x in conclusions[:4])
+        or "未选主模型",
+        "not_selected": list(applicability.get("rejected_models") or []),
+        "candidate_models": list(applicability.get("rejected_models") or []),
+        "family": applicability.get("family"),
+        "family_label": applicability.get("family_label"),
+        "applicable_model_category": applicability.get("applicable_model_category"),
+        "evidence_id": applicability.get("evidence_id"),
+        "evidence_version": applicability.get("evidence_version"),
+        "selection_policy_version": (applicability.get("policy") or {}).get(
+            "policy_version"
+        ),
+        "applicability": applicability,
+    }
+
+
+def _merge_missing(
+    first: list[dict], second: list[dict]
+) -> list[dict]:
+    """合并两个缺口清单：同一 fact_id 只保留一条，优先保留带模型解释的那条。"""
+    merged: dict[str, dict] = {}
+    for item in first + second:
+        key = str(item.get("fact_id") or item.get("metric") or "")
+        if key in merged:
+            existing = merged[key]
+            if not existing.get("note") and item.get("note"):
+                merged[key] = item
+            continue
+        merged[key] = item
+    return sorted(merged.values(), key=lambda x: str(x.get("fact_id")))
+
+
+def _required_checks(valuation) -> list[str]:
+    model_id = valuation.model_id
+    if model_id == "bank_dividend_discount":
+        return [
+            "核心一级资本充足率不低于适用下限",
+            "拨备覆盖率不低于适用下限",
+            "不良率趋势不恶化",
+            "派息率不超过资本一致性上限",
+        ]
+    if model_id == "equity_dividend_discount":
+        return [
+            "派息率不超过当年每股收益（超出需解释）",
+            "终值增长不超过 ROE × 留存率",
+            "特别分红不进入可持续 DPS",
+        ]
+    if model_id == "equity_dcf_fcff":
+        return [
+            "FCFF 与经营现金流勾稽差额在容差内",
+            "权益桥接每项只计一次",
+            "末期现金流为正才启用永续终值",
+        ]
+    return []
+
+
+def _assumption_summary(
+    primary: AssumptionSet | None,
+    cross: AssumptionSet | None,
+    valuation,
+) -> list[dict]:
+    out: list[dict] = []
+    for label, item in (("primary", primary), ("cross_check", cross)):
+        if item is None:
+            continue
+        out.append(
+            {
+                "role": label,
+                "assumption_id": item.assumption_id,
+                "model_id": item.model_id,
+                "model_version": item.model_version,
+                "status": item.status,
+                "policy_version": item.policy_version,
+                "base_fiscal_year": item.base_fiscal_year,
+                "applicable_as_of": item.applicable_as_of,
+                "horizon_years": item.horizon_years,
+                "discount_rate": item.discount_rate.value,
+                "discount_rate_kind": item.discount_rate.provenance.kind,
+                "discount_rate_source": item.discount_rate.provenance.source,
+                "terminal": item.terminal.to_dict(),
+                "scenarios": list(item.scenarios),
+                "source_path": item.source_path,
+                "notes": item.notes,
+            }
+        )
+    _ = valuation
+    return out
 
 
 def _no_model_plan(reason: str) -> dict:

@@ -21,7 +21,12 @@ from engine.contracts.enums import (
     ModelStatus,
     ValuationState,
 )
-from engine.contracts.payloads import INDEX_POINT_UNIT, MONEY_UNITS, PAYLOAD_SCHEMAS
+from engine.contracts.payloads import (
+    INDEX_POINT_UNIT,
+    MONEY_UNITS,
+    PAYLOAD_OPTIONAL_FIELDS,
+    PAYLOAD_SCHEMAS,
+)
 from engine.data.numeric import is_finite_number
 from engine.models.registry import MODELS_BY_ID
 from engine.version import RESULT_SCHEMA_VERSION
@@ -35,7 +40,14 @@ _BLOCKED_ANALYSIS_STATUSES = {
     AnalysisStatus.ENGINE_ERROR,
 }
 
-_ALLOWED_MODEL_RESULT_TYPES = {"equity_value", "index_signal", "etf_execution", "research_signal"}
+_ALLOWED_MODEL_RESULT_TYPES = {
+    "equity_value",
+    "index_signal",
+    "etf_execution",
+    "research_signal",
+    # 阶段二：研究估值结果（model_status=research，decision=undetermined）
+    "research_valuation",
+}
 
 # 这些字段属于核心契约，缺失或为 null 一律视为违规（不允许「省略即通过」）
 _REQUIRED_KEYS = (
@@ -185,12 +197,15 @@ def validate_result(result: Any) -> list[str]:
     if payload_type not in PAYLOAD_SCHEMAS:
         problems.append(f"未知的 payload_type: {payload_type!r}")
     else:
-        missing = PAYLOAD_SCHEMAS[payload_type] - set(payload)
+        optional = PAYLOAD_OPTIONAL_FIELDS.get(payload_type, set())
+        required = PAYLOAD_SCHEMAS[payload_type] - optional
+        missing = required - set(payload)
         if missing:
             problems.append(f"payload({payload_type}) 缺少字段: {sorted(missing)}")
         extra = set(payload) - PAYLOAD_SCHEMAS[payload_type]
         if extra:
             problems.append(f"payload({payload_type}) 含未定义字段: {sorted(extra)}")
+        problems.extend(_check_research_valuation_payload(payload, data, analysis_status, model_status))
         if analysis_status != AnalysisStatus.COMPLETE or model_status != ModelStatus.VALIDATED:
             priced = [
                 field
@@ -222,6 +237,10 @@ def validate_result(result: Any) -> list[str]:
         if item["result_type"] == "research_signal":
             problems.extend(
                 _check_research_signal(item, data, analysis_status, model_status, decision)
+            )
+        elif item["result_type"] == "research_valuation":
+            problems.extend(
+                _check_research_valuation(item, data, analysis_status, model_status, decision)
             )
         elif analysis_status != AnalysisStatus.COMPLETE or model_status != ModelStatus.VALIDATED:
             problems.append(
@@ -295,6 +314,94 @@ def _check_research_signal(item, data, analysis_status, model_status, decision) 
         )
     if decision != Decision.UNDETERMINED:
         problems.append("携带研究结果时 decision 必须为 undetermined")
+    return problems
+
+
+# --- 研究估值结果的来源约束 ---------------------------------------------------
+_RESEARCH_VALUATION_FORBIDDEN_STATES = {
+    ValuationState.ATTRACTIVE,
+    ValuationState.NEUTRAL,
+    ValuationState.EXPENSIVE,
+}
+
+
+def _check_research_valuation(item, data, analysis_status, model_status, decision) -> list[str]:
+    """研究估值必须能追到真实登记、确实实现的模型，且不得冒充正式价格结论。"""
+    problems: list[str] = []
+    model_id = item.get("model_id")
+    plan = data.get("model_plan") or {}
+
+    if not model_id:
+        problems.append("research_valuation 必须注明 model_id")
+        return problems
+    model = MODELS_BY_ID.get(model_id)
+    if model is None:
+        problems.append(f"research_valuation 引用了未登记的模型: {model_id!r}")
+    else:
+        if not model.implemented:
+            problems.append(f"模型 {model_id} 未实现，不能输出研究估值")
+        if item.get("model_version") != model.version:
+            problems.append(
+                f"research_valuation 的 model_version={item.get('model_version')!r} "
+                f"与登记版本 {model.version!r} 不一致"
+            )
+        if plan.get("primary_model") != model_id:
+            problems.append("research_valuation 必须与 model_plan.primary_model 一致")
+    if item.get("model_status") != ModelStatus.RESEARCH.value:
+        problems.append("research_valuation 必须标记 model_status=research")
+    if model_status != ModelStatus.RESEARCH:
+        problems.append(
+            "携带 research_valuation 的结果，整体 model_status 必须为 research"
+            f"（当前 {model_status.value if model_status else None}）"
+        )
+    if analysis_status not in (AnalysisStatus.COMPLETE, AnalysisStatus.PARTIAL):
+        problems.append("研究估值只能在 complete/partial 的分析中出现")
+    if decision != Decision.UNDETERMINED:
+        problems.append("携带研究估值时 decision 必须为 undetermined")
+    return problems
+
+
+def _check_research_valuation_payload(payload, data, analysis_status, model_status) -> list[str]:
+    """载荷里的研究估值块：必须与模型结果一致，且不得混进正式定价字段。"""
+    problems: list[str] = []
+    research = payload.get("research_valuation")
+    if payload.get("payload_type") != "equity":
+        if research not in (None, {}, [], ""):
+            problems.append("research_valuation 只能出现在个股载荷中")
+        return problems
+
+    results = [
+        item
+        for item in (data.get("model_results") or [])
+        if isinstance(item, dict) and item.get("result_type") == "research_valuation"
+    ]
+    if research in (None, {}):
+        if results:
+            problems.append("model_results 声明了 research_valuation，但载荷中没有对应内容")
+        return problems
+
+    if not isinstance(research, dict):
+        problems.append("research_valuation 必须是对象或 null")
+        return problems
+    if not research.get("payload_version"):
+        problems.append("research_valuation 必须带 payload_version")
+    if not results:
+        problems.append("载荷含 research_valuation，但 model_results 没有对应记录")
+    else:
+        if results[0].get("model_id") != research.get("model_id"):
+            problems.append("research_valuation 的 model_id 与 model_results 不一致")
+        if results[0].get("model_version") != research.get("model_version"):
+            problems.append("research_valuation 的 model_version 与 model_results 不一致")
+    if model_status != ModelStatus.RESEARCH.value:
+        problems.append("载荷含研究估值时，整体 model_status 必须为 research")
+    valuation_state = data.get("valuation_state")
+    if valuation_state in {s.value for s in _RESEARCH_VALUATION_FORBIDDEN_STATES}:
+        problems.append(
+            "研究估值不能给出 attractive/neutral/expensive 的价格位置判断"
+            f"（当前 {valuation_state!r}）"
+        )
+    if payload.get("valuation") not in (None, {}, [], ""):
+        problems.append("研究估值不得写入正式 valuation 字段（该字段保留给 validated 模型）")
     return problems
 
 

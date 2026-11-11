@@ -1,0 +1,218 @@
+{
+  "schema_version": "assumption-set/1",
+  "instrument_id": "EQUITY:600519.SH",
+  "model_id": "equity_dcf_fcff",
+  "model_version": "0.2.0-research",
+  "applicable_as_of": "2026-11-10",
+  "base_fiscal_year": 2025,
+  "horizon_years": 5,
+  "discount_rate": {
+    "value": 0.074,
+    "provenance": {
+      "kind": "derivation",
+      "source": "WACC 构建：无风险利率 1.5965% + 股权风险溢价 5.0% + 公司特定溢价 0.8% ≈ 7.4%；有息负债几乎为零（仅租赁负债 2.34 亿元），债务权重可忽略，WACC≈股权成本",
+      "detail": "无风险利率是观测值；股权风险溢价与公司特定溢价是本轮研究假设候选，未获批准",
+      "evidence_ids": []
+    },
+    "build_up": {
+      "risk_free_pct": 1.5965,
+      "equity_risk_premium_pct": 5.0,
+      "company_specific_premium_pct": 0.8,
+      "debt_weight_pct": 0.1,
+      "after_tax_cost_of_debt_pct": 2.6
+    }
+  },
+  "terminal": {
+    "method": "growing_perpetuity",
+    "growth": 0.02,
+    "basis": "末期（2030 年）FCFF × (1+g) 作为永续首期；g 取 2.0% 作为长期名义增长参照（研究假设）",
+    "provenance": {
+      "kind": "research_hypothesis",
+      "source": "长期名义增长参照：以长期通胀中枢约 2% 作为上限，不高于可持续增长 ROE×留存率（约 7.1%）",
+      "detail": "终值增长未使用历史收入增速，避免把高增长期永续化",
+      "evidence_ids": []
+    }
+  },
+  "scenarios": {
+    "bear": {
+      "note": "收入停滞、利润率回落、资本开支上台阶（白酒需求走弱的压力情形）",
+      "drivers": {
+        "revenue_growth": [
+          0.0,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "ebit_margin": [
+          0.63,
+          0.62,
+          0.61,
+          0.6,
+          0.6
+        ],
+        "tax_rate": [
+          0.2566,
+          0.2566,
+          0.2566,
+          0.2566,
+          0.2566
+        ],
+        "da_pct_revenue": [
+          0.0131,
+          0.0131,
+          0.0131,
+          0.0131,
+          0.0131
+        ],
+        "capex_pct_revenue": [
+          0.025,
+          0.025,
+          0.025,
+          0.025,
+          0.025
+        ],
+        "nwc_pct_incremental_revenue": 0.18
+      },
+      "terminal_growth": 0.015
+    },
+    "base": {
+      "note": "2026 年按已披露前三季度同比（+1.8%）起步，之后回到 3–4% 的低速增长",
+      "drivers": {
+        "revenue_growth": [
+          0.018,
+          0.04,
+          0.04,
+          0.035,
+          0.03
+        ],
+        "ebit_margin": [
+          0.66,
+          0.66,
+          0.66,
+          0.658,
+          0.655
+        ],
+        "tax_rate": [
+          0.2566,
+          0.2566,
+          0.2566,
+          0.2566,
+          0.2566
+        ],
+        "da_pct_revenue": [
+          0.0131,
+          0.0131,
+          0.0131,
+          0.0131,
+          0.0131
+        ],
+        "capex_pct_revenue": [
+          0.02,
+          0.02,
+          0.02,
+          0.02,
+          0.02
+        ],
+        "nwc_pct_incremental_revenue": 0.15
+      },
+      "terminal_growth": 0.02
+    },
+    "bull": {
+      "note": "需求恢复、产品结构继续升级（高端占比提升带动利润率）",
+      "drivers": {
+        "revenue_growth": [
+          0.03,
+          0.05,
+          0.05,
+          0.045,
+          0.04
+        ],
+        "ebit_margin": [
+          0.67,
+          0.67,
+          0.67,
+          0.67,
+          0.67
+        ],
+        "tax_rate": [
+          0.2566,
+          0.2566,
+          0.2566,
+          0.2566,
+          0.2566
+        ],
+        "da_pct_revenue": [
+          0.0131,
+          0.0131,
+          0.0131,
+          0.0131,
+          0.0131
+        ],
+        "capex_pct_revenue": [
+          0.018,
+          0.018,
+          0.018,
+          0.018,
+          0.018
+        ],
+        "nwc_pct_incremental_revenue": 0.12
+      },
+      "terminal_growth": 0.025
+    }
+  },
+  "provenance": {
+    "revenue_growth": {
+      "kind": "derivation",
+      "source": "2026 年取已披露前三季度营业收入同比 +1.82%（快照 fin.2026-09-30.revenue 对 fin.2025-09-30.revenue）；其后年份为本轮研究假设：低速个位数增长，低于 2021–2024 年历史增速",
+      "detail": "历史增速来自财务报表，本身不能外推；预测路径是研究假设",
+      "evidence_ids": []
+    },
+    "ebit_margin": {
+      "kind": "derivation",
+      "source": "基期 EBIT 利润率 =（利润总额 1147.55 亿 + 财务费用净额 −8.15 亿）/ 营业收入 1720.54 亿 = 66.22%；预测期按基期水平小幅回落",
+      "detail": "未做大规模利润率扩张假设",
+      "evidence_ids": []
+    },
+    "tax_rate": {
+      "kind": "observed_data",
+      "source": "基期实际税率 = 所得税费用 294.45 亿 / 利润总额 1147.55 亿 = 25.66%，预测期沿用",
+      "detail": "实际税率随税收优惠与递延税变化，未单独建模",
+      "evidence_ids": []
+    },
+    "da_pct_revenue": {
+      "kind": "derivation",
+      "source": "基期折旧摊销合计 22.59 亿 / 营业收入 1720.54 亿 = 1.31%（固定资产折旧 + 无形/长期待摊/使用权资产摊销）",
+      "detail": "取自现金流量表补充资料",
+      "evidence_ids": []
+    },
+    "capex_pct_revenue": {
+      "kind": "derivation",
+      "source": "基期资本开支 31.28 亿 / 营业收入 1720.54 亿 = 1.82%；预测期取 2.0% 以覆盖扩产与技改",
+      "detail": "资本开支取『购建固定资产、无形资产和其他长期资产支付的现金』",
+      "evidence_ids": []
+    },
+    "nwc_pct_incremental_revenue": {
+      "kind": "research_hypothesis",
+      "source": "营运资本增量按新增收入的 15% 计提；基期（2025）营运资本增加 248.74 亿元，主要来自经营性应收增加与应付减少，属单年异常，未直接外推",
+      "detail": "该比例只影响增量部分，对估值影响有限（见敏感性表）",
+      "evidence_ids": []
+    }
+  },
+  "extras": {
+    "absent_as_zero": true,
+    "bridge_tolerance": 0.15,
+    "growth_consistency_tolerance": 0.0,
+    "sensitivity": {
+      "revenue_growth": 0.01,
+      "ebit_margin": 0.01,
+      "capex_pct_revenue": 0.005,
+      "discount_rate": 0.005,
+      "terminal_growth": 0.005
+    }
+  },
+  "status": "research_pending_approval",
+  "policy_version": "unapproved-phase2",
+  "created_at": "2026-11-11T14:20:00+08:00",
+  "notes": "主模型：资本开支轻（约 1.8% 收入）、现金转化高（历史 FCFF/归母净利润 0.71–1.02），自由现金流本身就是可分配来源。absent_as_zero 表示资产负债表未列出的借款科目按「无该项」处理；该标的唯一有息负债为租赁负债，利息费用与其对应。"
+}

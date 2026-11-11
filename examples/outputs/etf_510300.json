@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-98f75e9067003992",
-  "generated_at": "2026-11-11T13:44:57+08:00",
+  "analysis_id": "analysis-5b2658f67fe62eaa",
+  "generated_at": "2026-11-11T14:40:37+08:00",
   "instrument": {
     "instrument_id": "ETF:510300.SH",
     "display_name": "沪深300ETF华泰柏瑞",
@@ -188,24 +188,10 @@
   ],
   "missing_data": [
     {
-      "fact_id": "etf.nav_disclosed_at",
-      "metric": "nav_disclosure_time",
-      "status": "missing",
-      "note": "所有已核实免费接口都不提供净值披露时间，无法确认收盘时是否已知当日净值",
-      "period": "2026-11-10"
-    },
-    {
       "fact_id": "etf.premium_discount_pct",
       "metric": "premium_discount_pct",
       "status": "missing",
       "note": "净值披露时间缺失，按设计书要求不计算日终折溢价",
-      "period": "2026-11-10"
-    },
-    {
-      "fact_id": "etf.trading_status",
-      "metric": "trading_status",
-      "status": "missing",
-      "note": "未取得交易所停复牌状态字段；仅能确认当日有行情",
       "period": "2026-11-10"
     }
   ],
@@ -295,7 +281,7 @@
       }
     }
   },
-  "code_version": "phase1-0.1.2",
-  "policy_version": "unapproved-phase1",
-  "model_version": "none"
+  "code_version": "phase2-0.2.0",
+  "policy_version": "unapproved-phase2",
+  "model_version": "equity-research-0.2.0"
 }

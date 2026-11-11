@@ -15,25 +15,44 @@ def test_no_input_ever_yields_candidate(query, analyzer):
     assert validate_result(result) == []
 
 
-def test_equity_result_is_unsupported_with_facts(analyzer):
+def test_equity_result_reports_facts_without_becoming_a_buy_point(analyzer):
+    """阶段二起个股模型已实现：缺研究假设时停在资料不足，但仍如实展示事实。"""
     result = analyzer.analyze("工商银行")
-    assert result.analysis_status == AnalysisStatus.UNSUPPORTED.value
-    assert "MODEL_NOT_IMPLEMENTED_EQUITY" in result.reason_codes
-    assert result.model_status is None
-    assert result.valuation_state == ValuationState.UNKNOWN.value
+    assert result.analysis_status == AnalysisStatus.INSUFFICIENT_DATA.value
+    assert result.model_status is None, "没有执行模型时不得声称模型已运行"
+    assert result.decision == Decision.UNDETERMINED.value
+    assert result.valuation_state in (
+        ValuationState.UNKNOWN.value,
+        ValuationState.NOT_APPLICABLE.value,
+    )
     assert result.snapshot_id is not None
     payload = result.payload
     assert payload["payload_type"] == "equity"
     assert payload["valuation"] is None
+    assert payload["research_valuation"] is None
     assert payload["financial_periods"], "应展示财报报告期"
     assert payload["dividend_records"], "应展示按财年归集的分红"
 
 
 def test_equity_dividends_carry_fiscal_year_and_status(analyzer):
     result = analyzer.analyze("工商银行")
-    for record in result.payload["dividend_records"]:
-        assert record["period"], "每条分红必须标注所属财年"
-        assert "实施状态" in record["notes"]
+    summary = result.payload["dividend_summary"]
+    assert summary is not None
+    assert summary["fiscal_years"], "应按财年归集"
+    for entry in summary["fiscal_years"]:
+        assert entry["fiscal_year"] >= 1990
+        for component in entry["components"]:
+            assert component["kind"], "每条分红必须标注中期/年度/特别类型"
+            assert component["status"], "每条分红必须标注实施状态"
+            assert component["per_share"] > 0
+    # 中期与年度分配相加，不重复计入
+    fy2024 = next(e for e in summary["fiscal_years"] if e["fiscal_year"] == 2024)
+    kinds = {c["kind"] for c in fy2024["components"]}
+    assert kinds == {"中期分红", "年度分红"}
+    assert fy2024["ordinary_dps"] == pytest.approx(0.308, abs=1e-6)
+    # 财年合计与「过去十二个月实际支付」分开标注
+    assert summary["ltm_paid_per_share"] is not None
+    assert summary["ltm_paid_per_share"] != fy2024["ordinary_dps"]
 
 
 def test_index_result_carries_level_without_currency(analyzer):

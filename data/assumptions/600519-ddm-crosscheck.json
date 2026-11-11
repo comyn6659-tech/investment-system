@@ -1,0 +1,90 @@
+{
+  "schema_version": "assumption-set/1",
+  "instrument_id": "EQUITY:600519.SH",
+  "model_id": "equity_dividend_discount",
+  "model_version": "0.2.0-research",
+  "applicable_as_of": "2026-11-10",
+  "base_fiscal_year": 2025,
+  "horizon_years": 5,
+  "discount_rate": {
+    "value": 0.074,
+    "provenance": {
+      "kind": "derivation",
+      "source": "股权成本 = 无风险利率 1.5965% + 股权风险溢价 5.0% + 公司特定溢价 0.8%；与主模型一致以便两条路线可比（该标的无有息负债，WACC≈股权成本）",
+      "detail": "与 FCFF 主模型使用同一折现率，便于交叉检查",
+      "evidence_ids": []
+    },
+    "build_up": {
+      "risk_free_pct": 1.5965,
+      "equity_risk_premium_pct": 5.0,
+      "company_specific_premium_pct": 0.8
+    }
+  },
+  "terminal": {
+    "method": "growing_perpetuity",
+    "growth": 0.02,
+    "basis": "末期（2030 年）每股分配 × (1+g) 作为永续首期",
+    "provenance": {
+      "kind": "research_hypothesis",
+      "source": "与主模型一致的长期名义增长参照 2.0%",
+      "detail": "",
+      "evidence_ids": []
+    }
+  },
+  "scenarios": {
+    "base": {
+      "note": "交叉检查用：派息率维持 2025 财年的 78.9%，每股收益路径与 FCFF 主模型收入路径一致",
+      "drivers": {
+        "eps_growth": [
+          -0.0025,
+          0.04,
+          0.04,
+          0.035,
+          0.03
+        ],
+        "payout": [
+          0.789,
+          0.789,
+          0.789,
+          0.789,
+          0.789
+        ],
+        "roe": 0.3365
+      },
+      "terminal_growth": 0.02
+    }
+  },
+  "provenance": {
+    "eps_growth": {
+      "kind": "derivation",
+      "source": "2026 年取已披露前三季度归母净利润同比 −0.25%；其后与 FCFF 主模型的收入路径保持一致的个位数增长",
+      "detail": "两条路线使用相近的经营增长假设，否则交叉检查没有意义",
+      "evidence_ids": []
+    },
+    "payout": {
+      "kind": "observed_data",
+      "source": "2025 财年归属分配 = 年度分红 28.02423 元/股 + 季度分红 23.957 元/股 = 51.98 元/股；除以基本每股收益对应的 65.85 元（归母净利润 823.20 亿 / 当前总股本 12.50 亿股）= 78.9%",
+      "detail": "特别分红不进入该序列",
+      "evidence_ids": []
+    },
+    "roe": {
+      "kind": "observed_data",
+      "source": "2025 年归母净利润 823.20 亿 / 归母权益 2446.38 亿 = 33.65%",
+      "detail": "用于校验终值增长不超过 ROE×留存率",
+      "evidence_ids": []
+    }
+  },
+  "extras": {
+    "growth_consistency_tolerance": 0.0,
+    "sensitivity": {
+      "eps_growth": 0.01,
+      "payout": 0.05,
+      "discount_rate": 0.005,
+      "terminal_growth": 0.005
+    }
+  },
+  "status": "research_pending_approval",
+  "policy_version": "unapproved-phase2",
+  "created_at": "2026-11-11T14:20:00+08:00",
+  "notes": "交叉检查路线：只用于与 FCFF 主模型对照，不单独作为主模型输出。"
+}

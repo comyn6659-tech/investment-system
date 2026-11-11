@@ -1,0 +1,7 @@
+{
+  "query": "600519",
+  "intent": "buy_point_check",
+  "assumptions": "data/assumptions/600519-fcff-base.json",
+  "cross_check_assumptions": "data/assumptions/600519-ddm-crosscheck.json",
+  "note": "阶段二样本：非金融公司 FCFF 研究估值（主）+ 股息折现交叉检查"
+}

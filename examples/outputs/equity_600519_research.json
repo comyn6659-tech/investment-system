@@ -1,0 +1,5152 @@
+{
+  "schema_version": "analysis-result/1",
+  "analysis_id": "analysis-59341b7c872b7269",
+  "generated_at": "2026-11-11T14:40:36+08:00",
+  "instrument": {
+    "instrument_id": "EQUITY:600519.SH",
+    "display_name": "贵州茅台",
+    "asset_class": "equity",
+    "code": "600519",
+    "market": "CN",
+    "venue": "SSE",
+    "venue_type": "exchange",
+    "currency": "CNY",
+    "aliases": [],
+    "vendor_codes": [],
+    "index_class": null,
+    "etf_strategy": null,
+    "region": "domestic",
+    "underlying_index_id": null,
+    "scope": {
+      "status": "in_scope",
+      "reason_code": "DOMESTIC_A_SHARE",
+      "detail": "境内A股个股（交易所清单）"
+    },
+    "in_first_batch": false,
+    "data_coverage_verified": false,
+    "evidence": [
+      {
+        "evidence_id": "ev-cn-a-equity-list",
+        "kind": "exchange_list",
+        "publisher": "上海证券交易所 / 深圳证券交易所 / 北京证券交易所（经 AKShare 采集）",
+        "url": null,
+        "retrieved_at": "2026-11-11T02:24:42+08:00",
+        "fields_cited": [
+          "证券代码",
+          "证券简称",
+          "板块",
+          "上市日期"
+        ],
+        "note": "三个交易所清单均取到"
+      }
+    ],
+    "valid_from": "2001-08-27",
+    "valid_to": null,
+    "raw_input": "600519",
+    "identity_source": ""
+  },
+  "instrument_id": "EQUITY:600519.SH",
+  "intent": "buy_point_check",
+  "identity": {
+    "status": "resolved",
+    "raw_input": "600519",
+    "matched_by": "exact_code",
+    "candidates": [],
+    "reason_codes": [
+      "DOMESTIC_A_SHARE"
+    ],
+    "clarification_question": null
+  },
+  "snapshot_id": "snap-791670f4b3c68cab",
+  "as_of": "2026-11-10",
+  "available_at": "2026-11-10T15:00:00+08:00",
+  "analysis_status": "complete",
+  "model_status": "research",
+  "valuation_state": "unknown",
+  "decision": "undetermined",
+  "reason_codes": [
+    "MODEL_RESEARCH_VALUATION",
+    "RESEARCH_PARAMETERS_UNAPPROVED",
+    "SPECIAL_DIVIDEND_SEPARATED",
+    "RESEARCH_SIGNAL_ONLY"
+  ],
+  "model_plan": {
+    "primary_model": "equity_dcf_fcff",
+    "model_version": "0.2.0-research",
+    "model_status": "research",
+    "cross_check_model": "equity_dividend_discount",
+    "required_checks": [
+      "FCFF 与经营现金流勾稽差额在容差内",
+      "权益桥接每项只计一次",
+      "末期现金流为正才启用永续终值"
+    ],
+    "selection_reason": "未命中金融、控股、困境或明显周期规则；资本开支强度 1.8% < 10% 且 FCFF/归母净利润 0.72 ≥ 0.70：自由现金流本身就是可分配来源，用 FCFF 作主模型，股息折现作交叉检查",
+    "not_selected": [
+      {
+        "model_id": "equity_dividend_discount",
+        "reason_code": "MODEL_CROSS_CHECK_ONLY",
+        "reason": "作为交叉检查模型：本标的资本开支轻、现金转化高，分配路径主要由自由现金流决定，股息折现提供一致性检验"
+      }
+    ],
+    "candidate_models": [
+      {
+        "model_id": "equity_dividend_discount",
+        "reason_code": "MODEL_CROSS_CHECK_ONLY",
+        "reason": "作为交叉检查模型：本标的资本开支轻、现金转化高，分配路径主要由自由现金流决定，股息折现提供一致性检验"
+      }
+    ],
+    "family": "non_financial",
+    "family_label": "非金融企业",
+    "applicable_model_category": null,
+    "evidence_id": "biz-75d7c90bb5903b40",
+    "evidence_version": "2026-11-10",
+    "selection_policy_version": "model-applicability/1",
+    "applicability": {
+      "status": "selected",
+      "family": "non_financial",
+      "family_label": "非金融企业",
+      "primary_model": "equity_dcf_fcff",
+      "cross_check_model": "equity_dividend_discount",
+      "applicable_model_category": null,
+      "required_evidence_to_implement": [],
+      "reasons": [
+        {
+          "signal": "default_non_financial",
+          "observed": {
+            "industry": "白酒Ⅱ",
+            "top_segments": [
+              "茅台酒",
+              "系列酒"
+            ],
+            "revenue_growth_stdev": 0.060541583855155706,
+            "max_revenue_drawdown": 0.012000971769185173,
+            "cyclical_industry_clue": false
+          },
+          "conclusion": "non_financial",
+          "note": "未命中金融、控股、困境或明显周期规则"
+        },
+        {
+          "signal": "capital_intensity_and_cash_conversion",
+          "observed": {
+            "capex_intensity": 0.018177966172148584,
+            "cash_conversion_fcff_over_profit": 0.7162483445250187,
+            "payout_mean_3y": 0.6844147722756212,
+            "thresholds": {
+              "fcff_capex_intensity_max": 0.1,
+              "fcff_cash_conversion_min": 0.7,
+              "dividend_payout_min": 0.55
+            }
+          },
+          "conclusion": "fcff_primary",
+          "note": "资本开支强度 1.8% < 10% 且 FCFF/归母净利润 0.72 ≥ 0.70：自由现金流本身就是可分配来源，用 FCFF 作主模型，股息折现作交叉检查"
+        }
+      ],
+      "rejected_models": [
+        {
+          "model_id": "equity_dividend_discount",
+          "reason_code": "MODEL_CROSS_CHECK_ONLY",
+          "reason": "作为交叉检查模型：本标的资本开支轻、现金转化高，分配路径主要由自由现金流决定，股息折现提供一致性检验"
+        }
+      ],
+      "indicators": {
+        "industry": "白酒Ⅱ",
+        "top_segments": [
+          {
+            "segment": "茅台酒",
+            "revenue_share": 0.862219
+          },
+          {
+            "segment": "系列酒",
+            "revenue_share": 0.137195
+          }
+        ],
+        "revenue_growth_stdev": 0.060541583855155706,
+        "max_revenue_drawdown": 0.012000971769185173,
+        "loss_years": [],
+        "annual_years_observed": 8,
+        "capex_intensity": 0.018177966172148584,
+        "cash_conversion": 0.7162483445250187,
+        "payout_latest": 0.7893674228919949,
+        "payout_mean_3y": 0.6844147722756212,
+        "dividend_years_observed": 3,
+        "dividend_stability_cv": 0.1753138107589492
+      },
+      "evidence_id": "biz-75d7c90bb5903b40",
+      "evidence_version": "2026-11-10",
+      "policy": {
+        "policy_version": "model-applicability/1",
+        "status": "research_candidate_pending_approval",
+        "revenue_volatility_cyclical": 0.08,
+        "revenue_drawdown_cyclical": 0.15,
+        "cyclical_industries": [
+          "煤炭",
+          "钢铁",
+          "有色",
+          "化工",
+          "航运",
+          "港口",
+          "房地产",
+          "水泥",
+          "建材",
+          "工程机械",
+          "养殖",
+          "石油",
+          "航空"
+        ],
+        "fcff_capex_intensity_max": 0.1,
+        "fcff_cash_conversion_min": 0.7,
+        "dividend_payout_min": 0.55,
+        "notes": [
+          "阈值是研究起点，不是已批准政策；提高或降低门槛会改变主模型但不改变已算出的价值。",
+          "判定只读业务证据与经营指标，不读当前股价。"
+        ]
+      }
+    }
+  },
+  "assumptions": [
+    {
+      "role": "primary",
+      "assumption_id": "assump-489b99582aab805c",
+      "model_id": "equity_dcf_fcff",
+      "model_version": "0.2.0-research",
+      "status": "research_pending_approval",
+      "policy_version": "unapproved-phase2",
+      "base_fiscal_year": 2025,
+      "applicable_as_of": "2026-11-10",
+      "horizon_years": 5,
+      "discount_rate": 0.074,
+      "discount_rate_kind": "derivation",
+      "discount_rate_source": "WACC 构建：无风险利率 1.5965% + 股权风险溢价 5.0% + 公司特定溢价 0.8% ≈ 7.4%；有息负债几乎为零（仅租赁负债 2.34 亿元），债务权重可忽略，WACC≈股权成本",
+      "terminal": {
+        "method": "growing_perpetuity",
+        "growth": 0.02,
+        "basis": "末期（2030 年）FCFF × (1+g) 作为永续首期；g 取 2.0% 作为长期名义增长参照（研究假设）",
+        "provenance": {
+          "kind": "research_hypothesis",
+          "source": "长期名义增长参照：以长期通胀中枢约 2% 作为上限，不高于可持续增长 ROE×留存率（约 7.1%）",
+          "evidence_ids": [],
+          "detail": "终值增长未使用历史收入增速，避免把高增长期永续化"
+        }
+      },
+      "scenarios": [
+        "bear",
+        "base",
+        "bull"
+      ],
+      "source_path": "data/assumptions/600519-fcff-base.json",
+      "notes": "主模型：资本开支轻（约 1.8% 收入）、现金转化高（历史 FCFF/归母净利润 0.71–1.02），自由现金流本身就是可分配来源。absent_as_zero 表示资产负债表未列出的借款科目按「无该项」处理；该标的唯一有息负债为租赁负债，利息费用与其对应。"
+    },
+    {
+      "role": "cross_check",
+      "assumption_id": "assump-37be4516f09a996d",
+      "model_id": "equity_dividend_discount",
+      "model_version": "0.2.0-research",
+      "status": "research_pending_approval",
+      "policy_version": "unapproved-phase2",
+      "base_fiscal_year": 2025,
+      "applicable_as_of": "2026-11-10",
+      "horizon_years": 5,
+      "discount_rate": 0.074,
+      "discount_rate_kind": "derivation",
+      "discount_rate_source": "股权成本 = 无风险利率 1.5965% + 股权风险溢价 5.0% + 公司特定溢价 0.8%；与主模型一致以便两条路线可比（该标的无有息负债，WACC≈股权成本）",
+      "terminal": {
+        "method": "growing_perpetuity",
+        "growth": 0.02,
+        "basis": "末期（2030 年）每股分配 × (1+g) 作为永续首期",
+        "provenance": {
+          "kind": "research_hypothesis",
+          "source": "与主模型一致的长期名义增长参照 2.0%",
+          "evidence_ids": [],
+          "detail": ""
+        }
+      },
+      "scenarios": [
+        "base"
+      ],
+      "source_path": "data/assumptions/600519-ddm-crosscheck.json",
+      "notes": "交叉检查路线：只用于与 FCFF 主模型对照，不单独作为主模型输出。"
+    }
+  ],
+  "model_results": [
+    {
+      "result_type": "research_valuation",
+      "model_id": "equity_dcf_fcff",
+      "model_version": "0.2.0-research",
+      "model_status": "research",
+      "assumption_id": "assump-489b99582aab805c",
+      "headline_value_per_share": 1341.1280337369838,
+      "scenario_count": 3,
+      "cross_check_model": "equity_dividend_discount"
+    }
+  ],
+  "conditions": [
+    "研究估值只在所附假设成立时成立；假设与参数未经设计方批准，不得当作正式买点。",
+    "估值以快照中的合并报表数据为基准，未经审计调整或重述核对。"
+  ],
+  "invalidation": [
+    "若 2025 年报数据被更正（重述），本次研究估值需要重算。",
+    "若折现率、终值增长或分配路径的研究假设被修订，结论随之改变。",
+    "若公司业务结构发生变化（新增金融子公司、重大并购或剥离），适用性需要重新判定。"
+  ],
+  "evidence_refs": [
+    {
+      "evidence_id": "ev-cn-a-equity-list",
+      "kind": "exchange_list",
+      "publisher": "上海证券交易所 / 深圳证券交易所 / 北京证券交易所（经 AKShare 采集）",
+      "url": null,
+      "retrieved_at": "2026-11-11T02:24:42+08:00",
+      "fields_cited": [
+        "证券代码",
+        "证券简称",
+        "板块",
+        "上市日期"
+      ],
+      "note": "三个交易所清单均取到"
+    },
+    {
+      "evidence_id": "ev-em-stock-info",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://quote.eastmoney.com/",
+      "retrieved_at": "2026-11-11T14:18:41+08:00",
+      "fields_cited": [
+        "股票简称",
+        "行业",
+        "上市时间",
+        "总股本"
+      ],
+      "note": "行业分类只是模型选择的线索之一，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-11T14:18:41+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-11T14:18:41+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    },
+    {
+      "evidence_id": "cninfo.dividend",
+      "kind": "vendor_api",
+      "publisher": "巨潮资讯",
+      "url": "https://webapi.cninfo.com.cn/#/company",
+      "retrieved_at": "2026-11-11T14:31:27+08:00",
+      "fields_cited": [],
+      "note": "AKShare stock_dividend_cninfo"
+    },
+    {
+      "evidence_id": "sina.dividend_detail",
+      "kind": "vendor_api",
+      "publisher": "新浪财经",
+      "url": "https://vip.stock.finance.sina.com.cn/corp/go.php/vISSUE_ShareBonus/stockid/600519.phtml",
+      "retrieved_at": "2026-11-11T14:31:27+08:00",
+      "fields_cited": [],
+      "note": "AKShare stock_history_dividend_detail"
+    },
+    {
+      "evidence_id": "em.cash_flow_sheet",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-11T14:31:27+08:00",
+      "fields_cited": [],
+      "note": "AKShare stock_cash_flow_sheet_by_report_em"
+    },
+    {
+      "evidence_id": "em.balance_sheet",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-11T14:31:27+08:00",
+      "fields_cited": [],
+      "note": "AKShare stock_balance_sheet_by_report_em"
+    },
+    {
+      "evidence_id": "em.profit_sheet",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-11T14:31:27+08:00",
+      "fields_cited": [],
+      "note": "AKShare stock_profit_sheet_by_report_em"
+    },
+    {
+      "evidence_id": "em.stock_zh_a_hist",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://quote.eastmoney.com/",
+      "retrieved_at": "2026-11-11T14:31:27+08:00",
+      "fields_cited": [],
+      "note": "AKShare stock_zh_a_hist（不复权日线）"
+    },
+    {
+      "evidence_id": "em.stock_individual_info",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "url": "https://quote.eastmoney.com/",
+      "retrieved_at": "2026-11-11T14:31:27+08:00",
+      "fields_cited": [],
+      "note": "AKShare stock_individual_info_em"
+    }
+  ],
+  "missing_data": [],
+  "warnings": [
+    "特别分红（含所属财年缺失的记录）单列，未进入可持续 DPS 序列：21.9100 元/股、19.1060 元/股",
+    "1 条非现金分红类型（如股改分红）未计入 DPS"
+  ],
+  "clarification": null,
+  "payload": {
+    "payload_type": "equity",
+    "company_facts": {
+      "industry": {
+        "fact_id": "profile.industry",
+        "metric": "industry",
+        "status": "known",
+        "value": "白酒Ⅱ",
+        "unit": null,
+        "currency": null,
+        "period": null,
+        "available_at": null,
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "em.stock_individual_info",
+          "publisher": "东方财富",
+          "interface": "AKShare stock_individual_info_em",
+          "url": "https://quote.eastmoney.com/",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "含总股本、流通股、行业、上市时间（当前快照值，无历史版本）"
+        },
+        "transform": "个股信息当前值",
+        "restated": false,
+        "notes": "当前快照值，无历史版本；可获得时间未知",
+        "conflict_values": []
+      },
+      "listing_date": {
+        "fact_id": "profile.listing_date",
+        "metric": "listing_date",
+        "status": "known",
+        "value": "2001-08-27",
+        "unit": null,
+        "currency": null,
+        "period": null,
+        "available_at": null,
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "em.stock_individual_info",
+          "publisher": "东方财富",
+          "interface": "AKShare stock_individual_info_em",
+          "url": "https://quote.eastmoney.com/",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "含总股本、流通股、行业、上市时间（当前快照值，无历史版本）"
+        },
+        "transform": "个股信息『上市时间』，统一为 YYYY-MM-DD",
+        "restated": false,
+        "notes": "",
+        "conflict_values": []
+      },
+      "security_name": {
+        "fact_id": "profile.name",
+        "metric": "security_name",
+        "status": "known",
+        "value": "贵州茅台",
+        "unit": null,
+        "currency": null,
+        "period": null,
+        "available_at": null,
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "em.stock_individual_info",
+          "publisher": "东方财富",
+          "interface": "AKShare stock_individual_info_em",
+          "url": "https://quote.eastmoney.com/",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "含总股本、流通股、行业、上市时间（当前快照值，无历史版本）"
+        },
+        "transform": "个股信息当前值",
+        "restated": false,
+        "notes": "当前快照值，无历史版本；可获得时间未知",
+        "conflict_values": []
+      },
+      "total_shares": {
+        "fact_id": "profile.total_shares",
+        "metric": "total_shares",
+        "status": "known",
+        "value": 1250081601.0,
+        "unit": "shares",
+        "currency": null,
+        "period": null,
+        "available_at": null,
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "em.stock_individual_info",
+          "publisher": "东方财富",
+          "interface": "AKShare stock_individual_info_em",
+          "url": "https://quote.eastmoney.com/",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "含总股本、流通股、行业、上市时间（当前快照值，无历史版本）"
+        },
+        "transform": "个股信息『总股本』",
+        "restated": false,
+        "notes": "当前总股本（A股总股本），用于把股权价值换算为每股价值；未标注股本变动生效日，抓取时间 2026-11-11T14:31:27+08:00",
+        "conflict_values": []
+      }
+    },
+    "financial_periods": [
+      {
+        "period": "2026-09-30",
+        "notice_date": "2026-10-31",
+        "facts": {
+          "capex": {
+            "fact_id": "fin.2026-09-30.capex",
+            "metric": "capex",
+            "status": "known",
+            "value": 1449998414.96,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-09-30",
+            "available_at": "2026-10-31",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产、无形资产和其他长期资产支付的现金）",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "cash_and_equivalents": {
+            "fact_id": "fin.2026-09-30.cash",
+            "metric": "cash_and_equivalents",
+            "status": "known",
+            "value": 49926813769.81,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-09-30",
+            "available_at": "2026-10-31",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『MONETARYFUNDS』（货币资金）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          },
+          "depreciation": {
+            "fact_id": "fin.2026-09-30.depreciation",
+            "metric": "depreciation",
+            "status": "missing",
+            "value": null,
+            "unit": null,
+            "currency": null,
+            "period": "2026-09-30",
+            "available_at": "2026-10-31",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『FA_IR_DEPR』（固定资产折旧、油气资产折耗、生产性生物资产折旧）",
+            "restated": false,
+            "notes": "来源返回空值，不用 0 代替",
+            "conflict_values": []
+          },
+          "basic_eps": {
+            "fact_id": "fin.2026-09-30.eps_basic",
+            "metric": "basic_eps",
+            "status": "known",
+            "value": 51.53,
+            "unit": "CNY_per_share",
+            "currency": "CNY",
+            "period": "2026-09-30",
+            "available_at": "2026-10-31",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『BASIC_EPS』（基本每股收益（元/股））",
+            "restated": false,
+            "notes": "公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "equity_parent": {
+            "fact_id": "fin.2026-09-30.equity_parent",
+            "metric": "equity_parent",
+            "status": "known",
+            "value": 271204740541.63,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-09-30",
+            "available_at": "2026-10-31",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『TOTAL_PARENT_EQUITY』（归属于母公司股东权益合计）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          },
+          "income_tax": {
+            "fact_id": "fin.2026-09-30.income_tax",
+            "metric": "income_tax",
+            "status": "known",
+            "value": 22300518753.59,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-09-30",
+            "available_at": "2026-10-31",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『INCOME_TAX』（所得税费用（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "net_profit": {
+            "fact_id": "fin.2026-09-30.net_profit",
+            "metric": "net_profit",
+            "status": "known",
+            "value": 66717143218.04,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-09-30",
+            "available_at": "2026-10-31",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『NETPROFIT』（净利润（合并，含少数股东损益））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "net_profit_parent": {
+            "fact_id": "fin.2026-09-30.net_profit_parent",
+            "metric": "net_profit_parent",
+            "status": "known",
+            "value": 64467425981.95,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-09-30",
+            "available_at": "2026-10-31",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『PARENT_NETPROFIT』（归属于母公司股东的净利润）",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "operating_cash_flow": {
+            "fact_id": "fin.2026-09-30.ocf",
+            "metric": "operating_cash_flow",
+            "status": "known",
+            "value": 84058979832.29,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-09-30",
+            "available_at": "2026-10-31",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『NETCASH_OPERATE』（经营活动产生的现金流量净额（合并））",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "operating_profit": {
+            "fact_id": "fin.2026-09-30.operating_profit",
+            "metric": "operating_profit",
+            "status": "known",
+            "value": 88979846257.79,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-09-30",
+            "available_at": "2026-10-31",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『OPERATE_PROFIT』（营业利润（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "pretax_profit": {
+            "fact_id": "fin.2026-09-30.pretax_profit",
+            "metric": "pretax_profit",
+            "status": "known",
+            "value": 89017661971.63,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-09-30",
+            "available_at": "2026-10-31",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『TOTAL_PROFIT』（利润总额（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "total_operating_revenue": {
+            "fact_id": "fin.2026-09-30.revenue",
+            "metric": "total_operating_revenue",
+            "status": "known",
+            "value": 133283652508.95,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-09-30",
+            "available_at": "2026-10-31",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『TOTAL_OPERATE_INCOME』（营业总收入（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "total_assets": {
+            "fact_id": "fin.2026-09-30.total_assets",
+            "metric": "total_assets",
+            "status": "known",
+            "value": 318304891882.72,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-09-30",
+            "available_at": "2026-10-31",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『TOTAL_ASSETS』（资产总计）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          }
+        }
+      },
+      {
+        "period": "2026-06-30",
+        "notice_date": "2026-08-15",
+        "facts": {
+          "capex": {
+            "fact_id": "fin.2026-06-30.capex",
+            "metric": "capex",
+            "status": "known",
+            "value": 832142752.28,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-06-30",
+            "available_at": "2026-08-15",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产、无形资产和其他长期资产支付的现金）",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "cash_and_equivalents": {
+            "fact_id": "fin.2026-06-30.cash",
+            "metric": "cash_and_equivalents",
+            "status": "known",
+            "value": 53518798979.08,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-06-30",
+            "available_at": "2026-08-15",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『MONETARYFUNDS』（货币资金）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          },
+          "depreciation": {
+            "fact_id": "fin.2026-06-30.depreciation",
+            "metric": "depreciation",
+            "status": "known",
+            "value": 1019596188.09,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-06-30",
+            "available_at": "2026-08-15",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『FA_IR_DEPR』（固定资产折旧、油气资产折耗、生产性生物资产折旧）",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "basic_eps": {
+            "fact_id": "fin.2026-06-30.eps_basic",
+            "metric": "basic_eps",
+            "status": "known",
+            "value": 35.57,
+            "unit": "CNY_per_share",
+            "currency": "CNY",
+            "period": "2026-06-30",
+            "available_at": "2026-08-15",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『BASIC_EPS』（基本每股收益（元/股））",
+            "restated": false,
+            "notes": "公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "equity_parent": {
+            "fact_id": "fin.2026-06-30.equity_parent",
+            "metric": "equity_parent",
+            "status": "known",
+            "value": 251253594419.5,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-06-30",
+            "available_at": "2026-08-15",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『TOTAL_PARENT_EQUITY』（归属于母公司股东权益合计）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          },
+          "income_tax": {
+            "fact_id": "fin.2026-06-30.income_tax",
+            "metric": "income_tax",
+            "status": "known",
+            "value": 15405088610.51,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-06-30",
+            "available_at": "2026-08-15",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『INCOME_TAX』（所得税费用（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "net_profit": {
+            "fact_id": "fin.2026-06-30.net_profit",
+            "metric": "net_profit",
+            "status": "known",
+            "value": 46033330566.78,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-06-30",
+            "available_at": "2026-08-15",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『NETPROFIT』（净利润（合并，含少数股东损益））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "net_profit_parent": {
+            "fact_id": "fin.2026-06-30.net_profit_parent",
+            "metric": "net_profit_parent",
+            "status": "known",
+            "value": 44516880421.86,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-06-30",
+            "available_at": "2026-08-15",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『PARENT_NETPROFIT』（归属于母公司股东的净利润）",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "operating_cash_flow": {
+            "fact_id": "fin.2026-06-30.ocf",
+            "metric": "operating_cash_flow",
+            "status": "known",
+            "value": 70690750119.06,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-06-30",
+            "available_at": "2026-08-15",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『NETCASH_OPERATE』（经营活动产生的现金流量净额（合并））",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "operating_profit": {
+            "fact_id": "fin.2026-06-30.operating_profit",
+            "metric": "operating_profit",
+            "status": "known",
+            "value": 61411291686.27,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-06-30",
+            "available_at": "2026-08-15",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『OPERATE_PROFIT』（营业利润（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "pretax_profit": {
+            "fact_id": "fin.2026-06-30.pretax_profit",
+            "metric": "pretax_profit",
+            "status": "known",
+            "value": 61438419177.29,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-06-30",
+            "available_at": "2026-08-15",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『TOTAL_PROFIT』（利润总额（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "total_operating_revenue": {
+            "fact_id": "fin.2026-06-30.revenue",
+            "metric": "total_operating_revenue",
+            "status": "known",
+            "value": 92278072083.21,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-06-30",
+            "available_at": "2026-08-15",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『TOTAL_OPERATE_INCOME』（营业总收入（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "total_assets": {
+            "fact_id": "fin.2026-06-30.total_assets",
+            "metric": "total_assets",
+            "status": "known",
+            "value": 309050784569.31,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-06-30",
+            "available_at": "2026-08-15",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『TOTAL_ASSETS』（资产总计）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          }
+        }
+      },
+      {
+        "period": "2026-03-31",
+        "notice_date": "2026-04-25",
+        "facts": {
+          "capex": {
+            "fact_id": "fin.2026-03-31.capex",
+            "metric": "capex",
+            "status": "known",
+            "value": 604791583.89,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-03-31",
+            "available_at": "2026-04-25",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产、无形资产和其他长期资产支付的现金）",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "cash_and_equivalents": {
+            "fact_id": "fin.2026-03-31.cash",
+            "metric": "cash_and_equivalents",
+            "status": "known",
+            "value": 48786691397.55,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-03-31",
+            "available_at": "2026-04-25",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『MONETARYFUNDS』（货币资金）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          },
+          "depreciation": {
+            "fact_id": "fin.2026-03-31.depreciation",
+            "metric": "depreciation",
+            "status": "missing",
+            "value": null,
+            "unit": null,
+            "currency": null,
+            "period": "2026-03-31",
+            "available_at": "2026-04-25",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『FA_IR_DEPR』（固定资产折旧、油气资产折耗、生产性生物资产折旧）",
+            "restated": false,
+            "notes": "来源返回空值，不用 0 代替",
+            "conflict_values": []
+          },
+          "basic_eps": {
+            "fact_id": "fin.2026-03-31.eps_basic",
+            "metric": "basic_eps",
+            "status": "known",
+            "value": 21.76,
+            "unit": "CNY_per_share",
+            "currency": "CNY",
+            "period": "2026-03-31",
+            "available_at": "2026-04-25",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『BASIC_EPS』（基本每股收益（元/股））",
+            "restated": false,
+            "notes": "公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "equity_parent": {
+            "fact_id": "fin.2026-03-31.equity_parent",
+            "metric": "equity_parent",
+            "status": "known",
+            "value": 270894035676.27,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-03-31",
+            "available_at": "2026-04-25",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『TOTAL_PARENT_EQUITY』（归属于母公司股东权益合计）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          },
+          "income_tax": {
+            "fact_id": "fin.2026-03-31.income_tax",
+            "metric": "income_tax",
+            "status": "known",
+            "value": 9389418154.13,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-03-31",
+            "available_at": "2026-04-25",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『INCOME_TAX』（所得税费用（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "net_profit": {
+            "fact_id": "fin.2026-03-31.net_profit",
+            "metric": "net_profit",
+            "status": "known",
+            "value": 28153831489.89,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-03-31",
+            "available_at": "2026-04-25",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『NETPROFIT』（净利润（合并，含少数股东损益））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "net_profit_parent": {
+            "fact_id": "fin.2026-03-31.net_profit_parent",
+            "metric": "net_profit_parent",
+            "status": "known",
+            "value": 27242512886.45,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-03-31",
+            "available_at": "2026-04-25",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『PARENT_NETPROFIT』（归属于母公司股东的净利润）",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "operating_cash_flow": {
+            "fact_id": "fin.2026-03-31.ocf",
+            "metric": "operating_cash_flow",
+            "status": "known",
+            "value": 26909891269.13,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-03-31",
+            "available_at": "2026-04-25",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『NETCASH_OPERATE』（经营活动产生的现金流量净额（合并））",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "operating_profit": {
+            "fact_id": "fin.2026-03-31.operating_profit",
+            "metric": "operating_profit",
+            "status": "known",
+            "value": 37537008686.42,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-03-31",
+            "available_at": "2026-04-25",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『OPERATE_PROFIT』（营业利润（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "pretax_profit": {
+            "fact_id": "fin.2026-03-31.pretax_profit",
+            "metric": "pretax_profit",
+            "status": "known",
+            "value": 37543249644.02,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-03-31",
+            "available_at": "2026-04-25",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『TOTAL_PROFIT』（利润总额（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "total_operating_revenue": {
+            "fact_id": "fin.2026-03-31.revenue",
+            "metric": "total_operating_revenue",
+            "status": "known",
+            "value": 54702912385.23,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-03-31",
+            "available_at": "2026-04-25",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『TOTAL_OPERATE_INCOME』（营业总收入（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "total_assets": {
+            "fact_id": "fin.2026-03-31.total_assets",
+            "metric": "total_assets",
+            "status": "known",
+            "value": 319918844905.58,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2026-03-31",
+            "available_at": "2026-04-25",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『TOTAL_ASSETS』（资产总计）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          }
+        }
+      },
+      {
+        "period": "2025-12-31",
+        "notice_date": "2026-04-17",
+        "facts": {
+          "capex": {
+            "fact_id": "fin.2025-12-31.capex",
+            "metric": "capex",
+            "status": "known",
+            "value": 3127594916.41,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-12-31",
+            "available_at": "2026-04-17",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产、无形资产和其他长期资产支付的现金）",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "cash_and_equivalents": {
+            "fact_id": "fin.2025-12-31.cash",
+            "metric": "cash_and_equivalents",
+            "status": "known",
+            "value": 51690610946.5,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-12-31",
+            "available_at": "2026-04-17",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『MONETARYFUNDS』（货币资金）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          },
+          "depreciation": {
+            "fact_id": "fin.2025-12-31.depreciation",
+            "metric": "depreciation",
+            "status": "known",
+            "value": 1893338311.91,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-12-31",
+            "available_at": "2026-04-17",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『FA_IR_DEPR』（固定资产折旧、油气资产折耗、生产性生物资产折旧）",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "basic_eps": {
+            "fact_id": "fin.2025-12-31.eps_basic",
+            "metric": "basic_eps",
+            "status": "known",
+            "value": 65.66,
+            "unit": "CNY_per_share",
+            "currency": "CNY",
+            "period": "2025-12-31",
+            "available_at": "2026-04-17",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『BASIC_EPS』（基本每股收益（元/股））",
+            "restated": false,
+            "notes": "公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "equity_parent": {
+            "fact_id": "fin.2025-12-31.equity_parent",
+            "metric": "equity_parent",
+            "status": "known",
+            "value": 244637811032.18,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-12-31",
+            "available_at": "2026-04-17",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『TOTAL_PARENT_EQUITY』（归属于母公司股东权益合计）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          },
+          "income_tax": {
+            "fact_id": "fin.2025-12-31.income_tax",
+            "metric": "income_tax",
+            "status": "known",
+            "value": 29444936771.41,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-12-31",
+            "available_at": "2026-04-17",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『INCOME_TAX』（所得税费用（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "net_profit": {
+            "fact_id": "fin.2025-12-31.net_profit",
+            "metric": "net_profit",
+            "status": "known",
+            "value": 85310324833.67,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-12-31",
+            "available_at": "2026-04-17",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『NETPROFIT』（净利润（合并，含少数股东损益））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "net_profit_parent": {
+            "fact_id": "fin.2025-12-31.net_profit_parent",
+            "metric": "net_profit_parent",
+            "status": "known",
+            "value": 82320067101.68,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-12-31",
+            "available_at": "2026-04-17",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『PARENT_NETPROFIT』（归属于母公司股东的净利润）",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "operating_cash_flow": {
+            "fact_id": "fin.2025-12-31.ocf",
+            "metric": "operating_cash_flow",
+            "status": "known",
+            "value": 61522204989.35,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-12-31",
+            "available_at": "2026-04-17",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『NETCASH_OPERATE』（经营活动产生的现金流量净额（合并））",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "operating_profit": {
+            "fact_id": "fin.2025-12-31.operating_profit",
+            "metric": "operating_profit",
+            "status": "known",
+            "value": 114808950164.24,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-12-31",
+            "available_at": "2026-04-17",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『OPERATE_PROFIT』（营业利润（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "pretax_profit": {
+            "fact_id": "fin.2025-12-31.pretax_profit",
+            "metric": "pretax_profit",
+            "status": "known",
+            "value": 114755261605.08,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-12-31",
+            "available_at": "2026-04-17",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『TOTAL_PROFIT』（利润总额（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "total_operating_revenue": {
+            "fact_id": "fin.2025-12-31.revenue",
+            "metric": "total_operating_revenue",
+            "status": "known",
+            "value": 172054171890.91,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-12-31",
+            "available_at": "2026-04-17",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『TOTAL_OPERATE_INCOME』（营业总收入（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "total_assets": {
+            "fact_id": "fin.2025-12-31.total_assets",
+            "metric": "total_assets",
+            "status": "known",
+            "value": 303834844021.44,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-12-31",
+            "available_at": "2026-04-17",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『TOTAL_ASSETS』（资产总计）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          }
+        }
+      },
+      {
+        "period": "2025-09-30",
+        "notice_date": "2025-10-30",
+        "facts": {
+          "capex": {
+            "fact_id": "fin.2025-09-30.capex",
+            "metric": "capex",
+            "status": "known",
+            "value": 2282862269.89,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-09-30",
+            "available_at": "2025-10-30",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产、无形资产和其他长期资产支付的现金）",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "cash_and_equivalents": {
+            "fact_id": "fin.2025-09-30.cash",
+            "metric": "cash_and_equivalents",
+            "status": "known",
+            "value": 51753057846.45,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-09-30",
+            "available_at": "2025-10-30",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『MONETARYFUNDS』（货币资金）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          },
+          "depreciation": {
+            "fact_id": "fin.2025-09-30.depreciation",
+            "metric": "depreciation",
+            "status": "missing",
+            "value": null,
+            "unit": null,
+            "currency": null,
+            "period": "2025-09-30",
+            "available_at": "2025-10-30",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『FA_IR_DEPR』（固定资产折旧、油气资产折耗、生产性生物资产折旧）",
+            "restated": false,
+            "notes": "来源返回空值，不用 0 代替",
+            "conflict_values": []
+          },
+          "basic_eps": {
+            "fact_id": "fin.2025-09-30.eps_basic",
+            "metric": "basic_eps",
+            "status": "known",
+            "value": 51.53,
+            "unit": "CNY_per_share",
+            "currency": "CNY",
+            "period": "2025-09-30",
+            "available_at": "2025-10-30",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『BASIC_EPS』（基本每股收益（元/股））",
+            "restated": false,
+            "notes": "公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "equity_parent": {
+            "fact_id": "fin.2025-09-30.equity_parent",
+            "metric": "equity_parent",
+            "status": "known",
+            "value": 257069964386.23,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-09-30",
+            "available_at": "2025-10-30",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『TOTAL_PARENT_EQUITY』（归属于母公司股东权益合计）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          },
+          "income_tax": {
+            "fact_id": "fin.2025-09-30.income_tax",
+            "metric": "income_tax",
+            "status": "known",
+            "value": 22504639708.51,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-09-30",
+            "available_at": "2025-10-30",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『INCOME_TAX』（所得税费用（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "net_profit": {
+            "fact_id": "fin.2025-09-30.net_profit",
+            "metric": "net_profit",
+            "status": "known",
+            "value": 66898804746.17,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-09-30",
+            "available_at": "2025-10-30",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『NETPROFIT』（净利润（合并，含少数股东损益））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "net_profit_parent": {
+            "fact_id": "fin.2025-09-30.net_profit_parent",
+            "metric": "net_profit_parent",
+            "status": "known",
+            "value": 64626746712.18,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-09-30",
+            "available_at": "2025-10-30",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『PARENT_NETPROFIT』（归属于母公司股东的净利润）",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "operating_cash_flow": {
+            "fact_id": "fin.2025-09-30.ocf",
+            "metric": "operating_cash_flow",
+            "status": "known",
+            "value": 38196802155.27,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-09-30",
+            "available_at": "2025-10-30",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『NETCASH_OPERATE』（经营活动产生的现金流量净额（合并））",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "operating_profit": {
+            "fact_id": "fin.2025-09-30.operating_profit",
+            "metric": "operating_profit",
+            "status": "known",
+            "value": 89489694566.48,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-09-30",
+            "available_at": "2025-10-30",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『OPERATE_PROFIT』（营业利润（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "pretax_profit": {
+            "fact_id": "fin.2025-09-30.pretax_profit",
+            "metric": "pretax_profit",
+            "status": "known",
+            "value": 89403444454.68,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-09-30",
+            "available_at": "2025-10-30",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『TOTAL_PROFIT』（利润总额（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "total_operating_revenue": {
+            "fact_id": "fin.2025-09-30.revenue",
+            "metric": "total_operating_revenue",
+            "status": "known",
+            "value": 130903889634.88,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-09-30",
+            "available_at": "2025-10-30",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『TOTAL_OPERATE_INCOME』（营业总收入（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "total_assets": {
+            "fact_id": "fin.2025-09-30.total_assets",
+            "metric": "total_assets",
+            "status": "known",
+            "value": 304738184929.86,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-09-30",
+            "available_at": "2025-10-30",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『TOTAL_ASSETS』（资产总计）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          }
+        }
+      },
+      {
+        "period": "2025-06-30",
+        "notice_date": "2025-08-13",
+        "facts": {
+          "capex": {
+            "fact_id": "fin.2025-06-30.capex",
+            "metric": "capex",
+            "status": "known",
+            "value": 1595995809.23,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-06-30",
+            "available_at": "2025-08-13",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『CONSTRUCT_LONG_ASSET』（购建固定资产、无形资产和其他长期资产支付的现金）",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "cash_and_equivalents": {
+            "fact_id": "fin.2025-06-30.cash",
+            "metric": "cash_and_equivalents",
+            "status": "known",
+            "value": 51644880716.93,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-06-30",
+            "available_at": "2025-08-13",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『MONETARYFUNDS』（货币资金）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          },
+          "depreciation": {
+            "fact_id": "fin.2025-06-30.depreciation",
+            "metric": "depreciation",
+            "status": "known",
+            "value": 940703752.88,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-06-30",
+            "available_at": "2025-08-13",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『FA_IR_DEPR』（固定资产折旧、油气资产折耗、生产性生物资产折旧）",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "basic_eps": {
+            "fact_id": "fin.2025-06-30.eps_basic",
+            "metric": "basic_eps",
+            "status": "known",
+            "value": 36.18,
+            "unit": "CNY_per_share",
+            "currency": "CNY",
+            "period": "2025-06-30",
+            "available_at": "2025-08-13",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『BASIC_EPS』（基本每股收益（元/股））",
+            "restated": false,
+            "notes": "公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "equity_parent": {
+            "fact_id": "fin.2025-06-30.equity_parent",
+            "metric": "equity_parent",
+            "status": "known",
+            "value": 238646536390.48,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-06-30",
+            "available_at": "2025-08-13",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『TOTAL_PARENT_EQUITY』（归属于母公司股东权益合计）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          },
+          "income_tax": {
+            "fact_id": "fin.2025-06-30.income_tax",
+            "metric": "income_tax",
+            "status": "known",
+            "value": 15791319317.58,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-06-30",
+            "available_at": "2025-08-13",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『INCOME_TAX』（所得税费用（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "net_profit": {
+            "fact_id": "fin.2025-06-30.net_profit",
+            "metric": "net_profit",
+            "status": "known",
+            "value": 46986681449.24,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-06-30",
+            "available_at": "2025-08-13",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『NETPROFIT』（净利润（合并，含少数股东损益））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "net_profit_parent": {
+            "fact_id": "fin.2025-06-30.net_profit_parent",
+            "metric": "net_profit_parent",
+            "status": "known",
+            "value": 45402962298.1,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-06-30",
+            "available_at": "2025-08-13",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『PARENT_NETPROFIT』（归属于母公司股东的净利润）",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "operating_cash_flow": {
+            "fact_id": "fin.2025-06-30.ocf",
+            "metric": "operating_cash_flow",
+            "status": "known",
+            "value": 13119061031.33,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-06-30",
+            "available_at": "2025-08-13",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.cash_flow_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_cash_flow_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并现金流量表，按报告期；含折旧摊销补充资料列；金额单位：元"
+            },
+            "transform": "现金流量表『NETCASH_OPERATE』（经营活动产生的现金流量净额（合并））",
+            "restated": false,
+            "notes": "合并报表口径；折旧摊销列取自现金流量表补充资料",
+            "conflict_values": []
+          },
+          "operating_profit": {
+            "fact_id": "fin.2025-06-30.operating_profit",
+            "metric": "operating_profit",
+            "status": "known",
+            "value": 62768973374.37,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-06-30",
+            "available_at": "2025-08-13",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『OPERATE_PROFIT』（营业利润（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "pretax_profit": {
+            "fact_id": "fin.2025-06-30.pretax_profit",
+            "metric": "pretax_profit",
+            "status": "known",
+            "value": 62778000766.82,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-06-30",
+            "available_at": "2025-08-13",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『TOTAL_PROFIT』（利润总额（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "total_operating_revenue": {
+            "fact_id": "fin.2025-06-30.revenue",
+            "metric": "total_operating_revenue",
+            "status": "known",
+            "value": 91093762553.97,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-06-30",
+            "available_at": "2025-08-13",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.profit_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_profit_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并利润表，按报告期；含 NOTICE_DATE 与 UPDATE_DATE；金额单位：元"
+            },
+            "transform": "利润表『TOTAL_OPERATE_INCOME』（营业总收入（合并））",
+            "restated": false,
+            "notes": "合并报表口径；公告日期只有日期精度，按当日结束才视为已知",
+            "conflict_values": []
+          },
+          "total_assets": {
+            "fact_id": "fin.2025-06-30.total_assets",
+            "metric": "total_assets",
+            "status": "known",
+            "value": 292257789095.51,
+            "unit": "CNY",
+            "currency": "CNY",
+            "period": "2025-06-30",
+            "available_at": "2025-08-13",
+            "fetched_at": "2026-11-11T14:31:27+08:00",
+            "source": {
+              "source_id": "em.balance_sheet",
+              "publisher": "东方财富",
+              "interface": "AKShare stock_balance_sheet_by_report_em",
+              "url": "https://data.eastmoney.com/bbsj/",
+              "retrieved_at": "2026-11-11T14:31:27+08:00",
+              "notes": "合并资产负债表，按报告期；含 NOTICE_DATE；金额单位：元"
+            },
+            "transform": "资产负债表『TOTAL_ASSETS』（资产总计）",
+            "restated": false,
+            "notes": "合并报表口径",
+            "conflict_values": []
+          }
+        }
+      }
+    ],
+    "dividend_records": [
+      {
+        "fact_id": "div.2001年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 6.0,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2001年报",
+        "available_at": "2002-07-18",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2002-07-18；除权日=2002-07-25；股权登记日=2002-07-24；派息日=2002-07-30；所属财年=2001年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2002年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 2.0,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2002年报",
+        "available_at": "2003-07-08",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2003-07-08；除权日=2003-07-14；股权登记日=2003-07-11；派息日=2003-07-18；所属财年=2002年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2003年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 3.0,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2003年报",
+        "available_at": "2004-06-25",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2004-06-25；除权日=2004-07-01；股权登记日=2004-06-30；派息日=2004-07-07；所属财年=2003年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2004年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 5.0,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2004年报",
+        "available_at": "2005-07-30",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2005-07-30；除权日=2005-08-05；股权登记日=2005-08-04；派息日=2005-08-11；所属财年=2004年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2005年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 3.0,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2005年报",
+        "available_at": "2006-05-15",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2006-05-15；除权日=2006-05-19；股权登记日=2006-05-18；派息日=2006-05-23；所属财年=2005年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2006年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 7.0,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2006年报",
+        "available_at": "2007-07-09",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2007-07-09；除权日=2007-07-13；股权登记日=2007-07-12；派息日=2007-07-19；所属财年=2006年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2007年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 8.36,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2007年报",
+        "available_at": "2008-06-10",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2008-06-10；除权日=2008-06-16；股权登记日=2008-06-13；派息日=2008-06-20；所属财年=2007年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2008年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 11.56,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2008年报",
+        "available_at": "2009-06-25",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2009-06-25；除权日=2009-07-01；股权登记日=2009-06-30；派息日=2009-07-07；所属财年=2008年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2009年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 11.85,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2009年报",
+        "available_at": "2010-06-29",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2010-06-29；除权日=2010-07-05；股权登记日=2010-07-02；派息日=2010-07-09；所属财年=2009年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2010年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 23.0,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2010年报",
+        "available_at": "2011-06-27",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2011-06-27；除权日=2011-07-01；股权登记日=2011-06-30；派息日=2011-07-07；所属财年=2010年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2011年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 39.97,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2011年报",
+        "available_at": "2012-06-27",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2012-06-27；除权日=2012-07-05；股权登记日=2012-07-04；派息日=2012-07-13；所属财年=2011年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2012年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 64.19,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2012年报",
+        "available_at": "2013-06-03",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2013-06-03；除权日=2013-06-07；股权登记日=2013-06-06；派息日=2013-06-17；所属财年=2012年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2013年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 43.74,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2013年报",
+        "available_at": "2014-06-18",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2014-06-18；除权日=2014-06-25；股权登记日=2014-06-24；派息日=2014-06-25；所属财年=2013年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2014年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 43.74,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2014年报",
+        "available_at": "2015-07-10",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2015-07-10；除权日=2015-07-17；股权登记日=2015-07-16；派息日=2015-07-17；所属财年=2014年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2015年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 61.71,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2015年报",
+        "available_at": "2016-06-27",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2016-06-27；除权日=2016-07-01；股权登记日=2016-06-30；派息日=2016-07-01；所属财年=2015年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2016年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 67.87,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2016年报",
+        "available_at": "2017-07-01",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2017-07-01；除权日=2017-07-07；股权登记日=2017-07-06；派息日=2017-07-07；所属财年=2016年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2017年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 109.99,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2017年报",
+        "available_at": "2018-06-08",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2018-06-08；除权日=2018-06-15；股权登记日=2018-06-14；派息日=2018-06-15；所属财年=2017年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2018年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 145.39,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2018年报",
+        "available_at": "2019-06-22",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2019-06-22；除权日=2019-06-28；股权登记日=2019-06-27；派息日=2019-06-28；所属财年=2018年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2019年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 170.25,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2019年报",
+        "available_at": "2020-06-18",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2020-06-18；除权日=2020-06-24；股权登记日=2020-06-23；派息日=2020-06-24；所属财年=2019年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2020年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 192.93,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2020年报",
+        "available_at": "2021-06-21",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2021-06-21；除权日=2021-06-25；股权登记日=2021-06-24；派息日=2021-06-25；所属财年=2020年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2021年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 216.75,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2021年报",
+        "available_at": "2022-06-24",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2022-06-24；除权日=2022-06-30；股权登记日=2022-06-29；派息日=2022-06-30；所属财年=2021年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2022年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 259.11,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2022年报",
+        "available_at": "2023-06-26",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2023-06-26；除权日=2023-06-30；股权登记日=2023-06-29；派息日=2023-06-30；所属财年=2022年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2023年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 308.76,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2023年报",
+        "available_at": "2024-06-12",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2024-06-12；除权日=2024-06-19；股权登记日=2024-06-18；派息日=2024-06-19；所属财年=2023年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2024三季报.季度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 238.82,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2024三季报",
+        "available_at": "2024-12-14",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=季度分红；实施状态=实施；实施公告日=2024-12-14；除权日=2024-12-20；股权登记日=2024-12-19；派息日=2024-12-20；所属财年=2024三季报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2024年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 276.73,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2024年报",
+        "available_at": "2025-06-20",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2025-06-20；除权日=2025-06-26；股权登记日=2025-06-25；派息日=2025-06-26；所属财年=2024年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2025三季报.季度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 239.57,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2025三季报",
+        "available_at": "2025-12-11",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=季度分红；实施状态=实施；实施公告日=2025-12-11；除权日=2025-12-19；股权登记日=2025-12-18；派息日=2025-12-19；所属财年=2025三季报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.2025年报.年度分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 280.2423,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": "2025年报",
+        "available_at": "2026-06-22",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=年度分红；实施状态=实施；实施公告日=2026-06-22；除权日=2026-06-26；股权登记日=2026-06-25；派息日=2026-06-26；所属财年=2025年报",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.unlabeled-2006-05-17.股改分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 0.0,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": null,
+        "available_at": "2006-05-17",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=股改分红；实施状态=实施；实施公告日=2006-05-17；除权日=2006-05-19；股权登记日=2006-05-18；派息日=未知；所属财年=缺失（来源未标注）",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.unlabeled-2006-05-22.股改分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 5.91,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": null,
+        "available_at": "2006-05-22",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=股改分红；实施状态=实施；实施公告日=2006-05-22；除权日=2006-05-24；股权登记日=2006-05-23；派息日=2006-05-29；所属财年=缺失（来源未标注）",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.unlabeled-2022-12-21.特别分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 219.1,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": null,
+        "available_at": "2022-12-21",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=特别分红；实施状态=实施；实施公告日=2022-12-21；除权日=2022-12-27；股权登记日=2022-12-26；派息日=2022-12-27；所属财年=缺失（来源未标注）",
+        "conflict_values": []
+      },
+      {
+        "fact_id": "div.unlabeled-2023-12-14.特别分红.per_10",
+        "metric": "cash_dividend_per_10_shares",
+        "status": "known",
+        "value": 191.06,
+        "unit": "CNY",
+        "currency": "CNY",
+        "period": null,
+        "available_at": "2023-12-14",
+        "fetched_at": "2026-11-11T14:31:27+08:00",
+        "source": {
+          "source_id": "cninfo.dividend",
+          "publisher": "巨潮资讯",
+          "interface": "AKShare stock_dividend_cninfo",
+          "url": "https://webapi.cninfo.com.cn/#/company",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "分红类型（年度/中期/季度/特别）、派息比例（每 10 股，税前）、报告时间（所属财年）、实施公告日、除权日"
+        },
+        "transform": "巨潮『派息比例』（每 10 股，税前，含税口径未在来源中细分）",
+        "restated": false,
+        "notes": "分红类型=特别分红；实施状态=实施；实施公告日=2023-12-14；除权日=2023-12-20；股权登记日=2023-12-19；派息日=2023-12-20；所属财年=缺失（来源未标注）",
+        "conflict_values": []
+      }
+    ],
+    "model_applicability": {
+      "status": "selected",
+      "family": "non_financial",
+      "family_label": "非金融企业",
+      "primary_model": "equity_dcf_fcff",
+      "cross_check_model": "equity_dividend_discount",
+      "evidence_id": "biz-75d7c90bb5903b40",
+      "evidence_version": "2026-11-10",
+      "applicable_model_category": null,
+      "policy_version": "model-applicability/1"
+    },
+    "valuation": null,
+    "research_valuation": {
+      "payload_version": "equity-research/1",
+      "status": "complete",
+      "reason_codes": [
+        "MODEL_RESEARCH_VALUATION",
+        "RESEARCH_PARAMETERS_UNAPPROVED",
+        "SPECIAL_DIVIDEND_SEPARATED"
+      ],
+      "model_id": "equity_dcf_fcff",
+      "model_version": "0.2.0-research",
+      "model_status": "research",
+      "assumption_id": "assump-489b99582aab805c",
+      "assumption_status": "research_pending_approval",
+      "base_fiscal_year": 2025,
+      "headline_value_per_share": 1341.1280337369838,
+      "scenarios": [
+        {
+          "name": "base",
+          "value_per_share": 1341.1280337369838,
+          "terminal_share_of_value": 0.7769319891091863,
+          "note": "2026 年按已披露前三季度同比（+1.8%）起步，之后回到 3–4% 的低速增长",
+          "detail": {
+            "model": "fcff",
+            "years": [
+              {
+                "year": 2026,
+                "revenue": 175151146984.94638,
+                "ebit": 115599757010.06462,
+                "tax_rate": 0.2566,
+                "nopat": 85936859361.28204,
+                "depreciation_amortization": 2294480025.5027976,
+                "capex": 3503022939.698928,
+                "change_in_nwc": 464546264.10545653,
+                "fcff": 84263770182.98045
+              },
+              {
+                "year": 2027,
+                "revenue": 182157192864.34424,
+                "ebit": 120223747290.46721,
+                "tax_rate": 0.2566,
+                "nopat": 89374333735.73334,
+                "depreciation_amortization": 2386259226.5229096,
+                "capex": 3643143857.286885,
+                "change_in_nwc": 1050906881.9096786,
+                "fcff": 87066542223.05968
+              },
+              {
+                "year": 2028,
+                "revenue": 189443480578.918,
+                "ebit": 125032697182.08589,
+                "tax_rate": 0.2566,
+                "nopat": 92949307085.16266,
+                "depreciation_amortization": 2481709595.583826,
+                "capex": 3788869611.57836,
+                "change_in_nwc": 1092943157.186064,
+                "fcff": 90549203911.98207
+              },
+              {
+                "year": 2029,
+                "revenue": 196074002399.1801,
+                "ebit": 129016693578.66052,
+                "tax_rate": 0.2566,
+                "nopat": 95911010006.37624,
+                "depreciation_amortization": 2568569431.42926,
+                "capex": 3921480047.9836025,
+                "change_in_nwc": 994578273.0393173,
+                "fcff": 93563521116.78258
+              },
+              {
+                "year": 2030,
+                "revenue": 201956222471.15552,
+                "ebit": 132281325718.60687,
+                "tax_rate": 0.2566,
+                "nopat": 98337937539.21236,
+                "depreciation_amortization": 2645626514.3721375,
+                "capex": 4039124449.4231105,
+                "change_in_nwc": 882333010.7963104,
+                "fcff": 96062106593.36507
+              }
+            ],
+            "discounting": {
+              "rate": 0.074,
+              "explicit_present_value": 364578792968.7504,
+              "terminal_present_value": 1269805229701.37,
+              "terminal_share_of_total": 0.7769319891091863,
+              "total_present_value": 1634384022670.1206,
+              "schedule": [
+                {
+                  "period": 1,
+                  "cash_flow": 84263770182.98045,
+                  "discount_factor": 0.9310986964618249,
+                  "present_value": 78457886576.33188
+                },
+                {
+                  "period": 2,
+                  "cash_flow": 87066542223.05968,
+                  "discount_factor": 0.8669447825529095,
+                  "present_value": 75481884515.2042
+                },
+                {
+                  "period": 3,
+                  "cash_flow": 90549203911.98207,
+                  "discount_factor": 0.8072111569393944,
+                  "present_value": 73092327649.73218
+                },
+                {
+                  "period": 4,
+                  "cash_flow": 93563521116.78258,
+                  "discount_factor": 0.7515932559957116,
+                  "present_value": 70321711478.58614
+                },
+                {
+                  "period": 5,
+                  "cash_flow": 96062106593.36507,
+                  "discount_factor": 0.6998075009271058,
+                  "present_value": 67224982748.89606
+                }
+              ],
+              "terminal": {
+                "method": "growing_perpetuity",
+                "growth": 0.02,
+                "next_period_cash_flow": 97983348725.23238,
+                "terminal_year": 2030,
+                "basis": "末期（2030 年）FCFF × (1+g) 作为永续首期；g 取 2.0% 作为长期名义增长参照（研究假设）",
+                "terminal_value": 1814506457874.6738
+              }
+            },
+            "enterprise_value": 1634384022670.1206,
+            "bridge_rows": [
+              {
+                "item": "enterprise_value",
+                "label": "企业价值（EV，折现结果）",
+                "sign": 1,
+                "amount": 1634384022670.1206,
+                "note": "有限期现值 + 终值现值"
+              },
+              {
+                "item": "debt",
+                "label": "减：有息负债",
+                "sign": -1,
+                "amount": 233711179.82,
+                "note": "短期借款 + 长期借款 + 应付债券 + 一年内到期非流动负债（含租赁负债时另行说明）"
+              },
+              {
+                "item": "cash",
+                "label": "加：货币资金",
+                "sign": 1,
+                "amount": 51690610946.5,
+                "note": "非经营性现金；若含受限资金需另行扣除"
+              },
+              {
+                "item": "non_operating_assets",
+                "label": "加：非经营性资产",
+                "sign": 1,
+                "amount": 0.0,
+                "note": "未纳入 FCFF 预测的长期股权投资等；本轮样本取 0 并说明原因"
+              },
+              {
+                "item": "minority_interest",
+                "label": "减：少数股东权益",
+                "sign": -1,
+                "amount": 9321442876.89,
+                "note": "按账面权益扣除，未按公允价值重估"
+              },
+              {
+                "item": "preferred_equity",
+                "label": "减：其他权益工具（优先股/永续债）",
+                "sign": -1,
+                "amount": 0.0,
+                "note": "归属普通股东之前需先扣除"
+              }
+            ],
+            "equity_value": 1676519479559.9106,
+            "value_per_share": 1341.1280337369838,
+            "shares": 1250081601.0,
+            "net_debt": -51456899766.68,
+            "equity_bridge_notes": [
+              "报表未列出的有息负债科目按「无该项」处理：short_loan、long_loan、bond_payable（依据假设文件 absent_as_zero 声明）",
+              "非经营性资产本轮按 0 处理：来源报表未把长期股权投资等拆分为非经营性项目，因此该项被记入 EV 的一部分而非单独加回（偏保守）"
+            ],
+            "absent_debt_components": [
+              "short_loan",
+              "long_loan",
+              "bond_payable"
+            ],
+            "annual_basis": {
+              "fiscal_year": 2025,
+              "period_end": "2025-12-31",
+              "revenue": 172054171890.91,
+              "net_profit_parent": 82320067101.68,
+              "source": "合并利润表/资产负债表/现金流量表（快照）"
+            }
+          }
+        },
+        {
+          "name": "bear",
+          "value_per_share": 1061.5496019313239,
+          "terminal_share_of_value": 0.751411595566092,
+          "note": "收入停滞、利润率回落、资本开支上台阶（白酒需求走弱的压力情形）",
+          "detail": {
+            "model": "fcff",
+            "years": [
+              {
+                "year": 2026,
+                "revenue": 172054171890.91,
+                "ebit": 108394128291.2733,
+                "tax_rate": 0.2566,
+                "nopat": 80580194971.73257,
+                "depreciation_amortization": 2253909651.770921,
+                "capex": 4301354297.27275,
+                "change_in_nwc": 0.0,
+                "fcff": 78532750326.23074
+              },
+              {
+                "year": 2027,
+                "revenue": 175495255328.7282,
+                "ebit": 108807058303.8115,
+                "tax_rate": 0.2566,
+                "nopat": 80887167143.05347,
+                "depreciation_amortization": 2298987844.8063397,
+                "capex": 4387381383.218205,
+                "change_in_nwc": 619395018.8072772,
+                "fcff": 78179378585.83432
+              },
+              {
+                "year": 2028,
+                "revenue": 179005160435.30276,
+                "ebit": 109193147865.53468,
+                "tax_rate": 0.2566,
+                "nopat": 81174186123.2385,
+                "depreciation_amortization": 2344967601.7024665,
+                "capex": 4475129010.882569,
+                "change_in_nwc": 631782919.1834198,
+                "fcff": 78412241794.87497
+              },
+              {
+                "year": 2029,
+                "revenue": 182585263644.00882,
+                "ebit": 109551158186.40529,
+                "tax_rate": 0.2566,
+                "nopat": 81440330995.7737,
+                "depreciation_amortization": 2391866953.7365155,
+                "capex": 4564631591.100221,
+                "change_in_nwc": 644418577.5670898,
+                "fcff": 78623147780.8429
+              },
+              {
+                "year": 2030,
+                "revenue": 186236968916.889,
+                "ebit": 111742181350.1334,
+                "tax_rate": 0.2566,
+                "nopat": 83069137615.68918,
+                "depreciation_amortization": 2439704292.811246,
+                "capex": 4655924222.922225,
+                "change_in_nwc": 657306949.1184338,
+                "fcff": 80195610736.45976
+              }
+            ],
+            "discounting": {
+              "rate": 0.074,
+              "explicit_present_value": 319408299816.0263,
+              "terminal_present_value": 965479869217.4059,
+              "terminal_share_of_total": 0.751411595566092,
+              "total_present_value": 1284888169033.4321,
+              "schedule": [
+                {
+                  "period": 1,
+                  "cash_flow": 78532750326.23074,
+                  "discount_factor": 0.9310986964618249,
+                  "present_value": 73121741458.3154
+                },
+                {
+                  "period": 2,
+                  "cash_flow": 78179378585.83432,
+                  "discount_factor": 0.8669447825529095,
+                  "present_value": 67777204368.21773
+                },
+                {
+                  "period": 3,
+                  "cash_flow": 78412241794.87497,
+                  "discount_factor": 0.8072111569393944,
+                  "present_value": 63295236417.45256
+                },
+                {
+                  "period": 4,
+                  "cash_flow": 78623147780.8429,
+                  "discount_factor": 0.7515932559957116,
+                  "present_value": 59092627637.23572
+                },
+                {
+                  "period": 5,
+                  "cash_flow": 80195610736.45976,
+                  "discount_factor": 0.6998075009271058,
+                  "present_value": 56121489934.80488
+                }
+              ],
+              "terminal": {
+                "method": "growing_perpetuity",
+                "growth": 0.015,
+                "next_period_cash_flow": 81398544897.50665,
+                "terminal_year": 2030,
+                "basis": "末期（2030 年）FCFF × (1+g) 作为永续首期；g 取 2.0% 作为长期名义增长参照（研究假设）",
+                "terminal_value": 1379636354195.028
+              }
+            },
+            "enterprise_value": 1284888169033.4321,
+            "bridge_rows": [
+              {
+                "item": "enterprise_value",
+                "label": "企业价值（EV，折现结果）",
+                "sign": 1,
+                "amount": 1284888169033.4321,
+                "note": "有限期现值 + 终值现值"
+              },
+              {
+                "item": "debt",
+                "label": "减：有息负债",
+                "sign": -1,
+                "amount": 233711179.82,
+                "note": "短期借款 + 长期借款 + 应付债券 + 一年内到期非流动负债（含租赁负债时另行说明）"
+              },
+              {
+                "item": "cash",
+                "label": "加：货币资金",
+                "sign": 1,
+                "amount": 51690610946.5,
+                "note": "非经营性现金；若含受限资金需另行扣除"
+              },
+              {
+                "item": "non_operating_assets",
+                "label": "加：非经营性资产",
+                "sign": 1,
+                "amount": 0.0,
+                "note": "未纳入 FCFF 预测的长期股权投资等；本轮样本取 0 并说明原因"
+              },
+              {
+                "item": "minority_interest",
+                "label": "减：少数股东权益",
+                "sign": -1,
+                "amount": 9321442876.89,
+                "note": "按账面权益扣除，未按公允价值重估"
+              },
+              {
+                "item": "preferred_equity",
+                "label": "减：其他权益工具（优先股/永续债）",
+                "sign": -1,
+                "amount": 0.0,
+                "note": "归属普通股东之前需先扣除"
+              }
+            ],
+            "equity_value": 1327023625923.2222,
+            "value_per_share": 1061.5496019313239,
+            "shares": 1250081601.0,
+            "net_debt": -51456899766.68,
+            "equity_bridge_notes": [
+              "报表未列出的有息负债科目按「无该项」处理：short_loan、long_loan、bond_payable（依据假设文件 absent_as_zero 声明）",
+              "非经营性资产本轮按 0 处理：来源报表未把长期股权投资等拆分为非经营性项目，因此该项被记入 EV 的一部分而非单独加回（偏保守）"
+            ],
+            "absent_debt_components": [
+              "short_loan",
+              "long_loan",
+              "bond_payable"
+            ],
+            "annual_basis": {
+              "fiscal_year": 2025,
+              "period_end": "2025-12-31",
+              "revenue": 172054171890.91,
+              "net_profit_parent": 82320067101.68,
+              "source": "合并利润表/资产负债表/现金流量表（快照）"
+            }
+          }
+        },
+        {
+          "name": "bull",
+          "value_per_share": 1555.5679130660599,
+          "terminal_share_of_value": 0.7982587842567691,
+          "note": "需求恢复、产品结构继续升级（高端占比提升带动利润率）",
+          "detail": {
+            "model": "fcff",
+            "years": [
+              {
+                "year": 2026,
+                "revenue": 177215797047.6373,
+                "ebit": 118734584021.91699,
+                "tax_rate": 0.2566,
+                "nopat": 88267289761.8931,
+                "depreciation_amortization": 2321526941.3240485,
+                "capex": 3189884346.857471,
+                "change_in_nwc": 619395018.8072754,
+                "fcff": 86779537337.5524
+              },
+              {
+                "year": 2027,
+                "revenue": 186076586900.01917,
+                "ebit": 124671313223.01285,
+                "tax_rate": 0.2566,
+                "nopat": 92680654249.98776,
+                "depreciation_amortization": 2437603288.390251,
+                "capex": 3349378564.2003446,
+                "change_in_nwc": 1063294782.285824,
+                "fcff": 90705584191.89185
+              },
+              {
+                "year": 2028,
+                "revenue": 195380416245.02014,
+                "ebit": 130904878884.1635,
+                "tax_rate": 0.2566,
+                "nopat": 97314686962.48715,
+                "depreciation_amortization": 2559483452.809764,
+                "capex": 3516847492.4103622,
+                "change_in_nwc": 1116459521.4001172,
+                "fcff": 95240863401.48645
+              },
+              {
+                "year": 2029,
+                "revenue": 204172534976.04602,
+                "ebit": 136795598433.95084,
+                "tax_rate": 0.2566,
+                "nopat": 101693847875.79906,
+                "depreciation_amortization": 2674660208.186203,
+                "capex": 3675105629.568828,
+                "change_in_nwc": 1055054247.7231054,
+                "fcff": 99638348206.69333
+              },
+              {
+                "year": 2030,
+                "revenue": 212339436375.08786,
+                "ebit": 142267422371.30887,
+                "tax_rate": 0.2566,
+                "nopat": 105761601790.83102,
+                "depreciation_amortization": 2781646616.513651,
+                "capex": 3822109854.751581,
+                "change_in_nwc": 980028167.8850207,
+                "fcff": 103741110384.70807
+              }
+            ],
+            "discounting": {
+              "rate": 0.074,
+              "explicit_present_value": 383802852344.779,
+              "terminal_present_value": 1518648517995.2798,
+              "terminal_share_of_total": 0.7982587842567691,
+              "total_present_value": 1902451370340.0588,
+              "schedule": [
+                {
+                  "period": 1,
+                  "cash_flow": 86779537337.5524,
+                  "discount_factor": 0.9310986964618249,
+                  "present_value": 80800314094.5553
+                },
+                {
+                  "period": 2,
+                  "cash_flow": 90705584191.89185,
+                  "discount_factor": 0.8669447825529095,
+                  "present_value": 78636732963.57431
+                },
+                {
+                  "period": 3,
+                  "cash_flow": 95240863401.48645,
+                  "discount_factor": 0.8072111569393944,
+                  "present_value": 76879487534.2207
+                },
+                {
+                  "period": 4,
+                  "cash_flow": 99638348206.69333,
+                  "discount_factor": 0.7515932559957116,
+                  "present_value": 74887510550.70311
+                },
+                {
+                  "period": 5,
+                  "cash_flow": 103741110384.70807,
+                  "discount_factor": 0.6998075009271058,
+                  "present_value": 72598807201.72557
+                }
+              ],
+              "terminal": {
+                "method": "growing_perpetuity",
+                "growth": 0.025,
+                "next_period_cash_flow": 106334638144.32576,
+                "terminal_year": 2030,
+                "basis": "末期（2030 年）FCFF × (1+g) 作为永续首期；g 取 2.0% 作为长期名义增长参照（研究假设）",
+                "terminal_value": 2170094656006.6484
+              }
+            },
+            "enterprise_value": 1902451370340.0588,
+            "bridge_rows": [
+              {
+                "item": "enterprise_value",
+                "label": "企业价值（EV，折现结果）",
+                "sign": 1,
+                "amount": 1902451370340.0588,
+                "note": "有限期现值 + 终值现值"
+              },
+              {
+                "item": "debt",
+                "label": "减：有息负债",
+                "sign": -1,
+                "amount": 233711179.82,
+                "note": "短期借款 + 长期借款 + 应付债券 + 一年内到期非流动负债（含租赁负债时另行说明）"
+              },
+              {
+                "item": "cash",
+                "label": "加：货币资金",
+                "sign": 1,
+                "amount": 51690610946.5,
+                "note": "非经营性现金；若含受限资金需另行扣除"
+              },
+              {
+                "item": "non_operating_assets",
+                "label": "加：非经营性资产",
+                "sign": 1,
+                "amount": 0.0,
+                "note": "未纳入 FCFF 预测的长期股权投资等；本轮样本取 0 并说明原因"
+              },
+              {
+                "item": "minority_interest",
+                "label": "减：少数股东权益",
+                "sign": -1,
+                "amount": 9321442876.89,
+                "note": "按账面权益扣除，未按公允价值重估"
+              },
+              {
+                "item": "preferred_equity",
+                "label": "减：其他权益工具（优先股/永续债）",
+                "sign": -1,
+                "amount": 0.0,
+                "note": "归属普通股东之前需先扣除"
+              }
+            ],
+            "equity_value": 1944586827229.8489,
+            "value_per_share": 1555.5679130660599,
+            "shares": 1250081601.0,
+            "net_debt": -51456899766.68,
+            "equity_bridge_notes": [
+              "报表未列出的有息负债科目按「无该项」处理：short_loan、long_loan、bond_payable（依据假设文件 absent_as_zero 声明）",
+              "非经营性资产本轮按 0 处理：来源报表未把长期股权投资等拆分为非经营性项目，因此该项被记入 EV 的一部分而非单独加回（偏保守）"
+            ],
+            "absent_debt_components": [
+              "short_loan",
+              "long_loan",
+              "bond_payable"
+            ],
+            "annual_basis": {
+              "fiscal_year": 2025,
+              "period_end": "2025-12-31",
+              "revenue": 172054171890.91,
+              "net_profit_parent": 82320067101.68,
+              "source": "合并利润表/资产负债表/现金流量表（快照）"
+            }
+          }
+        }
+      ],
+      "sensitivity": [
+        {
+          "variable": "收入增速",
+          "delta": 0.01,
+          "value_per_share": 1395.6418753088374,
+          "change_pct": 0.0406477533841072,
+          "note": "revenue_growth ++0.0100（研究假设区间）"
+        },
+        {
+          "variable": "收入增速",
+          "delta": -0.01,
+          "value_per_share": 1288.462403102672,
+          "change_pct": -0.0392696515988572,
+          "note": "revenue_growth -0.0100（研究假设区间）"
+        },
+        {
+          "variable": "EBIT 利润率",
+          "delta": 0.01,
+          "value_per_share": 1361.5386705795795,
+          "change_pct": 0.015219006932337908,
+          "note": "ebit_margin ++0.0100（研究假设区间）"
+        },
+        {
+          "variable": "EBIT 利润率",
+          "delta": -0.01,
+          "value_per_share": 1320.7173968943878,
+          "change_pct": -0.01521900693233802,
+          "note": "ebit_margin -0.0100（研究假设区间）"
+        },
+        {
+          "variable": "资本开支/收入",
+          "delta": 0.005,
+          "value_per_share": 1327.4001370174549,
+          "change_pct": -0.010236082144429393,
+          "note": "capex_pct_revenue ++0.0050（研究假设区间）"
+        },
+        {
+          "variable": "资本开支/收入",
+          "delta": -0.005,
+          "value_per_share": 1354.8559304565129,
+          "change_pct": 0.010236082144429615,
+          "note": "capex_pct_revenue -0.0050（研究假设区间）"
+        },
+        {
+          "variable": "折现率",
+          "delta": 0.005,
+          "value_per_share": 1229.7750312768367,
+          "change_pct": -0.08302936010506601,
+          "note": "discount_rate ++0.0050（研究假设区间）"
+        },
+        {
+          "variable": "折现率",
+          "delta": -0.005,
+          "value_per_share": 1475.2175414642804,
+          "change_pct": 0.09998262981175876,
+          "note": "discount_rate -0.0050（研究假设区间）"
+        },
+        {
+          "variable": "终值增长",
+          "delta": 0.005,
+          "value_per_share": 1450.2662325733809,
+          "change_pct": 0.0813779117958553,
+          "note": "terminal_growth ++0.0050（研究假设区间）"
+        },
+        {
+          "variable": "终值增长",
+          "delta": -0.005,
+          "value_per_share": 1250.4878347033655,
+          "change_pct": -0.06758504538977839,
+          "note": "terminal_growth -0.0050（研究假设区间）"
+        }
+      ],
+      "valuation_range": {
+        "low": 1061.5496019313239,
+        "mid": 1341.1280337369838,
+        "high": 1555.5679130660599,
+        "basis": "scenario_range_not_confidence_interval",
+        "scenario_names": [
+          "base",
+          "bear",
+          "bull"
+        ],
+        "note": "上下界来自输入情景，不是统计置信区间；情景由假设定义，未按估值高低挑选模型"
+      },
+      "price": {
+        "value": 1439.0,
+        "unit": "CNY_per_share",
+        "currency": "CNY",
+        "as_of": "2026-11-10",
+        "price_type": "close_unadjusted",
+        "available_at": "2026-11-10T15:00:00+08:00",
+        "source": {
+          "source_id": "em.stock_zh_a_hist",
+          "publisher": "东方财富",
+          "interface": "AKShare stock_zh_a_hist（不复权日线）",
+          "url": "https://quote.eastmoney.com/",
+          "retrieved_at": "2026-11-11T14:31:27+08:00",
+          "notes": "不复权日线；用于取已收盘交易日的收盘价，不做复权处理"
+        },
+        "bar_status": "closed"
+      },
+      "price_relationship": {
+        "relation": "research_value_below_price",
+        "difference_pct": -0.06801387509591117,
+        "band": 0.05,
+        "note": "研究情景估值与当前收盘价的对比，只用于描述差距；参数未获批准，这不是买点、不是安全边际结论，也不构成正式价格判断"
+      },
+      "applicability": {
+        "status": "selected",
+        "family": "non_financial",
+        "family_label": "非金融企业",
+        "primary_model": "equity_dcf_fcff",
+        "cross_check_model": "equity_dividend_discount",
+        "applicable_model_category": null,
+        "required_evidence_to_implement": [],
+        "reasons": [
+          {
+            "signal": "default_non_financial",
+            "observed": {
+              "industry": "白酒Ⅱ",
+              "top_segments": [
+                "茅台酒",
+                "系列酒"
+              ],
+              "revenue_growth_stdev": 0.060541583855155706,
+              "max_revenue_drawdown": 0.012000971769185173,
+              "cyclical_industry_clue": false
+            },
+            "conclusion": "non_financial",
+            "note": "未命中金融、控股、困境或明显周期规则"
+          },
+          {
+            "signal": "capital_intensity_and_cash_conversion",
+            "observed": {
+              "capex_intensity": 0.018177966172148584,
+              "cash_conversion_fcff_over_profit": 0.7162483445250187,
+              "payout_mean_3y": 0.6844147722756212,
+              "thresholds": {
+                "fcff_capex_intensity_max": 0.1,
+                "fcff_cash_conversion_min": 0.7,
+                "dividend_payout_min": 0.55
+              }
+            },
+            "conclusion": "fcff_primary",
+            "note": "资本开支强度 1.8% < 10% 且 FCFF/归母净利润 0.72 ≥ 0.70：自由现金流本身就是可分配来源，用 FCFF 作主模型，股息折现作交叉检查"
+          }
+        ],
+        "rejected_models": [
+          {
+            "model_id": "equity_dividend_discount",
+            "reason_code": "MODEL_CROSS_CHECK_ONLY",
+            "reason": "作为交叉检查模型：本标的资本开支轻、现金转化高，分配路径主要由自由现金流决定，股息折现提供一致性检验"
+          }
+        ],
+        "indicators": {
+          "industry": "白酒Ⅱ",
+          "top_segments": [
+            {
+              "segment": "茅台酒",
+              "revenue_share": 0.862219
+            },
+            {
+              "segment": "系列酒",
+              "revenue_share": 0.137195
+            }
+          ],
+          "revenue_growth_stdev": 0.060541583855155706,
+          "max_revenue_drawdown": 0.012000971769185173,
+          "loss_years": [],
+          "annual_years_observed": 8,
+          "capex_intensity": 0.018177966172148584,
+          "cash_conversion": 0.7162483445250187,
+          "payout_latest": 0.7893674228919949,
+          "payout_mean_3y": 0.6844147722756212,
+          "dividend_years_observed": 3,
+          "dividend_stability_cv": 0.1753138107589492
+        },
+        "evidence_id": "biz-75d7c90bb5903b40",
+        "evidence_version": "2026-11-10",
+        "policy": {
+          "policy_version": "model-applicability/1",
+          "status": "research_candidate_pending_approval",
+          "revenue_volatility_cyclical": 0.08,
+          "revenue_drawdown_cyclical": 0.15,
+          "cyclical_industries": [
+            "煤炭",
+            "钢铁",
+            "有色",
+            "化工",
+            "航运",
+            "港口",
+            "房地产",
+            "水泥",
+            "建材",
+            "工程机械",
+            "养殖",
+            "石油",
+            "航空"
+          ],
+          "fcff_capex_intensity_max": 0.1,
+          "fcff_cash_conversion_min": 0.7,
+          "dividend_payout_min": 0.55,
+          "notes": [
+            "阈值是研究起点，不是已批准政策；提高或降低门槛会改变主模型但不改变已算出的价值。",
+            "判定只读业务证据与经营指标，不读当前股价。"
+          ]
+        }
+      },
+      "data_used": {
+        "snapshot_id": "snap-791670f4b3c68cab",
+        "as_of": "2026-11-10",
+        "available_at": "2026-11-10T15:00:00+08:00",
+        "price": {
+          "value": 1439.0,
+          "unit": "CNY_per_share",
+          "currency": "CNY",
+          "as_of": "2026-11-10",
+          "price_type": "close_unadjusted",
+          "available_at": "2026-11-10T15:00:00+08:00",
+          "source": {
+            "source_id": "em.stock_zh_a_hist",
+            "publisher": "东方财富",
+            "interface": "AKShare stock_zh_a_hist（不复权日线）",
+            "url": "https://quote.eastmoney.com/",
+            "retrieved_at": "2026-11-11T14:31:27+08:00",
+            "notes": "不复权日线；用于取已收盘交易日的收盘价，不做复权处理"
+          },
+          "bar_status": "closed"
+        },
+        "annual_years": [
+          2025,
+          2024,
+          2023
+        ],
+        "annual_notes": [
+          "快照中另有 9 个非年报报告期（2026-09-30, 2026-06-30, 2026-03-31, 2025-09-30…），这些累计数未在年报画像中使用，需要时按 TTM 规则转换"
+        ],
+        "dividend_book": {
+          "fiscal_years": [
+            {
+              "fiscal_year": 2025,
+              "ordinary_dps": 51.98123,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2025三季报.季度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2025三季报",
+                  "kind": "季度分红",
+                  "per_10_shares": 239.57,
+                  "per_share": 23.957,
+                  "ex_date": "2025-12-19",
+                  "announce_date": "2025-12-11",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                },
+                {
+                  "fact_id": "div.2025年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2025年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 280.2423,
+                  "per_share": 28.02423,
+                  "ex_date": "2026-06-26",
+                  "announce_date": "2026-06-22",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2024,
+              "ordinary_dps": 51.555,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2024三季报.季度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2024三季报",
+                  "kind": "季度分红",
+                  "per_10_shares": 238.82,
+                  "per_share": 23.881999999999998,
+                  "ex_date": "2024-12-20",
+                  "announce_date": "2024-12-14",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                },
+                {
+                  "fact_id": "div.2024年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2024年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 276.73,
+                  "per_share": 27.673000000000002,
+                  "ex_date": "2025-06-26",
+                  "announce_date": "2025-06-20",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2023,
+              "ordinary_dps": 30.875999999999998,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2023年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2023年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 308.76,
+                  "per_share": 30.875999999999998,
+                  "ex_date": "2024-06-19",
+                  "announce_date": "2024-06-12",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2022,
+              "ordinary_dps": 25.911,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2022年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2022年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 259.11,
+                  "per_share": 25.911,
+                  "ex_date": "2023-06-30",
+                  "announce_date": "2023-06-26",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2021,
+              "ordinary_dps": 21.675,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2021年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2021年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 216.75,
+                  "per_share": 21.675,
+                  "ex_date": "2022-06-30",
+                  "announce_date": "2022-06-24",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2020,
+              "ordinary_dps": 19.293,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2020年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2020年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 192.93,
+                  "per_share": 19.293,
+                  "ex_date": "2021-06-25",
+                  "announce_date": "2021-06-21",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2019,
+              "ordinary_dps": 17.025,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2019年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2019年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 170.25,
+                  "per_share": 17.025,
+                  "ex_date": "2020-06-24",
+                  "announce_date": "2020-06-18",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2018,
+              "ordinary_dps": 14.538999999999998,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2018年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2018年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 145.39,
+                  "per_share": 14.538999999999998,
+                  "ex_date": "2019-06-28",
+                  "announce_date": "2019-06-22",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2017,
+              "ordinary_dps": 10.998999999999999,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2017年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2017年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 109.99,
+                  "per_share": 10.998999999999999,
+                  "ex_date": "2018-06-15",
+                  "announce_date": "2018-06-08",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2016,
+              "ordinary_dps": 6.787000000000001,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2016年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2016年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 67.87,
+                  "per_share": 6.787000000000001,
+                  "ex_date": "2017-07-07",
+                  "announce_date": "2017-07-01",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2015,
+              "ordinary_dps": 6.171,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2015年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2015年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 61.71,
+                  "per_share": 6.171,
+                  "ex_date": "2016-07-01",
+                  "announce_date": "2016-06-27",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2014,
+              "ordinary_dps": 4.3740000000000006,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2014年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2014年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 43.74,
+                  "per_share": 4.3740000000000006,
+                  "ex_date": "2015-07-17",
+                  "announce_date": "2015-07-10",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2013,
+              "ordinary_dps": 4.3740000000000006,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2013年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2013年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 43.74,
+                  "per_share": 4.3740000000000006,
+                  "ex_date": "2014-06-25",
+                  "announce_date": "2014-06-18",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2012,
+              "ordinary_dps": 6.419,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2012年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2012年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 64.19,
+                  "per_share": 6.419,
+                  "ex_date": "2013-06-07",
+                  "announce_date": "2013-06-03",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2011,
+              "ordinary_dps": 3.997,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2011年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2011年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 39.97,
+                  "per_share": 3.997,
+                  "ex_date": "2012-07-05",
+                  "announce_date": "2012-06-27",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2010,
+              "ordinary_dps": 2.3,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2010年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2010年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 23.0,
+                  "per_share": 2.3,
+                  "ex_date": "2011-07-01",
+                  "announce_date": "2011-06-27",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2009,
+              "ordinary_dps": 1.185,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2009年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2009年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 11.85,
+                  "per_share": 1.185,
+                  "ex_date": "2010-07-05",
+                  "announce_date": "2010-06-29",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2008,
+              "ordinary_dps": 1.1560000000000001,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2008年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2008年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 11.56,
+                  "per_share": 1.1560000000000001,
+                  "ex_date": "2009-07-01",
+                  "announce_date": "2009-06-25",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2007,
+              "ordinary_dps": 0.836,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2007年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2007年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 8.36,
+                  "per_share": 0.836,
+                  "ex_date": "2008-06-16",
+                  "announce_date": "2008-06-10",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2006,
+              "ordinary_dps": 0.7,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2006年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2006年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 7.0,
+                  "per_share": 0.7,
+                  "ex_date": "2007-07-13",
+                  "announce_date": "2007-07-09",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2005,
+              "ordinary_dps": 0.3,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2005年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2005年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 3.0,
+                  "per_share": 0.3,
+                  "ex_date": "2006-05-19",
+                  "announce_date": "2006-05-15",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2004,
+              "ordinary_dps": 0.5,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2004年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2004年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 5.0,
+                  "per_share": 0.5,
+                  "ex_date": "2005-08-05",
+                  "announce_date": "2005-07-30",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2003,
+              "ordinary_dps": 0.3,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2003年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2003年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 3.0,
+                  "per_share": 0.3,
+                  "ex_date": "2004-07-01",
+                  "announce_date": "2004-06-25",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2002,
+              "ordinary_dps": 0.2,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2002年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2002年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 2.0,
+                  "per_share": 0.2,
+                  "ex_date": "2003-07-14",
+                  "announce_date": "2003-07-08",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            },
+            {
+              "fiscal_year": 2001,
+              "ordinary_dps": 0.6,
+              "special_dps": 0,
+              "has_annual_final": true,
+              "components": [
+                {
+                  "fact_id": "div.2001年报.年度分红.per_10",
+                  "fiscal_year": null,
+                  "fiscal_label": "2001年报",
+                  "kind": "年度分红",
+                  "per_10_shares": 6.0,
+                  "per_share": 0.6,
+                  "ex_date": "2002-07-25",
+                  "announce_date": "2002-07-18",
+                  "status": "实施（已实施依据：implemented_status）",
+                  "is_special": false,
+                  "is_implemented": true,
+                  "source_id": "cninfo.dividend",
+                  "bucket": "ordinary"
+                }
+              ]
+            }
+          ],
+          "unlabeled_special": [
+            {
+              "fact_id": "div.unlabeled-2022-12-21.特别分红.per_10",
+              "fiscal_year": null,
+              "fiscal_label": null,
+              "kind": "特别分红",
+              "per_10_shares": 219.1,
+              "per_share": 21.91,
+              "ex_date": "2022-12-27",
+              "announce_date": "2022-12-21",
+              "status": "实施（已实施依据：implemented_status）",
+              "is_special": true,
+              "is_implemented": true,
+              "source_id": "cninfo.dividend"
+            },
+            {
+              "fact_id": "div.unlabeled-2023-12-14.特别分红.per_10",
+              "fiscal_year": null,
+              "fiscal_label": null,
+              "kind": "特别分红",
+              "per_10_shares": 191.06,
+              "per_share": 19.106,
+              "ex_date": "2023-12-20",
+              "announce_date": "2023-12-14",
+              "status": "实施（已实施依据：implemented_status）",
+              "is_special": true,
+              "is_implemented": true,
+              "source_id": "cninfo.dividend"
+            }
+          ],
+          "unlabeled_ordinary": [],
+          "excluded_not_implemented": [],
+          "excluded_other_kinds": [
+            {
+              "fact_id": "div.unlabeled-2006-05-22.股改分红.per_10",
+              "fiscal_year": null,
+              "fiscal_label": null,
+              "kind": "股改分红",
+              "per_10_shares": 5.91,
+              "per_share": 0.591,
+              "ex_date": "2006-05-24",
+              "announce_date": "2006-05-22",
+              "status": "实施（已实施依据：implemented_status）",
+              "is_special": false,
+              "is_implemented": true,
+              "source_id": "cninfo.dividend"
+            }
+          ],
+          "ltm_paid_per_share": 51.98123,
+          "ltm_window": [
+            "2025-11-10",
+            "2026-11-10"
+          ],
+          "notes": [
+            "财年合计 = 该财年内「年度分红 + 中期/季度分配」的每股派息之和；两者不重复计入。",
+            "特别分红单列，不进入可持续 DPS 序列，也不外推为未来普通股息。",
+            "「过去十二个月实际支付」按除权日滚动统计，与「某财年对应分配」不是同一指标。",
+            "2 条特别分红缺少所属财年：单列展示，不并入任何财年合计。",
+            "1 条记录不是现金分红类型（如股改分红）：不计入 DPS。"
+          ]
+        },
+        "selection_metrics": {
+          "capex_intensity": 0.018177966172148584,
+          "cash_conversion": 0.7162483445250187,
+          "payout_latest": 0.7893674228919949,
+          "payout_mean_3y": 0.6844147722756212,
+          "dividend_years_observed": 3,
+          "dividend_stability_cv": 0.1753138107589492
+        },
+        "selection_policy": {
+          "policy_version": "model-applicability/1",
+          "status": "research_candidate_pending_approval",
+          "revenue_volatility_cyclical": 0.08,
+          "revenue_drawdown_cyclical": 0.15,
+          "cyclical_industries": [
+            "煤炭",
+            "钢铁",
+            "有色",
+            "化工",
+            "航运",
+            "港口",
+            "房地产",
+            "水泥",
+            "建材",
+            "工程机械",
+            "养殖",
+            "石油",
+            "航空"
+          ],
+          "fcff_capex_intensity_max": 0.1,
+          "fcff_cash_conversion_min": 0.7,
+          "dividend_payout_min": 0.55,
+          "notes": [
+            "阈值是研究起点，不是已批准政策；提高或降低门槛会改变主模型但不改变已算出的价值。",
+            "判定只读业务证据与经营指标，不读当前股价。"
+          ]
+        },
+        "fcff_bridge": {
+          "fiscal_year": 2025,
+          "period_end": "2025-12-31",
+          "lines": [
+            {
+              "item": "net_profit",
+              "label": "净利润（含少数股东损益）",
+              "amount": 85310324833.67,
+              "sign": 1,
+              "status": "known",
+              "note": "合并利润表『NETPROFIT』"
+            },
+            {
+              "item": "income_tax",
+              "label": "加：所得税费用",
+              "amount": 29444936771.41,
+              "sign": 1,
+              "status": "known",
+              "note": "合并利润表『INCOME_TAX』"
+            },
+            {
+              "item": "pretax_profit",
+              "label": "＝利润总额（勾稽核对）",
+              "amount": 114755261605.08,
+              "sign": 1,
+              "status": "known",
+              "note": "净利润 + 所得税费用 = 利润总额；不一致说明存在未解释项"
+            },
+            {
+              "item": "interest_expense",
+              "label": "加：净利息费用（还原 EBIT）",
+              "amount": -815240284.72,
+              "sign": 1,
+              "status": "known",
+              "note": "财务费用净额（利息支出−利息收入）"
+            },
+            {
+              "item": "ebit",
+              "label": "＝EBIT（息税前利润）",
+              "amount": 113940021320.36,
+              "sign": 1,
+              "status": "derived",
+              "note": "利润总额 + 净利息费用"
+            },
+            {
+              "item": "tax_on_ebit",
+              "label": "减：按 EBIT 口径的所得税",
+              "amount": 29235755089.443233,
+              "sign": -1,
+              "status": "derived",
+              "note": "实际税率 25.66% = 所得税费用 / 利润总额"
+            },
+            {
+              "item": "nopat",
+              "label": "＝NOPAT（税后经营利润）",
+              "amount": 84704266230.91676,
+              "sign": 1,
+              "status": "derived",
+              "note": "EBIT × (1 − 实际税率)"
+            },
+            {
+              "item": "depreciation_amortization",
+              "label": "加：折旧与摊销",
+              "amount": 2259387054.2799997,
+              "sign": 1,
+              "status": "derived",
+              "note": "固定资产折旧 + 无形资产摊销 + 长期待摊费用摊销 + 使用权资产摊销"
+            },
+            {
+              "item": "capex",
+              "label": "减：资本开支",
+              "amount": 3127594916.41,
+              "sign": -1,
+              "status": "known",
+              "note": "购建固定资产、无形资产和其他长期资产支付的现金"
+            },
+            {
+              "item": "change_in_nwc",
+              "label": "减：营运资本增加",
+              "amount": 24874446586.02,
+              "sign": -1,
+              "status": "derived",
+              "note": "现金流量表补充资料（存货减少 + 经营性应收减少 + 经营性应付增加）；资产负债表口径（存货 + 应收票据及应收账款 − 应付票据及应付账款）为 5,083,363,527 元；与披露口径差额 19,791,083,059 元，来自预付款项/其他应收等未纳入简化口径的项目"
+            },
+            {
+              "item": "fcff",
+              "label": "＝FCFF（企业自由现金流）",
+              "amount": 58961611782.766754,
+              "sign": 1,
+              "status": "derived",
+              "note": "NOPAT + 折旧摊销 − 资本开支 − 营运资本增加"
+            }
+          ],
+          "fcff": 58961611782.766754,
+          "ebit": 113940021320.36,
+          "effective_tax_rate": 0.25658899086250286,
+          "nopat": 84704266230.91676,
+          "depreciation_amortization": 2259387054.2799997,
+          "capex": 3127594916.41,
+          "change_in_nwc": 24874446586.02,
+          "ocf_implied_fcff": 57788551470.18677,
+          "reconciliation_gap": 1173060312.5799866,
+          "reconciliation_relative": 0.019067267058829458,
+          "reconciled": true,
+          "nwc_source": "现金流量表补充资料（存货减少 + 经营性应收减少 + 经营性应付增加）",
+          "change_in_nwc_cross_check": 5083363526.949997,
+          "issues": []
+        },
+        "share_count_check": {
+          "current_total_shares": 1250081601.0,
+          "weighted_shares_from_eps": 1253732365.240329,
+          "relative_difference": 0.0029119167228559254,
+          "note": "当前股本用于每股换算；加权股数由归母净利润/基本每股收益反推"
+        },
+        "research_hypothesis_parameters": [
+          "nwc_pct_incremental_revenue"
+        ]
+      },
+      "cross_check": {
+        "model_id": "equity_dividend_discount",
+        "model_version": "0.2.0-research",
+        "assumption_id": "assump-37be4516f09a996d",
+        "value_per_share": 1015.5858387602837,
+        "difference_pct": -0.24273759610377665,
+        "terminal_share_of_value": 0.7778034799711302,
+        "note": "两条路线共用同一份财务事实，但驱动项不同；差异用于说明模型口径分歧，不取平均"
+      },
+      "missing": [],
+      "issues": [],
+      "invalidation": [
+        "若 2025 年报数据被更正（重述），本次研究估值需要重算。",
+        "若折现率、终值增长或分配路径的研究假设被修订，结论随之改变。",
+        "若公司业务结构发生变化（新增金融子公司、重大并购或剥离），适用性需要重新判定。"
+      ],
+      "warnings": [
+        "特别分红（含所属财年缺失的记录）单列，未进入可持续 DPS 序列：21.9100 元/股、19.1060 元/股",
+        "1 条非现金分红类型（如股改分红）未计入 DPS"
+      ]
+    },
+    "dividend_summary": {
+      "fiscal_years": [
+        {
+          "fiscal_year": 2025,
+          "ordinary_dps": 51.98123,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "季度分红",
+              "per_share": 23.957,
+              "ex_date": "2025-12-19",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2025三季报"
+            },
+            {
+              "kind": "年度分红",
+              "per_share": 28.02423,
+              "ex_date": "2026-06-26",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2025年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2024,
+          "ordinary_dps": 51.555,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "季度分红",
+              "per_share": 23.881999999999998,
+              "ex_date": "2024-12-20",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2024三季报"
+            },
+            {
+              "kind": "年度分红",
+              "per_share": 27.673000000000002,
+              "ex_date": "2025-06-26",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2024年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2023,
+          "ordinary_dps": 30.875999999999998,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 30.875999999999998,
+              "ex_date": "2024-06-19",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2023年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2022,
+          "ordinary_dps": 25.911,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 25.911,
+              "ex_date": "2023-06-30",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2022年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2021,
+          "ordinary_dps": 21.675,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 21.675,
+              "ex_date": "2022-06-30",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2021年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2020,
+          "ordinary_dps": 19.293,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 19.293,
+              "ex_date": "2021-06-25",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2020年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2019,
+          "ordinary_dps": 17.025,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 17.025,
+              "ex_date": "2020-06-24",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2019年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2018,
+          "ordinary_dps": 14.538999999999998,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 14.538999999999998,
+              "ex_date": "2019-06-28",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2018年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2017,
+          "ordinary_dps": 10.998999999999999,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 10.998999999999999,
+              "ex_date": "2018-06-15",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2017年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2016,
+          "ordinary_dps": 6.787000000000001,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 6.787000000000001,
+              "ex_date": "2017-07-07",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2016年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2015,
+          "ordinary_dps": 6.171,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 6.171,
+              "ex_date": "2016-07-01",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2015年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2014,
+          "ordinary_dps": 4.3740000000000006,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 4.3740000000000006,
+              "ex_date": "2015-07-17",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2014年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2013,
+          "ordinary_dps": 4.3740000000000006,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 4.3740000000000006,
+              "ex_date": "2014-06-25",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2013年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2012,
+          "ordinary_dps": 6.419,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 6.419,
+              "ex_date": "2013-06-07",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2012年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2011,
+          "ordinary_dps": 3.997,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 3.997,
+              "ex_date": "2012-07-05",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2011年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2010,
+          "ordinary_dps": 2.3,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 2.3,
+              "ex_date": "2011-07-01",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2010年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2009,
+          "ordinary_dps": 1.185,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 1.185,
+              "ex_date": "2010-07-05",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2009年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2008,
+          "ordinary_dps": 1.1560000000000001,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 1.1560000000000001,
+              "ex_date": "2009-07-01",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2008年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2007,
+          "ordinary_dps": 0.836,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 0.836,
+              "ex_date": "2008-06-16",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2007年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2006,
+          "ordinary_dps": 0.7,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 0.7,
+              "ex_date": "2007-07-13",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2006年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2005,
+          "ordinary_dps": 0.3,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 0.3,
+              "ex_date": "2006-05-19",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2005年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2004,
+          "ordinary_dps": 0.5,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 0.5,
+              "ex_date": "2005-08-05",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2004年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2003,
+          "ordinary_dps": 0.3,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 0.3,
+              "ex_date": "2004-07-01",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2003年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2002,
+          "ordinary_dps": 0.2,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 0.2,
+              "ex_date": "2003-07-14",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2002年报"
+            }
+          ]
+        },
+        {
+          "fiscal_year": 2001,
+          "ordinary_dps": 0.6,
+          "special_dps": 0,
+          "has_annual_final": true,
+          "components": [
+            {
+              "kind": "年度分红",
+              "per_share": 0.6,
+              "ex_date": "2002-07-25",
+              "status": "实施（已实施依据：implemented_status）",
+              "bucket": "ordinary",
+              "fiscal_label": "2001年报"
+            }
+          ]
+        }
+      ],
+      "ltm_paid_per_share": 51.98123,
+      "ltm_window": [
+        "2025-11-10",
+        "2026-11-10"
+      ],
+      "unlabeled_special": [
+        {
+          "per_share": 21.91,
+          "kind": "特别分红",
+          "announce_date": "2022-12-21"
+        },
+        {
+          "per_share": 19.106,
+          "kind": "特别分红",
+          "announce_date": "2023-12-14"
+        }
+      ],
+      "notes": [
+        "财年合计 = 该财年内「年度分红 + 中期/季度分配」的每股派息之和；两者不重复计入。",
+        "特别分红单列，不进入可持续 DPS 序列，也不外推为未来普通股息。",
+        "「过去十二个月实际支付」按除权日滚动统计，与「某财年对应分配」不是同一指标。",
+        "2 条特别分红缺少所属财年：单列展示，不并入任何财年合计。",
+        "1 条记录不是现金分红类型（如股改分红）：不计入 DPS。"
+      ]
+    }
+  },
+  "code_version": "phase2-0.2.0",
+  "policy_version": "unapproved-phase2",
+  "model_version": "equity-research-0.2.0"
+}

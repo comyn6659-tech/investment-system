@@ -1,0 +1,19 @@
+{
+  "schema_version": "market-rates/1",
+  "as_of": "2026-11-10",
+  "fetched_at": "2026-11-11T14:23:05+08:00",
+  "rates_pct": {
+    "cn_10y": 1.5965,
+    "cn_5y": 1.3097,
+    "cn_30y": 2.0363
+  },
+  "source": {
+    "source_id": "em.bond_zh_us_rate",
+    "publisher": "东方财富（中债口径汇总）",
+    "interface": "AKShare bond_zh_us_rate",
+    "url": "https://data.eastmoney.com/cjsj/globalRateBond.html",
+    "retrieved_at": "2026-11-11T14:23:05+08:00",
+    "note": "中国国债到期收益率，日频；用于研究假设中的无风险利率参照"
+  },
+  "usage_note": "无风险利率是观测值；股权风险溢价与公司特定溢价是本轮研究假设候选，不由本文件决定，也不构成已批准政策。"
+}

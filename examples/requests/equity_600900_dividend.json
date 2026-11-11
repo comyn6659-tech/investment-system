@@ -1,0 +1,6 @@
+{
+  "query": "600900",
+  "intent": "buy_point_check",
+  "assumptions": "data/assumptions/600900-ddm-base.json",
+  "note": "阶段二样本：成熟非金融公司股息折现研究估值"
+}

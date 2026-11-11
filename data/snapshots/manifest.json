@@ -1,6 +1,24 @@
 {
   "snapshots": [
     {
+      "snapshot_id": "snap-791670f4b3c68cab",
+      "instrument_id": "EQUITY:600519.SH",
+      "asset_class": "equity",
+      "as_of": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "fetched_at": "2026-11-11T14:31:27+08:00",
+      "file": "snap-791670f4b3c68cab.json"
+    },
+    {
+      "snapshot_id": "snap-855281f9cc5afb1f",
+      "instrument_id": "EQUITY:600900.SH",
+      "asset_class": "equity",
+      "as_of": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "fetched_at": "2026-11-11T14:25:10+08:00",
+      "file": "snap-855281f9cc5afb1f.json"
+    },
+    {
       "snapshot_id": "snap-fac0481bd5f7d1b5",
       "instrument_id": "EQUITY:601398.SH",
       "asset_class": "equity",
@@ -8,6 +26,15 @@
       "available_at": "2026-10-31",
       "fetched_at": "2026-11-11T13:36:56+08:00",
       "file": "snap-fac0481bd5f7d1b5.json"
+    },
+    {
+      "snapshot_id": "snap-e701028693917737",
+      "instrument_id": "EQUITY:601398.SH",
+      "asset_class": "equity",
+      "as_of": "2026-11-10",
+      "available_at": "2026-11-10T15:00:00+08:00",
+      "fetched_at": "2026-11-11T14:39:01+08:00",
+      "file": "snap-e701028693917737.json"
     },
     {
       "snapshot_id": "snap-6938a7a7b2c868c4",

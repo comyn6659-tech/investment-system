@@ -39,8 +39,12 @@ PAYLOAD_SCHEMAS: dict[str, set[str]] = {
         "company_facts",
         "financial_periods",
         "dividend_records",
+        "dividend_summary",
         "model_applicability",
         "valuation",
+        # 阶段二研究估值（有版本）：正式 valuation 仍保留给 validated 模型，
+        # 研究结果单独放在这里，绝不混进市场事实字段
+        "research_valuation",
     },
     "index": {
         "payload_type",
@@ -64,6 +68,17 @@ PAYLOAD_SCHEMAS: dict[str, set[str]] = {
 }
 
 
+# 可选字段：旧结果（阶段一）没有这些字段仍然合法，新结果可以带上
+PAYLOAD_OPTIONAL_FIELDS: dict[str, set[str]] = {
+    "equity": {"research_valuation", "dividend_summary"},
+    "index": set(),
+    "etf": set(),
+    "none": set(),
+}
+
+RESEARCH_VALUATION_PAYLOAD_VERSION = "equity-research/1"
+
+
 def empty_equity_payload() -> dict[str, Any]:
     return {
         "payload_type": "equity",
@@ -72,6 +87,8 @@ def empty_equity_payload() -> dict[str, Any]:
         "dividend_records": [],
         "model_applicability": {"status": "not_evaluated", "reason_code": None},
         "valuation": None,
+        "research_valuation": None,
+        "dividend_summary": None,
     }
 
 
