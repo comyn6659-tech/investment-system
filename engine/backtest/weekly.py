@@ -4,6 +4,8 @@
 - 观察点 = 每个 ISO 周最后一个交易日；
 - 样本 = 观察点之前 5 个日历年内、每周最后一个**有效（正值）**滚动市盈率，每周一条；
   当前周不入池；
+- 池内取的是「该周最后一个正值」；观察点自身仍取**当日**值，缺失或非正不给分位
+  （收尾项 R1：此前误用「该周最后一个交易日的值」，缺值会让整周作废）；
 - 覆盖 = 有效周数 ≥ 该区间内有交易日的周数 × 90%，否则该观察点不可评估；
 - 分位公式沿用 `engine.series.window.percentile_of`，不另写第二套。
 """
@@ -34,21 +36,40 @@ class WeeklyObservation:
     week: str
     date: str
     close: float | None
-    pe: float | None
+    pe: float | None  # 观察日当天的值（作为「当前值」使用）
+    week_pe: float | None = None  # 该周最后一个正值（作为「池内样本」使用）
 
     def to_dict(self) -> dict[str, Any]:
-        return {"week": self.week, "date": self.date, "close": self.close, "pe": self.pe}
+        return {
+            "week": self.week,
+            "date": self.date,
+            "close": self.close,
+            "pe": self.pe,
+            "week_pe": self.week_pe,
+        }
 
 
 def build_weekly_observations(
     close_observations: Sequence[tuple[str, float]],
     pe_observations: Sequence[tuple[str, float]],
 ) -> list[WeeklyObservation]:
-    """以交易日历（收盘序列）为准，每周取最后一个交易日作为观察点。"""
+    """以交易日历（收盘序列）为准，每周取最后一个交易日作为观察点。
+
+    同时记录该周**最后一个正值 PE**（`week_pe`），供参考池使用：
+    池内样本按「每周最后一个有效值」取，避免观察日当天缺值就让整周作废。
+    """
     pe_by_date = {d: v for d, v in pe_observations}
     last_in_week: dict[str, tuple[str, float]] = {}
     for day, close in sorted(close_observations):
         last_in_week[iso_week(day)] = (day, close)
+
+    # 每周最后一个正值 PE：按日期升序扫描，后出现的覆盖先出现的
+    week_pe: dict[str, float] = {}
+    for day, value in sorted(pe_by_date.items()):
+        if value is None or value <= 0:
+            continue
+        week_pe[iso_week(day)] = value
+
     out: list[WeeklyObservation] = []
     for week in sorted(last_in_week):
         day, close = last_in_week[week]
@@ -58,6 +79,7 @@ def build_weekly_observations(
                 date=day,
                 close=close,
                 pe=pe_by_date.get(day),
+                week_pe=week_pe.get(week),
             )
         )
     return out
@@ -119,7 +141,8 @@ def weekly_percentiles(
             for other in ordered[:index]
             if window_start < other.date < obs.date
         ]
-        valid = [o for o in pool_window if o.pe is not None and o.pe > 0]
+        # R1：池内取「每周最后一个正值」，不是「观察日的值」
+        valid = [o for o in pool_window if o.week_pe is not None and o.week_pe > 0]
         weeks_in_window = len(pool_window)
         coverage = (len(valid) / weeks_in_window) if weeks_in_window else None
 
@@ -140,7 +163,7 @@ def weekly_percentiles(
 
         percentile = None
         if reason is None:
-            percentile = percentile_of(obs.pe, [o.pe for o in valid])
+            percentile = percentile_of(obs.pe, [o.week_pe for o in valid])
         out.append(
             WeeklyPercentile(
                 week=obs.week,

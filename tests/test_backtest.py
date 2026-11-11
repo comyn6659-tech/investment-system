@@ -410,3 +410,114 @@ def test_run_index_backtest_is_deterministic():
         first["runs"]["total_return"]["lag1"]["10"]["full"]["cumulative_return"]
         == second["runs"]["total_return"]["lag1"]["10"]["full"]["cumulative_return"]
     )
+
+
+# --- 收尾项 R1：池内取每周最后一个正值，观察点仍取当日值 ---------------------
+def test_weekly_pool_uses_last_positive_pe_in_week():
+    """周内最后交易日缺 PE 时，该周仍以「最后一个正值」进入参考池（R1）。"""
+    days = _weekdays("2015-01-01", "2020-12-31")
+    fridays = [d for d in days if date.fromisoformat(d).weekday() == 4]
+    pe_pairs: list[tuple[str, float]] = []
+    for index, friday in enumerate(fridays):
+        if index in (10, 11):
+            # 这两周的周五没有 PE，但周三有；旧实现会让整周作废
+            wednesday = (date.fromisoformat(friday) - timedelta(days=2)).isoformat()
+            pe_pairs.append((wednesday, 20.0))
+        else:
+            pe_pairs.append((friday, 10.0))
+    observations = build_weekly_observations(
+        [(d, 100.0) for d in fridays], pe_pairs
+    )
+    affected = [o for o in observations if o.week in {iso_week(fridays[10]), iso_week(fridays[11])}]
+    assert all(o.pe is None for o in affected), "观察日当天确实没有值"
+    assert all(o.week_pe == pytest.approx(20.0) for o in affected), "周内最后一个正值仍进池"
+
+    result = weekly_percentiles(observations)
+    last = result[-1]
+    assert last.evaluable is True
+    window = last.window_start
+    pool = [
+        value
+        for day, value in pe_pairs
+        if window < day < last.date and value > 0
+    ]
+    assert last.pool_size == len(pool)
+
+
+def test_observation_point_still_requires_same_day_value():
+    """观察点自身仍取当日值：当日缺失或非正时不给分位，即使周内有正值。"""
+    days = _weekdays("2015-01-01", "2020-12-31")
+    fridays = [d for d in days if date.fromisoformat(d).weekday() == 4]
+    pe_pairs = [(d, 10.0) for d in fridays]
+    last_friday = fridays[-1]
+    wednesday = (date.fromisoformat(last_friday) - timedelta(days=2)).isoformat()
+    pe_pairs[-1] = (wednesday, 15.0)  # 只给周三
+    observations = build_weekly_observations([(d, 100.0) for d in fridays], pe_pairs)
+    result = weekly_percentiles(observations)
+    assert result[-1].evaluable is False
+    assert "没有滚动市盈率" in (result[-1].reason or "")
+
+
+def test_r1_matches_reviewer_expected_coverage():
+    """修正后三指数的可评估周数与评估起点（复验报告第二节）。"""
+    store = SeriesStore(ROOT / "data" / "series")
+    expected = {
+        "000300": (547, "2016-03-11"),
+        "000905": (547, "2016-03-11"),
+        "000852": (363, "2019-10-18"),
+    }
+    launches = {"000300": "2005-04-08", "000905": "2007-01-15", "000852": "2014-10-17"}
+    for code, (count, start) in expected.items():
+        instrument_id = f"INDEX:{code}.SH"
+        close = store.find(instrument_id, METRIC_OFFICIAL_CLOSE, frequency=FREQ_DAILY)
+        pe = store.find(instrument_id, METRIC_OFFICIAL_PE_ROLLING, frequency=FREQ_DAILY)
+        weekly = [
+            w
+            for w in build_weekly_observations(close.observations, pe.observations)
+            if w.date >= launches[code]
+        ]
+        result = weekly_percentiles(weekly)
+        evaluable = [r for r in result if r.evaluable]
+        assert len(evaluable) == count, code
+        assert evaluable[0].date == start, code
+
+
+# --- 收尾项 R2：开发/留出区间各自的买入持有基准 ------------------------------
+def test_development_and_holdout_have_their_own_benchmarks():
+    payload = json.loads(
+        (ROOT / "data" / "backtest" / "candidate-a.json").read_text(encoding="utf-8")
+    )
+    for code in ("000300", "000905", "000852"):
+        entry = payload["indices"][code]
+        assert set(entry["benchmarks"]["by_window"]) == {"full", "development", "holdout"}
+        for window in ("development", "holdout"):
+            for lag in ("lag1", "lag2"):
+                for cost in ("5", "10", "20"):
+                    block = entry["runs"]["total_return"][lag][cost][window]
+                    assert block["benchmark_total_return_buy_hold"] is not None
+                    assert block["benchmark_price_buy_hold"] is not None
+                    assert block["excess_vs_total_return"] == pytest.approx(
+                        block["cumulative_return"] - block["benchmark_total_return_buy_hold"]
+                    )
+
+
+def test_window_benchmarks_match_series_recomputation():
+    """开发/留出基准可由序列独立复算。"""
+    payload = json.loads(
+        (ROOT / "data" / "backtest" / "candidate-a.json").read_text(encoding="utf-8")
+    )
+    store = SeriesStore(ROOT / "data" / "series")
+    for code in ("000300", "000905", "000852"):
+        entry = payload["indices"][code]
+        tr = store.find(
+            f"INDEX:{code}.SH", METRIC_TOTAL_RETURN_CLOSE, frequency=FREQ_DAILY
+        )
+        prices = dict(tr.observations)
+        calendar = sorted(prices)
+        for window, (block_key) in (
+            ("development", "development"),
+            ("holdout", "holdout"),
+        ):
+            block = entry["runs"]["total_return"]["lag1"]["10"][block_key]
+            expected = buy_and_hold(prices, calendar, start=block["start"], end=block["end"])
+            assert block["benchmark_total_return_buy_hold"] == pytest.approx(expected)

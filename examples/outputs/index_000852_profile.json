@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-100415ee7f8ef342",
-  "generated_at": "2026-11-12T00:16:32+08:00",
+  "analysis_id": "analysis-c1756e2d01205d1d",
+  "generated_at": "2026-11-12T00:41:27+08:00",
   "instrument": {
     "instrument_id": "INDEX:000852.SH",
     "display_name": "中证1000",
@@ -720,7 +720,7 @@
       "is_trading_signal": false
     }
   },
-  "code_version": "phase3-0.5.0",
+  "code_version": "phase3-0.5.1",
   "policy_version": "unapproved-phase2",
   "model_version": "research-0.3.0"
 }

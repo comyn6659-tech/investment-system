@@ -111,8 +111,7 @@ def _run_basis(
     cost_scenarios: Sequence[float],
     lags: Sequence[int],
     split_date: str,
-    benchmark_tr: float | None,
-    benchmark_price: float | None,
+    benchmarks: Mapping[str, Mapping[str, float | None]],
 ) -> dict[str, Any]:
     results: dict[str, Any] = {}
     for lag in lags:
@@ -144,8 +143,8 @@ def _run_basis(
                 start=evaluation_start,
                 end=evaluation_end,
                 price_calendar=calendar,
-                benchmark_tr=benchmark_tr,
-                benchmark_price=benchmark_price,
+                benchmark_tr=(benchmarks["full"] or {}).get("tr"),
+                benchmark_price=(benchmarks["full"] or {}).get("price"),
             )
             dev = summarize_window(
                 [t for t in trades if t["entry_exec_date"] < split_date],
@@ -153,6 +152,8 @@ def _run_basis(
                 start=evaluation_start,
                 end=min(split_date, evaluation_end),
                 price_calendar=calendar,
+                benchmark_tr=(benchmarks["development"] or {}).get("tr"),
+                benchmark_price=(benchmarks["development"] or {}).get("price"),
             )
             holdout = summarize_window(
                 [t for t in trades if t["entry_exec_date"] >= split_date],
@@ -160,6 +161,8 @@ def _run_basis(
                 start=max(split_date, evaluation_start),
                 end=evaluation_end,
                 price_calendar=calendar,
+                benchmark_tr=(benchmarks["holdout"] or {}).get("tr"),
+                benchmark_price=(benchmarks["holdout"] or {}).get("price"),
             )
             per_cost[str(int(cost))] = {
                 "cost_bp": cost,
@@ -235,12 +238,19 @@ def run_index_backtest(
 
     tr_prices = _price_map(tr_observations)
     close_prices = _price_map(close_observations)
-    benchmark_tr = buy_and_hold(
-        tr_prices, tr_calendar, start=evaluation_start, end=evaluation_end
-    )
-    benchmark_price = buy_and_hold(
-        close_prices, close_calendar, start=evaluation_start, end=evaluation_end
-    )
+
+    windows = {
+        "full": (evaluation_start, evaluation_end),
+        "development": (evaluation_start, min(split_date, evaluation_end)),
+        "holdout": (max(split_date, evaluation_start), evaluation_end),
+    }
+    benchmarks = {
+        key: {
+            "tr": buy_and_hold(tr_prices, tr_calendar, start=start, end=end),
+            "price": buy_and_hold(close_prices, close_calendar, start=start, end=end),
+        }
+        for key, (start, end) in windows.items()
+    }
 
     runs = {
         "total_return": _run_basis(
@@ -252,8 +262,7 @@ def run_index_backtest(
             cost_scenarios=cost_scenarios,
             lags=lags,
             split_date=split_date,
-            benchmark_tr=benchmark_tr,
-            benchmark_price=benchmark_price,
+            benchmarks=benchmarks,
         ),
         "price": _run_basis(
             observations=observations,
@@ -264,8 +273,7 @@ def run_index_backtest(
             cost_scenarios=cost_scenarios,
             lags=lags,
             split_date=split_date,
-            benchmark_tr=benchmark_tr,
-            benchmark_price=benchmark_price,
+            benchmarks=benchmarks,
         ),
     }
 
@@ -282,9 +290,11 @@ def run_index_backtest(
             "note": "施工单冻结值，未做任何搜索",
         },
         "benchmarks": {
-            "total_return_buy_hold": benchmark_tr,
-            "price_buy_hold": benchmark_price,
+            "total_return_buy_hold": benchmarks["full"]["tr"],
+            "price_buy_hold": benchmarks["full"]["price"],
             "cash_return": 0.0,
+            "by_window": benchmarks,
+            "note": "全样本与开发/留出区间分别报告同期买入持有基准（收尾项 R2）",
         },
         "data_quality": quality,
         "weekly": {

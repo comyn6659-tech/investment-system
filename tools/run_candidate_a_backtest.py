@@ -156,7 +156,7 @@ def render_markdown(payload: dict) -> str:
         bench = entry["benchmarks"]
         lines += [
             "",
-            f"同期基准：全收益指数买入持有 {_pct(bench['total_return_buy_hold'])}；"
+            f"全样本同期基准：全收益指数买入持有 {_pct(bench['total_return_buy_hold'])}；"
             f"价格指数买入持有 {_pct(bench['price_buy_hold'])}；现金 0%。",
             "",
         ]
@@ -166,8 +166,10 @@ def render_markdown(payload: dict) -> str:
         lines += [
             "### 开发 / 留出区间（全收益、T+1、成本 10bp）",
             "",
-            "| 区间 | 起止 | 成交笔数 | 累计收益 | 年化 | 最大回撤 | 市场暴露 |",
-            "|---|---|---|---|---|---|---|",
+            "同期买入持有基准按同一区间、同一价格序列单独计算（收尾项 R2）。",
+            "",
+            "| 区间 | 起止 | 成交笔数 | 累计收益 | 年化 | 最大回撤 | 市场暴露 | 同期全收益买入持有 | 超额（全收益） | 同期价格买入持有 | 超额（价格） |",
+            "|---|---|---|---|---|---|---|---|---|---|---|",
         ]
         for key, name in (("development", "开发"), ("holdout", "留出"), ("full", "全样本")):
             block = tr_lag1[key]
@@ -175,7 +177,11 @@ def render_markdown(payload: dict) -> str:
                 f"| {name} | {block['start']} → {block['end']} | {block['trades']} | "
                 f"{_pct(block['cumulative_return'])} | {_pct(block['annualized_return'])} | "
                 f"{_pct((block['max_drawdown'] or {}).get('max_drawdown'))} | "
-                f"{_pct(block['market_exposure'], 1)} |"
+                f"{_pct(block['market_exposure'], 1)} | "
+                f"{_pct(block['benchmark_total_return_buy_hold'])} | "
+                f"{_pct(block['excess_vs_total_return'])} | "
+                f"{_pct(block['benchmark_price_buy_hold'])} | "
+                f"{_pct(block['excess_vs_price'])} |"
             )
         lines += [
             "",
