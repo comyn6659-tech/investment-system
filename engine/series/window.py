@@ -185,10 +185,19 @@ def build_window(
 
     parsed.sort(key=lambda p: (p.date, p.value))
 
-    # 每月保留最后一个观测（同一天多值时取最后一条原始顺序里的较大者已在排序中体现）
+    # 先按有效性过滤，再按月取最后一条：约定的「每月最后一个有效观测」，
+    # 不是「取最后一条再判断是否有效」——后者会让月中有效、月末无效的月份整月消失。
+    eligible: list[MonthlyPoint] = []
+    dropped_non_positive: list[MonthlyPoint] = []
+    for point in parsed:
+        if require_positive and point.value <= 0:
+            dropped_non_positive.append(point)
+            continue
+        eligible.append(point)
+
     by_month: dict[str, MonthlyPoint] = {}
     duplicates: list[MonthlyPoint] = []
-    for point in parsed:
+    for point in eligible:
         existing = by_month.get(point.month)
         if existing is not None:
             duplicates.append(existing)
@@ -197,20 +206,15 @@ def build_window(
     # 比较值一律取最新可用的同口径实际观测；PE 若该值非正，就没有可用分位，
     # 不允许退回更早的正值来冒充「当前值」。
     comparison: MonthlyPoint | None = parsed[-1] if parsed else None
-    dropped_non_positive: list[MonthlyPoint] = []
-    if comparison is not None and require_positive and comparison.value <= 0:
+    if (
+        comparison is not None
+        and require_positive
+        and comparison.value <= 0
+        and comparison not in dropped_non_positive
+    ):
         dropped_non_positive.append(comparison)
 
-    monthly_points: list[MonthlyPoint] = []
-    non_positive_in_window: list[MonthlyPoint] = []
-    for month in months:
-        point = by_month.get(month)
-        if point is None:
-            continue
-        if require_positive and point.value <= 0:
-            non_positive_in_window.append(point)
-            continue
-        monthly_points.append(point)
+    monthly_points = [by_month[month] for month in months if month in by_month]
 
     comparison_removed = False
     pool_points = list(monthly_points)
@@ -255,9 +259,10 @@ def build_window(
         notes.append(f"{len(dropped_future)} 条晚于分析时点的记录已剔除。")
     if duplicates:
         notes.append(f"{len(duplicates)} 条同月较早记录按「每月最后一个观测」规则丢弃。")
-    if non_positive_in_window:
+    if dropped_non_positive:
         notes.append(
-            f"{len(non_positive_in_window)} 个非正观测未进入本指标分布（PE 非正不参与）。"
+            f"{len(dropped_non_positive)} 个非正观测被剔除，未进入本指标分布"
+            "（PE 非正不参与）；同月若仍有有效观测，该月仍保留。"
         )
 
     return WindowResult(
@@ -280,7 +285,7 @@ def build_window(
         percentile_display=format_percentile(percentile),
         sufficient=insufficient_reason is None,
         insufficient_reason=insufficient_reason,
-        dropped_non_positive=tuple(dropped_non_positive + non_positive_in_window),
+        dropped_non_positive=tuple(dropped_non_positive),
         dropped_future=tuple(dropped_future),
         dropped_duplicate_months=tuple(duplicates),
         dropped_unparsable=tuple(unparsable),

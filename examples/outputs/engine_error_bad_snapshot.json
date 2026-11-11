@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-da3bf20345d4948b",
-  "generated_at": "2026-11-11T17:00:12+08:00",
+  "analysis_id": "analysis-3755f661fd5b23f0",
+  "generated_at": "2026-11-11T22:59:58+08:00",
   "instrument": {
     "instrument_id": "INDEX:000300.SH",
     "display_name": "沪深300",
@@ -138,7 +138,7 @@
     },
     "valuation_profile": null
   },
-  "code_version": "phase3-0.3.0",
+  "code_version": "phase3-0.3.1",
   "policy_version": "unapproved-phase2",
   "model_version": "research-0.3.0"
 }

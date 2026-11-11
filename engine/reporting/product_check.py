@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 from engine.data.facts import Fact
@@ -88,48 +89,93 @@ def build_product_check(
         }
 
     price = _num(snapshot, "etf.price")
-    build_block = (snapshot.coverage or {}).get("build") or {}
-    bar_status = build_block.get("bar_status")
+    _build = (snapshot.coverage or {}).get("build") or {}
+    _bar_status = _build.get("bar_status")
     bar = {
-        "value": bar_status,
-        "status": "known" if bar_status else "unknown",
+        "value": _bar_status,
+        "status": "known" if _bar_status else "unknown",
         "period": snapshot.as_of,
         "note": "按交易所收盘时间判定；intraday 表示当日未收盘",
     }
     nav = _num(snapshot, "etf.nav")
     nav_date = _text(snapshot, "etf.nav_date")
     nav_disclosed = _text(snapshot, "etf.nav_disclosed_at")
-    premium = _num(snapshot, "etf.premium_discount_same_day_pct")
+    cached_premium = _num(snapshot, "etf.premium_discount_same_day_pct")
 
-    # 同日折溢价的前提必须在出口再核一次：价格、净值、折溢价三者同一估值日期，
-    # 且净值必须为正。快照一旦被改动或拼接，就不许继续用它。
-    premium_reject_reason: str | None = None
-    if premium is not None and premium.get("value") is not None:
-        price_date = (price or {}).get("period")
-        nav_day = (nav_date or {}).get("value")
-        nav_value = (nav or {}).get("value")
-        if price_date != nav_day:
-            premium_reject_reason = (
-                f"价格日期 {price_date} 与净值日期 {nav_day} 不一致，拒绝同日折溢价"
-            )
-        elif premium.get("period") != price_date:
-            premium_reject_reason = (
-                f"折溢价记录日期 {premium.get('period')} 与价格日期 {price_date} 不一致"
-            )
-        elif nav_value is None or float(nav_value) <= 0:
-            premium_reject_reason = f"单位净值 {nav_value} 不可用或非正"
-    if premium_reject_reason:
-        premium = {
+    # 派生事实在使用处统一核验：价格可用且是收盘价、净值可用且为正、
+    # NAV 数值事实自身日期与 nav_date 一致、价格与净值同一估值日期。
+    # 条件齐备时用价格与净值**重算**，缓存值只作一致性核对；
+    # 任何一条不满足都不输出旧值。
+    build_block = (snapshot.coverage or {}).get("build") or {}
+    bar_value = build_block.get("bar_status")
+    price_value = (price or {}).get("value")
+    price_date = (price or {}).get("period")
+    nav_value = (nav or {}).get("value")
+    nav_fact_period = (nav or {}).get("period")
+    nav_date_value = (nav_date or {}).get("value")
+    cached_value = (cached_premium or {}).get("value")
+
+    reject_reason: str | None = None
+    if price_value is None:
+        reject_reason = "价格缺失或不可用，无法计算同日折溢价"
+    elif bar_value != "closed":
+        reject_reason = f"价格状态为 {bar_value or '未知'}，不是已收盘价，不计算同日折溢价"
+    elif nav_value is None:
+        reject_reason = "单位净值缺失或不可用，无法计算同日折溢价"
+    elif float(nav_value) <= 0:
+        reject_reason = f"单位净值 {nav_value} 非正，拒绝同日折溢价"
+    elif nav_fact_period != nav_date_value:
+        reject_reason = (
+            f"NAV 数值事实日期 {nav_fact_period} 与 nav_date {nav_date_value} 不一致，拒绝混日计算"
+        )
+    elif price_date != nav_date_value:
+        reject_reason = f"价格日期 {price_date} 与净值日期 {nav_date_value} 不一致，拒绝同日折溢价"
+    elif float(price_value) <= 0:
+        reject_reason = f"收盘价 {price_value} 非正，拒绝同日折溢价"
+
+    cache_note = ""
+    if reject_reason is not None:
+        premium: dict[str, Any] = {
             "label": "事后同日折溢价",
             "value": None,
             "status": "rejected",
             "unit": "percent",
             "currency": None,
             "period": None,
-            "note": premium_reject_reason,
+            "cached_value": cached_value,
+            "recomputed": False,
+            "note": reject_reason,
         }
-    elif premium is not None:
-        premium = {**premium, "label": "事后同日折溢价"}
+    else:
+        recomputed = (float(price_value) / float(nav_value) - 1.0) * 100.0
+        cache_consistent: bool | None = None
+        if cached_value is not None:
+            cache_consistent = math.isclose(
+                float(cached_value), recomputed, rel_tol=1e-9, abs_tol=1e-9
+            )
+            if not cache_consistent:
+                cache_note = (
+                    f"缓存值 {cached_value:.6f}% 与按当前价格/净值重算的 {recomputed:.6f}% 不一致，"
+                    "已改用重算值；请检查快照是否被改动或拼接"
+                )
+        premium = {
+            "label": "事后同日折溢价",
+            "value": recomputed,
+            "status": "computed",
+            "unit": "percent",
+            "currency": None,
+            "period": price_date,
+            "price": float(price_value),
+            "nav": float(nav_value),
+            "cached_value": cached_value,
+            "cache_consistent": cache_consistent,
+            "recomputed": True,
+            "note": (
+                "事后同日折溢价 = 市场收盘价 / 同日单位净值 − 1；"
+                "净值披露时刻未知，不能据此证明当日收盘前已可交易，也不用于回测的当日成交"
+                + (f"；{cache_note}" if cache_note else "")
+            ),
+        }
 
     missing: list[dict[str, Any]] = []
     if nav_disclosed is not None and nav_disclosed["status"] != "known":

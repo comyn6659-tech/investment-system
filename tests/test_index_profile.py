@@ -331,3 +331,111 @@ def test_real_series_cover_the_60_month_window():
             assert result.pool_size >= MIN_VALID_MONTHS
             assert result.window_start_month == "2021-11"
             assert result.window_end_month == "2026-10"
+
+
+# --- W1：先按月取最后一条、再过滤非正，会丢掉整月有效观测 ---------------------
+def _review_w1_observations():
+    """复验反例：每月 15 日有效，前七个月 28 日追加一个非正 PE。"""
+    obs = [(f"{2021 + (10 + i) // 12:04d}-{(10 + i) % 12 + 1:02d}-15", float(i + 1)) for i in range(60)]
+    obs += [(day[:7] + "-28", -1.0) for day, _ in obs[:7]]
+    obs += [("2026-11-10", 30.5)]
+    return obs
+
+
+def test_w1_month_keeps_last_valid_observation_when_month_end_is_invalid():
+    result = build_window(
+        _review_w1_observations(),
+        metric="pe_rolling",
+        as_of="2026-11-10",
+        require_positive=True,
+    )
+    assert result.pool_size == 60, "月中有效、月末非正时，该月仍应保留最后一个有效观测"
+    assert result.percentile == pytest.approx(50.0)
+    assert len(result.valid_months) == 60
+    assert result.insufficient_reason is None
+    assert len(result.dropped_non_positive) == 7
+    assert any("同月若仍有有效观测" in note for note in result.notes)
+
+
+def test_w1_same_month_multiple_valid_values_keep_the_last():
+    observations = _monthly("2021-11", 60)
+    observations.append(("2022-03-10", 500.0))  # 与 2022-03-28 同月，均为有效值
+    result = build_window(observations, metric="pb", as_of="2026-11-15")
+    march = [p for p in result.monthly_points if p.month == "2022-03"]
+    assert len(march) == 1
+    assert march[0].value == pytest.approx(5.0), "同月多条有效值时取最后一条（2022-03-28）"
+
+
+def test_w1_invalid_last_value_does_not_change_the_current_comparison():
+    """最新观测为非正时仍不给分位，不允许回退到月中正值冒充当前值。"""
+    observations = _monthly("2021-11", 60)
+    observations.append(("2026-11-10", -5.0))
+    result = build_window(
+        observations, metric="pe_rolling", as_of="2026-11-10", require_positive=True
+    )
+    assert result.comparison is not None and result.comparison.value == -5.0
+    assert result.percentile is None
+    assert "非正" in (result.insufficient_reason or "")
+
+
+# --- W2：官方短序列必须受画像 as_of 限制 -------------------------------------
+def test_w2_official_short_series_respects_as_of():
+    pe = _series()
+    official = _series(
+        metric="official_pe_ratio_1",
+        field="市盈率1",
+        frequency=FREQ_DAILY_SHORT,
+        observations=(("2026-11-07", 13.5), ("2026-11-10", 13.8), ("2026-11-11", 999.0)),
+    )
+    profile = build_index_profile(
+        instrument_id="INDEX:000300.SH",
+        as_of="2026-11-10",
+        series={"pe_rolling": pe},
+        short_series={"official_pe_ratio_1": official},
+    )
+    block = profile["official_short_history"]["official_pe_ratio_1"]
+    assert block["latest"] == {"date": "2026-11-10", "value": 13.8}
+    assert block["latest"]["date"] <= profile["as_of"]
+    assert block["excluded_future_observations"] == 1
+    assert block["observation_count"] == 2
+    assert block["coverage_end"] == "2026-11-10"
+
+
+def test_w2_official_series_entirely_in_future_is_reported_as_gap():
+    pe = _series()
+    official = _series(
+        metric="official_pe_ratio_1",
+        field="市盈率1",
+        frequency=FREQ_DAILY_SHORT,
+        observations=(("2026-11-11", 999.0), ("2026-11-12", 1000.0)),
+    )
+    profile = build_index_profile(
+        instrument_id="INDEX:000300.SH",
+        as_of="2026-11-10",
+        series={"pe_rolling": pe},
+        short_series={"official_pe_ratio_1": official},
+    )
+    block = profile["official_short_history"]["official_pe_ratio_1"]
+    assert block["latest"] is None
+    assert block["status"] == "no_observation_by_as_of"
+    assert block["observation_count"] == 0
+    assert "不晚于 2026-11-10" in block["note"]
+    assert any(item["metric"] == "official_pe_ratio_1" for item in profile["missing"])
+    # 供应商画像本身不受影响
+    assert profile["metrics"]["pe_rolling"]["percentile"] is not None
+
+
+def test_w2_official_short_history_normal_case_is_unchanged():
+    store = SeriesStore(ROOT / "data" / "series")
+    series = store.find("INDEX:000300.SH", METRIC_PE_ROLLING, frequency=FREQ_MONTHLY_REFERENCE)
+    official = store.find("INDEX:000300.SH", "official_pe_ratio_1", frequency=FREQ_DAILY_SHORT)
+    profile = build_index_profile(
+        instrument_id="INDEX:000300.SH",
+        as_of="2026-11-10",
+        series={"pe_rolling": series},
+        short_series={"official_pe_ratio_1": official},
+    )
+    block = profile["official_short_history"]["official_pe_ratio_1"]
+    assert block["observation_count"] == 20
+    assert block["latest"]["date"] == "2026-11-10"
+    assert block["excluded_future_observations"] == 0

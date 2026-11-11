@@ -124,19 +124,49 @@ def build_index_profile(
     for metric, item in (short_series or {}).items():
         if item.frequency != FREQ_DAILY_SHORT:
             continue
-        latest_date, latest_value = item.observations[-1]
-        official[metric] = {
+        # 官方短序列同样受画像 as_of 限制：截至该日没有可用记录时只报缺口，
+        # 不能把未来观测塞进「截至某日」的报告。
+        visible = tuple(o for o in item.observations if o[0] <= as_of)
+        excluded_future = len(item.observations) - len(visible)
+        block: dict[str, Any] = {
             "metric": metric,
             "label": item.field,
             "series_id": item.series_id,
             "field": item.field,
             "source": item.source.to_dict(),
-            "latest": {"date": latest_date, "value": latest_value},
-            "observation_count": len(item.observations),
-            "coverage_start": item.start_date,
-            "coverage_end": item.end_date,
             "usage": "仅作并列事实；样本过短，不参与长历史排名",
+            "excluded_future_observations": excluded_future,
         }
+        if visible:
+            latest_date, latest_value = visible[-1]
+            block.update(
+                {
+                    "status": "computed",
+                    "latest": {"date": latest_date, "value": latest_value},
+                    "observation_count": len(visible),
+                    "coverage_start": visible[0][0],
+                    "coverage_end": latest_date,
+                }
+            )
+        else:
+            block.update(
+                {
+                    "status": "no_observation_by_as_of",
+                    "latest": None,
+                    "observation_count": 0,
+                    "coverage_start": None,
+                    "coverage_end": None,
+                    "note": f"官方序列没有不晚于 {as_of} 的观测，因此不展示数值",
+                }
+            )
+            missing.append(
+                {
+                    "metric": metric,
+                    "label": item.field,
+                    "reason": f"官方短历史没有不晚于 {as_of} 的观测",
+                }
+            )
+        official[metric] = block
         series_ids[metric] = item.series_id
         sources[item.source.source_id] = item.source.to_dict()
 

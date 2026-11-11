@@ -249,3 +249,112 @@ def test_index_profile_without_model_result_is_rejected(analyzer):
     data["model_results"] = []
     problems = validate_result(data)
     assert any("model_result" in item.lower() or "model_results" in item for item in problems)
+
+
+# --- E1：派生折溢价必须在出口按当前价格/净值核验 ----------------------------
+def _premium_variants(catalog):
+    """四个反例变体：只改一项事实，其余保持真实快照。"""
+    instrument, snapshot = _snapshot(catalog)
+    nav_period_changed = replace(
+        snapshot,
+        facts=[
+            replace(f, period="2026-11-09") if f.fact_id == "etf.nav" else f
+            for f in snapshot.facts
+        ],
+    )
+    intraday = replace(
+        snapshot,
+        coverage={
+            **snapshot.coverage,
+            "build": {**snapshot.coverage["build"], "bar_status": "intraday"},
+        },
+    )
+    variants = {
+        "price_changed": _with_facts(snapshot, _set("etf.price", 5.0)),
+        "nav_period_changed": nav_period_changed,
+        "intraday": intraday,
+        "price_missing": _with_facts(snapshot, _drop({"etf.price"})),
+    }
+    return instrument, snapshot, variants
+
+
+def test_e1_normal_samples_are_consistent_with_cache(catalog):
+    instrument, snapshot = _snapshot(catalog)
+    check = build_product_check(instrument, catalog.underlying(instrument), snapshot)
+    premium = check["premium_discount_same_day"]
+    assert premium["recomputed"] is True
+    assert premium["cache_consistent"] is True
+    price = snapshot.fact("etf.price").value
+    nav = snapshot.fact("etf.nav").value
+    assert premium["value"] == pytest.approx((price / nav - 1.0) * 100.0)
+
+
+def test_e1_changed_price_recomputes_instead_of_reusing_stale_cache(catalog):
+    instrument, _, variants = _premium_variants(catalog)
+    check = build_product_check(
+        instrument, catalog.underlying(instrument), variants["price_changed"]
+    )
+    premium = check["premium_discount_same_day"]
+    nav = variants["price_changed"].fact("etf.nav").value
+    expected = (5.0 / nav - 1.0) * 100.0
+    assert premium["value"] == pytest.approx(expected)
+    assert premium["cache_consistent"] is False
+    assert premium["cached_value"] is not None
+    assert "不一致" in premium["note"]
+
+
+def test_e1_nav_fact_period_mismatch_is_refused(catalog):
+    instrument, _, variants = _premium_variants(catalog)
+    check = build_product_check(
+        instrument, catalog.underlying(instrument), variants["nav_period_changed"]
+    )
+    premium = check["premium_discount_same_day"]
+    assert premium["value"] is None
+    assert premium["status"] == "rejected"
+    assert "不一致" in premium["note"]
+    assert check["status"] == "partial"
+
+
+def test_e1_intraday_price_is_refused(catalog):
+    instrument, _, variants = _premium_variants(catalog)
+    check = build_product_check(instrument, catalog.underlying(instrument), variants["intraday"])
+    premium = check["premium_discount_same_day"]
+    assert premium["value"] is None
+    assert premium["status"] == "rejected"
+    assert "不是已收盘价" in premium["note"]
+
+
+def test_e1_missing_price_is_refused(catalog):
+    instrument, _, variants = _premium_variants(catalog)
+    check = build_product_check(
+        instrument, catalog.underlying(instrument), variants["price_missing"]
+    )
+    premium = check["premium_discount_same_day"]
+    assert premium["value"] is None
+    assert premium["status"] == "rejected"
+    assert "价格缺失" in premium["note"]
+
+
+def test_e1_pipeline_never_exports_a_stale_premium(catalog):
+    """完整分析 + JSON 出口：改价格后不能输出旧的派生折溢价。"""
+    analyzer_ = Analyzer(
+        AnalyzerConfig(
+            registry_path=ROOT / "data" / "registry" / "instruments.json",
+            equity_list_path=ROOT / "data" / "registry" / "cn_a_equities.json",
+            snapshot_dir=SNAPSHOT_DIR,
+            evidence_dir=ROOT / "data" / "evidence",
+            series_dir=ROOT / "data" / "series",
+        )
+    )
+    instrument, snapshot = _snapshot(catalog)
+    stale = snapshot.fact("etf.premium_discount_same_day_pct").value
+    changed = _with_facts(snapshot, _set("etf.price", 5.0))
+    monkey = analyzer_._load_snapshot
+    try:
+        analyzer_._load_snapshot = lambda *a, **k: changed  # type: ignore[assignment]
+        data = json.loads(export_json(analyzer_.analyze("510300")))
+    finally:
+        analyzer_._load_snapshot = monkey  # type: ignore[assignment]
+    premium = data["payload"]["product_check"]["premium_discount_same_day"]["value"]
+    assert premium != pytest.approx(stale)
+    assert premium == pytest.approx((5.0 / snapshot.fact("etf.nav").value - 1.0) * 100.0)

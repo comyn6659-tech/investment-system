@@ -1,6 +1,6 @@
 # 第三阶段首轮交付：宽基指数估值画像 + ETF 产品资料检查
 
-日期：2026-11-11｜代码版本 `phase3-0.3.0`｜政策版本 `unapproved-phase2`｜模型版本 `research-0.3.0`
+日期：2026-11-11｜代码版本 `phase3-0.3.1`（W1/W2/E1 收尾）｜政策版本 `unapproved-phase2`｜模型版本 `research-0.3.0`
 
 本文件交代本轮实现范围、真实输出、测试结果与剩余缺口。
 口径与窗口的完整定义见 [index-profile-spec.md](index-profile-spec.md)，
@@ -30,6 +30,63 @@
 两个策略模型仍是 `research` + `implemented=false`，本轮不实现。
 
 ---
+
+## 1.1 W1 / W2 / E1 收尾（复验报告三项）
+
+复验报告：`phase3-review-and-handover-boundary.md`。只修这三项，未扩大重构、未改投资政策、未开始回测。
+
+### W1：先按月取最后值、再过滤非正 PE，丢掉整月有效观测
+
+**根因**：`build_window` 先用月末记录覆盖月中记录，再剔除非正值。因此「月中有效、月末非正」的月份
+整个消失，覆盖被错误降低（反例：应从 60 个月掉到 53 个月，分位变成 `null`）。
+
+**修复**：`engine/series/window.py` 改为**先按有效性过滤，再按月取最后一条**
+（`eligible` → `by_month`）。被剔除的非正观测仍完整列在 `dropped_non_positive`，
+说明文字明确「同月若仍有有效观测，该月仍保留」。
+**当前最新 PE 自身非正时仍不给分位**，不回退到旧正值。
+
+修复后同一反例：参考池 60 个月、分位 50.0%、`insufficient_reason = null`。
+
+### W2：官方短序列未受画像 as_of 限制
+
+**根因**：长序列在 `build_window` 里剔除了未来记录，官方短序列却直接取 `observations[-1]`，
+序列更新后重放旧日期快照会把后一天的官方值展示出来。
+
+**修复**：`engine/series/profile.py` 对官方短序列同样只保留 `date <= as_of` 的观测；
+`latest`、`observation_count`、`coverage_start/end` 都按可见记录计算，
+未来记录计入 `excluded_future_observations`。截至 `as_of` 没有可见记录时返回
+`status = no_observation_by_as_of`、`latest = null`，并列入 `missing`，不硬取未来值。
+
+修复后：追加 `2026-11-11 = 999` 的合成记录，画像 `as_of = 2026-11-10` 的官方最新值仍是
+`2026-11-10 / 13.82`，`excluded_future_observations = 1`。
+
+### E1：ETF 直接沿用缓存折溢价
+
+**根因**：`product_check` 读取快照里已存的折溢价，只核了部分日期与 NAV 正值，
+没有核价格是否可用、是否收盘价、NAV 数值事实自身日期，也没有验证派生值是否仍与当前价格/净值一致。
+
+**修复**：`engine/reporting/product_check.py` 在使用处统一核验：
+价格可用且为 `closed`、NAV 可用且为正、`NAV 数值事实 period == nav_date`、价格与净值同一估值日期、
+价格为正。条件齐备时**用价格与净值重算**，缓存值只作一致性核对
+（`cached_value` / `cache_consistent`；不一致时改用重算值并在 `note` 里说明）。
+任一条件不满足就把值置空、`status = rejected` 并写明原因，不再输出旧值。
+
+四个变体的修复后行为：
+
+| 变体 | 修复前 | 修复后 |
+|---|---|---|
+| 价格改为 5、NAV 4.1361 | 仍输出 −0.026595% | 重算为 **+20.886826%**，`cache_consistent = false` |
+| NAV 数值事实 period 改为 11-09、`nav_date` 仍 11-10 | 仍输出旧值 | `rejected`，说明「NAV 数值事实日期与 nav_date 不一致」 |
+| `bar_status` 改为 `intraday` | 仍输出旧值 | `rejected`，说明「不是已收盘价」 |
+| 价格设为 missing、保留日期 | 仍输出旧值 | `rejected`，说明「价格缺失」 |
+
+正常三只 ETF 的折溢价与缓存完全一致（`cache_consistent = true`），数值未变。
+
+### 正常样例是否变化
+
+**没有变化**：三只指数 PE/PB 分位（75.8/39.2、75.0/76.7、65.0/34.2）、参考池 60 个月、
+中位数、官方短历史最新值与观测数（20）全部与修复前一致；三只 ETF 折溢价仍为
+−0.026595% / −0.222890% / −0.209143%，`analysis_status = complete`、`decision = undetermined` 不变。
 
 ## 2. 指数画像（I1 / I2 / I3）
 
@@ -110,14 +167,15 @@
 
 ```text
 $ PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
-330 passed in 3.72s
+342 passed in 3.55s
 ```
 
 | 文件 | 项数 | 本轮新增覆盖 |
 |---|---|---|
-| `tests/test_index_profile.py` | 24 | 分位手算与并列值、60 个月窗口边界、每月去重、当前值排除、覆盖不足（<54）、非正 PE（入池与当前值两种）、未来日期剔除、中位数/区间手算、序列哈希与篡改检测、画像确定性、真实序列覆盖 60/60 |
-| `tests/test_etf_product.py` | 20 | 同日折溢价公式、跨日拒算、净值缺失/非正、停复牌与价差显式缺失、披露时刻未知、20 日均额天数、费率来源、三只 ETF 对应指数、指数/ETF 画像一致性、出口护栏 |
+| `tests/test_index_profile.py` | 30 | 分位手算与并列值、60 个月窗口边界、每月去重、当前值排除、覆盖不足（<54）、非正 PE（入池与当前值两种）、未来日期剔除、中位数/区间手算、序列哈希与篡改检测、画像确定性、真实序列覆盖 60/60 |
+| `tests/test_etf_product.py` | 26 | 同日折溢价公式、跨日拒算、净值缺失/非正、停复牌与价差显式缺失、披露时刻未知、20 日均额天数、费率来源、三只 ETF 对应指数、指数/ETF 画像一致性、出口护栏 |
 | 既有回归 | 286 | 个股研究估值、阶段一契约与快照（全部保留通过） |
+| 本轮新增（W1/W2/E1） | 12 | W1 三例、W2 三例、E1 六例；复验脚本 6 个 FAIL 全部转为 PASS |
 
 阶段一/二的断言只改了三类「模型已实现」后的语义更新（指数/ETF 由 `unsupported` 变为
 `complete`+`research`），其余保持不变；新增的 `index_profile` 结果类型有独立的来源校验。

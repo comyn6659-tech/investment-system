@@ -181,6 +181,18 @@
 | I5 输出与回归 | CLI 文本/JSON 同语义；全部研究决策为 undetermined；无目标点位/目标价/正式买点；个股及阶段一相关回归通过 | `engine/reporting/text_summary.py`、`engine/contracts/validation.py` | `test_etf_exports_validate_and_have_no_formal_decision`、`test_index_profile_cannot_be_a_trading_signal`、`test_index_profile_without_model_result_is_rejected`；个股 286 项回归全部通过 | ✅ |
 | I6 交付完整 | DELIVERY.md 汇总真实示例、测试结果、数据覆盖、口径与剩余缺口，并给出可复现命令 | `DELIVERY.md`、`docs/phase3-delivery.md`、`docs/index-profile-spec.md`、`docs/phase3-samples.md` | 入口文件 §1–§6；样例由 `tools/render_phase3_report.py` 自动生成 | ✅ |
 
+## 第三阶段收尾（W1 / W2 / E1）
+
+| 编号 | 检查项 | 实现位置 | 测试 | 状态 |
+|---|---|---|---|---|
+| W1-1 | 先按有效性过滤，再取每月最后一个有效观测；同月有有效值时该月不丢 | `engine/series/window.py::build_window` | `test_w1_month_keeps_last_valid_observation_when_month_end_is_invalid`（60 月 / 50%）、`test_w1_same_month_multiple_valid_values_keep_the_last` | ✅ |
+| W1-2 | 当前最新 PE 非正时仍不给分位，不回退旧正值 | 同上 | `test_w1_invalid_last_value_does_not_change_the_current_comparison` | ✅ |
+| W2-1 | 官方短序列只展示不晚于 `as_of` 的观测，`latest/数量/覆盖` 自洽 | `engine/series/profile.py::build_index_profile` | `test_w2_official_short_series_respects_as_of`、`test_w2_official_short_history_normal_case_is_unchanged` | ✅ |
+| W2-2 | 官方序列全在未来时只报缺口，不硬取未来值 | 同上 | `test_w2_official_series_entirely_in_future_is_reported_as_gap` | ✅ |
+| E1-1 | 派生折溢价在使用处核验价格可用/收盘、NAV 可用且为正、NAV 事实日期与 `nav_date` 一致、同日 | `engine/reporting/product_check.py::build_product_check` | `test_e1_nav_fact_period_mismatch_is_refused`、`test_e1_intraday_price_is_refused`、`test_e1_missing_price_is_refused` | ✅ |
+| E1-2 | 缓存值只作一致性核对；与重算不一致时改用重算值并留痕 | 同上 | `test_e1_changed_price_recomputes_instead_of_reusing_stale_cache`、`test_e1_pipeline_never_exports_a_stale_premium` | ✅ |
+| E1-3 | 正常三只 ETF 折溢价数字不变 | 同上 | `test_e1_normal_samples_are_consistent_with_cache`、`test_same_day_premium_is_computed_from_price_and_nav` | ✅ |
+
 ## 第三阶段遗留（不阻断本轮）
 
 | # | 事项 | 影响 |

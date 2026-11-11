@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-da2762c5058fab9a",
-  "generated_at": "2026-11-11T17:00:13+08:00",
+  "analysis_id": "analysis-9be39acdaf8f3dec",
+  "generated_at": "2026-11-11T22:59:59+08:00",
   "instrument": {
     "instrument_id": "ETF:512100.SH",
     "display_name": "中证1000ETF南方",
@@ -462,23 +462,18 @@
         "disclosure_time_known": false
       },
       "premium_discount_same_day": {
+        "label": "事后同日折溢价",
         "value": -0.20914251568567854,
-        "status": "known",
+        "status": "computed",
         "unit": "percent",
         "currency": null,
         "period": "2026-11-10",
-        "as_of": "2026-11-10",
-        "available_at": null,
-        "source": {
-          "source_id": "em.etf_nav",
-          "publisher": "东方财富",
-          "interface": "AKShare fund_etf_fund_info_em",
-          "url": "http://fundf10.eastmoney.com/jjzq_512100.html",
-          "retrieved_at": "2026-11-11T16:54:49+08:00",
-          "notes": "单位净值/累计净值；接口不含净值披露时间"
-        },
-        "note": "价格与净值对应同一估值日期；净值披露时刻未知，不能据此证明当日收盘前已可交易，也不用于回测的当日成交",
-        "label": "事后同日折溢价"
+        "price": 2.672,
+        "nav": 2.6776,
+        "cached_value": -0.20914251568567854,
+        "cache_consistent": true,
+        "recomputed": true,
+        "note": "事后同日折溢价 = 市场收盘价 / 同日单位净值 − 1；净值披露时刻未知，不能据此证明当日收盘前已可交易，也不用于回测的当日成交"
       },
       "fees": {
         "management": {
@@ -924,14 +919,16 @@
               "retrieved_at": "2026-11-11T16:53:05+08:00",
               "definition_note": "官方文件只提供最近约 20 个交易日；市盈率/股息率口径未在文件内说明。"
             },
+            "usage": "仅作并列事实；样本过短，不参与长历史排名",
+            "excluded_future_observations": 0,
+            "status": "computed",
             "latest": {
               "date": "2026-11-10",
               "value": 29.58
             },
             "observation_count": 20,
             "coverage_start": "2026-10-14",
-            "coverage_end": "2026-11-10",
-            "usage": "仅作并列事实；样本过短，不参与长历史排名"
+            "coverage_end": "2026-11-10"
           }
         },
         "missing": [],
@@ -969,7 +966,7 @@
       }
     }
   },
-  "code_version": "phase3-0.3.0",
+  "code_version": "phase3-0.3.1",
   "policy_version": "unapproved-phase2",
   "model_version": "research-0.3.0"
 }
