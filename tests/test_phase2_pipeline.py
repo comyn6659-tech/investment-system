@@ -355,3 +355,33 @@ def test_summary_text_reports_missing_and_invalidation(analyzer):
     assert "资料不足" in text
     assert "哪些变化会使当前结论失效" in text
     assert "bank.cet1_ratio" in text
+
+
+@pytest.mark.parametrize(
+    "query,needs_assumptions",
+    [
+        ("600519", True),
+        ("600900", True),
+        ("601398", False),
+        ("601318", False),
+        ("601088", False),
+        ("600030", False),
+        ("600000", False),
+        ("沪深300", False),
+        ("510300", False),
+    ],
+)
+def test_text_report_renders_for_every_status(analyzer, query, needs_assumptions):
+    """任何 analysis_status 都必须能渲染文本摘要（曾因 model_plan 结构变化抛 KeyError）。"""
+    assumptions = None
+    if query == "600519":
+        assumptions = load_assumptions(MAOTAI_FCFF)
+    elif query == "600900":
+        assumptions = load_assumptions(CJDL_DDM)
+    result = analyzer.analyze(query, assumptions=assumptions)
+    text = render_text(result.to_dict())
+    assert "【标的】" in text
+    assert "【结论】" in text
+    assert "【方法】" in text
+    assert "不形成买点结论" in text
+    assert validate_result(result) == []

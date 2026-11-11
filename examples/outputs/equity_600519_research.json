@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
   "analysis_id": "analysis-59341b7c872b7269",
-  "generated_at": "2026-11-11T14:40:36+08:00",
+  "generated_at": "2026-11-11T14:43:05+08:00",
   "instrument": {
     "instrument_id": "EQUITY:600519.SH",
     "display_name": "贵州茅台",
@@ -88,13 +88,7 @@
         "reason": "作为交叉检查模型：本标的资本开支轻、现金转化高，分配路径主要由自由现金流决定，股息折现提供一致性检验"
       }
     ],
-    "candidate_models": [
-      {
-        "model_id": "equity_dividend_discount",
-        "reason_code": "MODEL_CROSS_CHECK_ONLY",
-        "reason": "作为交叉检查模型：本标的资本开支轻、现金转化高，分配路径主要由自由现金流决定，股息折现提供一致性检验"
-      }
-    ],
+    "candidate_models": [],
     "family": "non_financial",
     "family_label": "非金融企业",
     "applicable_model_category": null,

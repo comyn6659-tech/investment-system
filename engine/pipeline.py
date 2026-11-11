@@ -658,7 +658,9 @@ def _equity_model_plan(valuation) -> dict:
         "selection_reason": "；".join(str(x) for x in conclusions[:4])
         or "未选主模型",
         "not_selected": list(applicability.get("rejected_models") or []),
-        "candidate_models": list(applicability.get("rejected_models") or []),
+        # 个股的候选模型不是「登记表里的描述符」，而是未被选中的路线，
+        # 因此这里留空，避免与阶段一 planned_model_plan 的结构混用
+        "candidate_models": [],
         "family": applicability.get("family"),
         "family_label": applicability.get("family_label"),
         "applicable_model_category": applicability.get("applicable_model_category"),

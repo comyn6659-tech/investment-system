@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
   "analysis_id": "analysis-50b95e1f4e6d8699",
-  "generated_at": "2026-11-11T14:40:36+08:00",
+  "generated_at": "2026-11-11T14:43:05+08:00",
   "instrument": {
     "instrument_id": "EQUITY:601318.SH",
     "display_name": "中国平安",
@@ -87,18 +87,7 @@
         "reason": "保险公司利润与现金流受准备金假设、投资收益率与会计准则共同影响，普通企业 FCFF 与股息折现会把投资收益与准备金释放错当成经营现金流。本版未实现内含价值口径，因此不进任何估值模型。"
       }
     ],
-    "candidate_models": [
-      {
-        "model_id": "equity_dcf_fcff",
-        "reason_code": "MODEL_FAMILY_NOT_IMPLEMENTED",
-        "reason": "保险公司利润与现金流受准备金假设、投资收益率与会计准则共同影响，普通企业 FCFF 与股息折现会把投资收益与准备金释放错当成经营现金流。本版未实现内含价值口径，因此不进任何估值模型。"
-      },
-      {
-        "model_id": "equity_dividend_discount",
-        "reason_code": "MODEL_FAMILY_NOT_IMPLEMENTED",
-        "reason": "保险公司利润与现金流受准备金假设、投资收益率与会计准则共同影响，普通企业 FCFF 与股息折现会把投资收益与准备金释放错当成经营现金流。本版未实现内含价值口径，因此不进任何估值模型。"
-      }
-    ],
+    "candidate_models": [],
     "family": "insurance",
     "family_label": "保险（寿险/财险）",
     "applicable_model_category": "内含价值（EV）+ 新业务价值（NBV）折现",

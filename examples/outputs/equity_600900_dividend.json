@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
   "analysis_id": "analysis-64f73e49bee51f7d",
-  "generated_at": "2026-11-11T14:40:36+08:00",
+  "generated_at": "2026-11-11T14:43:05+08:00",
   "instrument": {
     "instrument_id": "EQUITY:600900.SH",
     "display_name": "长江电力",
@@ -87,13 +87,7 @@
         "reason": "作为交叉检查模型：本标的资本开支较重或现金转化偏低，单年自由现金流受再投资节奏影响，不宜作为主模型"
       }
     ],
-    "candidate_models": [
-      {
-        "model_id": "equity_dcf_fcff",
-        "reason_code": "MODEL_CROSS_CHECK_ONLY",
-        "reason": "作为交叉检查模型：本标的资本开支较重或现金转化偏低，单年自由现金流受再投资节奏影响，不宜作为主模型"
-      }
-    ],
+    "candidate_models": [],
     "family": "non_financial",
     "family_label": "非金融企业",
     "applicable_model_category": null,

@@ -110,17 +110,17 @@ cd /Users/comyn/Documents/deepseek-harness/投资/investment-system
 
 ```text
 $ PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
-258 passed in 2.61s
+267 passed in 2.89s
 ```
 
-阶段一为 142 项；本轮新增 116 项，分组如下：
+阶段一为 142 项；本轮新增 125 项，分组如下：
 
 | 文件 | 项数 | 覆盖内容 |
 |---|---|---|
 | `tests/test_valuation_kernel.py` | 48 | 折现恒等式、零增长终值退化为永续年金、折现率单调性、负现金流保留、终值边界、权益桥接符号/单位/重复计数、每 10 股转换、特别分红剥离、超额分配、增长一致性、银行资本与拨备约束 |
 | `tests/test_applicability.py` | 25 | 企业族判定、行业只作线索、周期需波动证据、未实现路线不进 DCF、选择不依赖价格、证据文件哈希、报告期与 TTM 规则 |
 | `tests/test_assumptions.py` | 13 | 假设可重放、内容哈希、状态不能升级为 validated、驱动项长度、来源必填、折现率 > 终值增长 |
-| `tests/test_phase2_pipeline.py` | 30 | 真实样本完整链路、价格变化不影响内在价值与选择、盘中价不参与比较、银行缺口、未实现路线、无证据/无假设、跨标的假设、时点过期、契约护栏、JSON 与文本一致 |
+| `tests/test_phase2_pipeline.py` | 39 | 真实样本完整链路、价格变化不影响内在价值与选择、盘中价不参与比较、银行缺口、未实现路线、无证据/无假设、跨标的假设、时点过期、契约护栏、JSON 与文本一致 |
 
 阶段一原有回归（契约、身份、快照、时点、出口护栏）全部保留并通过；
 本轮**只改了三处**与阶段一行为直接相关的断言，均为模型已实现后的语义更新，

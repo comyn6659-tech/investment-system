@@ -89,15 +89,24 @@ def render_text(result: dict[str, Any]) -> str:
     if plan.get("primary_model"):
         lines.append(f"【方法】主模型 {plan['primary_model']}（{plan.get('model_status')}）")
     else:
-        lines.append(f"【方法】未选主模型：{plan.get('selection_reason', '无说明')}")
+        lines.append(f"【方法】未选主模型：{plan.get('selection_reason') or '无说明'}")
         candidates = plan.get("candidate_models") or []
         if candidates:
             lines.append("  本应评估的模型：")
             for model in candidates:
-                lines.append(
-                    f"    - {model['model_id']}（{model['status']}，已实现={model['implemented']}）："
-                    f"{model['notes']}"
+                model_id = model.get("model_id") or model.get("model") or "未命名模型"
+                status = model.get("status") or model.get("reason_code") or "未知状态"
+                implemented = model.get("implemented")
+                note = model.get("notes") or model.get("reason") or ""
+                implemented_text = (
+                    f"，已实现={implemented}" if implemented is not None else ""
                 )
+                lines.append(f"    - {model_id}（{status}{implemented_text}）：{note}")
+        category = plan.get("applicable_model_category")
+        if category:
+            lines.append(f"  适用模型类别：{category}")
+        for item in plan.get("required_evidence_to_implement") or []:
+            lines.append(f"    - 补齐后可实现：{item}")
 
     # 4. 业务载荷：个股情景 / 指数位置 / ETF 执行
     lines.extend(_render_payload(payload))

@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
   "analysis_id": "analysis-dd74e8b49c1a2061",
-  "generated_at": "2026-11-11T14:40:37+08:00",
+  "generated_at": "2026-11-11T14:43:05+08:00",
   "instrument": {
     "instrument_id": "EQUITY:601398.SH",
     "display_name": "工商银行",
@@ -92,18 +92,7 @@
         "reason": "普通企业股息折现缺少资本充足与资产质量约束，银行必须走 bank_dividend_discount"
       }
     ],
-    "candidate_models": [
-      {
-        "model_id": "equity_dcf_fcff",
-        "reason_code": "MODEL_NOT_APPLICABLE_TO_BANK",
-        "reason": "银行不适用普通企业 FCFF：存款与同业负债是经营负债而非融资，资本开支与营运资本口径也不成立"
-      },
-      {
-        "model_id": "equity_dividend_discount",
-        "reason_code": "MODEL_NOT_APPLICABLE_TO_BANK",
-        "reason": "普通企业股息折现缺少资本充足与资产质量约束，银行必须走 bank_dividend_discount"
-      }
-    ],
+    "candidate_models": [],
     "family": "bank",
     "family_label": "银行",
     "applicable_model_category": "银行专用股息折现（资本与资产质量约束）",
