@@ -312,7 +312,8 @@ def _render_research_valuation(
 ) -> list[str]:
     """研究估值报告：公司/模型选择、数据与缺口、价值范围与驱动、现价关系、失效条件。"""
     lines: list[str] = []
-    applicability = applicability or research.get("applicability") or {}
+    # 研究估值里带的是完整适用性（含指标与政策），载荷里的 model_applicability 是精简版
+    applicability = research.get("applicability") or applicability or {}
 
     # 1. 这是什么公司、为何选这个模型、哪些模型不适用
     lines.append("")
@@ -322,6 +323,19 @@ def _render_research_valuation(
         f" ｜ 主模型：{research.get('model_id')}（{research.get('model_status')}）"
         f" ｜ 版本：{research.get('model_version')}"
     )
+    indicators = applicability.get("indicators") or {}
+    industry = indicators.get("industry")
+    segments = indicators.get("top_segments") or []
+    if industry or segments:
+        mix = "、".join(
+            f"{item.get('segment')} {item['revenue_share']:.1%}"
+            for item in segments
+            if item.get("revenue_share") is not None
+        )
+        lines.append(
+            f"  业务：行业分类 {industry or '未取得'}"
+            + (f" ｜ 主营构成：{mix}" if mix else " ｜ 主营构成未取得")
+        )
     for reason in (applicability.get("reasons") or [])[:4]:
         note = reason.get("note")
         if note:
