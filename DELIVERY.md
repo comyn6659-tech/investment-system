@@ -9,7 +9,7 @@
 | 代码版本 | `phase3-0.3.0` |
 | 政策版本 | `unapproved-phase2`（没有任何模型或参数升级为 `validated`） |
 | 模型版本 | `research-0.3.0`（个股 3 个 + 指数画像 1 个，全部 `research`） |
-| 本轮提交 | `PENDING`（见 §7） |
+| 本轮提交 | `1bb379c` |
 | 工作区 | 干净（`git status --short` 为空） |
 | 上一轮已签收提交 | `317506e`（S1/S2）、`82b8d4c`（交付入口） |
 
@@ -135,7 +135,7 @@ PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
 
 | 提交 | 内容 |
 |---|---|
-| `PENDING` | **本轮**：指数画像 + ETF 产品资料检查 + 24/20 项新回归 + 文档与入口 |
+| `1bb379c` | **本轮**：指数画像 + ETF 产品资料检查 + 24/20 项新回归 + 文档与入口 |
 | `82b8d4c` | 交付入口（阶段二） |
 | `317506e` | S1 / S2 修复（阶段二收尾，已签收） |
 | `a8c8f7a` | 报告补业务构成 |
