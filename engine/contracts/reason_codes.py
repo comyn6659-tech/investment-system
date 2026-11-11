@@ -208,3 +208,8 @@ BANK_CAPITAL_CONSTRAINT = _register(
 CROSS_CHECK_DIVERGENCE = _register(
     "CROSS_CHECK_DIVERGENCE", "model", "两条路线的研究估值差异较大，需解释差异来源", blocks_candidate=False
 )
+TERMINAL_DISTRIBUTION_UNFUNDED = _register(
+    "TERMINAL_DISTRIBUTION_UNFUNDED",
+    "model",
+    "末期分配超过当年盈利且没有持续资金来源证据，不能作为永续终值",
+)

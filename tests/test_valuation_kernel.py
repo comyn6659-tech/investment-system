@@ -221,33 +221,134 @@ def _annual(**numbers) -> AnnualFinancials:
     return AnnualFinancials(fiscal_year=2025, period_end="2025-12-31", values=values)
 
 
-def test_equity_bridge_from_financials_and_absent_debt_policy():
+def _policy(**overrides):
+    """构造逐项桥接政策：只给需要的项，其余项必须来自报表。"""
+    from engine.financials.bridge import BridgeItemPolicy
+
+    return {
+        name: BridgeItemPolicy(item=name, treat_absent_as_zero=True, basis=basis)
+        for name, basis in overrides.items()
+    }
+
+
+def test_bridge_policy_covers_debt_and_structural_items_but_not_minority():
     annual = _annual(
         cash=500.0,
-        short_loan=None,
-        long_loan=None,
-        bond_payable=None,
-        current_portion_lt_debt=None,
         lease_liab=10.0,
         minority_equity=20.0,
         interest_expense=1.0,
     )
-    built = build_equity_bridge(annual, shares=100.0, absent_as_zero=True)
+    built = build_equity_bridge(
+        annual,
+        shares=100.0,
+        policy=_policy(
+            debt_components="报表未列示短期借款等科目",
+            non_operating_assets="未拆分非经营性项目，留在 EV 内",
+            preferred_equity="报表无其他权益工具",
+        ),
+    )
     assert built.bridge.debt == pytest.approx(10.0)
-    assert set(built.absent_components) == {
-        "short_loan",
-        "long_loan",
-        "bond_payable",
-        "current_portion_lt_debt",
-    }
-    with pytest.raises(ValuationError):
-        build_equity_bridge(annual, shares=100.0, absent_as_zero=False)
+    assert built.bridge.minority_interest == pytest.approx(20.0)
+    statuses = {t.item: t.status for t in built.treatments}
+    assert statuses["debt_components"] == "sourced_partial", "部分科目有来源、部分按声明视为零"
+    assert statuses["minority_equity"] == "sourced"
+    assert statuses["cash"] == "sourced"
+
+
+def test_missing_minority_equity_cannot_be_treated_as_zero():
+    """S1：缺少数数股东权益时必须拒绝，不能默认零后给出更高的每股价值。"""
+    annual = _annual(cash=500.0, lease_liab=10.0, interest_expense=1.0)
+    policy = _policy(
+        debt_components="报表未列示借款科目",
+        non_operating_assets="x",
+        preferred_equity="x",
+    )
+    with pytest.raises(ValuationError) as excinfo:
+        build_equity_bridge(annual, shares=100.0, policy=policy)
+    assert excinfo.value.code == "MODEL_INPUT_MISSING"
+    assert "少数股东权益" in excinfo.value.message
+
+
+def test_minority_equity_assertion_requires_a_basis():
+    from engine.financials.bridge import BridgeItemPolicy
+
+    with pytest.raises(ValuationError) as excinfo:
+        BridgeItemPolicy(item="minority_equity", treat_absent_as_zero=True, basis="  ")
+    assert excinfo.value.code == "BRIDGE_ITEM_INVALID"
+
+
+def test_known_zero_minority_equity_still_computes():
+    from engine.data.facts import Fact
+
+    annual = _annual(cash=500.0, lease_liab=10.0, interest_expense=1.0)
+    annual.values["minority_equity"] = Fact.known_zero(
+        fact_id="fin.2025-12-31.minority_equity",
+        metric="minority_equity",
+        unit="CNY",
+        currency="CNY",
+        period="2025-12-31",
+    )
+    built = build_equity_bridge(
+        annual,
+        shares=100.0,
+        policy=_policy(debt_components="x", non_operating_assets="x", preferred_equity="x"),
+    )
+    assert built.bridge.minority_interest == 0.0
+    statuses = {t.item: t.status for t in built.treatments}
+    assert statuses["minority_equity"] == "sourced_zero"
+
+
+def test_conflicting_minority_equity_is_rejected():
+    from engine.data.facts import Fact
+
+    annual = _annual(cash=500.0, lease_liab=10.0, interest_expense=1.0)
+    annual.values["minority_equity"] = Fact.conflict(
+        fact_id="fin.2025-12-31.minority_equity",
+        metric="minority_equity",
+        values=[10.0, 20.0],
+        period="2025-12-31",
+    )
+    with pytest.raises(ValuationError) as excinfo:
+        build_equity_bridge(
+            annual,
+            shares=100.0,
+            policy=_policy(debt_components="x", non_operating_assets="x", preferred_equity="x"),
+        )
+    assert excinfo.value.code == "MODEL_INPUT_MISSING"
+
+
+def test_there_is_no_blanket_absent_as_zero_switch_left():
+    """S1：不允许再用一个全局开关把所有桥接项授权归零。"""
+    annual = _annual(cash=500.0, lease_liab=10.0, minority_equity=1.0, interest_expense=1.0)
+    with pytest.raises(TypeError):
+        build_equity_bridge(  # type: ignore[call-arg]
+            annual, shares=100.0, absent_as_zero=True
+        )
+
+
+def test_bridge_policy_rejects_unknown_items():
+    from engine.financials.bridge import parse_bridge_policy
+
+    with pytest.raises(ValuationError) as excinfo:
+        parse_bridge_policy({"everything": {"treat_absent_as_zero": True, "basis": "x"}})
+    assert excinfo.value.code == "BRIDGE_ITEM_INVALID"
+
+
+def test_missing_preferred_equity_is_refused_without_a_declaration():
+    annual = _annual(cash=500.0, lease_liab=10.0, minority_equity=1.0, interest_expense=1.0)
+    with pytest.raises(ValuationError) as excinfo:
+        build_equity_bridge(annual, shares=100.0, policy=_policy(debt_components="x"))
+    assert excinfo.value.code == "MODEL_INPUT_MISSING"
 
 
 def test_debt_absent_but_interest_paid_without_lease_is_a_conflict():
-    annual = _annual(cash=100.0, lease_liab=None, interest_expense=5.0)
+    annual = _annual(cash=100.0, lease_liab=None, interest_expense=5.0, minority_equity=1.0)
     with pytest.raises(ValuationError) as excinfo:
-        build_equity_bridge(annual, shares=10.0, absent_as_zero=True)
+        build_equity_bridge(
+            annual,
+            shares=10.0,
+            policy=_policy(debt_components="x", non_operating_assets="x", preferred_equity="x"),
+        )
     assert excinfo.value.code == "BRIDGE_ITEM_INVALID"
 
 
@@ -299,12 +400,62 @@ def test_payout_above_earnings_blocks_positive_terminal_growth():
     assert excinfo.value.code == "GROWTH_NOT_FUNDED_BY_RETENTION"
 
 
-def test_payout_above_earnings_is_allowed_with_zero_terminal_growth():
+def test_excess_payout_with_zero_growth_terminal_is_refused():
+    """S2：把增长设成 0 只消除了增长需求，没有消除超额分配的资金需求。"""
     drivers = _ddm(payout=(1.2, 1.2, 1.2), terminal_growth=0.0)
+    with pytest.raises(ValuationError) as excinfo:
+        value_dividend(drivers)
+    assert excinfo.value.code == "TERMINAL_DISTRIBUTION_UNFUNDED"
+
+
+def test_full_payout_with_zero_growth_still_degenerates_to_annuity():
+    drivers = _ddm(payout=(1.0, 1.0, 1.0), terminal_growth=0.0)
     valuation = value_dividend(drivers)
+    assert valuation.value_per_share == pytest.approx(perpetuity_present_value(10.0, 0.10))
+
+
+def test_supported_finite_excess_distribution_is_not_blanket_rejected():
+    """有明确资金支持的有限期额外分配：只进明确预测期，终值用可持续分配。"""
+    drivers = _ddm(payout=(1.2, 1.2, 1.2), terminal_growth=0.0)
+    valuation = value_dividend(
+        drivers, terminal_dps=10.0, terminal_basis="超额部分仅由已知一次性现金支持，仅限预测期"
+    )
+    explicit = 12 / 1.1 + 12 / 1.1**2 + 12 / 1.1**3
+    terminal = 10 / 0.10 / 1.1**3
+    assert valuation.value_per_share == pytest.approx(explicit + terminal)
     codes = {issue.code for issue in valuation.issues}
-    assert "DISTRIBUTION_NOT_COVERED_BY_EARNINGS" in codes
-    assert valuation.value_per_share > 0
+    assert "EXCESS_DISTRIBUTION_TERMINAL_SPLIT" in codes
+
+
+def test_sustainable_terminal_dps_above_earnings_is_rejected():
+    drivers = _ddm(payout=(1.2, 1.2, 1.2), terminal_growth=0.0)
+    with pytest.raises(ValuationError) as excinfo:
+        value_dividend(drivers, terminal_dps=11.0, terminal_basis="测试依据")
+    assert excinfo.value.code == "TERMINAL_DISTRIBUTION_UNFUNDED"
+
+
+def test_sustainable_terminal_dps_requires_a_basis():
+    drivers = _ddm(payout=(1.2, 1.2, 1.2), terminal_growth=0.0)
+    with pytest.raises(ValuationError) as excinfo:
+        value_dividend(drivers, terminal_dps=10.0, terminal_basis="  ")
+    assert excinfo.value.code == "TERMINAL_BASIS_MISSING"
+
+
+def test_excess_distribution_without_terminal_is_allowed():
+    """不启用终值时，超额分配只是有限期事实，不构成永续假设。"""
+    drivers = _ddm(payout=(1.2, 1.2, 1.2), terminal_growth=None)
+    valuation = value_dividend(drivers)
+    assert valuation.value_per_share == pytest.approx(12 / 1.1 + 12 / 1.1**2 + 12 / 1.1**3)
+
+
+def test_bank_route_inherits_terminal_sustainability_check():
+    """银行路线复用同一股息内核：超额分配同样不能自动永续。"""
+    with pytest.raises(ValuationError) as excinfo:
+        value_bank_dividend(
+            _bank_drivers(payout=(1.5, 1.5)),
+            _risk(),
+        )
+    assert excinfo.value.code == "TERMINAL_DISTRIBUTION_UNFUNDED"
 
 
 def test_terminal_growth_cannot_exceed_sustainable_growth():

@@ -142,6 +142,20 @@
 | P2-5 研究与正式决策分离 | 本轮生产输出没有 candidate/wait/avoid；真实研究结果可导出；未运行模型、必要数据缺失不能夹带价格；原阶段一回归通过 | `contracts/validation.py::_check_research_valuation*`、`decision/policy.py`、`pipeline._equity_result` | `test_no_equity_or_product_output_is_ever_candidate`（9 个标的）、`test_research_payload_cannot_claim_a_price_position`、`test_research_payload_requires_research_model_status`、`test_bank_route_stops_with_concrete_data_gap`（`research_valuation is None`）、原阶段一 142 项全部保留通过；文本与 JSON 出口对每种状态都有渲染测试 | ✅ |
 | P2-6 可复现与交付 | 固定数据、假设及版本可复现；提交参数来源与敏感性表、示例、测试输出和未解决事项 | `data/assumptions/`（内容哈希）、`docs/assumptions-and-sensitivity.md`、`docs/phase2-samples.md`、`examples/outputs/`、`docs/phase2-delivery.md` | `test_same_inputs_replay_identical_values`、`test_assumption_id_is_content_addressed_and_stable`、`test_changed_one_number_changes_the_assumption_id`；`tools/render_phase2_report.py` 与 `tools/render_examples.py` 从真实运行生成 | ✅ |
 
+## 阶段二 S1 / S2 收尾（复验报告）
+
+| 编号 | 检查项 | 实现位置 | 测试 | 状态 |
+|---|---|---|---|---|
+| S1-1 | 缺失/冲突的少数股东权益不得默认零；桥接信息不足时 `insufficient_data`，不产出每股价值 | `financials/bridge.py::_resolve_item` | `test_missing_minority_equity_cannot_be_treated_as_zero`、`test_conflicting_minority_equity_is_rejected`、`test_s1_*`（含真实样本单字段缺失的完整运行） | ✅ |
+| S1-2 | 有来源的已知零仍可计算 | 同上（`sourced_zero`） | `test_known_zero_minority_equity_still_computes`、`test_s1_zero_minority_interest_is_still_valued` | ✅ |
+| S1-3 | 零声明必须逐项、带依据，不能用一个全局开关授权所有项 | `financials/bridge.py::parse_bridge_policy` / `BridgeItemPolicy` | `test_there_is_no_blanket_absent_as_zero_switch_left`、`test_minority_equity_assertion_requires_a_basis`、`test_bridge_policy_rejects_unknown_items` | ✅ |
+| S1-4 | 同一桥接函数的同类缺失回退一并处理（现金、优先股、非经营性资产、有息负债） | 同上 | `test_missing_preferred_equity_is_refused_without_a_declaration`、`test_bridge_policy_covers_debt_and_structural_items_but_not_minority` | ✅ |
+| S2-1 | 无持续资金来源的超额 DPS 不得作为自动永续终值，且限制与终值增长正负无关 | `valuation/ddm.py::check_growth_consistency` | `test_excess_payout_with_zero_growth_terminal_is_refused`、`test_s2_excess_payout_scenario_is_refused_end_to_end` | ✅ |
+| S2-2 | 不静默截断派息率；有证据时拆分有限期超额分配与可持续终值 | `valuation/ddm.py::value_dividend`（`terminal_dps` + 依据） | `test_supported_finite_excess_distribution_is_not_blanket_rejected`、`test_s2_supported_terminal_split_computes_end_to_end` | ✅ |
+| S2-3 | 正常 100% 派息 + 零增长仍退化为永续年金 | 同上 | `test_full_payout_with_zero_growth_still_degenerates_to_annuity` | ✅ |
+| S2-4 | 可持续终值分配必须 ≤ 当年每股收益且附依据 | 同上 | `test_sustainable_terminal_dps_above_earnings_is_rejected`、`test_sustainable_terminal_dps_requires_a_basis` | ✅ |
+| S2-5 | 银行路线复用同一内核，同步受约束 | `valuation/bank.py` | `test_bank_route_inherits_terminal_sustainability_check` | ✅ |
+
 ## 阶段二遗留（不阻断本轮）
 
 | # | 事项 | 处理建议 |
@@ -149,5 +163,5 @@
 | G1 | 银行资本充足率/不良率/拨备覆盖率/风险加权资产无免费来源 | 需年报原文或持牌数据源；数学与约束已实现并有测试 |
 | G2 | 600900 缺 FCFF 交叉检查（目标资本结构假设未批准） | 待 P11 政策决定 |
 | G3 | 600519 两条路线差 24.3%，接近 25% 阈值 | 属终值增长与可持续增长口径问题，交设计方判断（P3） |
-| G4 | 非经营性资产按 0、受限资金未拆分、少数股东按账面扣除 | 需要更细的报表科目后再收窄 |
+| G4 | 非经营性资产按 0、受限资金未拆分、少数股东按账面扣除 | 已是逐项声明、可审计的已知近似；需要更细的报表科目后再收窄 |
 | G5 | 业务证据由脚本整理，未做自动化财报文本阅读 | 后续阶段 |

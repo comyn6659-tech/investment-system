@@ -385,3 +385,158 @@ def test_text_report_renders_for_every_status(analyzer, query, needs_assumptions
     assert "【方法】" in text
     assert "不形成买点结论" in text
     assert validate_result(result) == []
+
+
+# --- S1 / S2 反例回归（复验报告）-------------------------------------------
+MAOTAI_SNAPSHOT = "EQUITY:600519.SH"
+
+
+def _maotai_snapshot_id() -> str:
+    snapshot_id = SnapshotStore(SNAPSHOT_DIR).latest_for(MAOTAI_SNAPSHOT)
+    assert snapshot_id is not None
+    return snapshot_id
+
+
+def _minority_fact_id(fiscal_year: int = 2025) -> str:
+    return f"fin.{fiscal_year}-12-31.minority_equity"
+
+
+def test_s1_missing_minority_interest_blocks_the_model(tmp_path):
+    """缺少数数股东权益时不得默认零并给出更高的完整估值。"""
+    fact_id = _minority_fact_id()
+    baseline = _analyzer().analyze("600519", assumptions=load_assumptions(MAOTAI_FCFF))
+    baseline_value = baseline.payload["research_valuation"]["headline_value_per_share"]
+
+    def drop_minority(fact: Fact) -> Fact:
+        if fact.fact_id == fact_id:
+            return Fact.missing(
+                fact_id=fact.fact_id,
+                metric=fact.metric,
+                period=fact.period,
+                unit=fact.unit,
+                currency=fact.currency,
+            )
+        return fact
+
+    variant_id = _write_variant(tmp_path, _maotai_snapshot_id(), drop_minority)
+    result = _analyzer(tmp_path).analyze(
+        "600519", assumptions=load_assumptions(MAOTAI_FCFF), snapshot_id=variant_id
+    )
+    assert result.analysis_status == "insufficient_data"
+    assert result.payload["research_valuation"] is None
+    assert rc.MISSING_MODEL_INPUT in result.reason_codes
+    notes = " ".join(item.get("note") or "" for item in result.missing_data)
+    assert "少数股东权益" in notes
+    assert baseline_value > 0
+
+
+def test_s1_zero_minority_interest_is_still_valued(tmp_path):
+    """有来源的已知零必须仍可计算。"""
+    fact_id = _minority_fact_id()
+
+    def zero_minority(fact: Fact) -> Fact:
+        if fact.fact_id == fact_id:
+            return Fact.known_zero(
+                fact_id=fact.fact_id,
+                metric=fact.metric,
+                period=fact.period,
+                unit=fact.unit,
+                currency=fact.currency,
+                source=fact.source,
+                available_at=fact.available_at,
+                fetched_at=fact.fetched_at,
+            )
+        return fact
+
+    variant_id = _write_variant(tmp_path, _maotai_snapshot_id(), zero_minority)
+    result = _analyzer(tmp_path).analyze(
+        "600519", assumptions=load_assumptions(MAOTAI_FCFF), snapshot_id=variant_id
+    )
+    assert result.analysis_status == "complete"
+    research = result.payload["research_valuation"]
+    assert research["headline_value_per_share"] > 0
+    treatments = {
+        item["item"]: item["status"]
+        for item in research["scenarios"][0]["detail"]["equity_bridge_items"]
+    }
+    assert treatments["minority_equity"] == "sourced_zero"
+
+
+def test_s1_conflicting_minority_interest_blocks_the_model(tmp_path):
+    fact_id = _minority_fact_id()
+
+    def conflict_minority(fact: Fact) -> Fact:
+        if fact.fact_id == fact_id:
+            return Fact.conflict(
+                fact_id=fact.fact_id,
+                metric=fact.metric,
+                values=[9_000_000_000.0, 9_321_442_876.89],
+                period=fact.period,
+                unit=fact.unit,
+                currency=fact.currency,
+            )
+        return fact
+
+    variant_id = _write_variant(tmp_path, _maotai_snapshot_id(), conflict_minority)
+    result = _analyzer(tmp_path).analyze(
+        "600519", assumptions=load_assumptions(MAOTAI_FCFF), snapshot_id=variant_id
+    )
+    assert result.analysis_status == "insufficient_data"
+    assert result.payload["research_valuation"] is None
+
+
+def test_s1_bridge_policy_is_a_required_assumption_field(analyzer):
+    data = json.loads(MAOTAI_FCFF.read_text(encoding="utf-8"))
+    data["extras"].pop("bridge_policy")
+    stripped = type(load_assumptions(MAOTAI_FCFF)).from_dict(data)
+    result = analyzer.analyze("600519", assumptions=stripped)
+    assert result.analysis_status == "insufficient_data"
+    assert rc.MISSING_MODEL_INPUT in result.reason_codes
+
+
+def _cjdl_assumption_variant(**scenario_overrides):
+    from engine.assumptions.schema import AssumptionSet
+
+    data = json.loads(CJDL_DDM.read_text(encoding="utf-8"))
+    data["scenarios"]["base"].update(scenario_overrides)
+    return AssumptionSet.from_dict(data)
+
+
+def test_s2_excess_payout_scenario_is_refused_end_to_end(analyzer):
+    """末期分配超过盈利、终值增长为零时，不能把超额分配当永续。"""
+    assumptions = _cjdl_assumption_variant(
+        drivers={
+            "eps_growth": [-0.066, 0.03, 0.03, 0.03, 0.025],
+            "payout": [1.2, 1.2, 1.2, 1.2, 1.2],
+            "roe": 0.1559,
+        },
+        terminal_growth=0.0,
+    )
+    result = analyzer.analyze("600900", assumptions=assumptions)
+    assert result.analysis_status == "insufficient_data"
+    assert result.payload["research_valuation"] is None
+    assert rc.TERMINAL_DISTRIBUTION_UNFUNDED in result.reason_codes
+
+
+def test_s2_supported_terminal_split_computes_end_to_end(analyzer):
+    """显式可持续终值分配 + 依据时，超额部分只进预测期，结果可计算。"""
+    assumptions = _cjdl_assumption_variant(
+        drivers={
+            "eps_growth": [-0.066, 0.03, 0.03, 0.03, 0.025],
+            "payout": [1.2, 1.2, 1.2, 1.2, 1.2],
+            "roe": 0.1559,
+        },
+        terminal_growth=0.0,
+        sustainable_terminal_dps=1.0,
+        sustainable_terminal_basis="测试：超额部分由已知一次性资金支持，仅限预测期",
+    )
+    result = analyzer.analyze("600900", assumptions=assumptions)
+    assert result.analysis_status == "complete"
+    research = result.payload["research_valuation"]
+    assert research["headline_value_per_share"] > 0
+    scenario_detail = research["scenarios"][0]["detail"]
+    assert scenario_detail["discounting"]["terminal"]["next_period_cash_flow"] == pytest.approx(
+        1.0
+    )
+    codes = {issue["code"] for issue in scenario_detail["issues"]}
+    assert "EXCESS_DISTRIBUTION_TERMINAL_SPLIT" in codes

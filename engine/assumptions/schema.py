@@ -109,6 +109,22 @@ class Scenario:
     note: str = ""
     discount_rate: float | None = None
     terminal_growth: float | None = None
+    # 末期分配超过盈利时，终值必须改用显式声明的可持续每股分配，并说明资金来源
+    sustainable_terminal_dps: float | None = None
+    sustainable_terminal_basis: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.sustainable_terminal_dps is not None:
+            if self.terminal_growth is None:
+                raise ValuationError(
+                    e.TERMINAL_BASIS_MISSING,
+                    f"情景 {self.name} 给出可持续终值分配但没有启用终值增长",
+                )
+            if not (self.sustainable_terminal_basis or "").strip():
+                raise ValuationError(
+                    e.TERMINAL_BASIS_MISSING,
+                    f"情景 {self.name} 的可持续终值分配必须说明资金来源与口径",
+                )
 
     def series(self, name: str) -> tuple[float, ...]:
         value = self.drivers.get(name)
@@ -123,13 +139,18 @@ class Scenario:
         return float(value)
 
     def to_dict(self) -> dict[str, object]:
-        return {
+        payload: dict[str, object] = {
             "name": self.name,
             "drivers": self.drivers,
             "note": self.note,
             "discount_rate": self.discount_rate,
             "terminal_growth": self.terminal_growth,
         }
+        # 只在用到时写入：没有超额分配的假设文件不会因为它而改变内容哈希
+        if self.sustainable_terminal_dps is not None:
+            payload["sustainable_terminal_dps"] = self.sustainable_terminal_dps
+            payload["sustainable_terminal_basis"] = self.sustainable_terminal_basis
+        return payload
 
 
 @dataclass(frozen=True)
@@ -290,6 +311,10 @@ class AssumptionSet:
                     note=str(body.get("note", "")),
                     discount_rate=_opt_float(body.get("discount_rate")),
                     terminal_growth=_opt_float(body.get("terminal_growth")),
+                    sustainable_terminal_dps=_opt_float(
+                        body.get("sustainable_terminal_dps")
+                    ),
+                    sustainable_terminal_basis=body.get("sustainable_terminal_basis"),
                 )
                 for name, body in (data.get("scenarios") or {}).items()
             }

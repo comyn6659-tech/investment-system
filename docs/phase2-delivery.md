@@ -1,6 +1,6 @@
 # 阶段二首轮交付：个股研究估值
 
-日期：2026-11-11｜代码版本 `phase2-0.2.0`｜政策版本 `unapproved-phase2`｜模型版本 `equity-research-0.2.0`
+日期：2026-11-11｜代码版本 `phase2-0.2.1`（S1/S2 收尾）｜政策版本 `unapproved-phase2`｜模型版本 `equity-research-0.2.0`
 
 本文件交代实现范围、运行方式、真实输出、测试结果与未解决事项。
 按《第一阶段签收与第二阶段首轮施工指令》，本轮只做个股研究估值，
@@ -73,6 +73,68 @@ cd /Users/comyn/Documents/deepseek-harness/投资/investment-system
 
 ---
 
+## 2.1 S1 / S2 收尾（复验报告两项）
+
+复验报告：`phase2-review-and-closeout.md`。只修这两项，未扩大范围、未调参、未升级 `validated`。
+
+### S1：少数股东权益缺失被当成零
+
+**根因**：`build_equity_bridge` 用 `annual.number("minority_equity") or 0.0` 把「缺失」和「确认无此项」
+合成同一个结果；同一个函数里还有一个 `absent_as_zero` 全局开关，可以一次性授权所有桥接项归零。
+
+**修复**（`engine/financials/bridge.py`）：
+
+- 删除全局 `absent_as_zero`，改为 `bridge_policy` **逐项**声明：每个桥接项
+  （`debt_components` / `cash` / `minority_equity` / `non_operating_assets` / `preferred_equity`）
+  只有「有来源的数值（含来源确认的零）」或「该项独立的零声明 + 依据」两种合法来源；
+- 两者都没有 → `insufficient_data`（`MODEL_INPUT_MISSING`），不再产出「少扣一项」的完整估值；
+- 每项的处理方式（`sourced` / `sourced_zero` / `asserted_zero` + 依据）随结果输出
+  （`research_valuation.scenarios[].detail.equity_bridge_items`），可逐项审计；
+- 同类旁路一并处理：`cash` 必须有可用数值；`preferred_equity` 不再由默认参数静默置零；
+  `debt_components` 的零声明必须带依据，且仍保留「无负债却有利息费用」的冲突检查。
+
+**修复后复现**（复验脚本同一操作：只把 600519 基准财年 `minority_equity` 改成 missing）：
+
+```text
+原样本：      complete，基准研究价值 1341.1280337369838 元/股
+该字段缺失：  insufficient_data，没有研究估值（research_valuation = null）
+             原因码含 MISSING_MODEL_INPUT，说明写「少数股东权益…缺失不能被当成零」
+```
+
+已知零仍可计算（`sourced_zero`），冲突同样拒绝。
+
+### S2：没有持续资金来源的超额分配被零增长终值无限延续
+
+**根因**：`check_growth_consistency` 只在 `terminal_growth > 0` 时检查留存约束；
+`value_dividend` 又把末期 DPS 直接乘 `(1+g)` 当终值首期。把增长设成 0 只是取消了增长需求，
+超额分配的资金需求仍在，于是每年 120 的永续分配被照单折现。
+
+**修复**（`engine/valuation/ddm.py`）：
+
+- 终值首期不再默认沿用末期 DPS：末期 DPS > 末期 EPS 且启用终值时，
+  没有显式可持续终值就拒绝（`TERMINAL_DISTRIBUTION_UNFUNDED`），**与终值增长正负无关**；
+- 允许在有依据时拆分：`sustainable_terminal_dps` 必须 ≤ 末期每股收益、必须附资金来源说明，
+  终值首期改为该值，超额部分只进明确预测期，并记录 `EXCESS_DISTRIBUTION_TERMINAL_SPLIT`；
+- 不静默把派息率截到 100%，也不是只加提示照原值计算；
+- 银行路线复用同一内核，同步受该约束（已加回归）。
+
+**修复后复现**（复验脚本同一合成输入：EPS 100、派息率 120%、r=10%、g=0）：
+
+```text
+自动永续：拒绝 TERMINAL_DISTRIBUTION_UNFUNDED，没有估值数字
+显式可持续终值 100：1075.8157 元/股（= 100/10% + 20 × [1 − 1.1^-5]/10%）
+100% 派息 + 零增长：1000.0（仍退化为永续年金）
+```
+
+### 真实样本研究价值是否变化
+
+**没有变化**：600519 基准 1341.1280337369838 元/股、600900 基准 20.967224587337128 元/股，
+与复验报告记录的数值一致。原因：两个样本的少数股东权益都有来源数值，派息率均低于 100%，
+因此两项修复只收紧了「缺证据」的路径，没有改变已有样本的口径。
+`600519-fcff-base.json` 的 `assumption_id` 由 `assump-489b99582aab805c` 变为
+`assump-a9e9ce0fcbaf355f`——这是把 `absent_as_zero` 换成 `bridge_policy` 的**口径变更**，
+不是数据刷新，也不是为了改变估值而调参；另外两份假设文件的 id 未变。
+
 ## 3. 真实样本结果
 
 完整数字与逐行桥接表见 [phase2-samples.md](phase2-samples.md)（由真实运行生成，非手写）。
@@ -110,17 +172,17 @@ cd /Users/comyn/Documents/deepseek-harness/投资/investment-system
 
 ```text
 $ PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
-267 passed in 2.89s
+286 passed in 2.99s
 ```
 
-阶段一为 142 项；本轮新增 125 项，分组如下：
+阶段一为 142 项；本轮新增 144 项，分组如下：
 
 | 文件 | 项数 | 覆盖内容 |
 |---|---|---|
-| `tests/test_valuation_kernel.py` | 48 | 折现恒等式、零增长终值退化为永续年金、折现率单调性、负现金流保留、终值边界、权益桥接符号/单位/重复计数、每 10 股转换、特别分红剥离、超额分配、增长一致性、银行资本与拨备约束 |
+| `tests/test_valuation_kernel.py` | 61 | 折现恒等式、零增长终值退化为永续年金、折现率单调性、负现金流保留、终值边界、权益桥接符号/单位/重复计数、桥接项逐项零声明（含缺失/已知零/冲突）、每 10 股转换、特别分红剥离、超额分配与终值可持续性、增长一致性、银行资本与拨备约束 |
 | `tests/test_applicability.py` | 25 | 企业族判定、行业只作线索、周期需波动证据、未实现路线不进 DCF、选择不依赖价格、证据文件哈希、报告期与 TTM 规则 |
 | `tests/test_assumptions.py` | 13 | 假设可重放、内容哈希、状态不能升级为 validated、驱动项长度、来源必填、折现率 > 终值增长 |
-| `tests/test_phase2_pipeline.py` | 39 | 真实样本完整链路、价格变化不影响内在价值与选择、盘中价不参与比较、银行缺口、未实现路线、无证据/无假设、跨标的假设、时点过期、契约护栏、JSON 与文本一致 |
+| `tests/test_phase2_pipeline.py` | 45 | 真实样本完整链路、价格变化不影响内在价值与选择、盘中价不参与比较、银行缺口、未实现路线、无证据/无假设、跨标的假设、时点过期、契约护栏、JSON 与文本一致 |
 
 阶段一原有回归（契约、身份、快照、时点、出口护栏）全部保留并通过；
 本轮**只改了三处**与阶段一行为直接相关的断言，均为模型已实现后的语义更新，

@@ -137,6 +137,8 @@ class BankDividendDrivers:
     terminal_growth: float | None
     roe: float | None = None
     growth_consistency_tolerance: float = 0.0
+    sustainable_terminal_dps: float | None = None
+    sustainable_terminal_basis: str | None = None
 
 
 @dataclass(frozen=True)
@@ -222,7 +224,12 @@ def value_bank_dividend(
         roe=drivers.roe,
         growth_consistency_tolerance=drivers.growth_consistency_tolerance,
     )
-    valuation = value_dividend(dividend_drivers, issues=issues)
+    valuation = value_dividend(
+        dividend_drivers,
+        terminal_dps=drivers.sustainable_terminal_dps,
+        terminal_basis=drivers.sustainable_terminal_basis,
+        issues=issues,
+    )
     # 结果必须与自算的 DPS 路径一致，避免两套算法漂移
     expected = tuple(round(x, 9) for x in dps_path)
     actual = tuple(round(y.dps, 9) for y in valuation.years)

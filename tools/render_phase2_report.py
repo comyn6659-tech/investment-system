@@ -187,6 +187,20 @@ def render(cases: list[dict], results: list[dict], *, generated_at: str) -> str:
                 f"{_pct(row.get('change_pct'))} |"
             )
 
+        detail = (research.get("scenarios") or [{}])[0].get("detail") or {}
+        items = detail.get("equity_bridge_items") or []
+        if items:
+            lines.append("")
+            lines.append("### 权益桥接项的处理方式（S1：每一项都必须有来源或逐项零声明）")
+            lines.append("")
+            lines.append("| 桥接项 | 处理方式 | 金额（元） | 依据 |")
+            lines.append("|---|---|---|---|")
+            for item in items:
+                lines.append(
+                    f"| {item.get('label') or item['item']} | `{item['status']}` | "
+                    f"{_money(item.get('value'))} | {item.get('basis') or '—'} |"
+                )
+
         data = research.get("data_used") or {}
         bridge = data.get("fcff_bridge")
         if bridge:

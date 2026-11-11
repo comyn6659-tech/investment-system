@@ -26,7 +26,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Any, Mapping
 
+from engine.data.facts import Fact
 from engine.financials.annual import AnnualFinancials, FinancialHistory
 from engine.valuation import errors as e
 from engine.valuation.errors import ValuationError
@@ -366,11 +368,106 @@ def build_fcff_bridge(
 
 
 # --- 权益桥接 ---------------------------------------------------------------
+# 桥接项白名单：每一项都必须「有来源的值」或「有依据的零声明」，没有第三种处理方式。
+BRIDGE_ITEMS = (
+    "debt_components",
+    "cash",
+    "minority_equity",
+    "non_operating_assets",
+    "preferred_equity",
+)
+
+_BRIDGE_ITEM_LABELS = {
+    "debt_components": "有息负债各科目",
+    "cash": "货币资金",
+    "minority_equity": "少数股东权益",
+    "non_operating_assets": "非经营性资产",
+    "preferred_equity": "其他权益工具（优先股/永续债）",
+}
+
+
+@dataclass(frozen=True)
+class BridgeItemPolicy:
+    """某一桥接项在没有可用事实时的处理规则。
+
+    `treat_absent_as_zero=True` 等价于声明「本标的不存在该项」，必须给出依据；
+    没有这条声明时，缺数据就只能停在 insufficient_data。
+    """
+
+    item: str
+    treat_absent_as_zero: bool
+    basis: str = ""
+
+    def __post_init__(self) -> None:
+        if self.item not in BRIDGE_ITEMS:
+            raise ValuationError(
+                e.BRIDGE_ITEM_INVALID,
+                f"未知的权益桥接项 {self.item!r}，允许 {list(BRIDGE_ITEMS)}",
+            )
+        if self.treat_absent_as_zero and not self.basis.strip():
+            raise ValuationError(
+                e.BRIDGE_ITEM_INVALID,
+                f"桥接项 {self.item} 声明「视为零」时必须写明依据",
+            )
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "item": self.item,
+            "treat_absent_as_zero": self.treat_absent_as_zero,
+            "basis": self.basis,
+        }
+
+
+def parse_bridge_policy(raw: Mapping[str, Any]) -> dict[str, BridgeItemPolicy]:
+    """解析假设文件里的 `bridge_policy`。
+
+    只接受白名单内的项；不允许用一个全局开关授权所有项归零
+    （那正是「不知道要扣多少」被当成「不需要扣」的来源）。
+    """
+    if not isinstance(raw, Mapping):
+        raise ValuationError(e.BRIDGE_ITEM_INVALID, "bridge_policy 必须是对象")
+    unknown = [key for key in raw if key not in BRIDGE_ITEMS]
+    if unknown:
+        raise ValuationError(
+            e.BRIDGE_ITEM_INVALID, f"bridge_policy 含未定义项 {unknown}，允许 {list(BRIDGE_ITEMS)}"
+        )
+    policy: dict[str, BridgeItemPolicy] = {}
+    for item, body in raw.items():
+        if not isinstance(body, Mapping):
+            raise ValuationError(e.BRIDGE_ITEM_INVALID, f"bridge_policy.{item} 必须是对象")
+        policy[item] = BridgeItemPolicy(
+            item=item,
+            treat_absent_as_zero=bool(body.get("treat_absent_as_zero", False)),
+            basis=str(body.get("basis", "")),
+        )
+    return policy
+
+
+@dataclass(frozen=True)
+class BridgeItemTreatment:
+    """桥接项的最终处理方式，随结果输出以便审计。"""
+
+    item: str
+    status: str  # sourced / sourced_zero / asserted_zero
+    value: float
+    basis: str = ""
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "item": self.item,
+            "label": _BRIDGE_ITEM_LABELS.get(self.item, self.item),
+            "status": self.status,
+            "value": self.value,
+            "basis": self.basis,
+        }
+
+
 @dataclass(frozen=True)
 class EquityBridgeBuild:
     bridge: EquityBridge
     absent_components: tuple[str, ...]
     notes: tuple[str, ...]
+    treatments: tuple[BridgeItemTreatment, ...] = ()
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -382,69 +479,173 @@ class EquityBridgeBuild:
             "shares": self.bridge.shares,
             "net_debt": self.bridge.net_debt,
             "absent_components": list(self.absent_components),
+            "item_treatments": [t.to_dict() for t in self.treatments],
             "notes": list(self.notes),
         }
+
+
+def _resolve_item(
+    item: str,
+    fact: Fact | None,
+    policy: Mapping[str, BridgeItemPolicy],
+    *,
+    model: str,
+) -> tuple[float, BridgeItemTreatment]:
+    """一个桥接项要么有可用事实，要么有显式零声明，否则拒绝整个模型。"""
+    label = _BRIDGE_ITEM_LABELS.get(item, item)
+    if fact is not None and fact.is_usable_number:
+        value = float(fact.value)
+        status = "sourced_zero" if fact.is_zero else "sourced"
+        return value, BridgeItemTreatment(item=item, status=status, value=value, basis=fact.source.source_id if fact.source else "")
+    declared = policy.get(item)
+    if declared is not None and declared.treat_absent_as_zero:
+        return 0.0, BridgeItemTreatment(
+            item=item, status="asserted_zero", value=0.0, basis=declared.basis
+        )
+    status_text = fact.status.value if fact is not None else "absent"
+    detail = ""
+    if fact is not None and fact.notes:
+        detail = f"（来源说明：{fact.notes}）"
+    raise ValuationError(
+        e.MODEL_INPUT_MISSING,
+        f"{model} 需要 {label}，但当前状态为 {status_text}{detail}；"
+        "缺失/冲突不能被当成零，也不能由通用开关授权归零。"
+        "若确认该项对本标的不存在，请在假设文件 bridge_policy 中单独声明并写明依据。",
+    )
 
 
 def build_equity_bridge(
     annual: AnnualFinancials,
     *,
     shares: float,
-    absent_as_zero: bool,
-    non_operating_assets: float = 0.0,
-    preferred_equity: float = 0.0,
+    policy: Mapping[str, BridgeItemPolicy] | None = None,
     model: str = "equity_dcf_fcff",
 ) -> EquityBridgeBuild:
     """从资产负债表科目构造权益桥接项。
 
-    `absent_as_zero` 必须由研究假设显式声明并给出理由：报表未列出某负债科目，
-    可能是「确实没有」，也可能是取数缺失，两者不能默认等同。
+    每个桥接项只有两种合法来源：报表中可用的数值，或假设文件对**该项**的显式零声明。
+    不再有 `absent_as_zero` 这类一次性授权所有项的开关。
     """
+    policy = dict(policy or {})
     notes: list[str] = []
+    treatments: list[BridgeItemTreatment] = []
     absent: list[str] = []
+
     debt = 0.0
     for name in DEBT_COMPONENTS:
-        value = annual.number(name)
-        if value is None:
+        fact = annual.fact(name)
+        if fact is not None and fact.is_usable_number:
+            debt += float(fact.value)
+        else:
             absent.append(name)
-            continue
-        debt += value
-    if absent:
-        if not absent_as_zero:
-            raise ValuationError(
-                e.MODEL_INPUT_MISSING,
-                "有息负债科目缺失且未声明 absent_as_zero：" + "、".join(absent),
-            )
-        notes.append(
-            "报表未列出的有息负债科目按「无该项」处理："
-            + "、".join(absent)
-            + "（依据假设文件 absent_as_zero 声明）"
+    debt_treatment = _resolve_composite_debt(annual, debt, absent, policy, model=model)
+    treatments.append(debt_treatment)
+    if debt_treatment.status == "asserted_zero":
+        notes.append(f"有息负债：{debt_treatment.basis}")
+
+    cash_fact = annual.fact("cash")
+    if cash_fact is None or not cash_fact.is_usable_number:
+        raise ValuationError(
+            e.MODEL_INPUT_MISSING,
+            f"{model} 缺少可用的货币资金，无法完成企业价值到股权价值的桥接",
         )
+    cash = float(cash_fact.value)
+    treatments.append(
+        BridgeItemTreatment(
+            item="cash",
+            status="sourced_zero" if cash_fact.is_zero else "sourced",
+            value=cash,
+            basis=cash_fact.source.source_id if cash_fact.source else "",
+        )
+    )
+
+    minority, minority_treatment = _resolve_item(
+        "minority_equity", annual.fact("minority_equity"), policy, model=model
+    )
+    treatments.append(minority_treatment)
+    if minority_treatment.status == "asserted_zero":
+        notes.append(f"少数股东权益：{minority_treatment.basis}")
+
+    non_op, non_op_treatment = _resolve_absent_item(
+        "non_operating_assets", policy, model=model
+    )
+    treatments.append(non_op_treatment)
+    if non_op_treatment.status == "asserted_zero":
+        notes.append(f"非经营性资产：{non_op_treatment.basis}")
+
+    preferred, preferred_treatment = _resolve_absent_item(
+        "preferred_equity", policy, model=model
+    )
+    treatments.append(preferred_treatment)
+    if preferred_treatment.status == "asserted_zero":
+        notes.append(f"其他权益工具：{preferred_treatment.basis}")
+
     interest = annual.number("interest_expense") or annual.number("finance_expense") or 0.0
-    if debt == 0 and interest > 0 and absent_as_zero:
+    if debt == 0 and interest > 0 and absent:
         lease = annual.number("lease_liab")
         if not lease:
-            issues = (
+            raise ValuationError(
+                e.BRIDGE_ITEM_INVALID,
                 f"{annual.period_end} 无任何有息负债科目，却有利息费用 {interest:,.0f}："
-                "负债口径与利息费用冲突"
+                "负债口径与利息费用冲突",
             )
-            raise ValuationError(e.BRIDGE_ITEM_INVALID, issues)
-        notes.append(
-            f"利息费用 {interest:,.0f} 与租赁负债 {lease:,.0f} 对应，未另计普通借款"
-        )
+        notes.append(f"利息费用 {interest:,.0f} 与租赁负债 {lease:,.0f} 对应，未另计普通借款")
 
-    cash = annual.require("cash", model=model)
-    minority = annual.number("minority_equity") or 0.0
     bridge = EquityBridge(
         debt=debt,
         cash=cash,
-        non_operating_assets=non_operating_assets,
+        non_operating_assets=non_op,
         minority_interest=minority,
-        preferred_equity=preferred_equity,
+        preferred_equity=preferred,
         shares=shares,
     )
-    notes.append(
-        "非经营性资产本轮按 0 处理：来源报表未把长期股权投资等拆分为非经营性项目，"
-        "因此该项被记入 EV 的一部分而非单独加回（偏保守）"
+    return EquityBridgeBuild(
+        bridge=bridge,
+        absent_components=tuple(absent),
+        notes=tuple(notes),
+        treatments=tuple(treatments),
     )
-    return EquityBridgeBuild(bridge=bridge, absent_components=tuple(absent), notes=tuple(notes))
+
+
+def _resolve_composite_debt(
+    annual: AnnualFinancials,
+    debt: float,
+    absent: list[str],
+    policy: Mapping[str, BridgeItemPolicy],
+    *,
+    model: str,
+) -> BridgeItemTreatment:
+    if not absent:
+        return BridgeItemTreatment(item="debt_components", status="sourced", value=debt)
+    declared = policy.get("debt_components")
+    if declared is None or not declared.treat_absent_as_zero:
+        raise ValuationError(
+            e.MODEL_INPUT_MISSING,
+            f"{model} 缺少有息负债科目 {absent}；缺失不能被当成零。"
+            "若确认本标的没有这些科目，请在假设文件 bridge_policy.debt_components 中声明并写明依据。",
+        )
+    basis = declared.basis + f"（未列示的科目：{'、'.join(absent)}）"
+    # 仍有部分科目来自报表时，状态必须体现「部分有来源 + 部分按声明视为零」
+    status = "asserted_zero" if debt == 0 else "sourced_partial"
+    return BridgeItemTreatment(
+        item="debt_components",
+        status=status,
+        value=debt,
+        basis=basis,
+    )
+
+
+def _resolve_absent_item(
+    item: str, policy: Mapping[str, BridgeItemPolicy], *, model: str
+) -> tuple[float, BridgeItemTreatment]:
+    declared = policy.get(item)
+    if declared is None or not declared.treat_absent_as_zero:
+        raise ValuationError(
+            e.MODEL_INPUT_MISSING,
+            f"{model} 未取得「{_BRIDGE_ITEM_LABELS.get(item, item)}」数据；"
+            "缺失不能被当成零，请在假设文件 bridge_policy 中对该项单独声明并写明依据，"
+            "或补齐该科目。",
+        )
+    return 0.0, BridgeItemTreatment(
+        item=item, status="asserted_zero", value=0.0, basis=declared.basis
+    )

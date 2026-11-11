@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-e93fb0a61ffdae76",
-  "generated_at": "2026-11-11T14:44:15+08:00",
+  "analysis_id": "analysis-20ddbf4d05d84c77",
+  "generated_at": "2026-11-11T15:01:52+08:00",
   "instrument": null,
   "instrument_id": null,
   "intent": "buy_point_check",
@@ -89,7 +89,7 @@
   "payload": {
     "payload_type": "none"
   },
-  "code_version": "phase2-0.2.0",
+  "code_version": "phase2-0.2.1",
   "policy_version": "unapproved-phase2",
   "model_version": "equity-research-0.2.0"
 }

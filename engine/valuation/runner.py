@@ -22,7 +22,11 @@ from engine.evidence.applicability import (
 )
 from engine.evidence.models import BusinessEvidence
 from engine.financials.annual import FinancialHistory, load_annual_history, load_dividend_records
-from engine.financials.bridge import build_equity_bridge, build_fcff_bridge
+from engine.financials.bridge import (
+    build_equity_bridge,
+    build_fcff_bridge,
+    parse_bridge_policy,
+)
 from engine.financials.dividends import DividendBook, build_dividend_book
 from engine.models.registry import MODELS_BY_ID
 from engine.valuation import errors as ve
@@ -252,7 +256,6 @@ def _fcff_scenario(
     scenario_name: str,
     *,
     overrides: dict[str, Any] | None = None,
-    absent_as_zero: bool,
     shares: float,
 ) -> ScenarioOutcome:
     annual = history.year(assumptions.base_fiscal_year)
@@ -288,7 +291,9 @@ def _fcff_scenario(
         else terminal_from_last_year(years, growth=growth, basis=assumptions.terminal.basis)
     )
     bridge_build = build_equity_bridge(
-        annual, shares=shares, absent_as_zero=absent_as_zero
+        annual,
+        shares=shares,
+        policy=parse_bridge_policy(assumptions.require_extras("bridge_policy")),
     )
     rate = _discount_rate(assumptions, scenario, overrides)
     valuation = value_fcff(
@@ -296,6 +301,7 @@ def _fcff_scenario(
     )
     detail = valuation.to_dict()
     detail["equity_bridge_notes"] = list(bridge_build.notes)
+    detail["equity_bridge_items"] = [t.to_dict() for t in bridge_build.treatments]
     detail["absent_debt_components"] = list(bridge_build.absent_components)
     detail["annual_basis"] = {
         "fiscal_year": annual.fiscal_year,
@@ -354,6 +360,7 @@ def _dividend_scenario(
     valuation = value_dividend(
         drivers,
         terminal_basis=assumptions.terminal.basis if growth is not None else None,
+        terminal_dps=scenario.sustainable_terminal_dps,
     )
     detail = valuation.to_dict()
     detail["annual_basis"] = {
@@ -418,6 +425,8 @@ def _bank_scenario(
         growth_consistency_tolerance=float(
             assumptions.extras.get("growth_consistency_tolerance", 0.0)
         ),
+        sustainable_terminal_dps=scenario.sustainable_terminal_dps,
+        sustainable_terminal_basis=scenario.sustainable_terminal_basis,
     )
     valuation = value_bank_dividend(drivers, risk)
     detail = valuation.to_dict()
@@ -487,7 +496,6 @@ def _run_scenario(
             assumptions,
             name,
             overrides=overrides,
-            absent_as_zero=bool(assumptions.extras.get("absent_as_zero", False)),
             shares=shares,
         )
     return runner(  # type: ignore[misc]
@@ -1024,6 +1032,8 @@ def run_research_valuation(
             ve.BANK_PROVISION_BELOW_REQUIREMENT: rc.BANK_CAPITAL_CONSTRAINT,
             ve.GROWTH_NOT_FUNDED_BY_RETENTION: rc.GROWTH_NOT_FUNDED_BY_RETENTION,
             ve.DISTRIBUTION_NOT_COVERED_BY_EARNINGS: rc.EXCESS_DISTRIBUTION,
+            ve.TERMINAL_DISTRIBUTION_UNFUNDED: rc.TERMINAL_DISTRIBUTION_UNFUNDED,
+            ve.TERMINAL_BASIS_MISSING: rc.MISSING_MODEL_INPUT,
         }
         codes.append(code_map.get(exc.code, rc.MISSING_MODEL_INPUT))
         return build(

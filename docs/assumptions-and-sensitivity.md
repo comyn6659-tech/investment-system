@@ -1,6 +1,6 @@
 # 研究假设、参数来源与敏感性
 
-版本：`assumption-set/1`｜生成日期：2026-11-11｜对应代码 `phase2-0.2.0`
+版本：`assumption-set/1`｜生成日期：2026-11-11｜对应代码 `phase2-0.2.1`
 
 本文件交代本轮**研究参数候选**的来源、推导与敏感性。所有参数都是候选，
 **没有任何一项获得正式使用批准**；代码里也不存在把它们升级为 `validated` 的路径
@@ -54,7 +54,7 @@
 
 ## 3. 各模型的参数清单
 
-### 3.1 600519 FCFF（`data/assumptions/600519-fcff-base.json`，`assump-489b99582aab805c`）
+### 3.1 600519 FCFF（`data/assumptions/600519-fcff-base.json`，`assump-a9e9ce0fcbaf355f`）
 
 | 参数 | 基准值 | 类别 | 来源 / 推导 |
 |---|---|---|---|
@@ -64,6 +64,10 @@
 | `da_pct_revenue` | 1.31% | derivation | 折旧摊销合计 22.59 亿 / 营业收入 1720.54 亿 |
 | `capex_pct_revenue` | 2.0% | derivation | 基期 1.82%（31.28 亿 / 1720.54 亿），预测期略上调覆盖技改 |
 | `nwc_pct_incremental_revenue` | 15% | research_hypothesis | 基期营运资本增加 248.74 亿元属单年异常（应收增加、应付减少），未直接外推 |
+| `bridge_policy.debt_components` | 视为零 | policy_pending_approval | 有息负债只有租赁负债 2.34 亿元，其余借款科目在来源报表中未列示，且利息费用与租赁负债对应 |
+| `bridge_policy.minority_equity` | **不接受视为零** | policy_pending_approval | 少数股东权益只接受报表数值；缺失即 `insufficient_data` |
+| `bridge_policy.non_operating_assets` | 视为零 | policy_pending_approval | 来源报表未拆分非经营性项目，该项继续留在 EV 内（偏保守，属审批前已知近似） |
+| `bridge_policy.preferred_equity` | 视为零 | policy_pending_approval | 报表无其他权益工具行项目；若出现该科目以报表数值优先 |
 | 终值增长 | 2.0% | research_hypothesis | 长期名义增长参照，低于可持续增长 ROE×留存率（≈7.1%） |
 | 折现率 | 7.40% | derivation | 见 §2.2 |
 
@@ -170,6 +174,30 @@
   结果里不平均、不择优，只并列展示并标记差异（本轮 24.3% < 25% 阈值，未触发 `CROSS_CHECK_DIVERGENCE`）。
 
 ---
+
+## 7.1 终值可持续性规则（S2）与需要什么证据
+
+当末期每股分配超过当年每股收益时，终值不允许直接沿用该分配：
+
+| 情形 | 处理 |
+|---|---|
+| 启用终值 + 超额分配 + 未给可持续终值 | 拒绝（`TERMINAL_DISTRIBUTION_UNFUNDED`），结果 `insufficient_data` |
+| 启用终值 + 超额分配 + 给了 `sustainable_terminal_dps` | 允许，但要求该值 ≤ 末期每股收益且附依据；超额部分只进明确预测期 |
+| 未启用终值 | 允许，超额分配只作为有限期事实折现 |
+
+**如果将来希望按现金流（而非会计利润）证明长期分配能力**，需要显式输入并校验：
+可分配现金的口径与来源、维持性资本开支、受限资金、以及至少一个完整周期的实际支付记录。
+本轮没有实现这套证据链，因此证据不足时一律拒绝该情景，而不是把超额分配自动永续化。
+
+对照案例（可复算）：EPS 每年 100、派息率 120%、股权成本 10%、终值增长 0
+
+```text
+自动永续（修复前的行为）：120 / 10% = 1200          ← 已拒绝
+有限期额外分配 + 可持续终值 100：                      
+  100 / 10% + 20 × [1 − 1.1^(-5)] / 10% ≈ 1075.82   ← 修复后的合法算法
+```
+
+两者是不同的经济情景，不能靠改报告措辞混同。
 
 ## 8. 参数变更流程
 

@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-50b95e1f4e6d8699",
-  "generated_at": "2026-11-11T14:44:15+08:00",
+  "analysis_id": "analysis-f4e44dc541c55d56",
+  "generated_at": "2026-11-11T15:01:52+08:00",
   "instrument": {
     "instrument_id": "EQUITY:601318.SH",
     "display_name": "中国平安",
@@ -283,7 +283,7 @@
     "research_valuation": null,
     "dividend_summary": null
   },
-  "code_version": "phase2-0.2.0",
+  "code_version": "phase2-0.2.1",
   "policy_version": "unapproved-phase2",
   "model_version": "equity-research-0.2.0"
 }

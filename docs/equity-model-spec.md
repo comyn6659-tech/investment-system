@@ -145,11 +145,36 @@ EV = 有限期 FCFF 现值 + 终值现值
 
 | 桥接项 | 口径 | 本轮样本处理 |
 |---|---|---|
-| 有息负债 | 短期借款 + 长期借款 + 应付债券 + 一年内到期非流动负债 + 租赁负债 | 报表未列出的科目必须由假设显式声明 `absent_as_zero`（附理由），否则拒绝计算 |
-| 货币资金 | `MONETARYFUNDS` | 未拆分受限资金，属已知简化 |
-| 非经营性资产 | 本轮取 0 | 来源报表未把长期股权投资拆成非经营性项目，该项被计入 EV（偏保守），结果里明确说明 |
-| 少数股东权益 | `MINORITY_EQUITY` | 按账面权益扣除，未按公允价值重估 |
-| 其他权益工具 | 本轮取 0 | 样本无优先股/永续债；若存在需显式给出 |
+| 有息负债 | 短期借款 + 长期借款 + 应付债券 + 一年内到期非流动负债 + 租赁负债 | 报表未列出的科目必须由假设**逐项**声明「视为零」并写明依据，否则拒绝计算 |
+| 货币资金 | `MONETARYFUNDS` | 必须有可用数值；未拆分受限资金，属已知简化 |
+| 非经营性资产 | 本轮取 0 | 由假设逐项声明「视为零」并写明依据：报表未把长期股权投资拆成非经营性项目，该项被计入 EV（偏保守） |
+| 少数股东权益 | `MINORITY_EQUITY` | 只接受报表数值（含来源确认的零）；缺失/冲突即拒绝，不默认零 |
+| 其他权益工具 | 本轮取 0 | 由假设逐项声明「视为零」并写明依据：报表无优先股/永续债行项目 |
+
+### 2.4.1 每个桥接项只有两种合法来源（S1 修复）
+
+`engine/financials/bridge.py` 里每个桥接项（`debt_components` / `cash` / `minority_equity` /
+`non_operating_assets` / `preferred_equity`）只有两条路：
+
+1. **有来源的数值**：报表事实状态为 `known` 或 `known_zero` → 直接采用，
+   处理方式记为 `sourced` / `sourced_zero`；
+2. **有依据的零声明**：假设文件 `bridge_policy.<item>` 对该项单独声明
+   `treat_absent_as_zero=true` 且给出 `basis` → 处理方式记为 `asserted_zero`。
+
+两者都没有时，模型返回 `insufficient_data`（`MODEL_INPUT_MISSING`），
+**不会**给出一个「少扣了一项」的每股价值。
+
+已删除上一版的 `absent_as_zero` 全局开关：一个开关就授权所有桥接项归零，
+等于把「不知道要扣多少」当成「确认不需要扣」。现在每一项的零声明都是独立的、必须带依据，
+并随结果写进 `research_valuation.scenarios[].detail.equity_bridge_items`，可逐项审计。
+处理方式只有四种取值：
+
+| 处理方式 | 含义 |
+|---|---|
+| `sourced` | 报表数值直接采用 |
+| `sourced_zero` | 报表确认该项为零（`known_zero`） |
+| `asserted_zero` | 该项整体没有来源数值，按假设的逐项声明视为零（附依据） |
+| `sourced_partial` | 部分科目有报表数值、部分科目按声明视为零（依据里列出未列示的科目） |
 | 冲突检测 | 全部负债科目缺失但有利息费用且无租赁负债 | 直接拒绝（`BRIDGE_ITEM_INVALID`），视为负债口径与利息费用冲突 |
 
 ### 2.5 必要数据与失败状态
@@ -198,12 +223,31 @@ DPS_t = EPS_t × payout_t
 - **不再扣企业净债务**：`DividendDrivers` 结构里没有债务字段，重复扣减不可能发生；
 - 终值 `DPS_(N+1)` 必须为正，否则拒绝启用终值。
 
+**终值可持续性（S2 修复）**：终值首期不允许直接沿用「末期 DPS」当它超过当年每股收益时。
+
+```
+末期 DPS > 末期 EPS 且启用终值：
+  ├─ 没有 sustainable_terminal_dps → 拒绝 TERMINAL_DISTRIBUTION_UNFUNDED
+  └─ 有 sustainable_terminal_dps：
+       要求 ≤ 末期 EPS、必须附依据；
+       终值首期 = sustainable_terminal_dps × (1+g)；
+       超额部分只计入明确预测期，记录 EXCESS_DISTRIBUTION_TERMINAL_SPLIT
+```
+
+该限制与终值增长的正负无关：增长设成 0 只是取消了增长需求，超额分配的资金需求仍然存在。
+不把派息率静默截到 100%，也不只是加一句提示后照原值计算。
+若确有证据表明超出会计利润的部分可由现金流长期支撑，必须显式给出可持续终值分配与口径；
+本轮不实现融资/资产消耗模型，证据不足时拒绝该情景。
+
 ### 3.4 一致性与反例处理
 
 | 情形 | 处理 |
 |---|---|
 | 派息率 > 100%（超额分配） | 不直接拒绝；记为 `DISTRIBUTION_NOT_COVERED_BY_EARNINGS`（非阻断），说明需以存量现金或融资支撑 |
 | 超额分配 + 正终值增长 | 拒绝（`GROWTH_NOT_FUNDED_BY_RETENTION`）：没有留存就没有内生增长 |
+| 超额分配 + 零增长终值 | 拒绝（`TERMINAL_DISTRIBUTION_UNFUNDED`）：零增长只消除了增长需求，没有消除超额分配的资金需求（S2 修复） |
+| 超额分配 + 显式可持续终值分配 | 允许：`sustainable_terminal_dps` 必须 ≤ 末期每股收益、必须附依据；超额部分只进明确预测期，并记录 `EXCESS_DISTRIBUTION_TERMINAL_SPLIT` |
+| 未启用终值（`terminal.method=none`） | 允许：超额分配只是有限期事实，不构成永续假设 |
 | 终值增长 > ROE × 末期留存率 | 拒绝（`GROWTH_NOT_FUNDED_BY_RETENTION`），报出可持续增长上限 |
 | 低 ROE | 不拒绝；只要终值增长不超过「ROE × 留存率」即可计算（测试 `test_low_roe_with_zero_growth_is_still_valued_and_flagged`） |
 | 基准期亏损（EPS ≤ 0） | 拒绝该路线（`MODEL_INPUT_MISSING`），并说明「亏损期无法由盈利外推股息」；企业族判定会把连续亏损归入困境路线 |
@@ -261,7 +305,7 @@ DPS_t = EPS_t × payout_t
 |---|---|
 | `complete` | 模型完整执行，且历史勾稽与交叉检查都没有超出容差的差额 |
 | `partial` | 模型执行完成，但勾稽差额超容差或两条路线分歧过大（`BRIDGE_RECONCILIATION_GAP` / `CROSS_CHECK_DIVERGENCE`） |
-| `insufficient_data` | 必要数据或必要证据缺失（业务证据、假设、股本、银行风险字段、桥接科目） |
+| `insufficient_data` | 必要数据或必要证据缺失（业务证据、假设、股本、银行风险字段、桥接科目、少数股东权益、超额分配的可持续终值依据） |
 | `unsupported` | 企业族首版未实现路线；或标的身份未核实、范围外 |
 | `engine_error` | 快照不可用、程序故障 |
 
