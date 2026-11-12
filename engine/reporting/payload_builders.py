@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import copy
 from typing import Any
 
 from engine.contracts.enums import AssetClass, DataStatus, EtfStrategy, IndexClass
@@ -144,6 +145,7 @@ def build_index_payload(
     strategy_candidates: list[dict[str, Any]],
     profile: dict[str, Any] | None = None,
     signal: dict[str, Any] | None = None,
+    series_library: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     payload = empty_index_payload()
     if profile is not None:
@@ -163,11 +165,47 @@ def build_index_payload(
     if snapshot is None:
         return payload
 
-    payload["history_coverage"] = dict(snapshot.coverage)
+    # 历史覆盖分成两块，避免把「实时抓取路径」说成「没有长历史」：
+    # - snapshot_path：本次快照的实时抓取覆盖（不是候选 A 所用序列）；
+    # - series_library：候选 A 研究信号与回测使用的固定序列库（data/series）。
+    snapshot_path = copy.deepcopy(dict(snapshot.coverage))
+    snapshot_path["scope"] = "snapshot_realtime_fetch"
+    rename = {
+        "valuation_source_official": "snapshot_fetch_official_indicator_file",
+        "valuation_source_monthly": "snapshot_fetch_monthly_vendor_series",
+        "total_return_series": "snapshot_fetch_total_return_series",
+        "supports_weekly_5y_history": "snapshot_fetch_supports_weekly_5y_history",
+    }
+    for old, new in rename.items():
+        if old in snapshot_path:
+            snapshot_path[new] = snapshot_path.pop(old)
+    for key in (
+        "snapshot_fetch_official_indicator_file",
+        "snapshot_fetch_monthly_vendor_series",
+        "snapshot_fetch_total_return_series",
+    ):
+        block = snapshot_path.get(key)
+        if isinstance(block, dict) and block.get("note"):
+            block["note"] = "快照实时抓取路径：" + str(block["note"])
+    coverage: dict[str, Any] = {
+        "scope_note": (
+            "snapshot_path 是本次实时抓取路径（快照）的覆盖，不是候选 A 研究信号所用序列；"
+            "series_library 才是信号与回测使用的固定序列库（data/series）"
+        ),
+        "snapshot_path": snapshot_path,
+        "series_library": series_library
+        or {
+            "status": "missing",
+            "supports_weekly_5y_history": False,
+            "note": "该标的没有登记固定序列，候选 A 信号不可计算",
+            "series": {},
+        },
+    }
     if profile is not None:
-        payload["history_coverage"]["monthly_reference_window"] = profile.get("window_rule")
-        payload["history_coverage"]["profile_status"] = profile.get("status")
-        payload["history_coverage"]["series_ids"] = profile.get("series_ids")
+        coverage["monthly_reference_window"] = profile.get("window_rule")
+        coverage["profile_status"] = profile.get("status")
+        coverage["profile_series_ids"] = profile.get("series_ids")
+    payload["history_coverage"] = coverage
 
     level_fact = snapshot.fact("index.level")
     if level_fact is not None and level_fact.is_usable_number:

@@ -241,6 +241,25 @@ def evaluate_grade(
     )
 
 
+def force_grade_c(result: GradeResult, name: str, *, note: str = "") -> GradeResult:
+    """机械护栏触发时把等级压到 C；保留原条件明细，便于审计。"""
+    unmet: list[str] = [name]
+    for item in result.unmet:
+        if item not in unmet:
+            unmet.append(item)
+    notes = list(result.notes)
+    if note:
+        notes.append(note)
+    return GradeResult(
+        grade="C",
+        conditions_a=result.conditions_a,
+        conditions_b=result.conditions_b,
+        unmet=tuple(unmet),
+        margin=None,
+        notes=tuple(notes),
+    )
+
+
 def conclude(
     policy: EquityPolicy,
     *,
@@ -344,5 +363,6 @@ __all__ = [
     "GradeResult",
     "conclude",
     "evaluate_grade",
+    "force_grade_c",
     "margin_sensitivity",
 ]

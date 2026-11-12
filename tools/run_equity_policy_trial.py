@@ -327,6 +327,54 @@ def render_markdown(payload: dict) -> str:
         "说明：安全边际只改变「候选买点」的价格门槛；无法判断的数量不随安全边际变化。"
         "上表对全部 A/B 级标的使用同一安全边际做敏感性，不等于政策按等级给出的 25%/40%。",
         "",
+        "### 4.2 基期异常变动清单",
+        "",
+    ]
+
+    thresholds = payload.get("reporting_thresholds") or {}
+    anomaly_rows = []
+    for record in records:
+        change = record.get("base_year_change") or {}
+        revenue_yoy = change.get("revenue_yoy")
+        profit_yoy = change.get("profit_yoy")
+        revenue_hit = (
+            revenue_yoy is not None
+            and abs(revenue_yoy) > float(thresholds.get("base_year_revenue_yoy_abs") or 1.0)
+        )
+        profit_hit = (
+            profit_yoy is not None
+            and abs(profit_yoy) > float(thresholds.get("base_year_profit_yoy_abs") or 1.0)
+        )
+        if revenue_hit or profit_hit:
+            anomaly_rows.append((record, change, revenue_hit, profit_hit))
+    if anomaly_rows:
+        lines += [
+            f"触发条件：基期营业收入同比绝对值 > {float(thresholds.get('base_year_revenue_yoy_abs') or 0):.0%}，"
+            f"或基期归母净利润同比绝对值 > {float(thresholds.get('base_year_profit_yoy_abs') or 0):.0%}。"
+            "清单只做披露，不改任何结论。",
+            "",
+            "| 代码 | 名称 | 财年 | 营业收入（亿元） | 上年营业收入（亿元） | 营收同比 | 归母净利润（亿元） | 上年（亿元） | 净利润同比 |",
+            "|---|---|---|---|---|---|---|---|---|",
+        ]
+        for record, change, _revenue_hit, _profit_hit in anomaly_rows:
+            revenue = change.get("revenue")
+            prior_revenue = change.get("prior_revenue")
+            profit = change.get("net_profit_parent")
+            prior_profit = change.get("prior_net_profit_parent")
+            lines.append(
+                f"| {record['code']} | {record.get('name') or '—'} | {change.get('fiscal_year')} | "
+                f"{_money(revenue / 1e8 if revenue is not None else None)} | "
+                f"{_money(prior_revenue / 1e8 if prior_revenue is not None else None)} | "
+                f"{_pct(change.get('revenue_yoy'), 1)} | "
+                f"{_money(profit / 1e8 if profit is not None else None)} | "
+                f"{_money(prior_profit / 1e8 if prior_profit is not None else None)} | "
+                f"{_pct(change.get('profit_yoy'), 1)} |"
+            )
+        lines.append("")
+    else:
+        lines += ["没有标的触发基期异常变动阈值。", ""]
+
+    lines += [
         "## 5. 关键标的与未满足条件",
         "",
     ]
@@ -381,8 +429,9 @@ def render_markdown(payload: dict) -> str:
             f"在 g = 2.0% 下 FCFF 基准价值 {_money(base_value)} 元/股（现价 {_money(leverage.get('price'))} 元）。"
             "这不是数据错误：有息负债、货币资金与净利润均来自合并报表；这是政策"
             "「债务权重用账面值、债务成本下限为无风险利率」的机械结果。"
-            "该标的的现金流勾稽差额超出容差，已按 partial 输出、结论为无法判断；"
-            "但高杠杆企业的 WACC 设定需要设计方明确（是否改用目标资本结构或给债务成本加信用利差）。",
+            "按 M4 新增的杠杆护栏（账面有息负债占比 > 50%），该标的占比超过上限，"
+            "状态按 partial、等级 C、预演结论无法判断；研究价值仅供研究参考，不用于结论。"
+            "政策护栏与 WACC 算法本身本批均未改动。",
             "",
         ]
 
@@ -406,11 +455,19 @@ def render_markdown(payload: dict) -> str:
         lines += ["600519 未产生可比较的两模型结果。", ""]
 
     lines += [
-        "## 7. 政策实现中发现的问题（提请设计方确认）",
+        "## 7. 设计决定与待确认问题（2026-11-12 验收复函）",
+        "",
+        "试运行提出的 6 个问题已由设计方逐条决定；本批按决定执行，并把高杠杆护栏写入政策：",
         "",
     ]
-    for question in payload.get("open_questions") or []:
-        lines.append(f"- {question}")
+    for decision in payload.get("designer_decisions") or []:
+        lines.append(
+            f"- **{decision.get('item')}**（{decision.get('status')}）：{decision.get('decision')}"
+        )
+    if payload.get("open_questions"):
+        lines += ["", "仍未解决的问题：", ""]
+        for question in payload["open_questions"]:
+            lines.append(f"- {question}")
     lines += [
         "",
         "## 8. 复现与产物",

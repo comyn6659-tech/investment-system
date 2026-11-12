@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-f9d8396152e51240",
-  "generated_at": "2026-11-12T13:52:10+08:00",
+  "analysis_id": "analysis-33cc47b6ecf96f2d",
+  "generated_at": "2026-11-12T14:36:24+08:00",
   "instrument": {
     "instrument_id": "EQUITY:600519.SH",
     "display_name": "贵州茅台",
@@ -5251,7 +5251,7 @@
       ]
     }
   },
-  "code_version": "phase4-0.1.0",
+  "code_version": "phase4-0.1.1",
   "policy_version": "unapproved-phase2",
   "model_version": "research-0.4.0"
 }

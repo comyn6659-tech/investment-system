@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -36,9 +36,13 @@ from engine.models.registry import MODELS_BY_ID, planned_model_plan
 from engine.reporting.payload_builders import build_equity_payload, build_etf_payload, build_index_payload
 from engine.reporting.product_check import build_product_check
 from engine.series.models import (
+    FREQ_DAILY,
     FREQ_DAILY_SHORT,
     FREQ_MONTHLY_REFERENCE,
+    METRIC_OFFICIAL_CLOSE,
     METRIC_OFFICIAL_PE_1,
+    METRIC_OFFICIAL_PE_ROLLING,
+    METRIC_TOTAL_RETURN_CLOSE,
     SeriesStore,
 )
 from engine.series.profile import POOL_METRICS, build_index_profile
@@ -449,6 +453,7 @@ class Analyzer:
             resolution=resolution,
             snapshot=snapshot,
         )
+        series_library = self._series_library_coverage(instrument.instrument_id)
         profile_status = profile.get("status")
         status_map = {
             "complete": AnalysisStatus.COMPLETE.value,
@@ -484,7 +489,11 @@ class Analyzer:
         result.reason_codes = codes
         result.model_plan = _index_profile_plan(profile, signal=signal)
         result.payload = self._build_payload(
-            instrument, snapshot, index_profile=profile, candidate_a_signal=signal
+            instrument,
+            snapshot,
+            index_profile=profile,
+            candidate_a_signal=signal,
+            series_library=series_library,
         )
         result.model_results = (
             [_index_profile_result(profile, instrument)]
@@ -718,6 +727,46 @@ class Analyzer:
         return self._finalize(result, instrument)
 
     # --- 已配置的假设 ---------------------------------------------------
+    def _series_library_coverage(self, instrument_id: str) -> dict:
+        """候选 A 使用的固定序列库覆盖（与快照实时抓取路径分开陈述）。"""
+        spec = (
+            (METRIC_OFFICIAL_CLOSE, "official_close", "官方指数收盘"),
+            (METRIC_OFFICIAL_PE_ROLLING, "official_pe_rolling", "官方滚动市盈率"),
+            (METRIC_TOTAL_RETURN_CLOSE, "total_return_close", "官方全收益指数收盘"),
+        )
+        series: dict[str, dict] = {}
+        for metric, key, label in spec:
+            item = self.series.find(instrument_id, metric, frequency=FREQ_DAILY)
+            if item is None:
+                continue
+            series[key] = {
+                "label": label,
+                "series_id": item.series_id,
+                "start": item.start_date,
+                "end": item.end_date,
+                "observations": len(item.observations),
+                "frequency": item.frequency,
+                "source_id": item.source.source_id,
+            }
+        supports = False
+        pe = series.get("official_pe_rolling")
+        close = series.get("official_close")
+        if pe and close:
+            span = (
+                date.fromisoformat(pe["end"]) - date.fromisoformat(pe["start"])
+            ).days
+            supports = span >= 5 * 365 - 30
+        return {
+            "status": "available" if series else "missing",
+            "supports_weekly_5y_history": supports,
+            "note": (
+                "候选 A 研究信号与回测使用这组固定序列；与 snapshot_path 的实时抓取覆盖是两回事"
+                if series
+                else "该标的没有登记固定序列，候选 A 信号不可计算"
+            ),
+            "series": series,
+        }
+
     def _signal_ledger_info(self, instrument_id: str) -> dict:
         """账本状态：只追加、已有记录不可修改；这里只读取，不写入。"""
         path = Path(self.config.ledger_path)
@@ -842,6 +891,7 @@ class Analyzer:
         index_profile: dict | None = None,
         product_check: dict | None = None,
         candidate_a_signal: dict | None = None,
+        series_library: dict | None = None,
     ) -> dict:
         if instrument.asset_class == AssetClass.EQUITY:
             return build_equity_payload(
@@ -857,6 +907,7 @@ class Analyzer:
                 strategy_candidates=strategy_candidates(),
                 profile=index_profile,
                 signal=candidate_a_signal,
+                series_library=series_library,
             )
         if instrument.asset_class == AssetClass.ETF:
             underlying = self.catalog.underlying(instrument)

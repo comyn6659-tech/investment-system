@@ -223,3 +223,14 @@
 | L8 | DELIVERY.md 汇总并链接上述内容、复现命令、测试结果、提交 ID | `DELIVERY.md` | 入口文件 §1–§8 | ✅ |
 
 **不作为通过条件**：候选买点数量、哪些股票被判为便宜。本批按事实交付，分布见试运行报告 §4。
+
+## 第四阶段第一批收尾（M1–M5，2026-11-12）
+
+| 编号 | 检查项 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| M1-1 | 指数报告历史覆盖拆成「快照实时抓取路径」与「序列库」，字段与说明不得与序列库事实相反 | `engine/reporting/payload_builders.py::build_index_payload`、`engine/pipeline.py::_series_library_coverage`、`engine/reporting/text_summary.py::_render_history_coverage` | 三只指数文本/JSON 扫描：`snapshot_fetch_*` 前缀、`series_library` 起止与观测数、`supports_weekly_5y_history: true`；`test_history_coverage_separates_snapshot_path_from_series_library` | ✅ |
+| M2-1 | 周度分位显示保留两位，且从**未舍入值**格式化 | `engine/signals/candidate_a.py`、`engine/reporting/text_summary.py` | 沪深300 2026-W45：67.7165% → 67.72%（原 67.70%）；`test_signal_percentile_display_is_two_decimals` | ✅ |
+| M3-1 | 000858 FY2025 两个数字用独立来源核对并写入交付文档 | `docs/phase4a-delivery.md` §9 M3 | 同花顺年度摘要 405.29 亿元 / 89.54 亿元，与东方财富一致；结论「已核对，数据属实」 | ✅ |
+| M3-2 | 试运行报告新增「基期异常变动清单」，阈值版本化，不改结论 | `engine/policy/trial.py`、`tools/run_equity_policy_trial.py`、政策 `reporting.base_year_anomaly` | 报告 §4.2 列出 000858（−54.6% / −71.9%）；`test_trial_base_year_anomaly_list`、`test_policy_carries_designer_decisions_and_guardrail` | ✅ |
+| M4-1 | 杠杆护栏 50% 版本化；超过时 partial / C / 无法判断，价值仅研究参考，新增原因码 | 政策 `quality.leverage_guardrail`、`engine/policy/valuation.py::leverage_guardrail`、`engine/contracts/reason_codes.py` | 601668 83.3% 触发；刚好 50% 不触发、50.01% 触发；`test_leverage_guardrail_boundary`、`test_trial_leverage_guardrail_forces_c` | ✅ |
+| M5-1 | 30 只预演结论不变；账本 3 条哈希不变；CLI 仍 research/undetermined；全部测试通过 | `data/policy-trial/trial-report.json`、`data/ledger/` | 结论逐只比对 0 差异；`update_signal_ledger.py --check` 0 问题；全套测试通过 | ✅ |

@@ -127,8 +127,9 @@
         "rule": "3y_average_ordinary_payout",
         "exclude_special_dividends": true,
         "assume_increase_without_commitment": false,
-        "basis": "设计方 §2：近 3 个财年平均派息率，剔除特别分红；除非公司有公开的明确分红承诺（附来源），不假设派息率上升。试运行未取得逐股分红承诺来源，因此一律不假设上升。",
-        "source": "设计方 §2；阶段二分红归集规则"
+        "basis": "设计方 §2：近 3 个财年平均派息率，剔除特别分红；除非公司有公开的明确分红承诺（附来源），不假设派息率上升。该限定只约束明确预测期（第 1–5 年）；终值派息率由 g 与新投资回报率按再投资一致性推出，不受本条约束（2026-11-12 设计决定）。",
+        "source": "设计方 §2；阶段二分红归集规则",
+        "scope": "explicit_forecast_period_only"
       },
       "statement_ratios_window": {
         "value": 3,
@@ -280,6 +281,13 @@
         "display": true,
         "basis": "设计方 §4：所有近似项对每股价值的合计影响须计算并展示。合计取各项绝对影响之和（保守口径），并逐项列出。",
         "source": "设计方 §4"
+      },
+      "leverage_guardrail": {
+        "value": 0.5,
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "on_breach": "status partial, grade C, conclusion undetermined, research values shown with a warning",
+        "basis": "施工单 M4：账面有息负债占（有息负债 + 权益市值）超过 50% 时，WACC 主要由债务成本决定、账面债务口径不可比，不给正式结论。本批 30 只其余标的最多 33.3%，不受影响；阈值交独立审查复核，批准在决策②。",
+        "source": "phase4a-acceptance-and-closeout.md M4"
       }
     },
     "grade": {
@@ -409,6 +417,22 @@
         "basis": "施工单 A.5：安全边际 20/25/30% 与 35/40/45% 的敏感性下预演结论的变化。",
         "source": "施工单 A.5"
       }
+    },
+    "reporting": {
+      "base_year_anomaly": {
+        "revenue_yoy_abs": {
+          "value": 0.4,
+          "basis": "收尾施工单 M3：基期营业收入同比绝对值 > 40% 列入「基期异常变动清单」，不改任何结论。",
+          "source": "phase4a-acceptance-and-closeout.md M3"
+        },
+        "profit_yoy_abs": {
+          "value": 0.6,
+          "basis": "收尾施工单 M3：基期归母净利润同比绝对值 > 60% 列入清单，不改任何结论。",
+          "source": "phase4a-acceptance-and-closeout.md M3"
+        },
+        "basis": "清单只做披露：把基期异常变动的标的与两个数值列出，提醒读者五年复合增速可能由异常基期主导。",
+        "source": "phase4a-acceptance-and-closeout.md M3"
+      }
     }
   },
   "mechanical_implementation": {
@@ -452,11 +476,37 @@
       "reference": "docs/equity-model-spec.md、engine/evidence/applicability.py"
     }
   ],
-  "open_questions_for_designer": [
-    "终值再投资一致性与「不假设派息率上升」在一般情况下不能同时成立：由 g 与 ROI 推出的终值派息率可能高于近 3 年历史派息率。试运行按再投资一致性等式执行，并并列披露两个派息率；若设计方希望以「不上升」为准，需要明确改写终值公式。",
-    "政策未规定 EBIT 利润率、资本开支、折旧摊销、营运资本与税率的预测来源；试运行采用 3 年算术平均并在报告中披露，需设计方确认或改写。",
-    "「受限资金未披露计为近似项」未规定量化方式；试运行用货币资金与期末现金等价物之差估算，需设计方确认。",
-    "政策未规定交叉检查不可用（第二路线拒绝计算）时如何定级；试运行按「无法验证分歧 → 不能给 A/B → C」处理。",
-    "高杠杆企业的资本权重：601668 中国建筑账面有息负债 9,405 亿元、权益市值 1,884 亿元，债务权重 83.3%，WACC 被压到 3.11%，FCFF 基准价值 93.17 元/股（现价 4.56 元）。这不是数据错误，而是「权益市值 / 账面有息负债」权重与「债务成本下限为无风险利率」的机械结果；请设计方明确是否改用目标资本结构、或按信用风险给债务成本加利差。"
+  "open_questions_for_designer": [],
+  "designer_decisions_2026_11_12": [
+    {
+      "item": "终值派息率与「不假设派息率上升」",
+      "decision": "保持按再投资一致性等式执行；「不假设派息率上升」只约束明确预测期，终值派息率由 g 与新投资回报率推出，报告并列显示。",
+      "status": "确认"
+    },
+    {
+      "item": "报表比率用 3 年算术平均、税率 0–25%",
+      "decision": "确认，作为政策 v1 的机械规则写入，仍随报告披露。",
+      "status": "确认"
+    },
+    {
+      "item": "受限资金代理口径",
+      "decision": "保持，继续计为近似项；有年报附注披露值时改用披露值（本批不做）。",
+      "status": "确认"
+    },
+    {
+      "item": "交叉检查不可用 → C",
+      "decision": "确认。",
+      "status": "确认"
+    },
+    {
+      "item": "银行资本与资产质量证据",
+      "decision": "本批不处理，银行继续停在资料不足 / C。",
+      "status": "确认"
+    },
+    {
+      "item": "高杠杆企业的 WACC",
+      "decision": "不改 WACC 算法；新增机械护栏：账面有息负债占（有息负债 + 权益市值）超过 50% 的企业不给正式结论（M4）。",
+      "status": "确认"
+    }
   ]
 }

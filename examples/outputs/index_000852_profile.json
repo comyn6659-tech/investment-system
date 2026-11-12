@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-0cdda20c437e888d",
-  "generated_at": "2026-11-12T13:52:11+08:00",
+  "analysis_id": "analysis-9a08017b8e66dc48",
+  "generated_at": "2026-11-12T14:36:25+08:00",
   "instrument": {
     "instrument_id": "INDEX:000852.SH",
     "display_name": "中证1000",
@@ -322,73 +322,111 @@
       }
     },
     "history_coverage": {
-      "build": {
-        "mode": "historical_close_bar",
-        "market_date": "2026-11-10",
-        "bar_status": "closed",
-        "built_at": "2026-11-11T13:36:56+08:00",
-        "date_source": "按日期选行",
-        "rows_after_market_date_dropped": 1
+      "scope_note": "snapshot_path 是本次实时抓取路径（快照）的覆盖，不是候选 A 研究信号所用序列；series_library 才是信号与回测使用的固定序列库（data/series）",
+      "snapshot_path": {
+        "build": {
+          "mode": "historical_close_bar",
+          "market_date": "2026-11-10",
+          "bar_status": "closed",
+          "built_at": "2026-11-11T13:36:56+08:00",
+          "date_source": "按日期选行",
+          "rows_after_market_date_dropped": 1
+        },
+        "price_series": {
+          "source_id": "em.index_daily_em",
+          "start": "2005-01-04",
+          "end": "2026-11-10",
+          "observations": 5306,
+          "frequency": "daily"
+        },
+        "dividend_yield_history": {
+          "available": false,
+          "note": "官方文件仅覆盖 20 个交易日，第三方月度序列不含股息率"
+        },
+        "aggregation_method": "unknown",
+        "aggregation_note": "官方文件未说明整体法/加权法与亏损成分处理；两套来源口径不可直接拼接",
+        "supports_5y_window": true,
+        "index_identity_verified": true,
+        "point_in_time_safe": false,
+        "point_in_time_granularity": "mixed",
+        "availability_precision_counts": {
+          "second": 1,
+          "date": 0,
+          "unknown": 4
+        },
+        "availability_unknown": [
+          "index.dividend_yield_csindex_1",
+          "index.pb",
+          "index.pe_csindex_1",
+          "index.pe_ttm"
+        ],
+        "availability_note": "只有全部事实都带秒级可获得时间，才标记 point_in_time_safe=true；仅日期精度按「当日结束时才可知」处理，不用于盘中历史判断。",
+        "scope": "snapshot_realtime_fetch",
+        "snapshot_fetch_official_indicator_file": {
+          "source_id": "csindex.indicator_file",
+          "publisher": "中证指数有限公司",
+          "start": "2026-10-14",
+          "end": "2026-11-10",
+          "observations": 20,
+          "frequency": "daily",
+          "note": "快照实时抓取路径：官方指标文件只提供最近 20 个交易日，不能用于 5 年分位"
+        },
+        "snapshot_fetch_monthly_vendor_series": {
+          "source_id": "legulegu.index_pe",
+          "publisher": "乐咕乐股",
+          "start": "2014-10-31",
+          "end": "2026-11-10",
+          "observations": 146,
+          "frequency": "monthly",
+          "note": "快照实时抓取路径：该缓存实测为月度采样，不足以构成连续周度样本；不能据此断言所有来源均无周度数据"
+        },
+        "snapshot_fetch_total_return_series": {
+          "available": false,
+          "note": "快照实时抓取路径：本次未取得全收益指数行情；该结论只针对已测来源与参数，不代表所有免费来源"
+        },
+        "snapshot_fetch_supports_weekly_5y_history": false
       },
-      "valuation_source_official": {
-        "source_id": "csindex.indicator_file",
-        "publisher": "中证指数有限公司",
-        "start": "2026-10-14",
-        "end": "2026-11-10",
-        "observations": 20,
-        "frequency": "daily",
-        "note": "官方指标文件只提供最近 20 个交易日，不能用于 5 年分位"
+      "series_library": {
+        "status": "available",
+        "supports_weekly_5y_history": true,
+        "note": "候选 A 研究信号与回测使用这组固定序列；与 snapshot_path 的实时抓取覆盖是两回事",
+        "series": {
+          "official_close": {
+            "label": "官方指数收盘",
+            "series_id": "ser-72878a74548eb9d0",
+            "start": "2014-10-17",
+            "end": "2026-11-11",
+            "observations": 2935,
+            "frequency": "daily",
+            "source_id": "csindex.indicators"
+          },
+          "official_pe_rolling": {
+            "label": "官方滚动市盈率",
+            "series_id": "ser-6a18097aa17a9fa6",
+            "start": "2014-10-17",
+            "end": "2026-11-11",
+            "observations": 2935,
+            "frequency": "daily",
+            "source_id": "csindex.indicators"
+          },
+          "total_return_close": {
+            "label": "官方全收益指数收盘",
+            "series_id": "ser-13845103862bf524",
+            "start": "2014-10-17",
+            "end": "2026-11-11",
+            "observations": 2935,
+            "frequency": "daily",
+            "source_id": "csindex.indicators"
+          }
+        }
       },
-      "valuation_source_monthly": {
-        "source_id": "legulegu.index_pe",
-        "publisher": "乐咕乐股",
-        "start": "2014-10-31",
-        "end": "2026-11-10",
-        "observations": 146,
-        "frequency": "monthly",
-        "note": "该缓存实测为月度采样，不足以构成连续周度样本；不能据此断言所有来源均无周度数据"
-      },
-      "price_series": {
-        "source_id": "em.index_daily_em",
-        "start": "2005-01-04",
-        "end": "2026-11-10",
-        "observations": 5306,
-        "frequency": "daily"
-      },
-      "total_return_series": {
-        "available": false,
-        "note": "本次未取得全收益指数行情；该结论只针对已测来源与参数，不代表所有免费来源"
-      },
-      "dividend_yield_history": {
-        "available": false,
-        "note": "官方文件仅覆盖 20 个交易日，第三方月度序列不含股息率"
-      },
-      "aggregation_method": "unknown",
-      "aggregation_note": "官方文件未说明整体法/加权法与亏损成分处理；两套来源口径不可直接拼接",
-      "supports_weekly_5y_history": false,
-      "supports_5y_window": true,
-      "index_identity_verified": true,
-      "point_in_time_safe": false,
-      "point_in_time_granularity": "mixed",
-      "availability_precision_counts": {
-        "second": 1,
-        "date": 0,
-        "unknown": 4
-      },
-      "availability_unknown": [
-        "index.dividend_yield_csindex_1",
-        "index.pb",
-        "index.pe_csindex_1",
-        "index.pe_ttm"
-      ],
-      "availability_note": "只有全部事实都带秒级可获得时间，才标记 point_in_time_safe=true；仅日期精度按「当日结束时才可知」处理，不用于盘中历史判断。",
       "monthly_reference_window": {
         "months": 60,
         "min_valid_months": 54,
         "rule": "分析时点所在月份之前的 N 个完整自然月；每月至多一个观测，取该月内最后一个有效且有实际日期的同口径记录；比较值为该来源最新可用观测，若落在参考池中则移除"
       },
       "profile_status": "complete",
-      "series_ids": {
+      "profile_series_ids": {
         "pe_rolling": "ser-34d9ea704da7b2c1",
         "pb": "ser-0e3c14ff893c9985",
         "official_pe_ratio_1": "ser-e532ae694a2bcbec"
@@ -475,7 +513,7 @@
           "valid_weeks": 254,
           "coverage": 1.0,
           "pool_size": 254,
-          "percentile_display": 62.0,
+          "percentile_display": 62.01,
           "week_complete": true,
           "note": "该观察点是所在 ISO 周最后一个已收盘交易日"
         },
@@ -548,7 +586,7 @@
         "valid_weeks": 254,
         "coverage": 1.0,
         "pool_size": 254,
-        "percentile_display": 62.0,
+        "percentile_display": 62.01,
         "week_complete": true,
         "note": "该观察点是所在 ISO 周最后一个已收盘交易日"
       },
@@ -873,7 +911,7 @@
       "is_trading_signal": false
     }
   },
-  "code_version": "phase4-0.1.0",
+  "code_version": "phase4-0.1.1",
   "policy_version": "unapproved-phase2",
   "model_version": "research-0.4.0"
 }

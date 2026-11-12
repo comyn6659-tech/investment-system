@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-0201c66fea5a5796",
-  "generated_at": "2026-11-12T13:52:11+08:00",
+  "analysis_id": "analysis-17db8a8df4342e0f",
+  "generated_at": "2026-11-12T14:36:25+08:00",
   "instrument": {
     "instrument_id": "ETF:512100.SH",
     "display_name": "中证1000ETF南方",
@@ -962,7 +962,7 @@
       }
     }
   },
-  "code_version": "phase4-0.1.0",
+  "code_version": "phase4-0.1.1",
   "policy_version": "unapproved-phase2",
   "model_version": "research-0.4.0"
 }

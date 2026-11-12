@@ -208,6 +208,11 @@ BANK_CAPITAL_CONSTRAINT = _register(
 CROSS_CHECK_DIVERGENCE = _register(
     "CROSS_CHECK_DIVERGENCE", "model", "两条路线的研究估值差异较大，需解释差异来源", blocks_candidate=False
 )
+LEVERAGE_GUARDRAIL_EXCEEDED = _register(
+    "LEVERAGE_GUARDRAIL_EXCEEDED",
+    "model",
+    "账面有息负债占比超过政策护栏，研究价值仅供参考，不给正式结论",
+)
 TERMINAL_DISTRIBUTION_UNFUNDED = _register(
     "TERMINAL_DISTRIBUTION_UNFUNDED",
     "model",

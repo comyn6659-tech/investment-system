@@ -561,6 +561,55 @@ def test_trial_distribution_and_margin_sensitivity(trial):
         assert row["candidate_buy_point"] + row["wait"] + row["avoid"] + row["undetermined"] == 30
 
 
+def test_policy_carries_designer_decisions_and_guardrail(policy):
+    """M3/M4：设计决定、基期异常阈值与杠杆护栏都要在政策文件里。"""
+    decisions = policy.data.get("designer_decisions_2026_11_12") or []
+    assert len(decisions) == 6
+    assert any("高杠杆" in item["item"] for item in decisions)
+    assert policy.value("quality.leverage_guardrail") == pytest.approx(0.50)
+    assert policy.node("quality.leverage_guardrail")["basis"]
+    assert policy.value("reporting.base_year_anomaly.revenue_yoy_abs") == pytest.approx(0.40)
+    assert policy.value("reporting.base_year_anomaly.profit_yoy_abs") == pytest.approx(0.60)
+
+
+def test_trial_base_year_anomaly_list(trial):
+    """M3：基期异常变动清单列出 000858 及其两个同比数值。"""
+    record = next(item for item in trial["records"] if item["code"] == "000858")
+    change = record["base_year_change"]
+    assert change["fiscal_year"] == 2025
+    assert change["revenue"] == pytest.approx(40528509770.23)
+    assert change["prior_revenue"] == pytest.approx(89175178322.7)
+    assert change["revenue_yoy"] == pytest.approx(40528509770.23 / 89175178322.7 - 1)
+    assert change["revenue_yoy"] < -0.40
+    assert change["profit_yoy"] < -0.60
+    if TRIAL_MD.exists():
+        text = TRIAL_MD.read_text(encoding="utf-8")
+        assert "基期异常变动清单" in text
+        assert "| 000858 |" in text
+
+
+def test_trial_leverage_guardrail_forces_c(trial):
+    """M4：601668 超过 50% 护栏，状态 partial、等级 C、结论无法判断，但价值仍展示。"""
+    record = next(item for item in trial["records"] if item["code"] == "601668")
+    guardrail = record["leverage_guardrail"]
+    assert guardrail["exceeded"] is True
+    assert guardrail["ratio"] > 0.50
+    assert record["status"] == "partial"
+    assert record["grade"]["grade"] == "C"
+    assert record["trial_conclusion"]["conclusion"] == "undetermined"
+    assert record["reason_codes"] == ["LEVERAGE_GUARDRAIL_EXCEEDED"]
+    assert record["values"]["base"] > 0  # 研究价值仍可展示
+    assert any("杠杆" in note for note in record["grade"]["notes"])
+
+
+def test_delivery_documents_independent_verification_of_000858():
+    """M3(a)：交付文档必须写明独立来源核对结果。"""
+    text = (ROOT / "docs" / "phase4a-delivery.md").read_text(encoding="utf-8")
+    assert "000858" in text and "已核对" in text
+    assert "405.29" in text and "89.54" in text
+    assert "同花顺" in text
+
+
 def test_trial_markdown_contains_required_sections():
     if not TRIAL_MD.exists():
         pytest.skip("试运行报告尚未生成")

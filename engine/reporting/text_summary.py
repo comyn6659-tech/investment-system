@@ -216,10 +216,7 @@ def _render_payload(payload: dict[str, Any]) -> list[str]:
                 lines.append(f"  - {name}：{_fact_text(fact)}")
         coverage = payload.get("history_coverage") or {}
         if coverage:
-            lines.append("")
-            lines.append("【历史覆盖】")
-            for key, value in coverage.items():
-                lines.append(f"  - {key}：{_coverage_text(value)}")
+            lines.extend(_render_history_coverage(coverage))
         profile = payload.get("valuation_profile")
         if profile:
             lines.extend(_render_index_profile(profile))
@@ -401,7 +398,7 @@ def _render_candidate_a_signal(signal: dict[str, Any]) -> list[str]:
     )
     latest = signal.get("latest")
     if latest:
-        percentile = latest.get("percentile_display")
+        percentile = latest.get("percentile")
         lines.append(
             f"  - 最新观察点：{latest.get('date')}（{latest.get('week')}，"
             f"{'该周已结束' if latest.get('week_complete') else '该周尚未结束，信号为盘中临时值'}）"
@@ -804,6 +801,40 @@ def _trading_text(value: Any) -> str:
     if value.get("status") is None:
         return f"缺失（状态 {value.get('status_code')}）"
     return str(value.get("status"))
+
+
+def _render_history_coverage(coverage: dict[str, Any]) -> list[str]:
+    """历史覆盖必须区分「快照实时抓取」与「候选 A 序列库」，避免自相矛盾。"""
+    lines = ["", "【历史覆盖】"]
+    note = coverage.get("scope_note")
+    if note:
+        lines.append(f"  - 口径：{note}")
+    snapshot_path = coverage.get("snapshot_path")
+    if isinstance(snapshot_path, dict) and snapshot_path:
+        lines.append("  - 快照实时抓取路径（不是候选 A 序列库）：")
+        for key, value in snapshot_path.items():
+            lines.append(f"    - {key}：{_coverage_text(value)}")
+    library = coverage.get("series_library") or {}
+    if isinstance(library, dict):
+        lines.append("  - 序列库（候选 A 研究信号与回测使用）：")
+        series = library.get("series") or {}
+        for key, block in series.items():
+            lines.append(
+                f"    - {block.get('label') or key}：{block.get('start')} → {block.get('end')}，"
+                f"{block.get('observations')} 个观测（{block.get('series_id')}，"
+                f"{block.get('source_id')}）"
+            )
+        if library.get("status") == "available":
+            lines.append(
+                "    - 支持 5 年周度历史："
+                f"{'是' if library.get('supports_weekly_5y_history') else '否'}"
+            )
+        else:
+            lines.append(f"    - 不可用：{library.get('note')}")
+    for key in ("monthly_reference_window", "profile_status", "profile_series_ids"):
+        if key in coverage:
+            lines.append(f"  - {key}：{_coverage_text(coverage[key])}")
+    return lines
 
 
 def _coverage_text(value: Any) -> str:

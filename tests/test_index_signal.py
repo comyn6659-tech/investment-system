@@ -10,6 +10,8 @@ from pathlib import Path
 import pytest
 
 from engine.pipeline import Analyzer, AnalyzerConfig
+from engine.policy.equity import EquityPolicy, load_policy
+from engine.policy.valuation import leverage_guardrail, leverage_ratio
 from engine.reporting.text_summary import render_text
 from engine.series.models import SeriesStore
 from engine.signals.candidate_a import build_candidate_a_signal, classify_signal
@@ -29,6 +31,11 @@ BACKTEST_JSON = ROOT / "data" / "backtest" / "candidate-a.json"
 @pytest.fixture(scope="module")
 def store() -> SeriesStore:
     return SeriesStore(SERIES_DIR)
+
+
+@pytest.fixture(scope="module")
+def policy() -> EquityPolicy:
+    return load_policy(ROOT / "data" / "policies" / "equity-policy-v1-draft.json")
 
 
 def _record(**overrides) -> LedgerRecord:
@@ -69,7 +76,7 @@ def test_candidate_a_signal_for_csi300(store):
     assert latest["date"] <= "2026-11-10"
     assert latest["week"] == "2026-W45"
     assert latest["percentile"] is not None
-    assert latest["percentile_display"] == pytest.approx(round(latest["percentile"], 1))
+    assert latest["percentile_display"] == pytest.approx(round(latest["percentile"], 2))
     if latest["percentile"] >= 60:
         assert signal["signal"] == "exit"
         assert signal["exit_condition_met"] is True
@@ -216,6 +223,57 @@ def test_index_report_contains_research_signal():
     assert "候选 A 研究信号（未批准）" in text
     assert "只追加账本" in text
     assert "不构成买卖建议" in text
+
+
+def test_history_coverage_separates_snapshot_path_from_series_library():
+    """M1：历史覆盖不得把「快照实时抓取」说成「没有长历史」。"""
+    analyzer = Analyzer(AnalyzerConfig())
+    for query in ("沪深300", "中证500", "中证1000"):
+        result = analyzer.analyze(query)
+        coverage = result.to_dict()["payload"]["history_coverage"]
+        assert "snapshot_path" in coverage and "series_library" in coverage
+        assert "快照" in coverage["scope_note"] and "序列库" in coverage["scope_note"]
+        snapshot_path = coverage["snapshot_path"]
+        # 快照路径的字段全部改名，避免与序列库事实混淆
+        assert "supports_weekly_5y_history" not in snapshot_path
+        assert "snapshot_fetch_supports_weekly_5y_history" in snapshot_path
+        assert "total_return_series" not in snapshot_path
+        assert "snapshot_fetch_total_return_series" in snapshot_path
+        library = coverage["series_library"]
+        assert library["status"] == "available"
+        assert library["supports_weekly_5y_history"] is True
+        assert set(library["series"]) == {
+            "official_close", "official_pe_rolling", "total_return_close"
+        }
+        for block in library["series"].values():
+            assert block["series_id"].startswith("ser-")
+            assert block["observations"] > 1000
+            assert block["start"] < block["end"]
+        text = render_text(result.to_dict())
+        assert "序列库（候选 A 研究信号与回测使用）" in text
+        assert "支持 5 年周度历史：是" in text
+        assert "快照实时抓取路径（不是候选 A 序列库）" in text
+
+
+def test_signal_percentile_display_is_two_decimals(store):
+    """M2：文本按未舍入值保留两位，JSON 显示值也是两位。"""
+    signal = build_candidate_a_signal(store, "INDEX:000300.SH", as_of="2026-11-10")
+    raw = signal["latest"]["percentile"]
+    display = signal["latest"]["percentile_display"]
+    assert display == pytest.approx(round(raw, 2))
+    analyzer = Analyzer(AnalyzerConfig())
+    result = analyzer.analyze("沪深300")
+    text = render_text(result.to_dict())
+    assert f"{raw:.2f}%" in text
+
+
+def test_leverage_guardrail_boundary(policy):
+    """M4：刚好 50% 不触发，略高于 50% 触发。"""
+    assert leverage_ratio(50.0, 50.0) == pytest.approx(0.5)
+    assert leverage_guardrail(policy, 0.5)["exceeded"] is False
+    assert leverage_guardrail(policy, 0.5001)["exceeded"] is True
+    assert leverage_guardrail(policy, 0.333)["exceeded"] is False
+    assert leverage_guardrail(policy, 0.833)["note"].startswith("研究价值仅供研究参考")
 
 
 def test_index_signal_cannot_become_price_judgement():

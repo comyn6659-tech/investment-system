@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-11-12T14:06:21+08:00",
+  "generated_at": "2026-11-12T14:35:53+08:00",
   "policy": {
     "policy_id": "equity-policy-v1-draft",
-    "policy_digest": "pol-78fdf05c40ace1b4",
+    "policy_digest": "pol-239f088ae9552f1a",
     "status": "draft_unapproved",
     "approved": false,
     "version_date": "2026-11-12",
@@ -45,6 +45,42 @@
     "months": 120
   },
   "test_set_size": 30,
+  "reporting_thresholds": {
+    "base_year_revenue_yoy_abs": 0.4,
+    "base_year_profit_yoy_abs": 0.6
+  },
+  "designer_decisions": [
+    {
+      "item": "终值派息率与「不假设派息率上升」",
+      "decision": "保持按再投资一致性等式执行；「不假设派息率上升」只约束明确预测期，终值派息率由 g 与新投资回报率推出，报告并列显示。",
+      "status": "确认"
+    },
+    {
+      "item": "报表比率用 3 年算术平均、税率 0–25%",
+      "decision": "确认，作为政策 v1 的机械规则写入，仍随报告披露。",
+      "status": "确认"
+    },
+    {
+      "item": "受限资金代理口径",
+      "decision": "保持，继续计为近似项；有年报附注披露值时改用披露值（本批不做）。",
+      "status": "确认"
+    },
+    {
+      "item": "交叉检查不可用 → C",
+      "decision": "确认。",
+      "status": "确认"
+    },
+    {
+      "item": "银行资本与资产质量证据",
+      "decision": "本批不处理，银行继续停在资料不足 / C。",
+      "status": "确认"
+    },
+    {
+      "item": "高杠杆企业的 WACC",
+      "decision": "不改 WACC 算法；新增机械护栏：账面有息负债占（有息负债 + 权益市值）超过 50% 的企业不给正式结论（M4）。",
+      "status": "确认"
+    }
+  ],
   "distribution": {
     "conclusions": {
       "candidate_buy_point": 0,
@@ -187,6 +223,7 @@
       "price": 1402.3,
       "price_as_of": "2026-11-11",
       "shares": 1250081601.0,
+      "reason_codes": [],
       "evidence_id": "biz-a78613fb556511a1",
       "snapshot": {
         "facts": 1859,
@@ -231,6 +268,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 172054171890.91,
+        "prior_revenue": 174144069958.25,
+        "revenue_yoy": -0.012000971769185353,
+        "net_profit_parent": 82320067101.68,
+        "prior_net_profit_parent": 86228146421.62,
+        "profit_yoy": -0.04532254817158088
+      },
       "inputs": {
         "revenue": 172054171890.91,
         "ebit_margin": 0.6724753896126033,
@@ -297,6 +343,13 @@
         "wacc": 0.07902753474452594,
         "interest_expense": 28734948.29,
         "notes": []
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.00013330372754779998,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -1122,6 +1175,7 @@
       "price": 72.39,
       "price_as_of": "2026-11-11",
       "shares": 3881608005.0,
+      "reason_codes": [],
       "evidence_id": "biz-a101745fe2f5ce18",
       "snapshot": {
         "facts": 1844,
@@ -1166,6 +1220,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 40528509770.23,
+        "prior_revenue": 89175178322.7,
+        "revenue_yoy": -0.5455180406416607,
+        "net_profit_parent": 8954257202.51,
+        "prior_net_profit_parent": 31853172533.98,
+        "profit_yoy": -0.7188896273061067
+      },
       "inputs": {
         "revenue": 40528509770.23,
         "ebit_margin": 0.39080371025713684,
@@ -1232,6 +1295,13 @@
         "wacc": 0.07896640022449017,
         "interest_expense": 28573949.37,
         "notes": []
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.0014517887779727583,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -2055,6 +2125,7 @@
       "price": 30.61,
       "price_as_of": "2026-11-11",
       "shares": 6325360667.0,
+      "reason_codes": [],
       "evidence_id": "biz-8abec02d9f81c779",
       "snapshot": {
         "facts": 1852,
@@ -2099,6 +2170,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 115931105774.99,
+        "prior_revenue": 115779554649.3,
+        "revenue_yoy": 0.001308962762458954,
+        "net_profit_parent": 11565166497.81,
+        "prior_net_profit_parent": 8452859993.18,
+        "profit_yoy": 0.3681956766279215
+      },
       "inputs": {
         "revenue": 115931105774.99,
         "ebit_margin": 0.09338675929219063,
@@ -2167,6 +2247,13 @@
         "notes": [
           "观测债务成本 2.70% 低于无风险利率，按政策下限取 2.76%"
         ]
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.20786009469838113,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -2992,6 +3079,7 @@
       "price": 34.61,
       "price_as_of": "2026-11-11",
       "shares": 5843973443.999999,
+      "reason_codes": [],
       "evidence_id": "biz-881f754a468e3b60",
       "snapshot": {
         "facts": 1811,
@@ -3036,6 +3124,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 28873380466.76,
+        "prior_revenue": 26904508894.01,
+        "revenue_yoy": 0.07317998557440109,
+        "net_profit_parent": 7038465194.15,
+        "prior_net_profit_parent": 6343626494.69,
+        "profit_yoy": 0.10953335604509862
+      },
       "inputs": {
         "revenue": 28873380466.76,
         "ebit_margin": 0.26426016465419755,
@@ -3102,6 +3199,13 @@
         "wacc": 0.07900866558093722,
         "interest_expense": 25520066.67,
         "notes": []
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.001378288390173559,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -3916,6 +4020,7 @@
       "price": 24.24,
       "price_as_of": "2026-11-11",
       "shares": 3464661213.0,
+      "reason_codes": [],
       "evidence_id": "biz-af99f7f183421a7e",
       "snapshot": {
         "facts": 1868,
@@ -3960,6 +4065,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 59459718486.96,
+        "prior_revenue": 59715249829.28,
+        "revenue_yoy": -0.004279163916261597,
+        "net_profit_parent": 5104609986.02,
+        "prior_net_profit_parent": 4989048074.6,
+        "profit_yoy": 0.02316311843302188
+      },
       "inputs": {
         "revenue": 59459718486.96,
         "ebit_margin": 0.11260884470656211,
@@ -4028,6 +4142,13 @@
         "notes": [
           "观测债务成本 1.62% 低于无风险利率，按政策下限取 2.76%"
         ]
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.109685032650233,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -4855,6 +4976,7 @@
       "price": 130.24,
       "price_as_of": "2026-11-11",
       "shares": 603317210.0,
+      "reason_codes": [],
       "evidence_id": "biz-44cbaf2458267f68",
       "snapshot": {
         "facts": 1844,
@@ -4899,6 +5021,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 9001411806.06,
+        "prior_revenue": 10787863091.37,
+        "revenue_yoy": -0.16559825335001832,
+        "net_profit_parent": 2158633048.42,
+        "prior_net_profit_parent": 2977002486.34,
+        "profit_yoy": -0.2748971294700273
+      },
       "inputs": {
         "revenue": 9001411806.06,
         "ebit_margin": 0.315318143636153,
@@ -4965,6 +5096,13 @@
         "wacc": 0.07829932143179584,
         "interest_expense": 31745589.19,
         "notes": []
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.013337352871584952,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -5584,6 +5722,7 @@
       "price": 87.68,
       "price_as_of": "2026-11-11",
       "shares": 7630066747.0,
+      "reason_codes": [],
       "evidence_id": "biz-23dc993201255670",
       "snapshot": {
         "facts": 1808,
@@ -5628,6 +5767,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 458502407000.0,
+        "prior_revenue": 409084266000.0,
+        "revenue_yoy": 0.12080186188339015,
+        "net_profit_parent": 43945411000.0,
+        "prior_net_profit_parent": 38537237000.0,
+        "profit_yoy": 0.14033631938895885
+      },
       "inputs": {
         "revenue": 458502407000.0,
         "ebit_margin": 0.10264899679699152,
@@ -5691,6 +5839,13 @@
         "wacc": 0.07399058530474216,
         "interest_expense": 2211331000.0,
         "notes": []
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.09162572781611918,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -6518,6 +6673,7 @@
       "price": 38.66,
       "price_as_of": "2026-11-11",
       "shares": 5601405741.0,
+      "reason_codes": [],
       "evidence_id": "biz-147ba013153eaebf",
       "snapshot": {
         "facts": 1868,
@@ -6562,6 +6718,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 171118161275.41,
+        "prior_revenue": 190038071604.78,
+        "revenue_yoy": -0.09955852619214911,
+        "net_profit_parent": 29003103411.66,
+        "prior_net_profit_parent": 32184570372.28,
+        "profit_yoy": -0.09885068912897899
+      },
       "inputs": {
         "revenue": 171118161275.41,
         "ebit_margin": 0.1660755095882839,
@@ -6630,6 +6795,13 @@
         "notes": [
           "观测债务成本 2.47% 低于无风险利率，按政策下限取 2.76%"
         ]
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.28285769599054433,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -7446,6 +7618,7 @@
       "price": 55.75,
       "price_as_of": "2026-11-11",
       "shares": 2609743532.0,
+      "reason_codes": [],
       "evidence_id": "biz-47e55e3bd3f2bda0",
       "snapshot": {
         "facts": 1862,
@@ -7490,6 +7663,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 45787435563.0,
+        "prior_revenue": 39251657267.0,
+        "revenue_yoy": 0.16650961388819674,
+        "net_profit_parent": 9312304150.0,
+        "prior_net_profit_parent": 7497976123.0,
+        "profit_yoy": 0.24197570080738973
+      },
       "inputs": {
         "revenue": 45787435563.0,
         "ebit_margin": 0.20659939568708738,
@@ -7558,6 +7740,13 @@
         "notes": [
           "观测债务成本 2.02% 低于无风险利率，按政策下限取 2.76%"
         ]
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.10401185608023465,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -8171,6 +8360,7 @@
       "price": 18.53,
       "price_as_of": "2026-11-11",
       "shares": 9195004437.0,
+      "reason_codes": [],
       "evidence_id": "biz-b1dba6274b4b3480",
       "snapshot": {
         "facts": 1841,
@@ -8264,6 +8454,7 @@
       "price": 69.9,
       "price_as_of": "2026-11-11",
       "shares": 3130471626.0,
+      "reason_codes": [],
       "evidence_id": "biz-c65cebf255f16d64",
       "snapshot": {
         "facts": 1850,
@@ -8308,6 +8499,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 203234573814.42,
+        "prior_revenue": 182069119160.94,
+        "revenue_yoy": 0.1162495581404488,
+        "net_profit_parent": 12527201094.15,
+        "prior_net_profit_parent": 13033066612.84,
+        "profit_yoy": -0.038814005461433654
+      },
       "inputs": {
         "revenue": 203234573814.42,
         "ebit_margin": 0.10613527261524532,
@@ -8373,6 +8573,13 @@
         "notes": [
           "观测债务成本 2.75% 低于无风险利率，按政策下限取 2.76%"
         ]
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.3325256858803768,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -9199,6 +9406,7 @@
       "price": 34.25,
       "price_as_of": "2026-11-11",
       "shares": 9164871550.0,
+      "reason_codes": [],
       "evidence_id": "biz-4cdd4862acf3f761",
       "snapshot": {
         "facts": 1823,
@@ -9243,6 +9451,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 92507796069.94,
+        "prior_revenue": 92495525118.3,
+        "revenue_yoy": 0.00013266535461364803,
+        "net_profit_parent": 14195371894.42,
+        "prior_net_profit_parent": 11977327023.54,
+        "profit_yoy": 0.18518696755300224
+      },
       "inputs": {
         "revenue": 92507796069.94,
         "ebit_margin": 0.16795641233040892,
@@ -9311,6 +9528,13 @@
         "notes": [
           "观测债务成本 2.60% 低于无风险利率，按政策下限取 2.76%"
         ]
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.025261758360855258,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -10132,6 +10356,7 @@
       "price": 246.66,
       "price_as_of": "2026-11-11",
       "shares": 4627249686.0,
+      "reason_codes": [],
       "evidence_id": "biz-6983f67eafe4e6ee",
       "snapshot": {
         "facts": 1691,
@@ -10177,6 +10402,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 423701834000.0,
+        "prior_revenue": 362012554000.0,
+        "revenue_yoy": 0.17040646606968224,
+        "net_profit_parent": 72201282000.0,
+        "prior_net_profit_parent": 50744682000.0,
+        "profit_yoy": 0.42283445583519463
+      },
       "inputs": {
         "revenue": 423701834000.0,
         "ebit_margin": 0.15928627325203912,
@@ -10242,6 +10476,13 @@
         "notes": [
           "观测债务成本 2.14% 低于无风险利率，按政策下限取 2.76%"
         ]
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.09488911139074217,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -11067,6 +11308,7 @@
       "price": 82.04,
       "price_as_of": "2026-11-11",
       "shares": 9117197565.0,
+      "reason_codes": [],
       "evidence_id": "biz-049158d045398366",
       "snapshot": {
         "facts": 1802,
@@ -11111,6 +11353,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 803964958000.0,
+        "prior_revenue": 777102455000.0,
+        "revenue_yoy": 0.034567517869957154,
+        "net_profit_parent": 32619022000.0,
+        "prior_net_profit_parent": 40254346000.0,
+        "profit_yoy": -0.18967701027859207
+      },
       "inputs": {
         "revenue": 803964958000.0,
         "ebit_margin": 0.057853731179536606,
@@ -11174,6 +11425,13 @@
         "wacc": 0.07187361702664166,
         "interest_expense": 2551657000.0,
         "notes": []
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.13737891169016114,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -11786,6 +12044,7 @@
       "price": 48.22,
       "price_as_of": "2026-11-11",
       "shares": 6637199874.0,
+      "reason_codes": [],
       "evidence_id": "biz-dbfd618e710f6a84",
       "snapshot": {
         "facts": 1844,
@@ -11830,6 +12089,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 31629416193.83,
+        "prior_revenue": 27984605342.06,
+        "revenue_yoy": 0.13024342516962206,
+        "net_profit_parent": 7711054811.98,
+        "prior_net_profit_parent": 6336527014.75,
+        "profit_yoy": 0.21692131889131216
+      },
       "inputs": {
         "revenue": 31629416193.83,
         "ebit_margin": 0.22724240599983267,
@@ -11896,6 +12164,13 @@
         "wacc": 0.07904335311187011,
         "interest_expense": 14349097.41,
         "notes": []
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.0002318913969105548,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -12721,6 +12996,7 @@
       "price": 29.48,
       "price_as_of": "2026-11-11",
       "shares": 24468217716.0,
+      "reason_codes": [],
       "evidence_id": "biz-2239f62bbdd168bc",
       "snapshot": {
         "facts": 1843,
@@ -12765,6 +13041,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 86241940222.2,
+        "prior_revenue": 84491870566.52,
+        "revenue_yoy": 0.020712876208630826,
+        "net_profit_parent": 34502809176.39,
+        "prior_net_profit_parent": 32496172808.65,
+        "profit_yoy": 0.06174992912414168
+      },
       "inputs": {
         "revenue": 86241940222.2,
         "ebit_margin": 0.5866706048897434,
@@ -12828,6 +13113,13 @@
         "wacc": 0.06434649077854651,
         "interest_expense": 9508718717.67,
         "notes": []
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.2853299624512795,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -13426,6 +13718,7 @@
       "price": 49.0,
       "price_as_of": "2026-11-11",
       "shares": 21689434304.0,
+      "reason_codes": [],
       "evidence_id": "biz-e5a69aed2c1fb6ee",
       "snapshot": {
         "facts": 1832,
@@ -13519,6 +13812,7 @@
       "price": 4.8,
       "price_as_of": "2026-11-11",
       "shares": 19862892778.0,
+      "reason_codes": [],
       "evidence_id": "biz-0b1eae832e60b3bb",
       "snapshot": {
         "facts": 1835,
@@ -13563,6 +13857,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 77644812382.0,
+        "prior_revenue": 74627273516.0,
+        "revenue_yoy": 0.040434799823593215,
+        "net_profit_parent": 5900148479.0,
+        "prior_net_profit_parent": 9039359180.0,
+        "profit_yoy": -0.34728243877570975
+      },
       "inputs": {
         "revenue": 77644812382.0,
         "ebit_margin": 0.16871615945550522,
@@ -13628,6 +13931,13 @@
         "notes": [
           "观测债务成本 2.24% 低于无风险利率，按政策下限取 2.76%"
         ]
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.12523212063440664,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -14246,6 +14556,7 @@
       "price": 99.93,
       "price_as_of": "2026-11-11",
       "shares": 21702251023.0,
+      "reason_codes": [],
       "evidence_id": "biz-92bfd5ffd08592cf",
       "snapshot": {
         "facts": 1482,
@@ -14295,6 +14606,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 1050187000000.0,
+        "prior_revenue": 1040759000000.0,
+        "revenue_yoy": 0.009058773452835789,
+        "net_profit_parent": 137095000000.0,
+        "prior_net_profit_parent": 138373000000.0,
+        "profit_yoy": -0.00923590584868439
+      },
       "inputs": {
         "revenue": 1050187000000.0,
         "ebit_margin": 0.1667642823073531,
@@ -14361,6 +14681,13 @@
         "wacc": 0.07684256502109317,
         "interest_expense": 3657000000.0,
         "notes": []
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.04458208234630443,
+        "limit": 0.5,
+        "exceeded": false,
+        "note": "未超过杠杆护栏"
       },
       "growth": {
         "path_pessimistic": [
@@ -14980,6 +15307,9 @@
       "price": 4.56,
       "price_as_of": "2026-11-11",
       "shares": 41320390444.0,
+      "reason_codes": [
+        "LEVERAGE_GUARDRAIL_EXCEEDED"
+      ],
       "evidence_id": "biz-112bb8e3ae489f51",
       "snapshot": {
         "facts": 1817,
@@ -15024,6 +15354,15 @@
         "chosen_because": "month_end_mean"
       },
       "base_year": 2025,
+      "base_year_change": {
+        "fiscal_year": 2025,
+        "revenue": 2082141811000.0,
+        "prior_revenue": 2187334286000.0,
+        "revenue_yoy": -0.0480916317516179,
+        "net_profit_parent": 39069002000.0,
+        "prior_net_profit_parent": 46193694000.0,
+        "profit_yoy": -0.1542351646525606
+      },
       "inputs": {
         "revenue": 2082141811000.0,
         "ebit_margin": 0.04564692871850242,
@@ -15089,6 +15428,13 @@
         "notes": [
           "观测债务成本 2.20% 低于无风险利率，按政策下限取 2.76%"
         ]
+      },
+      "leverage_guardrail": {
+        "rule": "book_interest_bearing_debt / (book_interest_bearing_debt + equity_market_cap)",
+        "ratio": 0.8331008246873284,
+        "limit": 0.5,
+        "exceeded": true,
+        "note": "研究价值仅供研究参考，不用于结论"
       },
       "growth": {
         "path_pessimistic": [
@@ -15783,12 +16129,15 @@
           }
         ],
         "unmet_conditions": [
+          "leverage_guardrail",
           "ocf_to_profit",
           "net_debt_to_ebitda",
           "cross_check_divergence",
           "approximation_impact"
         ],
-        "notes": []
+        "notes": [
+          "账面有息负债占比 83.3% 超过杠杆护栏 50%：研究价值仅供研究参考，不用于结论"
+        ]
       },
       "trial_conclusion": {
         "conclusion": "undetermined",
@@ -15859,7 +16208,7 @@
         }
       ],
       "status": "partial",
-      "status_reason": "FCFF 与经营现金流勾稽差额占经营现金流 -273.6%，超过政策容差 15%：结果按 partial 输出"
+      "status_reason": "账面有息负债占比 83.3% 超过杠杆护栏 50%（M4）：研究价值仅供研究参考，不给正式结论"
     },
     {
       "code": "601919",
@@ -15902,6 +16251,7 @@
       "price": 17.03,
       "price_as_of": "2026-11-11",
       "shares": 15218324687.0,
+      "reason_codes": [],
       "evidence_id": "biz-db8bd3e6fb69091d",
       "snapshot": {
         "facts": 1805,
@@ -15981,6 +16331,7 @@
       "price": 6.08,
       "price_as_of": "2026-11-11",
       "shares": 21782084748.999996,
+      "reason_codes": [],
       "evidence_id": "biz-07d4842262937a3e",
       "snapshot": {
         "facts": 1862,
@@ -16060,6 +16411,7 @@
       "price": 27.86,
       "price_as_of": "2026-11-11",
       "shares": 26590798241.0,
+      "reason_codes": [],
       "evidence_id": "biz-3e316f893cbd32c3",
       "snapshot": {
         "facts": 1835,
@@ -16139,6 +16491,7 @@
       "price": 11.92,
       "price_as_of": "2026-11-11",
       "shares": 183020977818.00003,
+      "reason_codes": [],
       "evidence_id": "biz-da15e01e60f740ee",
       "snapshot": {
         "facts": 1904,
@@ -16219,6 +16572,7 @@
       "price": 3.2,
       "price_as_of": "2026-11-11",
       "shares": 11930709471.0,
+      "reason_codes": [],
       "evidence_id": "biz-87246cea975e0b10",
       "snapshot": {
         "facts": 1862,
@@ -16299,6 +16653,7 @@
       "price": 11.75,
       "price_as_of": "2026-11-11",
       "shares": 7578069833.0,
+      "reason_codes": [],
       "evidence_id": "biz-da749ff2cf035fce",
       "snapshot": {
         "facts": 1805,
@@ -16379,6 +16734,7 @@
       "price": 42.56,
       "price_as_of": "2026-11-11",
       "shares": 25219845601.0,
+      "reason_codes": [],
       "evidence_id": "biz-4c2888fe2f7fa66c",
       "snapshot": {
         "facts": 1844,
@@ -16459,6 +16815,7 @@
       "price": 8.53,
       "price_as_of": "2026-11-11",
       "shares": 356406257089.0,
+      "reason_codes": [],
       "evidence_id": "biz-c7d8eeb69e91b0ab",
       "snapshot": {
         "facts": 1929,
@@ -16540,6 +16897,7 @@
       "price": 53.41,
       "price_as_of": "2026-11-11",
       "shares": 18107641995.0,
+      "reason_codes": [],
       "evidence_id": "biz-7fa5655936d6e929",
       "snapshot": {
         "facts": 1886,
@@ -16621,6 +16979,7 @@
       "price": 25.28,
       "price_as_of": "2026-11-11",
       "shares": 15624272212.0,
+      "reason_codes": [],
       "evidence_id": "biz-a1f9c3cac46175bd",
       "snapshot": {
         "facts": 1844,
@@ -16666,11 +17025,5 @@
     "政策未批准：批准权在股东（决策②），批准前系统不输出正式结论。",
     "测试集是工程样本，不是推荐列表；候选买点数量不作为验收条件。"
   ],
-  "open_questions": [
-    "终值再投资一致性与「不假设派息率上升」在一般情况下不能同时成立：由 g 与 ROI 推出的终值派息率可能高于近 3 年历史派息率。试运行按再投资一致性等式执行，并并列披露两个派息率；若设计方希望以「不上升」为准，需要明确改写终值公式。",
-    "政策未规定 EBIT 利润率、资本开支、折旧摊销、营运资本与税率的预测来源；试运行采用 3 年算术平均并在报告中披露，需设计方确认或改写。",
-    "「受限资金未披露计为近似项」未规定量化方式；试运行用货币资金与期末现金等价物之差估算，需设计方确认。",
-    "政策未规定交叉检查不可用（第二路线拒绝计算）时如何定级；试运行按「无法验证分歧 → 不能给 A/B → C」处理。",
-    "高杠杆企业的资本权重：601668 中国建筑账面有息负债 9,405 亿元、权益市值 1,884 亿元，债务权重 83.3%，WACC 被压到 3.11%，FCFF 基准价值 93.17 元/股（现价 4.56 元）。这不是数据错误，而是「权益市值 / 账面有息负债」权重与「债务成本下限为无风险利率」的机械结果；请设计方明确是否改用目标资本结构、或按信用风险给债务成本加利差。"
-  ]
+  "open_questions": []
 }

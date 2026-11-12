@@ -17,6 +17,7 @@ from engine.evidence.models import BusinessEvidence, EvidenceBook
 from engine.financials.annual import load_annual_history, load_dividend_records
 from engine.financials.bridge import build_fcff_bridge
 from engine.financials.dividends import build_dividend_book
+from engine.contracts import reason_codes as rc
 from engine.policy import grading, valuation
 from engine.policy.equity import EquityPolicy
 from engine.policy.valuation import CompanyInputs, PolicyModelError
@@ -330,6 +331,7 @@ def _base_record(
             "reason": f"状态 {status}：{status_reason}",
         },
         "grade": {"grade": "C", "unmet_conditions": ["route_not_evaluable"]},
+        "reason_codes": [],
     }
 
 
@@ -380,6 +382,7 @@ def evaluate_company(
         "price": price["value"] if price else None,
         "price_as_of": price["as_of"] if price else None,
         "shares": shares,
+        "reason_codes": [],
         "evidence_id": evidence.evidence_id if evidence is not None else None,
         "snapshot": {
             "facts": len(snapshot.facts),
@@ -523,6 +526,30 @@ def evaluate_company(
         return record
 
     record["base_year"] = base_year
+    prior_year = history.year(base_year - 1)
+    prior_revenue = prior_year.number("revenue") if prior_year is not None else None
+    prior_profit = (
+        prior_year.number("net_profit_parent") if prior_year is not None else None
+    )
+    revenue_yoy = (
+        inputs.revenue / prior_revenue - 1.0
+        if prior_revenue not in (None, 0) and prior_revenue > 0
+        else None
+    )
+    profit_yoy = (
+        inputs.net_profit_parent / prior_profit - 1.0
+        if prior_profit not in (None, 0) and prior_profit > 0 and inputs.net_profit_parent is not None
+        else None
+    )
+    record["base_year_change"] = {
+        "fiscal_year": base_year,
+        "revenue": inputs.revenue,
+        "prior_revenue": prior_revenue,
+        "revenue_yoy": revenue_yoy,
+        "net_profit_parent": inputs.net_profit_parent,
+        "prior_net_profit_parent": prior_profit,
+        "profit_yoy": profit_yoy,
+    }
     record["inputs"] = {
         "revenue": inputs.revenue,
         "ebit_margin": inputs.ebit_margin,
@@ -565,6 +592,10 @@ def evaluate_company(
 
     discount = valuation.build_discount(policy, inputs, risk_free=rf["normalized"])
     record["discount"] = discount.to_dict()
+    leverage = valuation.leverage_guardrail(
+        policy, valuation.leverage_ratio(discount.debt, discount.market_cap)
+    )
+    record["leverage_guardrail"] = leverage
 
     try:
         scenarios = valuation.value_all_scenarios(
@@ -679,6 +710,22 @@ def evaluate_company(
         family=applicability.family,
         bank_evidence_ok=_bank_evidence_ok(snapshot),
     )
+    if leverage["exceeded"]:
+        grade = grading.force_grade_c(
+            grade,
+            "leverage_guardrail",
+            note=(
+                f"账面有息负债占比 {leverage['ratio']:.1%} 超过杠杆护栏 "
+                f"{leverage['limit']:.0%}：研究价值仅供研究参考，不用于结论"
+            ),
+        )
+        if status == "complete":
+            status = "partial"
+        status_reason = (
+            f"账面有息负债占比 {leverage['ratio']:.1%} 超过杠杆护栏 "
+            f"{leverage['limit']:.0%}（M4）：研究价值仅供研究参考，不给正式结论"
+        )
+        record["reason_codes"] = [rc.LEVERAGE_GUARDRAIL_EXCEEDED]
     record["grade"] = grade.to_dict()
 
     conclusion = grading.conclude(
@@ -851,6 +898,15 @@ def run_trial(
             "months": len(macro.get("month_end_observations") or []),
         },
         "test_set_size": len(codes),
+        "reporting_thresholds": {
+            "base_year_revenue_yoy_abs": policy.value(
+                "reporting.base_year_anomaly.revenue_yoy_abs"
+            ),
+            "base_year_profit_yoy_abs": policy.value(
+                "reporting.base_year_anomaly.profit_yoy_abs"
+            ),
+        },
+        "designer_decisions": list(policy.data.get("designer_decisions_2026_11_12") or []),
         "distribution": {
             "conclusions": _conclusion_counts(records),
             "grades": _grade_counts(records),

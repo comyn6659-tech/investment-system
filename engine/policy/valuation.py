@@ -595,6 +595,31 @@ def build_discount(
     )
 
 
+# --- 杠杆护栏 ---------------------------------------------------------------
+def leverage_ratio(debt: float, market_cap: float) -> float:
+    """账面有息负债占（有息负债 + 权益市值）的比例；合计非正时返回 0。"""
+    total = float(debt) + float(market_cap)
+    if total <= 0:
+        return 0.0
+    return float(debt) / total
+
+
+def leverage_guardrail(policy: EquityPolicy, ratio: float) -> dict[str, Any]:
+    """政策护栏：超过比例上限时不给正式结论（只做研究参考）。"""
+    limit = policy.value("quality.leverage_guardrail")
+    return {
+        "rule": policy.node("quality.leverage_guardrail")["rule"],
+        "ratio": ratio,
+        "limit": limit,
+        "exceeded": ratio > limit,
+        "note": (
+            "研究价值仅供研究参考，不用于结论"
+            if ratio > limit
+            else "未超过杠杆护栏"
+        ),
+    }
+
+
 # --- 增长与终值 -------------------------------------------------------------
 @dataclass(frozen=True)
 class TerminalSpec:
@@ -916,6 +941,8 @@ __all__ = [
     "build_discount",
     "extract_inputs",
     "growth_paths",
+    "leverage_guardrail",
+    "leverage_ratio",
     "load_macro_series",
     "normalized_risk_free",
     "terminal_spec",

@@ -1,6 +1,6 @@
 # 第四阶段第一批交付：个股政策 v1 草案试运行 + 指数候选 A 研究信号
 
-日期：2026-11-12（Asia/Singapore）｜代码版本 `phase4-0.1.0`｜政策版本 `unapproved-phase2`（引擎）｜模型版本 `research-0.4.0`
+日期：2026-11-12（Asia/Singapore）｜代码版本 `phase4-0.1.1`｜政策版本 `unapproved-phase2`（引擎）｜模型版本 `research-0.4.0`
 
 本文件记录**实现与验收证据**；试运行结果本身见自动生成的
 [phase4a-equity-policy-trial.md](phase4a-equity-policy-trial.md)，机器可读结果见
@@ -304,7 +304,7 @@ WACC 3.11%，FCFF 基准价值 93.17 元/股（现价 4.56 元）。这不是数
 
 ---
 
-## 8. 发现与未解决项（提请设计方确认）
+## 8. 发现与未解决项（2026-11-12 已由设计方逐条决定）
 
 1. **终值派息率与「不假设派息率上升」存在公式层面的张力**：终值派息率 = 1 − g/新投资回报率，
    可能高于近 3 年历史派息率（例如 600309：历史 30.5%、终值隐含 74.7%）。由于基准情景
@@ -325,7 +325,69 @@ WACC 3.11%，FCFF 基准价值 93.17 元/股（现价 4.56 元）。这不是数
 
 ---
 
-## 9. 测试、复现与提交
+## 9. 收尾项 M1–M5（2026-11-12 验收复函）
+
+### M1 历史覆盖与候选 A 信号自相矛盾
+
+`payload.history_coverage` 拆成两块：
+
+- `snapshot_path`：本次实时抓取路径（快照）的覆盖；字段加 `snapshot_fetch_` 前缀，
+  `note` 统一加「快照实时抓取路径：」，`supports_weekly_5y_history` 改名为
+  `snapshot_fetch_supports_weekly_5y_history`；
+- `series_library`：候选 A 与回测使用的固定序列库（`data/series`），逐条给出
+  官方指数收盘、官方滚动市盈率、官方全收益的起止日期、观测数与序列 id，并给出
+  `supports_weekly_5y_history: true`。
+
+文本按同一结构分两段显示（「快照实时抓取路径（不是候选 A 序列库）」与
+「序列库（候选 A 研究信号与回测使用）」）。三只指数均验证：例如沪深300 官方滚动市盈率
+2011-06-28 → 2026-11-11、3,668 个观测，官方全收益 2005-04-08 → 2026-11-11、5,247 个观测；
+不再出现「不能用于 5 年分位」与信号并存的矛盾（该句已限定为快照路径）。
+测试：`test_history_coverage_separates_snapshot_path_from_series_library`（3 只指数 × JSON/文本）。
+
+### M2 分位显示精度
+
+`percentile_display` 改为保留两位；文本从未舍入的 `percentile` 按两位格式化。
+沪深300 2026-W45：真实 67.7165%，原显示 67.70%，现显示 **67.72%**。
+测试：`test_signal_percentile_display_is_two_decimals`。
+
+### M3 000858 基期数据核对与异常清单
+
+**(a) 独立来源核对**：同花顺年度财务摘要（AKShare `stock_financial_abstract_ths`，
+`indicator="按年度"`）显示 2025 年营业总收入 **405.29 亿元**（同比 −54.55%）、
+净利润 **89.54 亿元**（同比 −71.89%），与东方财富合并报表的 405.29 亿元 / 89.54 亿元一致。
+**核对结论：已核对，数据属实**；未重跑快照，受影响输出不变（该标的等级 C、预演结论无法判断）。
+
+**(b) 基期异常变动清单**：试运行报告新增 §4.2，触发条件写入政策
+`reporting.base_year_anomaly`（营收同比绝对值 > 40% 或归母净利润同比绝对值 > 60%）。
+本批只有 000858 触发（营收 −54.6%、归母净利润 −71.9%），只做披露，不改任何结论。
+测试：`test_trial_base_year_anomaly_list`、`test_delivery_documents_independent_verification_of_000858`。
+
+### M4 高杠杆护栏
+
+政策新增 `quality.leverage_guardrail = 50%`：
+
+```
+账面有息负债 /（账面有息负债 + 权益市值）> 50%
+→ 状态 partial、等级 C、预演结论无法判断
+→ 研究价值仍展示，但标注「仅供研究参考，不用于结论」
+→ 原因码 LEVERAGE_GUARDRAIL_EXCEEDED
+```
+
+依据：超过该比例时 WACC 主要由债务成本决定、账面债务口径不可比；50% 由设计方在看到
+601668 后确定，交独立审查复核。本批只有 601668 触发（83.3%），其余标的最多 33.3%。
+边界测试：刚好 50% 不触发、50.01% 触发（`test_leverage_guardrail_boundary`、
+`test_trial_leverage_guardrail_forces_c`）。WACC 算法本身未改。
+
+### M5 回归
+
+| 检查项 | 结果 |
+|---|---|
+| 30 只预演结论逐只相同 | 0 差异；601668 仍为无法判断 |
+| 账本既有 3 条记录哈希不变 | `--check` 0 问题；文件字节未变 |
+| CLI 仍为 research / undetermined | 沪深300 / 中证500 / 中证1000 / ETF / 个股均验证 |
+| 全部测试通过 | 见 §10 |
+
+## 10. 测试、复现与提交
 
 ```bash
 cd /Users/comyn/Documents/deepseek-harness/投资/investment-system
@@ -335,7 +397,7 @@ cd /Users/comyn/Documents/deepseek-harness/投资/investment-system
 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
 ```
 
-测试结果：435 passed（新增 34 项政策测试 + 14 项信号/账本测试，其余为既有回归）。新增 `tests/test_equity_policy.py`（34 项）与
-`tests/test_index_signal.py`（14 项），其余为既有回归。
+测试结果：见项目根 `DELIVERY.md`（收尾后总数）。新增 `tests/test_equity_policy.py`（38 项）与
+`tests/test_index_signal.py`（17 项），其余为既有回归。
 
 提交：见项目根 `DELIVERY.md`（实现提交 + 交付入口提交）

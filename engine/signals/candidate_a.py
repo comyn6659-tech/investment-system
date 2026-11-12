@@ -198,8 +198,10 @@ def build_candidate_a_signal(
             "position_context": "只描述条件是否成立；本报告不跟踪实际持仓，也不产生买卖指令",
             "latest": {
                 **point.to_dict(),
+                # 展示值保留两位小数：文本与 JSON 都按两位显示，避免
+                # 「先舍入到一位、再按两位格式化」造成 67.70% 这类偏差。
                 "percentile_display": (
-                    None if point.percentile is None else round(point.percentile, 1)
+                    None if point.percentile is None else round(point.percentile, 2)
                 ),
                 "week_complete": week_complete,
                 "note": (
