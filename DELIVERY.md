@@ -9,7 +9,7 @@
 | 代码版本 | `phase4-1.0.0` |
 | 政策版本 | 个股 `equity-policy-v1.1`（`pol-6d1a5387780fe6a2`，未改） |
 | 模型版本 | 个股政策 `validated-1.0.0`；指数/ETF 仍 `research-0.4.0` / `unapproved-phase2` |
-| 本轮实现提交 | `15f7aea` |
+| 本轮实现提交 | `15f7aea`；短序列备注修正 `b10fcd9` |
 | 工作区 | 干净（`git status --short` 为空） |
 | 上一轮 | `efbacfa`（第四阶段第二批入口，实现 `71d1beb`） |
 
@@ -113,6 +113,7 @@ PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
 | 提交 | 内容 |
 |---|---|
 | `15f7aea` | **本轮实现**：可行性核查、399006/399606 序列、官方当前 PE/PB、指数快照、名称识别、ETF 159915 |
+| `b10fcd9` | 短序列备注修正（只改说明文字，不改观测/来源/口径） |
 | 本文件所在提交 | 交付入口（记录实现提交 `15f7aea`） |
 | `efbacfa` / `71d1beb` | 第四阶段第二批（批准 v1.1、正式结论、新鲜度、结论账本） |
 | `28f3fb6` / `7ccf8f6` | 第四阶段 4a-R |

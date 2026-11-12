@@ -119,4 +119,5 @@ PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
 | 提交 | 内容 |
 |---|---|
 | `15f7aea` | 本批实现 |
-| 本文件所在提交 | 交付入口（记录实现提交 `15f7aea`） |
+| `b10fcd9` | 短序列备注修正（只改说明文字，不改观测/来源/口径） |
+| 本文件所在提交 | 交付入口（记录实现提交 `15f7aea`、`b10fcd9`） |
