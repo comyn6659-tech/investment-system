@@ -72,6 +72,7 @@
 ## 7. 复现
 
 ```bash
+.venv/bin/python tools/build_bank_pool_data.py --fetch-bank   # 补齐本地原始银行指标缓存
 .venv/bin/python tools/build_bank_valuation_inputs.py
 .venv/bin/python tools/run_bank_valuation_rehearsal.py
 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
