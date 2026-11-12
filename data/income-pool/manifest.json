@@ -1,0 +1,9 @@
+{
+  "current": "snapshot-qps-d8fb7e3718675b93",
+  "snapshot_id": "qps-d8fb7e3718675b93",
+  "content_hash": "d8fb7e3718675b938968b8a7c3771536bdbfe55fd18b866076a93b92d5bcd6d2",
+  "as_of": "2026-11-12",
+  "tables": 69,
+  "total_bytes": 10773539,
+  "written_at": "2026-11-13T03:11:27+08:00"
+}

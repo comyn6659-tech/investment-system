@@ -340,3 +340,21 @@
 | K3 | 每条计入处罚标明主体与身份；药明康德按身份重判；主体不明 → 待定（测试） | 政策 `definitions.penalty`、`engine/quality/metrics.py`、报告 §1g | `test_v12_penalty_subject_unknown_is_pending`、`test_v12_penalty_other_shareholder_is_recorded_not_counted`；9 条计入记录均有主体/身份/文号；药明康德 3 条股东事项改只记录，回池 | ✅ |
 | K4 | 对照表齐全；第五批快照与报告不变；既有账本不变、池账本只追加；全部测试通过 | 报告 §1d、`data/quality-pool/report-4e.json`、`snapshot-qps-1c1edb9a5fc01bc3/` | 第五批 120 家/18 家待定、快照 id 不变；池账本 3 条 0 问题；个股 7 条/候选 A 3 条/官方估值 4 条 0 问题；**541 passed** | ✅ |
 | K5 | DELIVERY.md 一页以内，含复现命令、测试结果、提交 ID | `DELIVERY.md`、`docs/phase4f-delivery.md` | 入口 §1–§7；实现提交与交付提交见文件 | ✅ |
+
+---
+
+# 第四阶段第七批验收清单（稳定收息型 + 所有制，M1–M8）
+
+对应文件：`batch4g-income-pool-instructions.md` 冻结验收条件。范围：新增 `income-pool-v1-draft`、
+分红补 2016–2020、收息池试运行、所有制标记与新账本；不改好公司池、不做银行、不评券商保险。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| M1 | 规则版本化、每个参数带依据；代码无散落数字；每条条件有边界测试（等于、略差、缺年份） | `data/policies/income-pool-v1-draft.json`、`engine/income/{metrics,evaluator}.py` | `test_default_income_company_passes_all_conditions`、`test_roe_average_boundary`、`test_roe_min_boundary`、`test_loss_years_zero_required`、`test_profit_decline_years_boundary`、`test_profit_decline_missing_year_and_field`、`test_dividend_every_year_boundary_and_missing`、`test_dividend_payout_boundary`、`test_fcf_to_dividend_boundary_and_zero_dividend`、`test_net_debt_to_ebitda_strict_boundary`、`test_audit_penalty_pledge_conditions`、`test_missing_window_year_fails_financial_conditions`、`test_missing_recent_year_fails_dividend_and_fcf` | ✅ |
+| M2 | 分红 2016–2020 补齐覆盖率报告；缺失按规则处理，不默认通过 | `tools/build_income_pool_data.py`、报告 §1c | 20 个报告期、2016–2020 共 13,610 行；各年有分红记录 78.0%/81.4%/75.6%/73.9%/73.5%；空派现 213 行为送转；缺失财年→待定测试 `test_missing_dividend_data_pends_dividend_and_fcf` | ✅ |
+| M3 | 治理三项对候选覆盖率报告；复用口径与 v1.2 一致（测试） | `data/policy-inputs/governance-review-v1.json`、`engine/income/evaluator.py`、报告 §1b | 审计/处罚/质押 402/402（100%）；`test_income_governance_conditions_reuse_v12` 比对条件定义、参数与判定 | ✅ |
+| M4 | 报告含第二部分 B 的全部内容 | `docs/phase4g-income-pool-report.md`、`data/income-pool/report.json` | 首页、入池 142、只差一条 244、漏斗、敏感性、30 只、行业分布、两个池交集 59、三种敏感性 | ✅ |
+| M5 | 所有制标记覆盖率与来源报告；只标记不影响判定（测试） | `tools/build_income_pool_data.py`、`data/policy-inputs/ownership-review-v1.json`、报告 §1e | 439 家 100% 标记；好公司池/收息池分布 10/22/93/6/7 与 18/38/76/3/7；`test_ownership_does_not_change_judgement` | ✅ |
+| M6 | 抽查公司可由快照独立复算 | `tools/run_income_pool.py --show`、`engine.quality.snapshot` | `test_income_snapshot_and_report_and_ledger` 同快照重放逐家状态一致；600519 逐年复算 | ✅ |
+| M7 | 好公司池快照、报告、账本不变；其他账本不变；新账本只追加；全部测试通过 | `data/quality-pool/*`、`data/ledger/*` | 好公司池快照/报告/账本 3 条未改；个股 7、候选 A 3、官方估值 4 条 0 问题；新账本 1 条 0 问题；**563 passed** | ✅ |
+| M8 | DELIVERY.md 一页以内，含复现命令、测试结果、提交 ID | `DELIVERY.md`、`docs/phase4g-delivery.md` | 入口 §1–§7 | ✅ |

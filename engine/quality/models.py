@@ -173,6 +173,11 @@ class Company:
     pledge_source_url: str | None = None
     penalty_subject_unknown: bool = False
     governance_in_scope: bool = False
+    dividend_available_years: tuple[int, ...] = ()
+    ownership: str | None = None
+    ownership_holder: str | None = None
+    ownership_basis: str | None = None
+    ownership_source: str | None = None
 
     @property
     def window_years(self) -> tuple[int, ...]:
@@ -210,6 +215,11 @@ class Company:
             "pledge_source_url": self.pledge_source_url,
             "penalty_subject_unknown": self.penalty_subject_unknown,
             "governance_in_scope": self.governance_in_scope,
+            "dividend_available_years": list(self.dividend_available_years),
+            "ownership": self.ownership,
+            "ownership_holder": self.ownership_holder,
+            "ownership_basis": self.ownership_basis,
+            "ownership_source": self.ownership_source,
         }
 
     @classmethod
@@ -255,6 +265,13 @@ class Company:
             pledge_source_url=payload.get("pledge_source_url"),
             penalty_subject_unknown=bool(payload.get("penalty_subject_unknown")),
             governance_in_scope=bool(payload.get("governance_in_scope")),
+            dividend_available_years=tuple(
+                int(year) for year in payload.get("dividend_available_years") or []
+            ),
+            ownership=payload.get("ownership"),
+            ownership_holder=payload.get("ownership_holder"),
+            ownership_basis=payload.get("ownership_basis"),
+            ownership_source=payload.get("ownership_source"),
         )
 
 

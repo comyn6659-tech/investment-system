@@ -151,6 +151,7 @@ def build_companies(
     window_start: int,
     window_end: int,
     min_years: int,
+    dividend_years: Iterable[int] | None = None,
 ) -> tuple[list[Company], dict[str, Any]]:
     balance_by_year = statements.get("balance") or {}
     income_by_year = statements.get("income") or {}
@@ -169,6 +170,9 @@ def build_companies(
         "incomplete": [],
         "by_year": {},
     }
+    dividend_year_list = (
+        tuple(dividend_years) if dividend_years is not None else tuple(range(2021, 2026))
+    )
     for row in universe_rows:
         code = str(row["code"]).zfill(6)
         stats["universe"] += 1
@@ -240,8 +244,9 @@ def build_companies(
                 financial_exclusion_reason=industry if financial else None,
                 expected_years=expected,
                 years=years,
-                dividends={year: dividends.get(code, {}).get(year, 0.0) for year in range(2021, 2026)},
+                dividends={year: dividends.get(code, {}).get(year, 0.0) for year in dividend_year_list},
                 pledge_company_ratio=pledge_by_code.get(code),
+                dividend_available_years=tuple(dividend_years) if dividend_years is not None else (),
             )
         )
 

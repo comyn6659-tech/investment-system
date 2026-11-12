@@ -521,6 +521,44 @@ def _parse_pledge_row(region: str | None, holdings: float | int | None) -> dict:
     }
 
 
+def _parse_pledge_by_name(region: str | None, name: str, holder_names: list[str]) -> dict:
+    """按股东姓名定位行：适配 PDF 把持股数拆成“2,742,578, 825”的情况。"""
+    if not region or not name:
+        return {"status": "missing", "error": "no_region_or_name"}
+    pattern = r"\s*".join(re.escape(char) for char in name)
+    match = re.search(pattern, region)
+    if not match:
+        return {"status": "missing", "error": "name_not_in_region"}
+    end = len(region)
+    for other in holder_names:
+        if not other or other == name:
+            continue
+        other_pattern = r"\s*".join(re.escape(char) for char in other)
+        other_match = re.search(other_pattern, region[match.end() :])
+        if other_match:
+            end = min(end, match.end() + other_match.start())
+    segment = region[match.end() : end]
+    keywords = list(
+        re.finditer(r"质押并冻结|质押|冻结|标记|未知|不适用|无|-", segment)
+    )
+    if not keywords:
+        return {"status": "missing", "error": "status_not_parsed", "tail": segment[:80]}
+    last = keywords[-1]
+    status = last.group(0)
+    if status in ("无", "不适用", "-", "冻结"):
+        return {"status": "none", "pledged_shares": 0.0, "status_text": status}
+    if status == "未知":
+        return {"status": "unknown", "tail": segment[:80]}
+    number = re.search(r"\d+(?:,\d{3})*", segment[last.end() :])
+    if not number:
+        return {"status": "unknown", "error": "pledged_not_parsed", "tail": segment[:80]}
+    return {
+        "status": "pledged",
+        "pledged_shares": float(number.group(0).replace(",", "")),
+        "status_text": status,
+    }
+
+
 def _latest_report(code: str) -> tuple[dict | None, str | None, str | None]:
     for title, year, label in REPORT_KINDS:
         report = _periodic_report(code, title, year)
@@ -693,6 +731,10 @@ def _pledge_row(
     row = _match_holder(name, rows, aliases)
     if row is not None:
         parsed = _parse_pledge_row(region, row["holdings"])
+        if parsed["status"] not in ("none", "pledged"):
+            parsed = _parse_pledge_by_name(
+                region, row["name"], [item.get("name") for item in rows if item.get("name")]
+            )
         if parsed["status"] in ("none", "pledged"):
             return {
                 "subject": row["name"],
@@ -776,6 +818,32 @@ def pledge_ratio(code: str, controllers: list[str], company_ratio: float | None)
     report, region, _text = _latest_report(code)
     rows = _sdgd_rows(code)
     if report is None or not rows:
+        if rows and controllers and not no_controller:
+            total_shares = _total_shares(code)
+            fallback_matches = []
+            for controller in controllers:
+                fallback = _rpta_pledge(code, [controller], total_shares, aliases)
+                if fallback:
+                    fallback_matches.append({"subject": controller, **fallback})
+            if fallback_matches:
+                worst = max(fallback_matches, key=lambda item: item["pledge_ratio"] or 0.0)
+                return {
+                    "available": True,
+                    "pledge_ratio": worst["pledge_ratio"],
+                    "pledged_shares": worst["pledged_shares"],
+                    "holdings": worst["holdings"],
+                    "subject": "；".join(item["subject"] for item in fallback_matches),
+                    "subject_role": "控股股东",
+                    "detail": "；".join(
+                        f"{item['subject']} {item['holdings']:,.0f} 股，质押 {item['pledged_shares']:,.0f} 股（{item['pledge_ratio']:.2%}）"
+                        for item in fallback_matches
+                    ),
+                    "report_date": None,
+                    "source_id": "eastmoney.pledge.detail",
+                    "source_url": "https://data.eastmoney.com/gpzy/pledgeDetail.aspx",
+                    "note": notes.get(code) or "定期报告 PDF 为扫描件；改用东方财富重要股东质押明细",
+                    "fetched_at": now(),
+                }
         reason = "最新定期报告股东表未取得（PDF 接口或解析失败）"
         if source_notes.get(code):
             reason = source_notes[code]

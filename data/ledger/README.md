@@ -127,3 +127,25 @@
 | `recorded_at` | 追加时刻（不参与哈希） |
 
 命令：`.venv/bin/python tools/update_official_valuation_ledger.py --check`。
+
+---
+
+# 稳定收息型账本（只追加）
+
+文件：`income-pool.jsonl`（JSON Lines，一行一条记录）。
+
+## 规则
+
+- 与好公司池账本相同：只追加；`record_id` 为记录内容（不含 `recorded_at`）哈希，
+  `pool_hash` 为入池名单哈希；同一 `as_of` + `policy_id` + `snapshot_id` 只允许一条。
+- 入池名单是规则试运行结果，不代表买入建议；规则仍为未批准草案。
+
+## 字段
+
+与好公司池账本相同（`as_of`、`policy_id`、`policy_digest`、`snapshot_id`、`counts`、
+`pool_codes`、`pool_hash`、`record_id`、`recorded_at`）。
+
+命令：`.venv/bin/python tools/run_income_pool.py --check`。
+
+2026-11-13 首次写入 1 条（`income-pool-v1-draft`，快照 `qps-d8fb7e3718675b93`，
+入池 142，`pool_hash=iph-3a3ca849f50a9f58`）。

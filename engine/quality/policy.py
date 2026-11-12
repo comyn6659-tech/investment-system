@@ -24,6 +24,7 @@ SUPPORTED_POLICY_IDS = (
     "quality-pool-v1-draft",
     "quality-pool-v1.1-draft",
     "quality-pool-v1.2-draft",
+    "income-pool-v1-draft",
 )
 POLICY_STATUS_DRAFT = "draft_unapproved"
 SUPPORTED_OPERATORS = (">=", ">", "<=", "<", "==")
@@ -40,6 +41,10 @@ _VALUE_LABELS = {
     "pledge_ratio": "控股股东最新质押比例",
     "audit_nonstandard_years": "最近 5 年非标准审计意见年数",
     "penalty_count": "最近 5 年信息披露类处罚/立案/公开谴责件数",
+    "roe_min": "窗口内最低一年 ROE",
+    "profit_decline_years": "窗口内归母净利润同比下降超过 30% 的年数",
+    "dividend_missing_years": "窗口内未现金分红的年数",
+    "fcf_to_dividend": "最近 5 年自由现金流合计 ÷ 现金分红合计",
 }
 
 

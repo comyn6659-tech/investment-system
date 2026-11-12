@@ -129,10 +129,12 @@ def load_snapshot_dir(path: Path) -> tuple[dict[str, Any], list[Any], dict[str, 
     universe: list[dict] = []
     industry: dict[str, str] = {}
     pledge: dict[str, float] = {}
+    dividend_periods: dict[int, set[str]] = {}
     audit: dict[str, dict[int, str]] = {}
     penalties: dict[str, list[dict]] = {}
     pledge_governance: dict[str, dict] = {}
     coverage: dict[str, dict] = {}
+    ownership: dict[str, dict] = {}
     for entry in manifest.get("tables") or []:
         rows = read_table(directory / str(entry["file"]))
         kind = entry.get("kind")
@@ -141,6 +143,10 @@ def load_snapshot_dir(path: Path) -> tuple[dict[str, Any], list[Any], dict[str, 
             by_kind[kind][year] = {str(row["SECUCODE"])[:6]: row for row in rows}
         elif kind == "dividends":
             dividends.extend(rows)
+            period = str(entry.get("report_date") or "")
+            if len(period) >= 10:
+                year = int(period[:4])
+                dividend_periods.setdefault(year, set()).add(period[5:10])
         elif kind == "universe":
             universe = rows
         elif kind == "industry":
@@ -167,6 +173,9 @@ def load_snapshot_dir(path: Path) -> tuple[dict[str, Any], list[Any], dict[str, 
         elif kind == "governance_coverage":
             for row in rows:
                 coverage[str(row["code"]).zfill(6)] = row
+        elif kind == "ownership":
+            for row in rows:
+                ownership[str(row["code"]).zfill(6)] = row
 
     window = manifest.get("window") or {}
     scope = manifest.get("scope") or {}
@@ -180,6 +189,9 @@ def load_snapshot_dir(path: Path) -> tuple[dict[str, Any], list[Any], dict[str, 
         window_start=int(window["start_fy"]),
         window_end=int(window["end_fy"]),
         min_years=int(window["min_years"]),
+        dividend_years=tuple(sorted(
+            year for year, halves in dividend_periods.items() if {"06-30", "12-31"} <= halves
+        )) or None,
     )
     if audit or penalties or pledge_governance or coverage:
         enriched = []
@@ -217,6 +229,10 @@ def load_snapshot_dir(path: Path) -> tuple[dict[str, Any], list[Any], dict[str, 
                     pledge_detail=pledge_row.get("detail") or None,
                     pledge_source_url=pledge_row.get("source_url") or None,
                     governance_in_scope=bool(cov),
+                    ownership=(ownership.get(company.code) or {}).get("ownership"),
+                    ownership_holder=(ownership.get(company.code) or {}).get("holder"),
+                    ownership_basis=(ownership.get(company.code) or {}).get("basis"),
+                    ownership_source=(ownership.get(company.code) or {}).get("source"),
                 )
             )
         companies = enriched

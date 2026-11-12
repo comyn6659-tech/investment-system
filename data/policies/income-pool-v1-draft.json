@@ -1,0 +1,423 @@
+{
+  "schema_version": "quality-pool-policy/1.0",
+  "policy_id": "income-pool-v1-draft",
+  "label": "稳定收息型规则 v1 草案（未批准）",
+  "status": "draft_unapproved",
+  "approved": false,
+  "version_date": "2026-11-13",
+  "source_document": "第四阶段第七批施工单（batch4g-income-pool-instructions.md）第一部分；股东 2026-11-13 决定②",
+  "decision_reference": "股东决策③（待批准）；本版只试运行，不产生正式入池结论",
+  "scope": {
+    "markets": [
+      "SH",
+      "SZ"
+    ],
+    "boards": [
+      "主板",
+      "创业板",
+      "科创板"
+    ],
+    "exclude_st": true,
+    "exclude_financial_industries": [
+      "银行",
+      "保险",
+      "证券",
+      "多元金融"
+    ],
+    "financial_exclusion_note": "金融业指标不适用，列为「范围外：指标不适用，另行设计」；不用普通企业口径替代。",
+    "min_fiscal_years": 7,
+    "window_years": 10,
+    "window_start_fy": 2016,
+    "window_end_fy": 2025,
+    "window_note": "窗口为最近 10 个完整财年；上市不足 10 年时从上市当年起算，至少 7 个财年。2026-11-12 时 2025 年报已披露。"
+  },
+  "parameters": {
+    "window_years": {
+      "value": 10,
+      "unit": "years",
+      "label": "评价窗口年数",
+      "basis": "施工单：与好公司池相同，最近 10 个完整财年；不足 10 年用全部可得年份。",
+      "source": "batch4g 第一部分"
+    },
+    "min_fiscal_years": {
+      "value": 7,
+      "unit": "years",
+      "label": "最少完整年报年数",
+      "basis": "施工单：与好公司池相同，完整年报不足 7 个财年剔除。",
+      "source": "batch4g 第一部分"
+    },
+    "loss_years_max": {
+      "value": 0,
+      "unit": "years",
+      "label": "窗口内亏损年数上限",
+      "basis": "施工单初值：窗口内亏损年数为 0。",
+      "source": "batch4g 第一部分"
+    },
+    "roe_average_min": {
+      "value": 0.08,
+      "unit": "ratio",
+      "label": "窗口内 ROE 平均值下限",
+      "basis": "施工单初值：窗口内 ROE 平均值 ≥ 8%；依据写明 8% 约等于本系统股权成本。",
+      "source": "batch4g 第一部分"
+    },
+    "roe_min_min": {
+      "value": 0.05,
+      "unit": "ratio",
+      "label": "窗口内最低一年 ROE 下限",
+      "basis": "施工单初值：窗口内最低一年 ROE ≥ 5%，用于排除靠个别高点撑平均的公司。",
+      "source": "batch4g 第一部分"
+    },
+    "profit_decline_years_max": {
+      "value": 1,
+      "unit": "years",
+      "label": "归母净利润同比下降超过 30% 的年数上限",
+      "basis": "施工单初值：窗口内归母净利润同比下降超过 30% 的年数 ≤ 1，用于排除靠周期高点分红的公司。",
+      "source": "batch4g 第一部分"
+    },
+    "profit_decline_threshold": {
+      "value": 0.3,
+      "unit": "ratio",
+      "label": "同比下滑判定阈值",
+      "basis": "施工单原文“同比下降超过 30%”；本参数只定义计算口径，不是入池门槛。",
+      "source": "batch4g 第一部分"
+    },
+    "dividend_missing_years_max": {
+      "value": 0,
+      "unit": "years",
+      "label": "窗口内未现金分红年数上限",
+      "basis": "施工单初值：窗口内每个财年都有现金分红。",
+      "source": "batch4g 第一部分"
+    },
+    "dividend_years": {
+      "value": 5,
+      "unit": "years",
+      "label": "分红率观察年数",
+      "basis": "施工单初值：最近 5 个财年现金分红合计 ÷ 归母净利润合计 ≥ 40%。",
+      "source": "batch4g 第一部分"
+    },
+    "dividend_payout_min": {
+      "value": 0.4,
+      "unit": "ratio",
+      "label": "最近 5 年现金分红率下限",
+      "basis": "施工单初值：最近 5 个财年现金分红合计 ÷ 归母净利润合计 ≥ 40%。",
+      "source": "batch4g 第一部分"
+    },
+    "fcf_years": {
+      "value": 5,
+      "unit": "years",
+      "label": "自由现金流与分红观察年数",
+      "basis": "施工单初值：最近 5 个财年（经营现金流 − 资本开支）合计 ÷ 现金分红合计 ≥ 1.0。",
+      "source": "batch4g 第一部分"
+    },
+    "fcf_to_dividend_min": {
+      "value": 1.0,
+      "unit": "multiple",
+      "label": "自由现金流 / 现金分红下限",
+      "basis": "施工单初值：最近 5 个财年自由现金流合计 ÷ 现金分红合计 ≥ 1.0。",
+      "source": "batch4g 第一部分"
+    },
+    "net_debt_to_ebitda_max": {
+      "value": 4.0,
+      "unit": "multiple",
+      "label": "净有息负债 / EBITDA 上限（严格小于）",
+      "basis": "施工单初值：最新财年（有息负债 − 货币资金）÷ EBITDA < 4；公用事业类收息公司天然负债较高，同时用分红现金流约束。",
+      "source": "batch4g 第一部分"
+    },
+    "audit_lookback_years": {
+      "value": 5,
+      "unit": "years",
+      "label": "审计意见回看年数",
+      "basis": "与好公司池 v1.2 相同：最近 5 个财年审计意见均为标准无保留。",
+      "source": "batch4g 第一部分；quality-pool-v1.2-draft"
+    },
+    "audit_nonstandard_years_max": {
+      "value": 0,
+      "unit": "years",
+      "label": "最近 5 年非标准审计意见年数上限",
+      "basis": "与好公司池 v1.2 相同：均为标准无保留 = 非标准年数 0。",
+      "source": "batch4g 第一部分；quality-pool-v1.2-draft"
+    },
+    "governance_lookback_years": {
+      "value": 5,
+      "unit": "years",
+      "label": "处罚与立案回看年数",
+      "basis": "与好公司池 v1.2 相同：最近 5 年无立案调查、信息披露类行政处罚或公开谴责。",
+      "source": "batch4g 第一部分；quality-pool-v1.2-draft"
+    },
+    "penalty_count_max": {
+      "value": 0,
+      "unit": "count",
+      "label": "最近 5 年信息披露类处罚/立案/公开谴责件数上限",
+      "basis": "与好公司池 v1.2 相同：计件数 = 0。",
+      "source": "batch4g 第一部分；quality-pool-v1.2-draft"
+    },
+    "pledge_ratio_max": {
+      "value": 0.5,
+      "unit": "ratio",
+      "label": "控股股东最新质押比例上限",
+      "basis": "与好公司池 v1.2 相同：控股股东质押比例 ≤ 50%；无控股股东按第一大股东（含一致行动人合计）口径。",
+      "source": "batch4g 第一部分；quality-pool-v1.2-draft"
+    }
+  },
+  "definitions": {
+    "roe": {
+      "formula": "归母净利润 ÷ 平均归母净资产",
+      "average_equity": "(期初归母净资产 + 期末归母净资产) ÷ 2；期初取上一财年末",
+      "basis": "施工单第一部分明确写为「归母净利润 ÷ 平均归母净资产」。",
+      "source": "batch4d 第一部分"
+    },
+    "profit_decline": {
+      "formula": "(本年归母净利润 − 上年归母净利润) ÷ |上年归母净利润| < −30%",
+      "comparison_window": "只比较窗口内有上一年数据的财年；2016 年无窗口内上一年，不参与。",
+      "basis": "施工单：窗口内归母净利润同比下降超过 30% 的年数 ≤ 1。",
+      "source": "batch4g 第一部分"
+    },
+    "dividend_every_year": {
+      "definition": "窗口内每个财年现金分红均 > 0",
+      "aggregation": "按分红方案报告期归集到财年；中期与年度方案都计入。",
+      "basis": "施工单：窗口内每个财年都有现金分红。",
+      "source": "batch4g 第一部分"
+    },
+    "dividend_payout": {
+      "formula": "最近 5 个财年现金分红合计 ÷ 归母净利润合计",
+      "cash_dividend": "每 10 股派现（含税）÷ 10 × 总股本；按财年归集。",
+      "basis": "施工单：最近 5 个财年现金分红合计 ÷ 归母净利润合计 ≥ 40%。",
+      "source": "batch4g 第一部分"
+    },
+    "fcf_to_dividend": {
+      "formula": "最近 5 个财年（经营现金流 − 资本开支）合计 ÷ 最近 5 个财年现金分红合计",
+      "basis": "施工单：分红要有现金撑着，≥ 1.0。",
+      "source": "batch4g 第一部分"
+    },
+    "net_debt": {
+      "formula": "有息负债 − 货币资金",
+      "basis": "施工单第一部分。",
+      "source": "batch4d 第一部分"
+    },
+    "ebitda": {
+      "formula": "利润总额 + 利息费用 + 折旧 + 摊销",
+      "interest_expense": "优先取利润表「财务费用—利息费用」；缺失时取「财务费用」；两者都缺失则 EBITDA 记为缺失",
+      "depreciation": "固定资产折旧、油气资产折耗、生产性生物资产折旧",
+      "amortization": "无形资产摊销 + 长期待摊费用摊销 + 使用权资产摊销",
+      "basis": "施工单只写 EBITDA，未给公式；本版按公开报表可复算的最接近口径固定下来，避免用行业均值或推断值。",
+      "source": "batch4d 第一部分；字段取自合并利润表与现金流量表补充资料"
+    },
+    "audit_opinion": {
+      "definition": "最近 5 个财年审计意见均为标准无保留意见",
+      "basis": "施工单第一部分。",
+      "source": "batch4d 第一部分"
+    },
+    "penalty": {
+      "definition": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责；只计下列主体：公司本身；控股股东、实际控制人及其一致行动人；在被处分事项发生时担任董事、监事、高级管理人员的人。",
+      "subject_scope": "公司本身；控股股东、实际控制人及其一致行动人；被处分事项发生时任职的董监高。",
+      "other_subjects": "其他股东（非控股、非一致行动人）及其他主体的处分只记录、不计入。",
+      "unknown_subject": "公告正文无法判断主体身份时，该公司该条记为「待定（主体身份不明）」，不得默认计入或不计入。",
+      "matter_scope": "仅信息披露类事项；内幕交易、短线交易、环保、安全生产、金融监管处罚不计入。",
+      "basis": "施工单 batch4f K3。",
+      "source": "batch4f K3"
+    },
+    "pledge_ratio": {
+      "definition": "控股股东最新质押比例（质押股份 ÷ 其所持股份）。",
+      "no_controller": "公司公告「无控股股东」时，用第一大股东（含其一致行动人合计）的质押股数 ÷ 持股数；第一大股东质押数据也取不到则记待定。",
+      "nominee_exclusion": "香港中央结算有限公司、HKSCC NOMINEES LIMITED、香港中央结算（代理人）有限公司等名义持有人不是实际持有人，不作为第一大股东；由其下一名实际持有人承担该角色。",
+      "threshold": "30% 与 50% 只是报告口径；本版判定门槛仍为 50%（≤50% 通过）。",
+      "basis": "施工单 batch4f K2；该条检查「大股东资金链紧张、控制权不稳」的风险。",
+      "source": "batch4f K2"
+    }
+  },
+  "groups": [
+    {
+      "id": "profit_stability",
+      "label": "利润稳",
+      "conditions": [
+        {
+          "id": "loss_years",
+          "label": "窗口内亏损年数",
+          "metric": "loss_years",
+          "operator": "==",
+          "parameter": "loss_years_max",
+          "unit": "years",
+          "distance": "value_minus_threshold"
+        },
+        {
+          "id": "roe_average",
+          "label": "窗口内 ROE 平均值",
+          "metric": "roe_average",
+          "operator": ">=",
+          "parameter": "roe_average_min",
+          "unit": "ratio",
+          "distance": "value_minus_threshold"
+        },
+        {
+          "id": "roe_min",
+          "label": "窗口内最低一年 ROE",
+          "metric": "roe_min",
+          "operator": ">=",
+          "parameter": "roe_min_min",
+          "unit": "ratio",
+          "distance": "value_minus_threshold"
+        },
+        {
+          "id": "profit_decline_years",
+          "label": "归母净利润同比下降超过 30% 的年数",
+          "metric": "profit_decline_years",
+          "operator": "<=",
+          "parameter": "profit_decline_years_max",
+          "unit": "years",
+          "distance": "threshold_minus_value"
+        }
+      ]
+    },
+    {
+      "id": "dividend_stability",
+      "label": "分红稳",
+      "conditions": [
+        {
+          "id": "dividend_every_year",
+          "label": "窗口内每个财年都有现金分红",
+          "metric": "dividend_missing_years",
+          "operator": "==",
+          "parameter": "dividend_missing_years_max",
+          "unit": "years",
+          "distance": "value_minus_threshold"
+        },
+        {
+          "id": "dividend_payout",
+          "label": "最近 5 年现金分红率",
+          "metric": "dividend_payout",
+          "operator": ">=",
+          "parameter": "dividend_payout_min",
+          "unit": "ratio",
+          "distance": "value_minus_threshold"
+        }
+      ]
+    },
+    {
+      "id": "cash_backing",
+      "label": "分红有现金撑着",
+      "conditions": [
+        {
+          "id": "fcf_to_dividend",
+          "label": "最近 5 年自由现金流 ÷ 现金分红",
+          "metric": "fcf_to_dividend",
+          "operator": ">=",
+          "parameter": "fcf_to_dividend_min",
+          "unit": "multiple",
+          "distance": "value_minus_threshold"
+        },
+        {
+          "id": "net_debt_ebitda",
+          "label": "净有息负债 / EBITDA",
+          "metric": "net_debt_to_ebitda",
+          "operator": "<",
+          "parameter": "net_debt_to_ebitda_max",
+          "unit": "multiple",
+          "distance": "threshold_minus_value"
+        }
+      ]
+    },
+    {
+      "id": "governance",
+      "label": "做好人",
+      "conditions": [
+        {
+          "id": "audit_opinion",
+          "label": "最近 5 年审计意见均为标准无保留",
+          "unit": "years",
+          "metric": "audit_nonstandard_years",
+          "operator": "==",
+          "parameter": "audit_nonstandard_years_max",
+          "distance": "value_minus_threshold"
+        },
+        {
+          "id": "no_penalty",
+          "label": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责",
+          "unit": "count",
+          "metric": "penalty_count",
+          "operator": "==",
+          "parameter": "penalty_count_max",
+          "distance": "value_minus_threshold"
+        },
+        {
+          "id": "pledge_ratio",
+          "label": "控股股东最新质押比例",
+          "metric": "pledge_ratio",
+          "operator": "<=",
+          "parameter": "pledge_ratio_max",
+          "unit": "ratio",
+          "distance": "threshold_minus_value"
+        }
+      ]
+    }
+  ],
+  "sensitivity": {
+    "roe_average_min": {
+      "values": [
+        0.06,
+        0.08,
+        0.1
+      ],
+      "basis": "施工单：报告 ROE 平均 6/8/10% 时入池数量；只报告，不选用。",
+      "source": "batch4g 第二部分 B"
+    },
+    "dividend_payout_min": {
+      "values": [
+        0.3,
+        0.4,
+        0.5
+      ],
+      "basis": "施工单：报告分红率 30/40/50% 时入池数量；只报告，不选用。",
+      "source": "batch4g 第二部分 B"
+    },
+    "net_debt_to_ebitda_max": {
+      "values": [
+        3.0,
+        4.0,
+        5.0
+      ],
+      "basis": "施工单：报告负债上限 3/4/5 倍时入池数量；只报告，不选用。",
+      "source": "batch4g 第二部分 B"
+    }
+  },
+  "missing_data": {
+    "market_wide_unavailable": "该条件记为本版未检验；池子照常发布，报告首页写明未检验的条件。",
+    "company_level_missing": "该公司状态为「待定（缺 X）」，不入池；不得用默认值、行业均值或推断填补。",
+    "missing_annual_report": "窗口内应有年报而缺失的，该条不通过；不用相邻年份或季度数据补。",
+    "missing_dividend_data": "分红表未覆盖的财年，该年不计为「未分红」；相关条件记待定，不用 0 填补。",
+    "no_default_fill": true
+  },
+  "notes": [
+    "稳定收息型只回答「过去十年是不是一家利润稳、分红稳、分红有现金撑着的公司」，不回答「现在便不便宜」，不预言未来；入池 ≠ 买入。",
+    "本池与好公司池是两类，不是高低之分；同一家公司可以同时属于两类。",
+    "本版为草案，approved=false；规则修改须经股东批准（决策③）。",
+    "治理三项只对「财务条件全过 + 只差一条」的候选逐家查；取不到的公司记待定，不用推断或替代口径。",
+    "所有制标记只用于报告展示，不参与任何条件判断。"
+  ],
+  "revision_note": "首次发布稳定收息型草案；治理三条复用 quality-pool-v1.2-draft 的口径与阈值。",
+  "governance_data": {
+    "audit_opinion": {
+      "source": "东方财富 F10 个股资产负债表 OPINION_TYPE",
+      "coverage_years": "2021–2025 年报",
+      "note": "逐家取 5 个财年；缺任一年即待定"
+    },
+    "penalty": {
+      "source": "东方财富公告检索（立案/行政处罚/公开谴责/纪律处分）+ 公告正文核对",
+      "window": "2021-11-12 至 2026-11-12",
+      "note": "标题命中后读公告正文；只计信息披露类事项；逐条判定主体与身份；其他股东/其他主体只记录不计入；主体不明记待定。"
+    },
+    "pledge": {
+      "source": "公司整体质押为 0 时直接记 0；否则最新定期报告前十名股东表；表内无法取得时用东方财富重要股东质押明细或年报释义补足",
+      "note": "控股股东质押股数 ÷ 其持股数；无控股股东时用第一大股东（含一致行动人合计）；名义持有人排除；取不到记待定。"
+    }
+  },
+  "ownership": {
+    "categories": [
+      "央企",
+      "地方国企",
+      "民企",
+      "外资",
+      "其他"
+    ],
+    "note": "依据实际控制人性质；无实际控制人时用第一大股东性质；只标记，不参与判定。"
+  }
+}

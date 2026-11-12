@@ -1,0 +1,30 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "cashflow-2024",
+  "file": "cashflow-2024.csv.gz",
+  "rows": 5368,
+  "columns": [
+    "SECUCODE",
+    "SECURITY_CODE",
+    "SECURITY_NAME_ABBR",
+    "NOTICE_DATE",
+    "REPORT_DATE",
+    "NETCASH_OPERATE",
+    "CONSTRUCT_LONG_ASSET",
+    "FA_IR_DEPR",
+    "OILGAS_BIOLOGY_DEPR",
+    "IA_AMORTIZE",
+    "LPE_AMORTIZE",
+    "USERIGHT_ASSET_AMORTIZE"
+  ],
+  "content_hash": "67f5f94f60bd40daba9a38e48488b4c8642376555a72358bdbd493b5f6c8d358",
+  "size_bytes": 294630,
+  "kind": "cashflow",
+  "report_date": "2024-12-31",
+  "source_id": "eastmoney.f10.cashflow",
+  "publisher": "东方财富",
+  "interface": "RPT_F10_FINANCE_GCASHFLOW",
+  "url": "https://datacenter.eastmoney.com/securities/api/data/v1/get",
+  "fetched_at": "2026-11-12T21:08:36+08:00",
+  "definition_note": "合并报表；金额单位元；按报告期一次取全市场。"
+}

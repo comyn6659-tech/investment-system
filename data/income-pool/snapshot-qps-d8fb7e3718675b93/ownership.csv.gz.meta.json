@@ -1,0 +1,25 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "ownership",
+  "file": "ownership.csv.gz",
+  "rows": 439,
+  "columns": [
+    "code",
+    "name",
+    "ownership",
+    "holder",
+    "holder_role",
+    "basis",
+    "source_id",
+    "source_url",
+    "fetched_at"
+  ],
+  "content_hash": "1003939b08deaf0aa03c21d379afd962e335dbc88003407ece5bb4dbee8d14f7",
+  "size_bytes": 12945,
+  "kind": "ownership",
+  "source_id": "eastmoney.f10.ownership",
+  "publisher": "东方财富 F10",
+  "interface": "RPT_F10_BASIC_ORGINFO ACTUAL_HOLDER；无实际控制人时用第一大股东",
+  "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+  "definition_note": "央企/地方国企/民企/外资/其他；只标记，不参与判定；逐家记录实控人名称与依据。"
+}
