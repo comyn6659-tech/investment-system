@@ -42,7 +42,7 @@ MODELS: tuple[ModelDescriptor, ...] = (
         model_id="equity_dcf_fcff",
         version="0.2.0-research",
         applies_to="equity",
-        status="research",
+        status="validated",
         implemented=True,
         required_fields=(
             "fin.revenue",
@@ -62,15 +62,16 @@ MODELS: tuple[ModelDescriptor, ...] = (
         ),
         failure_status="insufficient_data",
         notes=(
-            "研究版：EBIT×(1−t)+折旧摊销−资本开支−营运资本增加；"
-            "历史勾稽与 OCF 对照，差额超容差按 partial 输出。参数未获批准。"
+            "已按股东决策②于 2026-11-12 批准（equity-policy-v1.1，pol-6d1a5387780fe6a2）："
+            "EBIT×(1−t)+折旧摊销−资本开支−营运资本增加；历史勾稽与 OCF 对照，差额超容差按 partial 输出。"
+            "版本号沿用 0.2.0-research 以保持已签收样例可重放，批准状态见 status。"
         ),
     ),
     ModelDescriptor(
         model_id="equity_dividend_discount",
         version="0.2.0-research",
         applies_to="equity",
-        status="research",
+        status="validated",
         implemented=True,
         required_fields=(
             "div.*.per_10",
@@ -83,8 +84,9 @@ MODELS: tuple[ModelDescriptor, ...] = (
         supports=("派息率稳定、以现金分配为主要回报来源的成熟非金融公司",),
         failure_status="insufficient_data",
         notes=(
-            "研究版：DPS = EPS × 派息率，用股权成本折现；"
-            "特别分红不进入可持续 DPS；终值增长不得超过 ROE×留存率。参数未获批准。"
+            "已按股东决策②于 2026-11-12 批准（equity-policy-v1.1，pol-6d1a5387780fe6a2）："
+            "DPS = EPS × 派息率，用股权成本折现；特别分红不进入可持续 DPS；终值增长不得超过 ROE×留存率。"
+            "版本号沿用 0.2.0-research 以保持已签收样例可重放，批准状态见 status。"
         ),
     ),
     ModelDescriptor(
@@ -179,6 +181,9 @@ MODELS: tuple[ModelDescriptor, ...] = (
 )
 
 MODELS_BY_ID = {m.model_id: m for m in MODELS}
+
+# 政策批准只覆盖这两条路线；其余模型（银行股息、指数画像、候选 A、ETF 等）保持原状态
+VALIDATED_MODEL_IDS = frozenset({"equity_dcf_fcff", "equity_dividend_discount"})
 
 
 def for_asset(asset_class: str) -> list[ModelDescriptor]:

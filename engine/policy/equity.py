@@ -18,9 +18,16 @@ from engine.data.snapshot import stable_digest
 
 POLICY_SCHEMA_VERSION = "equity-policy/1.1"
 SUPPORTED_SCHEMA_VERSIONS = ("equity-policy/1", "equity-policy/1.1")
-POLICY_ID = "equity-policy-v1.1-draft"
-SUPPORTED_POLICY_IDS = ("equity-policy-v1-draft", "equity-policy-v1.1-draft")
+POLICY_ID = "equity-policy-v1.1"
+DRAFT_POLICY_ID = "equity-policy-v1.1-draft"
+SUPPORTED_POLICY_IDS = (
+    "equity-policy-v1-draft",
+    "equity-policy-v1.1-draft",
+    "equity-policy-v1.1",
+)
 POLICY_STATUS_DRAFT = "draft_unapproved"
+POLICY_STATUS_APPROVED = "approved"
+POLICY_STATUSES = (POLICY_STATUS_DRAFT, POLICY_STATUS_APPROVED)
 
 # 参数节点的取值形式：单值 / 规则 / 列表 / 网格 / 结构化字段组
 _VALUE_KEYS = (
@@ -126,12 +133,30 @@ class EquityPolicy:
             problems.append(
                 f"policy_id={self.data.get('policy_id')!r}，期望 {SUPPORTED_POLICY_IDS!r}"
             )
-        if self.data.get("status") != POLICY_STATUS_DRAFT:
-            problems.append(
-                f"status={self.data.get('status')!r}：本版只允许 {POLICY_STATUS_DRAFT!r}"
-            )
-        if self.data.get("approved") is not False:
-            problems.append("approved 必须为 false：草案不得自我批准")
+        status = self.data.get("status")
+        policy_id = self.data.get("policy_id")
+        if status not in POLICY_STATUSES:
+            problems.append(f"status={status!r}：只允许 {POLICY_STATUSES!r}")
+        if status == POLICY_STATUS_DRAFT:
+            if self.data.get("approved") is not False:
+                problems.append("approved 必须为 false：草案不得自我批准")
+            if policy_id not in ("equity-policy-v1-draft", DRAFT_POLICY_ID):
+                problems.append(
+                    f"草案 policy_id 必须是 'equity-policy-v1-draft' 或 {DRAFT_POLICY_ID!r}"
+                )
+        elif status == POLICY_STATUS_APPROVED:
+            if self.data.get("approved") is not True:
+                problems.append("status=approved 时 approved 必须为 true")
+            if policy_id != POLICY_ID:
+                problems.append(f"已批准政策 policy_id 必须是 {POLICY_ID!r}")
+            approval = self.data.get("approval") or {}
+            for key in ("approved_by", "approved_at", "decision", "review_date", "basis"):
+                if not approval.get(key):
+                    problems.append(f"已批准政策缺少批准记录 approval.{key}")
+            if approval.get("review_date") and str(approval["review_date"]) <= str(
+                approval.get("approved_at", "")
+            ):
+                problems.append("approval.review_date 必须晚于 approved_at")
 
         required = (
             "discount_rate.risk_free",
@@ -162,7 +187,7 @@ class EquityPolicy:
             "sensitivity.discount_rate_delta",
             "sensitivity.terminal_growth_delta",
         )
-        if self.data.get("policy_id") == "equity-policy-v1.1-draft":
+        if self.data.get("policy_id") in (DRAFT_POLICY_ID, POLICY_ID):
             required = required + (
                 "forecast.growth_cap",
                 "forecast.steady_growth",
@@ -192,7 +217,7 @@ class EquityPolicy:
                     problems.append(f"grade.{grade}.margin_of_safety={margin} 不在 (0,1) 内")
             if self.value("forecast.horizon_years") != int(self.value("forecast.horizon_years")):
                 problems.append("forecast.horizon_years 必须是整数")
-            if self.data.get("policy_id") == "equity-policy-v1.1-draft" and not 0.0 < self.value("forecast.growth_cap") < 1.0:
+            if self.data.get("policy_id") in (DRAFT_POLICY_ID, POLICY_ID) and not 0.0 < self.value("forecast.growth_cap") < 1.0:
                 problems.append("forecast.growth_cap 不在 (0,1) 内")
             if not 0.0 <= self.value("terminal.growth_base") < 1.0:
                 problems.append("terminal.growth_base 不在 [0,1) 内")
@@ -236,8 +261,11 @@ def load_policy(path: str | Path) -> EquityPolicy:
 
 __all__ = [
     "EquityPolicy",
+    "DRAFT_POLICY_ID",
     "POLICY_ID",
     "POLICY_SCHEMA_VERSION",
+    "POLICY_STATUSES",
+    "POLICY_STATUS_APPROVED",
     "POLICY_STATUS_DRAFT",
     "SUPPORTED_POLICY_IDS",
     "SUPPORTED_SCHEMA_VERSIONS",

@@ -253,3 +253,21 @@
 | N7 | 试运行 30 只全部有结果；新旧逐只对照表含状态、等级、三档价值、结论、变化原因 | `data/policy-trial/trial-report.json`、`docs/phase4a-equity-policy-trial.md` §7 | 30 行对照；`test_trial_covers_all_thirty_codes` | ✅ |
 | N8 | 指数、账本、CLI、回测不变；全部测试通过 | `engine/signals/*`、`engine/pipeline.py`（未改） | 账本 3 条 0 问题；CLI `research`/`undetermined`；**459 passed** | ✅ |
 | N9 | DELIVERY.md 汇总、复现命令、提交 ID | `DELIVERY.md` | 入口文件 §1–§10 | ✅ |
+
+---
+
+# 第四阶段第二批验收清单（启用个股正式结论，P1–P8）
+
+对应文件：`decision2-and-batch4b-instructions.md` 第二节。范围：批准落地、模型状态、CLI 正式结论、
+数据新鲜度、结论账本、30 只运行；不改政策参数、不扩股票池、不改指数/ETF、不做对话入口。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| P1 | approved 政策与 v1.1 草案逐参数相同；批准记录与复核日期在文件中 | `data/policies/equity-policy-v1.1.json`、`engine/policy/equity.py` | `test_p1_approved_policy_matches_draft_parameters`、`test_p1_policy_version_uses_approved_identifier`；`pol-920f936dbfefd436` | ✅ |
+| P2 | 只有政策下的 FCFF / 股息折现为 `validated`；其余模型状态不变；有测试防止其他模型升级 | `engine/models/registry.py` | `test_p2_only_policy_routes_are_validated`、`test_p2_formal_result_requires_validated_policy_model` | ✅ |
+| P3 | 30 只 CLI 结论与试运行 v1.1 预演结论 30/30 一致；试运行与 CLI 共用代码 | `engine/pipeline.py::_policy_equity_result` | `test_p3_thirty_cli_conclusions_match_trial`、`test_p3_cli_and_trial_share_evaluate_company`；报告 30/30 | ✅ |
+| P4 | CLI 输出含结论、等级及含义、三档价值及用途、起约束条件、距门槛、未满足条件、政策与快照、免责声明；C/partial/不支持/资料不足仍 undetermined 且有原因 | `engine/policy/conclusion.py`、`engine/reporting/text_summary.py` | `test_p4_formal_output_contains_required_fields`、`test_p4_text_output_contains_all_fields`、`test_p4_c_partial_unsupported_insufficient_are_undetermined` | ✅ |
+| P5 | 新鲜度三种情形各有测试，触发即 undetermined | `engine/policy/freshness.py`、政策 `runtime_parameters.freshness` | `test_p5_stale_price_hits`、`test_p5_stale_financials_hits`、`test_p5_missing_policy_field_hits`、`test_p5_stale_price_forces_undetermined_end_to_end` | ✅ |
+| P6 | 账本追加、重复跳过、冲突、篡改检测各有测试；首次写入条数 = 30 只中正式结论数量 | `engine/policy/conclusion_ledger.py`、`engine/cli.py` | `test_p6_ledger_append_skip_conflict_and_check`、`test_p6_ledger_detects_tampering`、`test_p6_cli_check_detects_tampering`、`test_p6_first_write_has_seven_formal_conclusions` | ✅ |
+| P7 | 指数信号、指数账本、ETF、回测不变；全部既有测试通过 | `engine/signals/*`、`engine/pipeline.py` | `test_p7_index_and_signal_ledger_unchanged`、`test_p7_backtest_file_is_read_only`；**480 passed** | ✅ |
+| P8 | DELIVERY.md 汇总、复现命令、测试结果、提交 ID | `DELIVERY.md` | 入口文件 §1–§10 | ✅ |

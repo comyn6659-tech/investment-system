@@ -18,7 +18,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from engine.assumptions.schema import load_assumptions
 from engine.contracts.validation import ContractViolation
@@ -27,6 +29,8 @@ from engine.valuation.errors import ValuationError
 from engine.pipeline import Analyzer, AnalyzerConfig
 from engine.reporting.json_exporter import export_json
 from engine.reporting.text_summary import render_text
+
+TZ = ZoneInfo("Asia/Singapore")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -61,6 +65,28 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="交叉检查用的第二份假设配置（可选，用于同一标的的另一条路线）",
     )
+    parser.add_argument(
+        "--policy", default=None, help="已批准政策文件（默认 data/policies/equity-policy-v1.1.json）"
+    )
+    parser.add_argument(
+        "--policy-snapshot-dir", default=None, help="政策试运行快照目录（默认 data/policy-trial/snapshots）"
+    )
+    parser.add_argument(
+        "--policy-evidence-dir", default=None, help="政策业务证据目录（默认 data/policy-trial/evidence）"
+    )
+    parser.add_argument(
+        "--conclusion-ledger", default=None, help="正式结论账本（默认 data/ledger/equity-conclusions.jsonl）"
+    )
+    parser.add_argument(
+        "--analysis-date",
+        default=None,
+        help="分析日 YYYY-MM-DD（用于复现；默认当前时间）",
+    )
+    parser.add_argument(
+        "--check-conclusions",
+        action="store_true",
+        help="只检查结论账本是否被改写/重复，然后退出",
+    )
     return parser
 
 
@@ -73,6 +99,35 @@ def _load_request(path: str) -> dict:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+
+    from engine.pipeline import (
+        DEFAULT_CONCLUSION_LEDGER,
+        DEFAULT_POLICY,
+        DEFAULT_POLICY_EVIDENCE,
+        DEFAULT_POLICY_SNAPSHOTS,
+    )
+
+    if args.check_conclusions:
+        from engine.policy.conclusion_ledger import ConclusionLedger
+
+        ledger = ConclusionLedger(Path(args.conclusion_ledger or DEFAULT_CONCLUSION_LEDGER))
+        problems = ledger.check()
+        try:
+            count = len(ledger.load())
+        except Exception:  # noqa: BLE001 - 账本损坏时 check() 已给出原因
+            count = None
+        print(
+            json.dumps(
+                {
+                    "ledger": str(ledger.path),
+                    "records": count,
+                    "problems": problems,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return 0 if not problems else 1
 
     query = args.query
     intent = args.intent
@@ -96,6 +151,17 @@ def main(argv: list[str] | None = None) -> int:
         equity_list_path=AnalyzerConfig().equity_list_path,
         snapshot_dir=Path(args.snapshot_dir) if args.snapshot_dir else AnalyzerConfig.snapshot_dir,
         evidence_dir=Path(args.evidence_dir) if args.evidence_dir else AnalyzerConfig.evidence_dir,
+        use_policy_path=True,
+        policy_path=Path(args.policy) if args.policy else DEFAULT_POLICY,
+        policy_snapshot_dir=(
+            Path(args.policy_snapshot_dir) if args.policy_snapshot_dir else DEFAULT_POLICY_SNAPSHOTS
+        ),
+        policy_evidence_dir=(
+            Path(args.policy_evidence_dir) if args.policy_evidence_dir else DEFAULT_POLICY_EVIDENCE
+        ),
+        conclusion_ledger_path=(
+            Path(args.conclusion_ledger) if args.conclusion_ledger else DEFAULT_CONCLUSION_LEDGER
+        ),
     )
     try:
         analyzer = Analyzer(config)
@@ -111,10 +177,16 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     try:
+        now = None
+        if args.analysis_date:
+            from datetime import datetime as _datetime
+
+            now = _datetime.fromisoformat(args.analysis_date + "T12:00:00").replace(tzinfo=TZ)
         result = analyzer.analyze(
             query,
             intent=intent,
             snapshot_id=snapshot,
+            now=now,
             assumptions=assumptions,
             cross_check_assumptions=cross_check,
         )
@@ -129,6 +201,28 @@ def main(argv: list[str] | None = None) -> int:
     if args.out:
         Path(args.out).write_text(text + "\n", encoding="utf-8")
     print(text)
+
+    # 正式结论（candidate/wait/avoid）写入只追加账本；undetermined 不写
+    if result.decision in ("candidate", "wait", "avoid"):
+        from engine.policy.conclusion import record_from_result
+        from engine.policy.conclusion_ledger import ConclusionLedger, ConclusionLedgerError
+
+        block = (result.payload or {}).get("policy_conclusion") or {}
+        if block and block.get("conclusion") != "undetermined":
+            try:
+                ledger = ConclusionLedger(config.conclusion_ledger_path)
+                record = record_from_result(
+                    result, recorded_at=datetime.now(TZ).isoformat(timespec="seconds")
+                )
+                outcome = ledger.append([record])
+                stream = sys.stderr if args.json else sys.stdout
+                if outcome["added"]:
+                    print(f"已写入结论账本：{outcome['added'][0]}", file=stream)
+                else:
+                    print(f"结论账本已有同内容记录，跳过：{outcome['skipped']}", file=stream)
+            except ConclusionLedgerError as exc:
+                print(f"结论账本写入失败：{exc}", file=sys.stderr)
+                return 3
 
     if result.analysis_status == "engine_error":
         return 3

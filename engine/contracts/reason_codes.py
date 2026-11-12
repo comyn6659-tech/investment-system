@@ -228,6 +228,31 @@ TERMINAL_GUARDRAIL_TERMINAL_SHARE = _register(
     "model",
     "基准情景终值占比达到政策上限：研究价值不用于结论",
 )
+POLICY_GRADE_C = _register(
+    "POLICY_GRADE_C",
+    "model",
+    "确定性等级 C：不满足正式结论条件，只展示研究价值",
+)
+POLICY_STATUS_PARTIAL = _register(
+    "POLICY_STATUS_PARTIAL",
+    "data",
+    "政策结果部分完成（勾稽、护栏或数据缺口），不形成正式结论",
+)
+STALE_PRICE = _register(
+    "STALE_PRICE",
+    "data",
+    "价格日期距分析日超过政策允许的交易日数，不得用旧价格给正式结论",
+)
+STALE_FINANCIALS = _register(
+    "STALE_FINANCIALS",
+    "data",
+    "已有更新的年报但快照未包含，不得用旧财务数据给正式结论",
+)
+MISSING_POLICY_FIELD = _register(
+    "MISSING_POLICY_FIELD",
+    "data",
+    "快照缺少政策计算所需字段，不得给正式结论",
+)
 PESSIMISTIC_VALUE_NONPOSITIVE = _register(
     "PESSIMISTIC_VALUE_NONPOSITIVE",
     "model",

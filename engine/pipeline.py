@@ -53,7 +53,13 @@ from engine.reporting.payload_builders import (
     collect_missing_data,
     strategy_candidates,
 )
-from engine.version import CODE_VERSION, MODEL_VERSION, POLICY_VERSION
+from engine.version import (
+    CODE_VERSION,
+    MODEL_VERSION,
+    POLICY_VERSION,
+    RESEARCH_POLICY_VERSION,
+    VALIDATED_MODEL_VERSION,
+)
 
 TZ = ZoneInfo("Asia/Singapore")
 DEFAULT_INTENT = "buy_point_check"
@@ -77,6 +83,11 @@ DEFAULT_EVIDENCE = PROJECT_ROOT / "data" / "evidence"
 DEFAULT_SERIES = PROJECT_ROOT / "data" / "series"
 DEFAULT_BACKTEST = PROJECT_ROOT / "data" / "backtest" / "candidate-a.json"
 DEFAULT_LEDGER = PROJECT_ROOT / "data" / "ledger" / "candidate-a-signals.jsonl"
+DEFAULT_POLICY = PROJECT_ROOT / "data" / "policies" / "equity-policy-v1.1.json"
+DEFAULT_POLICY_SNAPSHOTS = PROJECT_ROOT / "data" / "policy-trial" / "snapshots"
+DEFAULT_POLICY_EVIDENCE = PROJECT_ROOT / "data" / "policy-trial" / "evidence"
+DEFAULT_POLICY_MACRO = PROJECT_ROOT / "data" / "policy-trial" / "macro" / "cn-10y-yield.json"
+DEFAULT_CONCLUSION_LEDGER = PROJECT_ROOT / "data" / "ledger" / "equity-conclusions.jsonl"
 
 
 @dataclass(frozen=True)
@@ -90,6 +101,12 @@ class AnalyzerConfig:
     ledger_path: Path = DEFAULT_LEDGER
     assumptions_path: Path | None = None
     cross_check_assumptions_path: Path | None = None
+    use_policy_path: bool = False
+    policy_path: Path = DEFAULT_POLICY
+    policy_snapshot_dir: Path = DEFAULT_POLICY_SNAPSHOTS
+    policy_evidence_dir: Path = DEFAULT_POLICY_EVIDENCE
+    policy_macro_path: Path = DEFAULT_POLICY_MACRO
+    conclusion_ledger_path: Path = DEFAULT_CONCLUSION_LEDGER
 
 
 class Analyzer:
@@ -101,6 +118,9 @@ class Analyzer:
         self.store = SnapshotStore(self.config.snapshot_dir)
         self.evidence = EvidenceBook(Path(self.config.evidence_dir))
         self.series = SeriesStore(Path(self.config.series_dir))
+        self.policy_store = SnapshotStore(Path(self.config.policy_snapshot_dir))
+        self.policy_evidence = EvidenceBook(Path(self.config.policy_evidence_dir))
+        self._policy_cache = None
 
     # --- 主流程 ---------------------------------------------------------
     def analyze(
@@ -177,12 +197,28 @@ class Analyzer:
         否则价格会挂到错误的基金上。
         """
         if snapshot_id:
-            snapshot = self.store.load(snapshot_id)
+            try:
+                snapshot = self.store.load(snapshot_id)
+            except SnapshotError:
+                if instrument.asset_class != AssetClass.EQUITY:
+                    raise
+                snapshot = self.policy_store.load(snapshot_id)
         else:
-            latest = self.store.latest_for(instrument.instrument_id)
+            latest = None
+            if instrument.asset_class == AssetClass.EQUITY and self._prefer_policy_store():
+                latest = self.policy_store.latest_for(instrument.instrument_id)
+            if latest is None:
+                latest = self.store.latest_for(instrument.instrument_id)
+            if latest is None and instrument.asset_class == AssetClass.EQUITY:
+                latest = self.policy_store.latest_for(instrument.instrument_id)
             if latest is None:
                 return None
-            snapshot = self.store.load(latest)
+            try:
+                snapshot = self.store.load(latest)
+            except SnapshotError:
+                if instrument.asset_class != AssetClass.EQUITY:
+                    raise
+                snapshot = self.policy_store.load(latest)
 
         if snapshot.instrument_id != instrument.instrument_id:
             raise SnapshotError(
@@ -197,6 +233,29 @@ class Analyzer:
                 code="SNAPSHOT_ASSET_CLASS_MISMATCH",
             )
         return snapshot
+
+    def _prefer_policy_store(self) -> bool:
+        """只有显式启用政策路径（CLI/批次）才优先政策快照；研究链路保持原行为。"""
+        return bool(self.config.use_policy_path)
+
+    def _is_policy_snapshot(self, instrument: InstrumentRef, snapshot: Snapshot | None) -> bool:
+        if (
+            not self.config.use_policy_path
+            or snapshot is None
+            or instrument.asset_class != AssetClass.EQUITY
+        ):
+            return False
+        return any(
+            entry.get("snapshot_id") == snapshot.snapshot_id
+            for entry in self.policy_store.load_manifest()
+        )
+
+    def _approved_policy(self):
+        if self._policy_cache is None:
+            from engine.policy.equity import load_policy
+
+            self._policy_cache = load_policy(self.config.policy_path)
+        return self._policy_cache
 
     # --- 结果构造 -------------------------------------------------------
     def _base_result(
@@ -453,6 +512,8 @@ class Analyzer:
             resolution=resolution,
             snapshot=snapshot,
         )
+        result.policy_version = RESEARCH_POLICY_VERSION
+        result.model_version = MODEL_VERSION
         series_library = self._series_library_coverage(instrument.instrument_id)
         profile_status = profile.get("status")
         status_map = {
@@ -549,6 +610,8 @@ class Analyzer:
             resolution=resolution,
             snapshot=snapshot,
         )
+        result.policy_version = RESEARCH_POLICY_VERSION
+        result.model_version = MODEL_VERSION
         profile_status = (profile or {}).get("status")
         statuses = {profile_status, product.get("status")}
         if "insufficient_data" in statuses or profile is None:
@@ -611,6 +674,184 @@ class Analyzer:
         return self._finalize(result, instrument)
 
     # --- 个股：研究估值 -------------------------------------------------
+    def _policy_equity_result(
+        self,
+        instrument: InstrumentRef,
+        resolution: Resolution,
+        snapshot: Snapshot | None,
+        *,
+        intent: str,
+        generated_at: str,
+    ) -> AnalysisResult:
+        """已批准政策的个股结论：与试运行共用 evaluate_company，不另写估值。"""
+        import copy
+
+        from engine.policy.conclusion import (
+            build_policy_conclusion,
+            decision_for,
+            valuation_state_for,
+        )
+        from engine.policy.freshness import check_freshness
+        from engine.policy.trial import evaluate_company
+        from engine.policy.valuation import load_macro_series
+        from engine.models.registry import MODELS_BY_ID
+
+        policy = self._approved_policy()
+        result = self._base_result(
+            intent=intent,
+            generated_at=generated_at,
+            instrument=instrument,
+            resolution=resolution,
+            snapshot=snapshot,
+        )
+        if snapshot is None:
+            result.analysis_status = AnalysisStatus.INSUFFICIENT_DATA.value
+            result.reason_codes = [rc.SNAPSHOT_NOT_FOUND]
+            result.payload = {"payload_type": "equity"}
+            return self._finalize(result, instrument)
+
+        evidence = self.policy_evidence.get(instrument.instrument_id) or self.evidence.get(
+            instrument.instrument_id
+        )
+        macro = load_macro_series(self.config.policy_macro_path)
+        code = str(instrument.code or instrument.instrument_id.split(":")[1].split(".")[0])
+        record = evaluate_company(
+            policy,
+            snapshot=snapshot,
+            evidence=evidence,
+            macro=macro,
+            code=code,
+        )
+
+        values = record.get("values") or {}
+        grade = (record.get("grade") or {}).get("grade", "C")
+        status = record.get("status", "insufficient_data")
+        decision = decision_for(record) if values and status == "complete" and grade in ("A", "B") else Decision.UNDETERMINED.value
+
+        # P5：数据新鲜度护栏（只对已经算出价值的记录生效，避免把不支持路线改成资料不足）
+        hits = []
+        if values:
+            from datetime import date as _date
+
+            hits = check_freshness(
+                policy, snapshot, analysis_date=_date.fromisoformat(generated_at[:10])
+            )
+        if hits and values:
+            record = copy.deepcopy(record)
+            record["status"] = "partial"
+            record["status_reason"] = "；".join(hit.detail for hit in hits)
+            record["grade"] = {
+                "grade": "C",
+                "margin_of_safety": None,
+                "unmet_conditions": [hit.code for hit in hits],
+            }
+            record["trial_conclusion"] = {
+                "conclusion": "undetermined",
+                "reason": "数据新鲜度护栏触发",
+            }
+            record["reason_codes"] = [hit.code for hit in hits]
+            status = "partial"
+            decision = Decision.UNDETERMINED.value
+            grade = "C"
+
+        result.analysis_status = {
+            "complete": AnalysisStatus.COMPLETE.value,
+            "partial": AnalysisStatus.PARTIAL.value,
+            "insufficient_data": AnalysisStatus.INSUFFICIENT_DATA.value,
+            "unsupported": AnalysisStatus.UNSUPPORTED.value,
+        }.get(status, AnalysisStatus.INSUFFICIENT_DATA.value)
+        result.model_status = "validated" if values else None
+        if values:
+            result.model_version = VALIDATED_MODEL_VERSION
+        result.valuation_state = valuation_state_for(decision)
+        result.decision = decision
+
+        codes = list(record.get("reason_codes") or [])
+        if not codes:
+            if result.analysis_status == AnalysisStatus.UNSUPPORTED.value:
+                codes = [rc.MODEL_FAMILY_NOT_IMPLEMENTED]
+            elif result.analysis_status == AnalysisStatus.INSUFFICIENT_DATA.value:
+                bank = (record.get("route") or {}).get("primary_model") == "bank_dividend_discount"
+                codes = [rc.MISSING_BANK_RISK_EVIDENCE if bank else rc.MISSING_BUSINESS_EVIDENCE]
+            elif result.analysis_status == AnalysisStatus.PARTIAL.value:
+                codes = [rc.POLICY_STATUS_PARTIAL]
+            elif decision == Decision.UNDETERMINED.value:
+                codes = [rc.POLICY_GRADE_C]
+        result.reason_codes = codes
+
+        route = record.get("route") or {}
+        model_id = route.get("primary_model")
+        model = MODELS_BY_ID.get(model_id) if model_id else None
+        result.model_plan = {
+            "primary_model": model_id,
+            "model_version": model.version if model else None,
+            "model_status": "validated" if model is not None else None,
+            "cross_check_model": route.get("cross_check_model"),
+            "required_checks": [],
+            "selection_reason": "；".join(
+                str(item.get("note") or item.get("conclusion"))
+                for item in (route.get("reasons") or [])
+                if item.get("note") or item.get("conclusion")
+            )[:400],
+            "not_selected": list(route.get("rejected") or []),
+            "candidate_models": [],
+            "family": route.get("family"),
+            "family_label": None,
+            "applicable_model_category": route.get("applicable_model_category"),
+            "policy_version": policy.policy_id,
+        }
+
+        policy_block = None
+        if values:
+            policy_block = build_policy_conclusion(
+                record, policy=policy, analysis_date=generated_at[:10]
+            )
+        result.payload = self._build_payload(
+            instrument,
+            snapshot,
+            model_applicability={
+                "status": route.get("status"),
+                "family": route.get("family"),
+                "primary_model": model_id,
+                "cross_check_model": route.get("cross_check_model"),
+                "policy_version": policy.policy_id,
+            },
+            policy_conclusion=policy_block,
+        )
+        result.model_results = (
+            [
+                {
+                    "result_type": "policy_conclusion",
+                    "model_id": model_id,
+                    "model_version": model.version if model else None,
+                    "model_status": "validated",
+                    "policy_id": policy.policy_id,
+                    "grade": grade,
+                    "conclusion": (record.get("trial_conclusion") or {}).get("conclusion"),
+                    "value_per_share": values.get("base"),
+                    "snapshot_id": snapshot.snapshot_id,
+                }
+            ]
+            if values and model is not None
+            else []
+        )
+        result.assumptions = []
+        result.conditions = [
+            "等级 A/B/C 衡量数据完整度与模型稳定性，不是公司质量。",
+            "三档价值按已批准政策 equity-policy-v1.1 计算；本结果不构成投资建议。",
+        ]
+        if result.analysis_status == AnalysisStatus.PARTIAL.value:
+            result.conditions.append("结果状态 partial：按政策不给正式结论。")
+        result.missing_data = _merge_missing(
+            [], collect_missing_data(AssetClass.EQUITY, snapshot)
+        )
+        result.evidence_refs = self._evidence_refs(instrument, snapshot, evidence)
+        result.invalidation = [
+            "政策修订、无风险利率或 ERP 更新、快照刷新或价格变动后，本结论需要重跑。"
+        ]
+        result.warnings = [hit.detail for hit in hits]
+        return self._finalize(result, instrument)
+
     def _equity_result(
         self,
         instrument: InstrumentRef,
@@ -622,11 +863,16 @@ class Analyzer:
         assumptions: AssumptionSet | None,
         cross_check_assumptions: AssumptionSet | None,
     ) -> AnalysisResult:
-        """个股走「证据 → 适用性 → 假设 → 计算 → 研究报告」链路。
+        """个股：政策快照走已批准政策；其他快照保留原研究估值链路。"""
+        if self._is_policy_snapshot(instrument, snapshot):
+            return self._policy_equity_result(
+                instrument,
+                resolution,
+                snapshot,
+                intent=intent,
+                generated_at=generated_at,
+            )
 
-        无论走到哪一步，decision 都是 undetermined；模型只有 research 状态，
-        因此研究估值不会变成买点结论。
-        """
         evidence = self.evidence.get(instrument.instrument_id)
         primary_assumptions = assumptions or self._configured_assumptions()
         alt_assumptions = cross_check_assumptions or self._configured_cross_check()
@@ -652,6 +898,8 @@ class Analyzer:
             "insufficient_data": AnalysisStatus.INSUFFICIENT_DATA.value,
             "unsupported": AnalysisStatus.UNSUPPORTED.value,
         }
+        result.policy_version = RESEARCH_POLICY_VERSION
+        result.model_version = MODEL_VERSION
         result.analysis_status = status_map.get(
             valuation.status, AnalysisStatus.INSUFFICIENT_DATA.value
         )
@@ -888,6 +1136,7 @@ class Analyzer:
         *,
         research_valuation: dict | None = None,
         model_applicability: dict | None = None,
+        policy_conclusion: dict | None = None,
         index_profile: dict | None = None,
         product_check: dict | None = None,
         candidate_a_signal: dict | None = None,
@@ -899,6 +1148,7 @@ class Analyzer:
                 snapshot,
                 research_valuation=research_valuation,
                 model_applicability=model_applicability,
+                policy_conclusion=policy_conclusion,
             )
         if instrument.asset_class == AssetClass.INDEX:
             return build_index_payload(

@@ -6,14 +6,16 @@
 from __future__ import annotations
 
 # 代码版本：契约结构或判定逻辑任何语义变化都要升版本
-CODE_VERSION = "phase4-0.2.0"
+CODE_VERSION = "phase4-1.0.0"
 
 # 政策版本：投资政策（范围、模型适用性、门槛）变化才升版本。
-# 阶段一尚未批准任何新的投资门槛，因此这里只标记"未批准"状态。
-POLICY_VERSION = "unapproved-phase2"
+# 2026-11-12 股东决策②批准 equity-policy-v1.1；个股正式结论使用该标识。
+POLICY_VERSION = "equity-policy-v1.1"
+RESEARCH_POLICY_VERSION = "unapproved-phase2"
 
-# 模型版本：个股 3 个 + 指数画像 1 个 + 候选 A 研究信号 1 个，全部 research，均未获正式使用批准
+# 模型版本：默认给未批准/研究路径；个股政策正式结果在 pipeline 中改用 VALIDATED_MODEL_VERSION
 MODEL_VERSION = "research-0.4.0"
+VALIDATED_MODEL_VERSION = "validated-1.0.0"
 
 # 结果契约版本
 RESULT_SCHEMA_VERSION = "analysis-result/1"

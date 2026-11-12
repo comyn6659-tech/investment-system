@@ -2,7 +2,8 @@
 
 | 文件 | 版本 | 状态 | 用途 |
 |---|---|---|---|
-| `equity-policy-v1.1-draft.json` | `equity-policy-v1.1-draft` | `draft_unapproved` | 个股政策 v1.1 草案（**当前试运行版本**）：按审查 F1–F14 的 R1–R14 修订 |
+| `equity-policy-v1.1.json` | `equity-policy-v1.1` | `approved` | **当前正式政策**：股东决策②于 2026-11-12 批准；参数与 v1.1 草案逐项相同 |
+| `equity-policy-v1.1-draft.json` | `equity-policy-v1.1-draft` | `draft_unapproved` | 个股政策 v1.1 草案：按审查 F1–F14 的 R1–R14 修订；保留作对照 |
 | `equity-policy-v1-draft.json` | `equity-policy-v1-draft` | `draft_unapproved` | v1 草案，保留作对照，不删除；v1.1 的 `supersedes` 指向它 |
 
 ## v1.1 相对 v1 的修订（R1–R14）
@@ -33,3 +34,6 @@
 
 试运行报告：`docs/phase4a-equity-policy-trial.md`；机器可读结果：`data/policy-trial/trial-report.json`；
 v1 对照结果：`data/policy-trial/trial-report-v1.json`。
+
+正式结论：`docs/phase4b-equity-conclusions.md`；结论账本：`data/ledger/equity-conclusions.jsonl`。
+批准日期 2026-11-12，首次复核 2027-05-31；任何规则修改须重新批准。

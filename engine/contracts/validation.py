@@ -49,6 +49,8 @@ _ALLOWED_MODEL_RESULT_TYPES = {
     "research_valuation",
     # 阶段三：指数估值画像（描述性统计，不是交易信号）
     "index_profile",
+    # 阶段四第二批：已批准政策的正式结论
+    "policy_conclusion",
 }
 
 # 这些字段属于核心契约，缺失或为 null 一律视为违规（不允许「省略即通过」）
@@ -208,6 +210,7 @@ def validate_result(result: Any) -> list[str]:
         if extra:
             problems.append(f"payload({payload_type}) 含未定义字段: {sorted(extra)}")
         problems.extend(_check_research_valuation_payload(payload, data, analysis_status, model_status))
+        problems.extend(_check_policy_conclusion_payload(payload, data, analysis_status, model_status))
         problems.extend(_check_index_profile_payload(payload, data, analysis_status, model_status))
         problems.extend(_check_product_check_payload(payload, data, model_status))
         if analysis_status != AnalysisStatus.COMPLETE or model_status != ModelStatus.VALIDATED:
@@ -249,6 +252,10 @@ def validate_result(result: Any) -> list[str]:
         elif item["result_type"] == "index_profile":
             problems.extend(
                 _check_index_profile(item, data, analysis_status, model_status, decision)
+            )
+        elif item["result_type"] == "policy_conclusion":
+            problems.extend(
+                _check_policy_conclusion_result(item, data, analysis_status, model_status, decision)
             )
         elif analysis_status != AnalysisStatus.COMPLETE or model_status != ModelStatus.VALIDATED:
             problems.append(
@@ -331,6 +338,97 @@ _RESEARCH_VALUATION_FORBIDDEN_STATES = {
     ValuationState.NEUTRAL,
     ValuationState.EXPENSIVE,
 }
+
+
+def _check_policy_conclusion_payload(payload, data, analysis_status, model_status) -> list[str]:
+    """正式结论载荷：必须带政策、等级、三档价值、起约束条件与免责声明。"""
+    problems: list[str] = []
+    block = payload.get("policy_conclusion")
+    if payload.get("payload_type") != "equity":
+        if block not in (None, {}, [], ""):
+            problems.append("policy_conclusion 只能出现在个股载荷中")
+        return problems
+    if block in (None, {}):
+        return problems
+    if not isinstance(block, dict):
+        problems.append("policy_conclusion 必须是对象")
+        return problems
+    for key in (
+        "payload_version",
+        "analysis_date",
+        "policy",
+        "grade",
+        "values",
+        "price",
+        "candidate_entry_price",
+        "distance_to_candidate_pct",
+        "conclusion",
+        "snapshot_id",
+        "disclaimer",
+    ):
+        if key not in block:
+            problems.append(f"policy_conclusion 缺少字段 {key}")
+    policy = block.get("policy") or {}
+    if policy.get("status") != "approved":
+        problems.append("policy_conclusion 必须引用已批准政策")
+    grade = block.get("grade") or {}
+    if grade.get("grade") not in ("A", "B", "C"):
+        problems.append("policy_conclusion.grade.grade 必须是 A/B/C")
+    if not grade.get("meaning"):
+        problems.append("policy_conclusion 必须解释等级含义")
+    values = block.get("values") or {}
+    for key in ("pessimistic", "base", "optimistic", "usage"):
+        if key not in values:
+            problems.append(f"policy_conclusion.values 缺少 {key}")
+    if not block.get("disclaimer"):
+        problems.append("policy_conclusion 必须带免责声明")
+
+    conclusion = block.get("conclusion")
+    decision = data.get("decision")
+    mapping = {
+        "candidate_buy_point": "candidate",
+        "wait": "wait",
+        "avoid": "avoid",
+        "undetermined": "undetermined",
+    }
+    if mapping.get(conclusion) != decision:
+        problems.append(
+            f"policy_conclusion.conclusion={conclusion!r} 与 decision={decision!r} 不一致"
+        )
+    if decision in ("candidate", "wait", "avoid"):
+        if model_status != ModelStatus.VALIDATED.value:
+            problems.append("正式结论要求 model_status=validated")
+        if grade.get("grade") not in ("A", "B"):
+            problems.append("正式结论要求等级 A/B")
+        if (values.get("base") or {}).get("value") is None:
+            problems.append("正式结论必须带基准价值")
+    return problems
+
+
+def _check_policy_conclusion_result(item, data, analysis_status, model_status, decision) -> list[str]:
+    """policy_conclusion 模型结果必须来自已批准政策下的 validated 模型。"""
+    problems: list[str] = []
+    model_id = item.get("model_id")
+    model = MODELS_BY_ID.get(model_id)
+    plan = data.get("model_plan") or {}
+    if model is None:
+        problems.append(f"policy_conclusion 引用了未登记的模型: {model_id!r}")
+    else:
+        if model.status != "validated":
+            problems.append(f"模型 {model_id} 不是 validated，不能输出正式结论")
+        if item.get("model_version") != model.version:
+            problems.append("policy_conclusion 的 model_version 与登记版本不一致")
+        if plan.get("primary_model") != model_id:
+            problems.append("policy_conclusion 必须与 model_plan.primary_model 一致")
+    if item.get("model_status") != ModelStatus.VALIDATED.value:
+        problems.append("policy_conclusion 必须标记 model_status=validated")
+    if model_status != ModelStatus.VALIDATED.value:
+        problems.append("携带 policy_conclusion 的结果，整体 model_status 必须为 validated")
+    if analysis_status not in (AnalysisStatus.COMPLETE, AnalysisStatus.PARTIAL):
+        problems.append("policy_conclusion 只能在 complete/partial 的分析中出现")
+    if decision in ("candidate", "wait", "avoid") and analysis_status != AnalysisStatus.COMPLETE:
+        problems.append("正式结论要求 analysis_status=complete")
+    return problems
 
 
 def _check_research_valuation(item, data, analysis_status, model_status, decision) -> list[str]:

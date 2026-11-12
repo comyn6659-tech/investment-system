@@ -50,6 +50,7 @@ def build_equity_payload(
     *,
     research_valuation: dict[str, Any] | None = None,
     model_applicability: dict[str, Any] | None = None,
+    policy_conclusion: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """个股载荷。
 
@@ -64,6 +65,8 @@ def build_equity_payload(
             "payload_version": RESEARCH_VALUATION_PAYLOAD_VERSION,
             **research_valuation,
         }
+    if policy_conclusion is not None:
+        payload["policy_conclusion"] = policy_conclusion
     if snapshot is None:
         return payload
 

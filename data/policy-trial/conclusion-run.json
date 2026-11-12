@@ -1,0 +1,563 @@
+{
+  "analysis_date": "2026-11-12",
+  "generated_at": "2026-11-12T12:00:00+08:00",
+  "policy": {
+    "policy_id": "equity-policy-v1.1",
+    "policy_digest": "pol-6d1a5387780fe6a2",
+    "approved": true
+  },
+  "total": 30,
+  "match_count": 30,
+  "mismatches": [],
+  "formal_count": 7,
+  "undetermined_count": 23,
+  "ledger": {
+    "path": "data/ledger/equity-conclusions.jsonl",
+    "added": [
+      "concl-88c210a0d4d016ad",
+      "concl-402f8110bf6c09c4",
+      "concl-9957b79d595a05ee",
+      "concl-ee16b991cc71c1d4",
+      "concl-15b01838a5625ad4",
+      "concl-338475441bcaa58b",
+      "concl-74cec2debd853d5d"
+    ],
+    "skipped": [],
+    "total": 7
+  },
+  "rows": [
+    {
+      "code": "600519",
+      "name": "贵州茅台",
+      "status": "complete",
+      "grade": "B",
+      "values": {
+        "pessimistic": 1038.1999234152931,
+        "base": 1144.6629558507532,
+        "optimistic": 1558.695738020282
+      },
+      "price": 1402.3,
+      "entry": 686.7977735104519,
+      "distance": "+104.2%",
+      "decision": "wait",
+      "reason_codes": []
+    },
+    {
+      "code": "000858",
+      "name": "五 粮 液",
+      "status": "partial",
+      "grade": "C",
+      "values": {
+        "pessimistic": 48.61325844308254,
+        "base": 62.59869881868727,
+        "optimistic": 65.20272850250903
+      },
+      "price": 72.39,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "BASE_YEAR_ANOMALY"
+      ]
+    },
+    {
+      "code": "600887",
+      "name": "伊利股份",
+      "status": "complete",
+      "grade": "C",
+      "values": {
+        "pessimistic": 11.762021492407603,
+        "base": 15.91321992807521,
+        "optimistic": 23.82963756707234
+      },
+      "price": 30.61,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "POLICY_GRADE_C"
+      ]
+    },
+    {
+      "code": "603288",
+      "name": "海天味业",
+      "status": "complete",
+      "grade": "A",
+      "values": {
+        "pessimistic": 15.284535364625139,
+        "base": 17.408374205268707,
+        "optimistic": 22.696130629879693
+      },
+      "price": 34.61,
+      "entry": 13.05628065395153,
+      "distance": "+165.1%",
+      "decision": "avoid",
+      "reason_codes": []
+    },
+    {
+      "code": "000895",
+      "name": "双汇发展",
+      "status": "complete",
+      "grade": "A",
+      "values": {
+        "pessimistic": 10.976655140669004,
+        "base": 14.95011030041872,
+        "optimistic": 16.763610341543135
+      },
+      "price": 24.24,
+      "entry": 11.21258272531404,
+      "distance": "+116.2%",
+      "decision": "avoid",
+      "reason_codes": []
+    },
+    {
+      "code": "600436",
+      "name": "片仔癀",
+      "status": "partial",
+      "grade": "C",
+      "values": {
+        "pessimistic": 26.170262498417152,
+        "base": 28.9502343838884,
+        "optimistic": 39.030030468328476
+      },
+      "price": 130.24,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "BRIDGE_RECONCILIATION_GAP"
+      ]
+    },
+    {
+      "code": "000333",
+      "name": "美的集团",
+      "status": "complete",
+      "grade": "A",
+      "values": {
+        "pessimistic": 58.531564786881106,
+        "base": 76.98533357220714,
+        "optimistic": 102.21060753997925
+      },
+      "price": 87.68,
+      "entry": 57.739000179155354,
+      "distance": "+51.9%",
+      "decision": "wait",
+      "reason_codes": []
+    },
+    {
+      "code": "000651",
+      "name": "格力电器",
+      "status": "partial",
+      "grade": "A",
+      "values": {
+        "pessimistic": 26.961959295428798,
+        "base": 41.22671022820696,
+        "optimistic": 62.643732264110106
+      },
+      "price": 38.66,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "BRIDGE_RECONCILIATION_GAP"
+      ]
+    },
+    {
+      "code": "600660",
+      "name": "福耀玻璃",
+      "status": "complete",
+      "grade": "C",
+      "values": {
+        "pessimistic": 31.377253328622217,
+        "base": 52.47494138891429,
+        "optimistic": 69.83694966736093
+      },
+      "price": 55.75,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "POLICY_GRADE_C"
+      ]
+    },
+    {
+      "code": "600031",
+      "name": "三一重工",
+      "status": "unsupported",
+      "grade": null,
+      "values": {
+        "pessimistic": null,
+        "base": null,
+        "optimistic": null
+      },
+      "price": null,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "MODEL_FAMILY_NOT_IMPLEMENTED"
+      ]
+    },
+    {
+      "code": "600309",
+      "name": "万华化学",
+      "status": "partial",
+      "grade": "C",
+      "values": {
+        "pessimistic": 32.9508187530104,
+        "base": 60.46164403102902,
+        "optimistic": 122.92289436798202
+      },
+      "price": 69.9,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "TERMINAL_GUARDRAIL_BY_DEFAULT",
+        "TERMINAL_GUARDRAIL_EXPLICIT_CASH",
+        "TERMINAL_GUARDRAIL_TERMINAL_SHARE"
+      ]
+    },
+    {
+      "code": "002415",
+      "name": "海康威视",
+      "status": "complete",
+      "grade": "C",
+      "values": {
+        "pessimistic": 23.21615152391073,
+        "base": 26.839166253358602,
+        "optimistic": 34.237260313715595
+      },
+      "price": 34.25,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "POLICY_GRADE_C"
+      ]
+    },
+    {
+      "code": "300750",
+      "name": "宁德时代",
+      "status": "complete",
+      "grade": "B",
+      "values": {
+        "pessimistic": 148.99425345671264,
+        "base": 242.04495108030076,
+        "optimistic": 312.85728221495077
+      },
+      "price": 246.66,
+      "entry": 145.22697064818044,
+      "distance": "+69.8%",
+      "decision": "wait",
+      "reason_codes": []
+    },
+    {
+      "code": "002594",
+      "name": "比亚迪",
+      "status": "partial",
+      "grade": "C",
+      "values": {
+        "pessimistic": null,
+        "base": 23.767342900116578,
+        "optimistic": 40.69117862339085
+      },
+      "price": 82.04,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "TERMINAL_GUARDRAIL_BY_DEFAULT",
+        "TERMINAL_GUARDRAIL_EXPLICIT_CASH",
+        "TERMINAL_GUARDRAIL_TERMINAL_SHARE",
+        "PESSIMISTIC_VALUE_NONPOSITIVE"
+      ]
+    },
+    {
+      "code": "600276",
+      "name": "恒瑞医药",
+      "status": "complete",
+      "grade": "B",
+      "values": {
+        "pessimistic": 14.334957194621902,
+        "base": 19.45232094180768,
+        "optimistic": 22.45003138019884
+      },
+      "price": 48.22,
+      "entry": 11.671392565084608,
+      "distance": "+313.1%",
+      "decision": "avoid",
+      "reason_codes": []
+    },
+    {
+      "code": "600900",
+      "name": "长江电力",
+      "status": "complete",
+      "grade": "C",
+      "values": {
+        "pessimistic": 13.800897327043433,
+        "base": 17.598510252479826,
+        "optimistic": 22.304579581994922
+      },
+      "price": 29.48,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "POLICY_GRADE_C"
+      ]
+    },
+    {
+      "code": "601088",
+      "name": "中国神华",
+      "status": "unsupported",
+      "grade": null,
+      "values": {
+        "pessimistic": null,
+        "base": null,
+        "optimistic": null
+      },
+      "price": null,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "MODEL_FAMILY_NOT_IMPLEMENTED"
+      ]
+    },
+    {
+      "code": "601006",
+      "name": "大秦铁路",
+      "status": "partial",
+      "grade": "C",
+      "values": {
+        "pessimistic": 3.2333901454254157,
+        "base": 3.539539498686933,
+        "optimistic": 3.813861839375712
+      },
+      "price": 4.8,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "BRIDGE_RECONCILIATION_GAP"
+      ]
+    },
+    {
+      "code": "600941",
+      "name": "中国移动",
+      "status": "complete",
+      "grade": "B",
+      "values": {
+        "pessimistic": 69.95705310784047,
+        "base": 76.81803945288934,
+        "optimistic": 90.53694626751381
+      },
+      "price": 99.93,
+      "entry": 46.0908236717336,
+      "distance": "+116.8%",
+      "decision": "avoid",
+      "reason_codes": []
+    },
+    {
+      "code": "601668",
+      "name": "中国建筑",
+      "status": "partial",
+      "grade": "C",
+      "values": {
+        "pessimistic": 15.791896429783883,
+        "base": 20.182281928223897,
+        "optimistic": 83.15508581882548
+      },
+      "price": 4.56,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "BRIDGE_RECONCILIATION_GAP",
+        "LEVERAGE_GUARDRAIL_EXCEEDED",
+        "TERMINAL_GUARDRAIL_BY_DEFAULT"
+      ]
+    },
+    {
+      "code": "601919",
+      "name": "中远海控",
+      "status": "unsupported",
+      "grade": null,
+      "values": {
+        "pessimistic": null,
+        "base": null,
+        "optimistic": null
+      },
+      "price": null,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "MODEL_FAMILY_NOT_IMPLEMENTED"
+      ]
+    },
+    {
+      "code": "600019",
+      "name": "宝钢股份",
+      "status": "unsupported",
+      "grade": null,
+      "values": {
+        "pessimistic": null,
+        "base": null,
+        "optimistic": null
+      },
+      "price": null,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "MODEL_FAMILY_NOT_IMPLEMENTED"
+      ]
+    },
+    {
+      "code": "601899",
+      "name": "紫金矿业",
+      "status": "unsupported",
+      "grade": null,
+      "values": {
+        "pessimistic": null,
+        "base": null,
+        "optimistic": null
+      },
+      "price": null,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "MODEL_FAMILY_NOT_IMPLEMENTED"
+      ]
+    },
+    {
+      "code": "601857",
+      "name": "中国石油",
+      "status": "unsupported",
+      "grade": null,
+      "values": {
+        "pessimistic": null,
+        "base": null,
+        "optimistic": null
+      },
+      "price": null,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "MODEL_FAMILY_NOT_IMPLEMENTED"
+      ]
+    },
+    {
+      "code": "000002",
+      "name": "万 科Ａ",
+      "status": "unsupported",
+      "grade": null,
+      "values": {
+        "pessimistic": null,
+        "base": null,
+        "optimistic": null
+      },
+      "price": null,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "MODEL_FAMILY_NOT_IMPLEMENTED"
+      ]
+    },
+    {
+      "code": "601012",
+      "name": "隆基绿能",
+      "status": "unsupported",
+      "grade": null,
+      "values": {
+        "pessimistic": null,
+        "base": null,
+        "optimistic": null
+      },
+      "price": null,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "MODEL_FAMILY_NOT_IMPLEMENTED"
+      ]
+    },
+    {
+      "code": "600036",
+      "name": "招商银行",
+      "status": "insufficient_data",
+      "grade": null,
+      "values": {
+        "pessimistic": null,
+        "base": null,
+        "optimistic": null
+      },
+      "price": null,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "MISSING_BANK_RISK_EVIDENCE"
+      ]
+    },
+    {
+      "code": "601398",
+      "name": "工商银行",
+      "status": "insufficient_data",
+      "grade": null,
+      "values": {
+        "pessimistic": null,
+        "base": null,
+        "optimistic": null
+      },
+      "price": null,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "MISSING_BANK_RISK_EVIDENCE"
+      ]
+    },
+    {
+      "code": "601318",
+      "name": "中国平安",
+      "status": "unsupported",
+      "grade": null,
+      "values": {
+        "pessimistic": null,
+        "base": null,
+        "optimistic": null
+      },
+      "price": null,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "MODEL_FAMILY_NOT_IMPLEMENTED"
+      ]
+    },
+    {
+      "code": "600030",
+      "name": "中信证券",
+      "status": "unsupported",
+      "grade": null,
+      "values": {
+        "pessimistic": null,
+        "base": null,
+        "optimistic": null
+      },
+      "price": null,
+      "entry": null,
+      "distance": "—",
+      "decision": "undetermined",
+      "reason_codes": [
+        "MODEL_FAMILY_NOT_IMPLEMENTED"
+      ]
+    }
+  ]
+}

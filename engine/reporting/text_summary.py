@@ -191,10 +191,13 @@ def _render_payload(payload: dict[str, Any]) -> list[str]:
         elif payload.get("dividend_records"):
             lines.append("")
             lines.append(f"【分红记录】{len(payload['dividend_records'])} 条明细见 JSON")
+        policy_conclusion = payload.get("policy_conclusion")
+        if policy_conclusion:
+            lines.extend(_render_policy_conclusion(policy_conclusion))
         research = payload.get("research_valuation")
         if research:
             lines.extend(_render_research_valuation(research, payload.get("model_applicability")))
-        elif not payload.get("valuation"):
+        elif not payload.get("valuation") and not payload.get("policy_conclusion"):
             lines.append("")
             lines.append(
                 "【估值情景】无。本次没有产出研究估值"
@@ -549,6 +552,60 @@ def _fmt_cny(value: Any) -> str:
     return f"{amount:,.0f} 元"
 
 
+def _render_policy_conclusion(block: dict[str, Any]) -> list[str]:
+    """已批准政策的正式结论：等级、三档价值、起约束、距门槛、政策与快照。"""
+    lines: list[str] = []
+    policy = block.get("policy") or {}
+    grade = block.get("grade") or {}
+    values = block.get("values") or {}
+    price = block.get("price") or {}
+    entry = block.get("candidate_entry_price") or {}
+    binding = block.get("binding_condition") or {}
+    lines.append("")
+    formal = block.get("conclusion") != "undetermined"
+    lines.append(
+        "【正式结论（已批准政策）】" if formal else "【政策结果（已批准政策，未形成正式结论）】"
+    )
+    lines.append(f"  政策：{policy.get('policy_id')}（{policy.get('policy_digest')}，"
+                 f"批准日 {policy.get('approved_at')}，复核日 {policy.get('review_date')}）")
+    margin = grade.get("margin_of_safety")
+    lines.append(
+        f"  等级：{grade.get('grade')}（安全边际 "
+        f"{f'{margin:.0%}' if margin is not None else '—'}）"
+        f"｜含义：{grade.get('meaning')}"
+    )
+    lines.append("  三档价值（元/股）：")
+    for key, label in (("pessimistic", "悲观"), ("base", "基准"), ("optimistic", "乐观")):
+        item = values.get(key) or {}
+        usage = (values.get("usage") or {}).get(key)
+        lines.append(
+            f"    - {label}：{_money(item.get('value')) if item.get('value') is not None else '—'}"
+            + (f"｜用途：{usage}" if usage else "")
+        )
+    lines.append(
+        f"  现价：{_price(price.get('value'))}（{block.get('price_date') or '日期未知'}）"
+        f"｜候选门槛：{_price(entry.get('value'))}"
+    )
+    distance = block.get("distance_to_candidate_pct")
+    if distance is not None:
+        lines.append(
+            f"  距候选门槛：{distance:+.1f}%"
+            + ("（现价已低于门槛）" if distance <= 0 else "（现价仍高于门槛）")
+        )
+    if binding:
+        lines.append(
+            f"  起约束条件：{binding.get('label') or binding.get('name')}"
+            f"（{_price((binding.get('price') or {}).get('value'))}）"
+        )
+    unmet = grade.get("unmet_conditions") or []
+    lines.append("  主要未满足条件：" + ("、".join(unmet) if unmet else "无"))
+    if not formal:
+        lines.append("  该结果不形成正式结论；三档价值仅研究参考，不用于买卖判断。")
+    lines.append(f"  快照：{block.get('snapshot_id')}（数据截至 {block.get('as_of')}）")
+    lines.append(f"  {block.get('disclaimer')}")
+    return lines
+
+
 def _render_research_valuation(
     research: dict[str, Any], applicability: dict[str, Any] | None
 ) -> list[str]:
@@ -697,6 +754,15 @@ def _render_research_valuation(
     if hypotheses:
         lines.append("  属于研究假设（非观测值）的参数：" + "、".join(hypotheses))
     return lines
+
+
+def _price(value: Any) -> str:
+    if value is None:
+        return "未取得"
+    try:
+        return f"{float(value):,.2f} 元/股"
+    except (TypeError, ValueError):
+        return str(value)
 
 
 def _money(value: Any) -> str:
