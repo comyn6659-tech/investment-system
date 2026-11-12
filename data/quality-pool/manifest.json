@@ -1,10 +1,9 @@
 {
-  "current": "snapshot-qps-e6fd0031c30f1e01",
-  "snapshot_id": "qps-e6fd0031c30f1e01",
-  "content_hash": "e6fd0031c30f1e012dd3127bf08e3a510347b98b1042e823a32da245c444969b",
+  "current": "snapshot-qps-1c1edb9a5fc01bc3",
+  "snapshot_id": "qps-1c1edb9a5fc01bc3",
+  "content_hash": "1c1edb9a5fc01bc367f6a51a78015654b20f83cc28e0fcc3c244e2dbaa4aab47",
   "as_of": "2026-11-12",
-  "companies": 5225,
-  "tables": 44,
-  "total_bytes": 9748403,
-  "written_at": "2026-11-12T21:25:49+08:00"
+  "tables": 48,
+  "total_bytes": 9765327,
+  "written_at": "2026-11-12T23:06:19+08:00"
 }

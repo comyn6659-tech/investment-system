@@ -30,6 +30,7 @@ OUT_OF_SCOPE_MARKET = "OUT_OF_SCOPE_MARKET"
 class FinancialYear:
     fiscal_year: int
     parent_netprofit: float | None = None
+    revenue: float | None = None
     parent_equity: float | None = None
     operating_cashflow: float | None = None
     capex: float | None = None
@@ -67,6 +68,7 @@ class FinancialYear:
         return {
             "fiscal_year": self.fiscal_year,
             "parent_netprofit": self.parent_netprofit,
+            "revenue": self.revenue,
             "parent_equity": self.parent_equity,
             "operating_cashflow": self.operating_cashflow,
             "capex": self.capex,
@@ -83,6 +85,7 @@ class FinancialYear:
         return cls(
             fiscal_year=int(payload["fiscal_year"]),
             parent_netprofit=payload.get("parent_netprofit"),
+            revenue=payload.get("revenue"),
             parent_equity=payload.get("parent_equity"),
             operating_cashflow=payload.get("operating_cashflow"),
             capex=payload.get("capex"),
@@ -92,6 +95,43 @@ class FinancialYear:
             amortization=payload.get("amortization"),
             interest_debt=payload.get("interest_debt"),
             monetary_funds=payload.get("monetary_funds"),
+        )
+
+
+@dataclass(frozen=True)
+class GovernancePenalty:
+    date: str
+    event_type: str
+    title: str
+    reason: str | None = None
+    doc_no: str | None = None
+    url: str | None = None
+    info_disclosure: bool = False
+    counted: bool = False
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "date": self.date,
+            "event_type": self.event_type,
+            "title": self.title,
+            "reason": self.reason,
+            "doc_no": self.doc_no,
+            "url": self.url,
+            "info_disclosure": self.info_disclosure,
+            "counted": self.counted,
+        }
+
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, Any]) -> "GovernancePenalty":
+        return cls(
+            date=str(payload.get("date") or ""),
+            event_type=str(payload.get("event_type") or ""),
+            title=str(payload.get("title") or ""),
+            reason=payload.get("reason"),
+            doc_no=payload.get("doc_no"),
+            url=payload.get("url"),
+            info_disclosure=str(payload.get("info_disclosure")).lower() in ("true", "1", "yes"),
+            counted=str(payload.get("counted")).lower() in ("true", "1", "yes"),
         )
 
 
@@ -110,8 +150,16 @@ class Company:
     years: Mapping[int, FinancialYear]
     dividends: Mapping[int, float | None]
     pledge_company_ratio: float | None = None
-    audit_opinion: str | None = None
-    penalties: tuple[str, ...] = ()
+    audit_opinions: Mapping[int, str] = field(default_factory=dict)
+    audit_available: bool = False
+    penalties: tuple[GovernancePenalty, ...] = ()
+    penalty_available: bool = False
+    controlling_shareholder: str | None = None
+    controlling_pledge_ratio: float | None = None
+    pledge_report_date: str | None = None
+    pledge_available: bool = False
+    pledge_note: str | None = None
+    governance_in_scope: bool = False
 
     @property
     def window_years(self) -> tuple[int, ...]:
@@ -135,8 +183,16 @@ class Company:
             },
             "dividends": {str(year): value for year, value in sorted(self.dividends.items())},
             "pledge_company_ratio": self.pledge_company_ratio,
-            "audit_opinion": self.audit_opinion,
-            "penalties": list(self.penalties),
+            "audit_opinions": {str(year): value for year, value in sorted(self.audit_opinions.items())},
+            "audit_available": self.audit_available,
+            "penalties": [item.to_dict() for item in self.penalties],
+            "penalty_available": self.penalty_available,
+            "controlling_shareholder": self.controlling_shareholder,
+            "controlling_pledge_ratio": self.controlling_pledge_ratio,
+            "pledge_report_date": self.pledge_report_date,
+            "pledge_available": self.pledge_available,
+            "pledge_note": self.pledge_note,
+            "governance_in_scope": self.governance_in_scope,
         }
 
     @classmethod
@@ -162,8 +218,22 @@ class Company:
                 for year, value in (payload.get("dividends") or {}).items()
             },
             pledge_company_ratio=payload.get("pledge_company_ratio"),
-            audit_opinion=payload.get("audit_opinion"),
-            penalties=tuple(payload.get("penalties") or ()),
+            audit_opinions={
+                int(year): value
+                for year, value in (payload.get("audit_opinions") or {}).items()
+            },
+            audit_available=bool(payload.get("audit_available")),
+            penalties=tuple(
+                GovernancePenalty.from_dict(item)
+                for item in payload.get("penalties") or []
+            ),
+            penalty_available=bool(payload.get("penalty_available")),
+            controlling_shareholder=payload.get("controlling_shareholder"),
+            controlling_pledge_ratio=payload.get("controlling_pledge_ratio"),
+            pledge_report_date=payload.get("pledge_report_date"),
+            pledge_available=bool(payload.get("pledge_available")),
+            pledge_note=payload.get("pledge_note"),
+            governance_in_scope=bool(payload.get("governance_in_scope")),
         )
 
 

@@ -1,0 +1,22 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "governance-audit",
+  "file": "governance-audit.csv.gz",
+  "rows": 1260,
+  "columns": [
+    "code",
+    "fiscal_year",
+    "opinion_type",
+    "source_id",
+    "source_url",
+    "fetched_at"
+  ],
+  "content_hash": "fcbae27fa28b415b3422fa9ae833901602021e443a835a925ed6add076ede5f3",
+  "size_bytes": 4585,
+  "kind": "governance_audit",
+  "source_id": "eastmoney.f10.audit_opinion",
+  "publisher": "东方财富",
+  "interface": "PC_HSF10 zcfzbAjaxNew OPINION_TYPE",
+  "url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/zcfzbAjaxNew",
+  "definition_note": "2021–2025 年报审计意见类型；逐家取，缺年份即不可得。"
+}

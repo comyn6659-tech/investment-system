@@ -12,10 +12,12 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 from engine.quality.build import build_companies
+from engine.quality.models import GovernancePenalty
 from engine.quality.tables import TableError, read_table, verify_table
 
 SNAPSHOT_SCHEMA_VERSION = "quality-pool-snapshot/2"
@@ -24,6 +26,10 @@ SNAPSHOT_ID_PREFIX = "qps-"
 
 class SnapshotError(RuntimeError):
     """快照清单、表哈希或结构不合法。"""
+
+
+def _truthy(value: Any) -> bool:
+    return str(value).strip().lower() in ("true", "1", "yes", "y")
 
 
 def canonical_json(payload: Any) -> str:
@@ -123,6 +129,10 @@ def load_snapshot_dir(path: Path) -> tuple[dict[str, Any], list[Any], dict[str, 
     universe: list[dict] = []
     industry: dict[str, str] = {}
     pledge: dict[str, float] = {}
+    audit: dict[str, dict[int, str]] = {}
+    penalties: dict[str, list[dict]] = {}
+    pledge_governance: dict[str, dict] = {}
+    coverage: dict[str, dict] = {}
     for entry in manifest.get("tables") or []:
         rows = read_table(directory / str(entry["file"]))
         kind = entry.get("kind")
@@ -145,6 +155,18 @@ def load_snapshot_dir(path: Path) -> tuple[dict[str, Any], list[Any], dict[str, 
                 for row in rows
                 if row.get("pledge_ratio")
             }
+        elif kind == "governance_audit":
+            for row in rows:
+                audit.setdefault(str(row["code"]).zfill(6), {})[int(row["fiscal_year"])] = row["opinion_type"]
+        elif kind == "governance_penalty":
+            for row in rows:
+                penalties.setdefault(str(row["code"]).zfill(6), []).append(row)
+        elif kind == "governance_pledge":
+            for row in rows:
+                pledge_governance[str(row["code"]).zfill(6)] = row
+        elif kind == "governance_coverage":
+            for row in rows:
+                coverage[str(row["code"]).zfill(6)] = row
 
     window = manifest.get("window") or {}
     scope = manifest.get("scope") or {}
@@ -159,4 +181,33 @@ def load_snapshot_dir(path: Path) -> tuple[dict[str, Any], list[Any], dict[str, 
         window_end=int(window["end_fy"]),
         min_years=int(window["min_years"]),
     )
+    if audit or penalties or pledge_governance or coverage:
+        enriched = []
+        for company in companies:
+            cov = coverage.get(company.code) or {}
+            pledge_row = pledge_governance.get(company.code) or {}
+            enriched.append(
+                replace(
+                    company,
+                    audit_opinions=audit.get(company.code, {}),
+                    audit_available=_truthy(cov.get("audit_available")),
+                    penalties=tuple(
+                        GovernancePenalty.from_dict(row)
+                        for row in penalties.get(company.code, [])
+                        if _truthy(row.get("counted"))
+                    ),
+                    penalty_available=_truthy(cov.get("penalty_available")),
+                    controlling_shareholder=pledge_row.get("controller") or None,
+                    controlling_pledge_ratio=(
+                        float(pledge_row["pledge_ratio"])
+                        if pledge_row.get("pledge_ratio") not in (None, "")
+                        else None
+                    ),
+                    pledge_report_date=pledge_row.get("report_date") or None,
+                    pledge_available=_truthy(cov.get("pledge_available")),
+                    pledge_note=pledge_row.get("note") or None,
+                    governance_in_scope=bool(cov),
+                )
+            )
+        companies = enriched
     return manifest, companies, stats

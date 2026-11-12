@@ -19,6 +19,7 @@ from engine.quality.metrics import (
     has_fail_reason,
     metric_value,
 )
+from engine.quality.cycle import classify_cycle
 from engine.quality.models import (
     CONDITION_FAIL,
     CONDITION_PASS,
@@ -55,6 +56,8 @@ def _format(value: float | int | None, unit: str | None) -> str:
         return f"{value:.2f} 倍"
     if unit == "years":
         return f"{value:.0f} 年"
+    if unit == "count":
+        return f"{int(value)} 件"
     return f"{value:.4f}"
 
 
@@ -77,6 +80,10 @@ def _metric_summary(metrics: Mapping[str, Any]) -> dict[str, Any]:
         "dividend_total": metrics.get("dividend_total"),
         "dividend_profit_total": metrics.get("dividend_profit_total"),
         "roe_years": metrics.get("roe_years") or [],
+        "audit_nonstandard_years": _metric_dict(metrics.get("audit_nonstandard_years")),
+        "penalty_count": _metric_dict(metrics.get("penalty_count")),
+        "pledge_ratio": _metric_dict(metrics.get("pledge_ratio")),
+        "cycle": metrics.get("cycle") or {},
     }
 
 
@@ -180,8 +187,8 @@ def _evaluate_condition(
         distance = threshold - value
     operator_text = {"<": "<", "<=": "≤", ">": ">", ">=": "≥", "==": "="}[str(condition["operator"])]
     reason = (
-        f"{_format(value, unit)} {operator_text} {_format(threshold, unit)}"
-        + ("，通过" if passed else "，未通过")
+        f"观测值 {_format(value, unit)}，要求 {operator_text} {_format(threshold, unit)}，"
+        + ("通过" if passed else "未通过")
     )
     return ConditionResult(
         condition_id=cid,
@@ -220,10 +227,19 @@ def evaluate_company(company: Company, policy: QualityPolicy) -> CompanyResult:
         )
 
     metrics = compute_metrics(company, policy)
+    metrics["cycle"] = classify_cycle(company)
     conditions = [
         _evaluate_condition(group, condition, metrics, policy)
         for group, condition in policy.iter_conditions()
     ]
+    if not company.governance_in_scope:
+        for item in conditions:
+            if (
+                item.condition_id in ("audit_opinion", "no_penalty", "pledge_ratio")
+                and item.status != CONDITION_UNTESTED
+            ):
+                item.status = CONDITION_UNTESTED
+                item.reason = "不在 252 家候选范围，本版未逐家查"
     fails = [item for item in conditions if item.status == CONDITION_FAIL]
     pendings = [item for item in conditions if item.status == CONDITION_PENDING]
     if fails:

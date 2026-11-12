@@ -308,3 +308,20 @@
 | G7 | 入池账本与官方估值记录只追加、重复跳过、篡改可检出 | `tools/run_quality_pool.py`、`tools/update_official_valuation_ledger.py`、`data/ledger/*.jsonl` | `test_pool_ledger_append_skip_conflict_and_tamper`、`test_official_valuation_ledger_hash_and_tamper`；`--check` 各 0 问题 | ✅ |
 | G8 | 个股结论、两本既有账本、指数与 ETF 结果不变；全部测试通过 | 既有模块未改口径 | 个股 7 条、候选 A 3 条 0 问题；快照/序列/回测未改；**524 passed** | ✅ |
 | G9 | DELIVERY.md 汇总、复现命令、测试结果、提交 ID | `DELIVERY.md`、`docs/phase4d-delivery.md` | 入口 §1–§9；实现提交见 DELIVERY | ✅ |
+
+---
+
+# 第四阶段第五批验收清单（好公司池补治理检验，J1–J8）
+
+对应文件：`batch4e-governance-instructions.md` 冻结验收条件。范围：252 家候选逐家查审计意见、处罚/立案/公开谴责、控股股东质押；不改阈值、不扩范围、不改个股/指数/ETF。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| J1 | 三项治理数据对 252 家的覆盖率逐项报告；来源与接口有记录 | `tools/build_governance_data.py`、`data/quality-pool/report.json`、报告 §1b | 审计 252/252、处罚 252/252、质押 227/252；表级元数据 | ✅ |
+| J2 | 取不到 → 待定、不入池；有测试证明不会默认通过 | `engine/quality/metrics.py`、`evaluator.py` | `test_audit_condition_pass_fail_pending`、`test_penalty_condition_pass_fail_pending`、`test_pledge_condition_pass_fail_pending`；18 家待定 | ✅ |
+| J3 | 每家因治理出池的公司都有可核对证据（事由、日期、文号或链接） | `tools/run_quality_pool.py::_governance_evidence`、报告 §1c | 26 条条件证据 / 24 家公司；审计类型、公告文号或链接、质押比例 | ✅ |
+| J4 | 我抽查的公司治理判定可由快照复核 | `run_quality_pool.py --show`、`governance-*.csv.gz` | 600519 逐年审计意见、处罚检索、控股股东 0% 质押 | ✅ |
+| J5 | 周期属性标记与个股政策企业族分类一致（测试） | `engine/quality/cycle.py` 复用 `classify_family` | `test_cycle_marker_matches_policy_family_classification` | ✅ |
+| J6 | 报告措辞修正到位（测试扫描旧句式） | `engine/quality/evaluator.py`、`engine/quality/report.py` | `test_condition_reason_wording_is_not_misleading`、`test_4e_report_has_governance_sections_and_no_misleading_wording` | ✅ |
+| J7 | 第四批快照、两本既有账本、个股结论、指数与 ETF 结果不变；入池账本只追加；全部测试通过 | 旧快照/`report-4d.json` 未改 | 个股 7 条、候选 A 3 条、官方估值 4 条 0 问题；池账本 2 条 0 问题；**532 passed** | ✅ |
+| J8 | DELIVERY.md 一页以内汇总，含复现命令、测试结果、提交 ID | `DELIVERY.md`、`docs/phase4e-delivery.md` | 入口 §1–§8 | ✅ |

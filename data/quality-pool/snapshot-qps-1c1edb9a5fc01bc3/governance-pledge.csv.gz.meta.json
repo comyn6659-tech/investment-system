@@ -1,0 +1,26 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "governance-pledge",
+  "file": "governance-pledge.csv.gz",
+  "rows": 252,
+  "columns": [
+    "code",
+    "controller",
+    "holdings",
+    "pledged_shares",
+    "pledge_ratio",
+    "report_date",
+    "source_id",
+    "source_url",
+    "note",
+    "fetched_at"
+  ],
+  "content_hash": "a540cbcc62355258c697ebc924dffd86b74d83f5df55afca5731c28981dfa884",
+  "size_bytes": 8374,
+  "kind": "governance_pledge",
+  "source_id": "mixed",
+  "publisher": "东方财富 / 国网 F10 / 定期报告 PDF",
+  "interface": "公司整体质押表 + 最新定期报告前十名股东表",
+  "url": "https://data.eastmoney.com/gpzy/",
+  "definition_note": "控股股东质押股数 ÷ 其持股数；无控股股东且公司整体质押 >0 记不可得。"
+}

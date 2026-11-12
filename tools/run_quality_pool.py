@@ -26,11 +26,12 @@ from engine.quality.report import build_report, render_markdown  # noqa: E402
 from engine.quality.snapshot import load_snapshot_dir  # noqa: E402
 
 TZ = ZoneInfo("Asia/Singapore")
-POLICY_PATH = ROOT / "data" / "policies" / "quality-pool-v1-draft.json"
+POLICY_PATH = ROOT / "data" / "policies" / "quality-pool-v1.1-draft.json"
 POOL_DIR = ROOT / "data" / "quality-pool"
+BASELINE_REPORT = POOL_DIR / "report-4d.json"
 MANIFEST_PATH = POOL_DIR / "manifest.json"
 REPORT_JSON = POOL_DIR / "report.json"
-REPORT_MD = ROOT / "docs" / "phase4d-quality-pool-report.md"
+REPORT_MD = ROOT / "docs" / "phase4e-quality-pool-report.md"
 LEDGER = ROOT / "data" / "ledger" / "quality-pool.jsonl"
 
 
@@ -119,6 +120,87 @@ def check_ledger() -> int:
     return 0
 
 
+def _governance_evidence(company, condition_id: str) -> str:
+    if condition_id == "audit_opinion":
+        bad = [
+            f"{year} {opinion}"
+            for year, opinion in sorted(company.audit_opinions.items())
+            if opinion != "标准无保留意见"
+        ]
+        return "；".join(bad) or "审计意见缺失"
+    if condition_id == "no_penalty":
+        items = [item for item in company.penalties if item.counted]
+        return "；".join(
+            f"{item.date} {item.title}"
+            + (f"（{item.doc_no}）" if item.doc_no else (f"（{item.url}）" if item.url else ""))
+            for item in items
+        ) or "处罚数据缺失"
+    if condition_id == "pledge_ratio":
+        ratio = company.controlling_pledge_ratio
+        if ratio is not None:
+            return f"{ratio:.2%}（{company.pledge_report_date or '最新定期报告'}）"
+        note = company.pledge_note or "质押数据缺失"
+        labels = {
+            "no_periodic_pledge_table": "最新定期报告股东表未取得（PDF 接口或解析失败）",
+            "no_controller_with_company_pledge": "无控股股东，且公司整体质押 >0，控股股东口径不适用",
+            "pledge_unknown": "质押状态未知",
+            "no_controller": "无控股股东",
+        }
+        return labels.get(note, note)
+    return ""
+
+
+def _governance_summary(report: dict, run, companies) -> None:
+    candidates = set()
+    baseline_pool = set()
+    if BASELINE_REPORT.exists():
+        baseline = json.loads(BASELINE_REPORT.read_text(encoding="utf-8"))
+        baseline_pool = {item["code"] for item in baseline.get("in_pool") or []}
+        candidates = baseline_pool | {item["code"] for item in baseline.get("near_misses") or []}
+    by_code = {company.code: company for company in companies}
+    if not candidates:
+        candidates = set(by_code)
+    total = len(candidates)
+    report["governance_coverage"] = {
+        key: {
+            "total": total,
+            "available": sum(1 for code in candidates if getattr(by_code.get(code), flag, False)),
+            "ratio": (
+                sum(1 for code in candidates if getattr(by_code.get(code), flag, False)) / total
+                if total
+                else 0.0
+            ),
+            "note": note,
+        }
+        for key, flag, note in (
+            ("audit", "audit_available", "东方财富 F10 个股资产负债表 OPINION_TYPE"),
+            ("penalty", "penalty_available", "东方财富公告检索：立案/行政处罚/公开谴责/纪律处分"),
+            ("pledge", "pledge_available", "公司整体质押为 0 直接记 0；否则最新定期报告前十名股东表"),
+        )
+    }
+    results = {item.code: item for item in run.results}
+    removed = []
+    for code in sorted(baseline_pool):
+        result = results.get(code)
+        if result is None or result.status == "in_pool":
+            continue
+        company = by_code.get(code)
+        for condition in result.conditions:
+            if condition.condition_id not in ("audit_opinion", "no_penalty", "pledge_ratio"):
+                continue
+            if condition.status not in ("fail", "pending"):
+                continue
+            removed.append(
+                {
+                    "code": code,
+                    "name": result.name,
+                    "condition": condition.label,
+                    "evidence": _governance_evidence(company, condition.condition_id),
+                }
+            )
+    report["governance_removed"] = removed
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--snapshot", help="快照 JSON；默认取 manifest.current")
@@ -167,6 +249,23 @@ def main() -> int:
                 f"{item.capex or 0:>14,.0f}  {company.dividends.get(year, 0) or 0:>12,.0f}"
             )
         print()
+        print("治理数据：")
+        print("- 审计意见：" + "；".join(
+            f"{year} {company.audit_opinions.get(year) or '缺失'}"
+            for year in sorted(company.audit_opinions)
+        ))
+        print("- 处罚/立案：" + ("；".join(
+            f"{item.date} {item.event_type} {item.title}"
+            for item in company.penalties
+        ) or "无（公告检索完成）"))
+        print(
+            "- 控股股东：" + (company.controlling_shareholder or "无")
+            + "；质押比例：" + (
+                f"{company.controlling_pledge_ratio:.2%}（{company.pledge_report_date or '—'}）"
+                if company.controlling_pledge_ratio is not None else "不可得"
+            )
+        )
+        print()
         for condition in result.conditions:
             print(f"- {condition.label}：{condition.status}｜{condition.reason or ''}")
         return 0
@@ -174,6 +273,7 @@ def main() -> int:
         companies, policy, as_of=snapshot["as_of"], snapshot_id=snapshot["snapshot_id"]
     )
     report = build_report(run, policy, snapshot)
+    _governance_summary(report, run, companies)
     REPORT_JSON.parent.mkdir(parents=True, exist_ok=True)
     REPORT_JSON.write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

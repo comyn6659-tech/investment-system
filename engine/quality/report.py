@@ -45,6 +45,8 @@ def _fmt(value: Any, unit: str | None = None) -> str:
         return f"{float(value):.2f}"
     if unit == "years":
         return f"{float(value):.0f}"
+    if unit == "count":
+        return f"{int(value)}"
     return f"{float(value):.4f}"
 
 
@@ -75,6 +77,11 @@ def _scorecard(item: Any) -> dict[str, Any]:
         "loss_years": _metric(metrics, "loss_years"),
         "net_debt_to_ebitda": _metric(metrics, "net_debt_to_ebitda"),
         "dividend_payout": _metric(metrics, "dividend_payout"),
+        "audit_nonstandard_years": _metric(metrics, "audit_nonstandard_years"),
+        "penalty_count": _metric(metrics, "penalty_count"),
+        "pledge_ratio": _metric(metrics, "pledge_ratio"),
+        "cycle_label": (metrics.get("cycle") or {}).get("label"),
+        "is_cyclical": (metrics.get("cycle") or {}).get("is_cyclical"),
         "failing_conditions": [cond.condition_id for cond in item.failing],
         "pending_conditions": [cond.condition_id for cond in item.pending],
         "untested_count": len(item.untested),
@@ -159,7 +166,7 @@ def render_markdown(report: Mapping[str, Any], run: PoolRun, policy: QualityPoli
     meta = report["meta"]
     counts = report["counts"]
     lines: list[str] = []
-    lines.append("# 好公司池 v1 草案试运行报告")
+    lines.append(f"# {policy.label} 试运行报告")
     lines.append("")
     lines.append(
         f"> **规则状态：{policy.status}（approved={str(policy.approved).lower()}）**。"
@@ -205,11 +212,42 @@ def render_markdown(report: Mapping[str, Any], run: PoolRun, policy: QualityPoli
     else:
         lines.append("无。")
     lines.append("")
-    lines.append(
-        "未检验不等于通过：这些条件在本版没有全市场可重放的数据，池子照常发布，"
-        "但报告首页和每只入池公司的成绩单都保留该标记。"
-    )
+    if report["untested_conditions"]:
+        lines.append(
+            "未检验不等于通过：这些条件在本版没有全市场可重放的数据，池子照常发布，"
+            "但报告首页和每只入池公司的成绩单都保留该标记。"
+        )
     lines.append("")
+
+    coverage = report.get("governance_coverage") or {}
+    if coverage:
+        lines.append("## 1b. 治理三项覆盖率（252 家候选）")
+        lines.append("")
+        lines.append("| 项目 | 取得 | 覆盖率 | 说明 |")
+        lines.append("|---|---:|---:|---|")
+        for key, label in (
+            ("audit", "审计意见（2021–2025 年报）"),
+            ("penalty", "处罚/立案/公开谴责公告检索"),
+            ("pledge", "控股股东质押比例"),
+        ):
+            item = coverage.get(key) or {}
+            lines.append(
+                f"| {label} | {item.get('available', 0)} / {item.get('total', 0)} | "
+                f"{item.get('ratio', 0):.1%} | {item.get('note', '')} |"
+            )
+        lines.append("")
+
+    removed = report.get("governance_removed") or []
+    if removed:
+        lines.append("## 1c. 因治理条件出池的公司")
+        lines.append("")
+        lines.append("| 代码 | 名称 | 条件 | 证据 |")
+        lines.append("|---|---|---|---|")
+        for row in removed:
+            lines.append(
+                f"| {row['code']} | {row['name']} | {row['condition']} | {row['evidence']} |"
+            )
+        lines.append("")
 
     lines.append("## 2. 入池名单")
     lines.append("")
@@ -217,16 +255,17 @@ def render_markdown(report: Mapping[str, Any], run: PoolRun, policy: QualityPoli
         lines.append("本版没有公司通过全部已检验条件。")
     else:
         lines.append(
-            "| 代码 | 名称 | 行业 | 板块 | 窗口 | ROE均值 | ROE≥10%占比 | 近3年ROE | 现金转换 | 5年FCF(元) | 亏损年 | 净负债/EBITDA | 分红率 |"
+            "| 代码 | 名称 | 行业 | 板块 | 周期 | 窗口 | ROE均值 | ROE≥10%占比 | 近3年ROE | 现金转换 | 5年FCF(元) | 亏损年 | 净负债/EBITDA | 分红率 | 审计非标年 | 处罚件数 | 控股质押 |"
         )
-        lines.append("|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
+        lines.append("|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
         for row in report["in_pool"]:
             lines.append(
-                "| {code} | {name} | {industry} | {board} | {window} | {roe} | {share} | {recent} | {cash} | {fcf} | {loss} | {debt} | {div} |".format(
+                "| {code} | {name} | {industry} | {board} | {cycle} | {window} | {roe} | {share} | {recent} | {cash} | {fcf} | {loss} | {debt} | {div} | {audit} | {penalty} | {pledge} |".format(
                     code=row["code"],
                     name=row["name"],
                     industry=row["industry"] or "—",
                     board=row["board"],
+                    cycle=row.get("cycle_label") or "—",
                     window=row["window_years"],
                     roe=_fmt(row["roe_average"], "ratio"),
                     share=_fmt(row["roe_above_share"], "ratio"),
@@ -236,6 +275,9 @@ def render_markdown(report: Mapping[str, Any], run: PoolRun, policy: QualityPoli
                     loss=_fmt(row["loss_years"], "years"),
                     debt=_fmt(row["net_debt_to_ebitda"], "multiple"),
                     div=_fmt(row["dividend_payout"], "ratio"),
+                    audit=_fmt(row.get("audit_nonstandard_years"), "years"),
+                    penalty=_fmt(row.get("penalty_count"), "count") if row.get("penalty_count") is not None else "—",
+                    pledge=_fmt(row.get("pledge_ratio"), "ratio"),
                 )
             )
     lines.append("")
@@ -297,8 +339,8 @@ def render_markdown(report: Mapping[str, Any], run: PoolRun, policy: QualityPoli
     lines.append("")
     lines.append("条件列顺序：ROE均值、ROE≥10%占比、近3年ROE、现金转换、5年FCF、亏损年、净负债/EBITDA、审计意见、处罚、质押、分红。✓通过 ✗不通过 ?待定 —未检验/范围外。")
     lines.append("")
-    lines.append("| 代码 | 名称 | 行业 | 状态 | 条件 | 说明 |")
-    lines.append("|---|---|---|---|---|---|")
+    lines.append("| 代码 | 名称 | 行业 | 周期 | 状态 | 条件 | 说明 |")
+    lines.append("|---|---|---|---|---|---|---|")
     for row in report["test_set"]:
         if row.get("status") == "missing_from_snapshot":
             lines.append(f"| {row['code']} | — | — | 快照缺失 | — | — |")
@@ -307,7 +349,7 @@ def render_markdown(report: Mapping[str, Any], run: PoolRun, policy: QualityPoli
         if len(reason) > 90:
             reason = reason[:88] + "…"
         lines.append(
-            f"| {row['code']} | {row['name']} | {row['industry'] or '—'} | {STATUS_LABELS.get(row['status'], row['status'])} | {_condition_cell(row)} | {reason} |"
+            f"| {row['code']} | {row['name']} | {row['industry'] or '—'} | {(row.get('metrics') or {}).get('cycle', {}).get('label') or '—'} | {STATUS_LABELS.get(row['status'], row['status'])} | {_condition_cell(row)} | {reason} |"
         )
     lines.append("")
 

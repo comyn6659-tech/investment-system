@@ -1,0 +1,27 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "governance-penalty",
+  "file": "governance-penalty.csv.gz",
+  "rows": 32,
+  "columns": [
+    "code",
+    "event_date",
+    "event_type",
+    "title",
+    "reason",
+    "doc_no",
+    "url",
+    "info_disclosure",
+    "counted",
+    "source_id",
+    "fetched_at"
+  ],
+  "content_hash": "f40443da56ceaf99b43a2b850987159287d2d337da152cbd26d946649ad4827f",
+  "size_bytes": 3042,
+  "kind": "governance_penalty",
+  "source_id": "eastmoney.announcement",
+  "publisher": "东方财富",
+  "interface": "公告检索（立案/行政处罚/公开谴责/纪律处分）",
+  "url": "https://np-anotice-stock.eastmoney.com/api/security/ann",
+  "definition_note": "2021-11-12 至 2026-11-12；counted 为规则实际计件。"
+}

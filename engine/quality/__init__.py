@@ -18,6 +18,7 @@ from engine.quality.models import (
     CompanyResult,
     ConditionResult,
     FinancialYear,
+    GovernancePenalty,
     PoolRun,
 )
 from engine.quality.policy import (
@@ -47,6 +48,7 @@ __all__ = [
     "CompanyResult",
     "ConditionResult",
     "FinancialYear",
+    "GovernancePenalty",
     "POLICY_ID",
     "POLICY_SCHEMA_VERSION",
     "PolicyError",

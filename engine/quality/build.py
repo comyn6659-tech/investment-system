@@ -119,6 +119,7 @@ def _financial_year(
     return FinancialYear(
         fiscal_year=year,
         parent_netprofit=_float(income.get("PARENT_NETPROFIT")) if income else None,
+        revenue=_float(income.get("TOTAL_OPERATE_INCOME")) if income else None,
         parent_equity=_equity(balance),
         operating_cashflow=_float(cashflow.get("NETCASH_OPERATE")) if cashflow else None,
         capex=_float(cashflow.get("CONSTRUCT_LONG_ASSET")) if cashflow else None,

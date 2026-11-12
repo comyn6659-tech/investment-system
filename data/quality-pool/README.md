@@ -1,7 +1,15 @@
 # 好公司池固定快照
 
-本目录只保存**固定快照**与清单；原始下载缓存位于 `data/cache/quality-pool/`，
+本目录保存**固定快照**与清单；第四批快照（`snapshot-qps-e6fd0031c30f1e01`）保留不改，
+第五批新增治理表后生成新快照。原始下载缓存位于 `data/cache/quality-pool/`，
 已被 `.gitignore` 排除，不提交 git。
+
+## 当前快照
+
+| snapshot_id | 内容 | 状态 |
+|---|---|---|
+| `qps-e6fd0031c30f1e01` | 第四批：财务/分红/名单/公司整体质押，44 张表 | 保留不改，v1 政策复核 |
+| `qps-1c1edb9a5fc01bc3` | 第五批：在第四批 44 张表上增加 4 张治理表，48 张表 | 当前快照，v1.1 政策使用 |
 
 ## 目录结构
 
@@ -13,6 +21,10 @@ data/quality-pool/
 │   ├── universe.csv.gz               # 沪深 A 股名单、上市日期、板块、简称
 │   ├── industry.csv.gz               # 最新年报行业（识别金融业）
 │   ├── pledge.csv.gz                 # 公司整体质押比例（旁证，不参与规则）
+│   ├── governance-audit.csv.gz       # 252 家候选：2021–2025 审计意见
+│   ├── governance-penalty.csv.gz     # 252 家候选：处罚/立案/公开谴责公告
+│   ├── governance-pledge.csv.gz      # 252 家候选：控股股东质押
+│   ├── governance-coverage.csv.gz    # 252 家候选治理三项可得性
 │   ├── balance-2015.csv.gz …         # 资产负债表，按报告期
 │   ├── income-2016.csv.gz …          # 利润表，按报告期
 │   ├── cashflow-2016.csv.gz …        # 现金流量表，按报告期

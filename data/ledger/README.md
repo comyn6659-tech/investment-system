@@ -98,6 +98,9 @@
 
 命令：`.venv/bin/python tools/run_quality_pool.py --check`。
 
+2026-11-12 第四批首次写入 1 条（`quality-pool-v1-draft`，入池 144）；
+第五批追加 1 条（`quality-pool-v1.1-draft`，入池 120），旧记录不变。
+
 ---
 
 # 官方指数当日估值账本（只追加，不参与计算）

@@ -21,6 +21,9 @@ NEGATIVE_PROFIT_SUM = "negative_profit_sum"
 EBITDA_MISSING = "ebitda_missing"
 EBITDA_NONPOSITIVE = "ebitda_nonpositive"
 NET_DEBT_MISSING = "net_debt_missing"
+AUDIT_MISSING = "missing_audit_opinion"
+PENALTY_MISSING = "missing_penalty_data"
+PLEDGE_MISSING = "missing_pledge_data"
 
 # 这些原因属于公司事实/口径不适用，条件应记为「不通过」，而不是「待定」。
 FAIL_REASONS = frozenset(
@@ -217,6 +220,49 @@ def compute_metrics(company: Company, policy: QualityPolicy) -> dict[str, Any]:
     else:
         dividend_payout = MetricValue(dividend_total / dividend_np, note="现金分红合计 ÷ 归母净利润合计")
 
+    audit_n = int(policy.value("audit_lookback_years"))
+    audit_years = years[-audit_n:]
+    audit_missing = [
+        year
+        for year in audit_years
+        if company.audit_opinions.get(year) in (None, "")
+    ]
+    if not company.audit_available or audit_missing:
+        audit_metric = MetricValue(
+            None,
+            (AUDIT_MISSING,),
+            f"缺审计意见年份：{audit_missing}" if audit_missing else "审计意见数据不可得",
+        )
+    else:
+        nonstandard = [
+            year
+            for year in audit_years
+            if str(company.audit_opinions.get(year)) != "标准无保留意见"
+        ]
+        audit_metric = MetricValue(
+            len(nonstandard),
+            note="非标准年份：" + ("、".join(str(y) for y in nonstandard) if nonstandard else "无"),
+        )
+
+    if not company.penalty_available:
+        penalty_metric = MetricValue(None, (PENALTY_MISSING,), "处罚/立案公告检索未完成")
+    else:
+        counted = [item for item in company.penalties if item.counted]
+        penalty_metric = MetricValue(
+            len(counted),
+            note="；".join(item.title for item in counted[:3]) if counted else "无",
+        )
+
+    if not company.pledge_available:
+        pledge_metric = MetricValue(None, (PLEDGE_MISSING,), company.pledge_note or "控股股东质押数据不可得")
+    elif company.controlling_pledge_ratio is None:
+        pledge_metric = MetricValue(None, (PLEDGE_MISSING,), company.pledge_note or "控股股东质押比例缺失")
+    else:
+        pledge_metric = MetricValue(
+            company.controlling_pledge_ratio,
+            note=company.pledge_report_date or "最新定期报告",
+        )
+
     return {
         "roe_years": roe_rows,
         "roe_average": roe_average,
@@ -227,7 +273,9 @@ def compute_metrics(company: Company, policy: QualityPolicy) -> dict[str, Any]:
         "loss_years": loss_years,
         "net_debt_to_ebitda": net_debt_ratio,
         "dividend_payout": dividend_payout,
-        "pledge_ratio": MetricValue(None, ("untested",), "控股股东质押比例本版未检验"),
+        "audit_nonstandard_years": audit_metric,
+        "penalty_count": penalty_metric,
+        "pledge_ratio": pledge_metric,
         "dividend_total": dividend_total if dividend_available else None,
         "dividend_profit_total": dividend_np if dividend_available else None,
         "cash_flow_total": cash_ocf if cash_available else None,

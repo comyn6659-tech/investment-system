@@ -20,6 +20,7 @@ from typing import Any, Iterator, Mapping
 POLICY_SCHEMA_VERSION = "quality-pool-policy/1.0"
 SUPPORTED_SCHEMA_VERSIONS = ("quality-pool-policy/1.0",)
 POLICY_ID = "quality-pool-v1-draft"
+SUPPORTED_POLICY_IDS = ("quality-pool-v1-draft", "quality-pool-v1.1-draft")
 POLICY_STATUS_DRAFT = "draft_unapproved"
 SUPPORTED_OPERATORS = (">=", ">", "<=", "<", "==")
 
@@ -33,6 +34,8 @@ _VALUE_LABELS = {
     "net_debt_to_ebitda": "净有息负债 / EBITDA",
     "dividend_payout": "最近 5 年现金分红率",
     "pledge_ratio": "控股股东最新质押比例",
+    "audit_nonstandard_years": "最近 5 年非标准审计意见年数",
+    "penalty_count": "最近 5 年信息披露类处罚/立案/公开谴责件数",
 }
 
 
@@ -140,7 +143,7 @@ def _require(condition: bool, message: str) -> None:
 
 def validate_policy(raw: Mapping[str, Any]) -> None:
     _require(raw.get("schema_version") in SUPPORTED_SCHEMA_VERSIONS, "政策 schema_version 不受支持")
-    _require(raw.get("policy_id") == POLICY_ID, f"政策 policy_id 必须是 {POLICY_ID}")
+    _require(raw.get("policy_id") in SUPPORTED_POLICY_IDS, f"政策 policy_id 必须是 {SUPPORTED_POLICY_IDS} 之一")
     _require(raw.get("status") == POLICY_STATUS_DRAFT, "好公司池政策本版只能是 draft_unapproved")
     _require(raw.get("approved") is False, "草案不得自我批准（approved 必须为 false）")
     _require(isinstance(raw.get("parameters"), dict) and raw["parameters"], "政策缺少 parameters")
@@ -170,7 +173,7 @@ def validate_policy(raw: Mapping[str, Any]) -> None:
         _require(parameter in raw["parameters"], f"条件 {cid} 引用了不存在的参数 {parameter}")
         _require("value" in raw["parameters"][parameter], f"参数 {parameter} 没有 value")
         _require(condition.get("distance") in ("value_minus_threshold", "threshold_minus_value"), f"条件 {cid} 的 distance 不受支持")
-    _require(any(c.get("evaluation") == "untested" for c in (c for _, c in ((g, c) for g in raw["groups"] for c in (g.get("conditions") or [])))), "政策至少保留一个未检验条件")
+    # v1.1 起治理条件已补数据，不再强制保留未检验条件。
 
 
 def load_policy(path: Path) -> QualityPolicy:

@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import replace
 from pathlib import Path
 
@@ -45,6 +46,7 @@ def _year(
     year: int,
     *,
     netprofit: float = 15.0,
+    revenue: float = 100.0,
     equity: float = 100.0,
     ocf: float = 15.0,
     capex: float = 0.0,
@@ -58,6 +60,7 @@ def _year(
     return FinancialYear(
         fiscal_year=year,
         parent_netprofit=netprofit,
+        revenue=revenue,
         parent_equity=equity,
         operating_cashflow=ocf,
         capex=capex,
@@ -483,3 +486,183 @@ def test_build_companies_scope_and_coverage():
     assert by_code["600001"].is_st is True
     assert by_code["600002"].financial_excluded is True
     assert by_code["600003"].expected_years == tuple(range(2020, 2026))
+
+
+V11_POLICY = ROOT / "data" / "policies" / "quality-pool-v1.1-draft.json"
+
+
+@pytest.fixture(scope="module")
+def policy_v11():
+    return load_policy(V11_POLICY)
+
+
+def _governance_company(**overrides) -> Company:
+    base = _company()
+    defaults = dict(
+        audit_opinions={year: "标准无保留意见" for year in range(2021, 2026)},
+        audit_available=True,
+        penalties=(),
+        penalty_available=True,
+        controlling_shareholder="测试控股股东",
+        controlling_pledge_ratio=0.0,
+        pledge_report_date="2026-09-30",
+        pledge_available=True,
+        governance_in_scope=True,
+    )
+    defaults.update(overrides)
+    return Company(**{**_company_dict(base), **defaults})
+
+
+def _company_dict(company: Company) -> dict:
+    return {
+        "code": company.code,
+        "name": company.name,
+        "exchange": company.exchange,
+        "board": company.board,
+        "industry": company.industry,
+        "listing_date": company.listing_date,
+        "is_st": company.is_st,
+        "financial_excluded": company.financial_excluded,
+        "financial_exclusion_reason": company.financial_exclusion_reason,
+        "expected_years": company.expected_years,
+        "years": company.years,
+        "dividends": company.dividends,
+        "pledge_company_ratio": company.pledge_company_ratio,
+    }
+
+
+def test_v11_policy_has_no_untested_conditions(policy_v11):
+    assert policy_v11.policy_id == "quality-pool-v1.1-draft"
+    assert policy_v11.approved is False
+    assert policy_v11.untested_conditions() == []
+    assert len(policy_v11.conditions()) == 11
+
+
+def test_audit_condition_pass_fail_pending(policy_v11):
+    passed = evaluate_company(_governance_company(), policy_v11)
+    assert _condition(passed, "audit_opinion").status == CONDITION_PASS
+
+    opinions = {year: "标准无保留意见" for year in range(2021, 2026)}
+    opinions[2024] = "保留意见"
+    failed = evaluate_company(_governance_company(audit_opinions=opinions), policy_v11)
+    assert _condition(failed, "audit_opinion").status == CONDITION_FAIL
+    assert _condition(failed, "audit_opinion").value == 1
+
+    opinions.pop(2021)
+    pending = evaluate_company(_governance_company(audit_opinions=opinions), policy_v11)
+    assert _condition(pending, "audit_opinion").status == CONDITION_PENDING
+    assert pending.status != STATUS_IN_POOL
+
+
+def test_penalty_condition_pass_fail_pending(policy_v11):
+    from engine.quality.models import GovernancePenalty
+
+    passed = evaluate_company(_governance_company(), policy_v11)
+    assert _condition(passed, "no_penalty").status == CONDITION_PASS
+
+    event = GovernancePenalty(
+        date="2024-05-01",
+        event_type="行政处罚",
+        title="关于收到行政处罚决定书的公告",
+        reason="年度报告存在虚假记载",
+        doc_no="〔2024〕12号",
+        url="https://example.org/1",
+        info_disclosure=True,
+        counted=True,
+    )
+    failed = evaluate_company(_governance_company(penalties=(event,)), policy_v11)
+    assert _condition(failed, "no_penalty").status == CONDITION_FAIL
+    assert _condition(failed, "no_penalty").value == 1
+
+    pending = evaluate_company(_governance_company(penalty_available=False), policy_v11)
+    assert _condition(pending, "no_penalty").status == CONDITION_PENDING
+    assert pending.status != STATUS_IN_POOL
+
+
+def test_pledge_condition_pass_fail_pending(policy_v11):
+    passed = evaluate_company(_governance_company(controlling_pledge_ratio=0.5), policy_v11)
+    assert _condition(passed, "pledge_ratio").status == CONDITION_PASS
+
+    failed = evaluate_company(_governance_company(controlling_pledge_ratio=0.5001), policy_v11)
+    assert _condition(failed, "pledge_ratio").status == CONDITION_FAIL
+
+    pending = evaluate_company(_governance_company(pledge_available=False), policy_v11)
+    assert _condition(pending, "pledge_ratio").status == CONDITION_PENDING
+    assert pending.status != STATUS_IN_POOL
+
+
+def test_cycle_marker_matches_policy_family_classification(policy_v11):
+    from engine.evidence.applicability import classify_family
+    from engine.evidence.models import AnnualPoint, BusinessEvidence
+    from engine.quality.cycle import classify_cycle
+
+    companies = [
+        _governance_company(industry="煤炭", years={
+            **{
+                2016: _year(2016, netprofit=20.0, revenue=100.0),
+                2017: _year(2017, netprofit=20.0, revenue=140.0),
+                2018: _year(2018, netprofit=20.0, revenue=90.0),
+                2019: _year(2019, netprofit=20.0, revenue=150.0),
+                2020: _year(2020, netprofit=20.0, revenue=80.0),
+                2021: _year(2021, netprofit=20.0, revenue=160.0),
+                2022: _year(2022, netprofit=20.0, revenue=100.0),
+                2023: _year(2023, netprofit=20.0, revenue=180.0),
+                2024: _year(2024, netprofit=20.0, revenue=110.0),
+                2025: _year(2025, netprofit=20.0, revenue=200.0),
+            },
+        }),
+    ]
+    for company in companies:
+        marker = classify_cycle(company)
+        evidence = BusinessEvidence(
+            instrument_id="EQUITY:600000.SH",
+            display_name=company.name,
+            as_of="2026-11-12",
+            version="test",
+            prepared_at="2026-11-12T00:00:00+08:00",
+            industry_clue=company.industry,
+            segments=(),
+            regional_segments=(),
+            annual=tuple(
+                AnnualPoint(year, item.revenue, item.parent_netprofit)
+                for year, item in sorted(company.years.items())
+                if year >= 2016
+            ),
+        )
+        family, _ = classify_family(evidence)
+        assert marker["family"] == family
+
+
+def test_condition_reason_wording_is_not_misleading(policy_v11):
+    years = {year: _year(year, netprofit=14.99) for year in range(2015, 2026)}
+    result = evaluate_company(_governance_company(years=years), policy_v11)
+    reason = _condition(result, "roe_average").reason or ""
+    assert reason.startswith("观测值 ")
+    assert "，要求 " in reason
+    assert not re.search(r"\d% ≥ [\d.]+%，未通过", reason)
+
+
+REPORT_4E = ROOT / "docs" / "phase4e-quality-pool-report.md"
+REPORT_JSON_4E = ROOT / "data" / "quality-pool" / "report.json"
+
+
+def test_4e_report_has_governance_sections_and_no_misleading_wording():
+    if not REPORT_4E.exists():
+        pytest.skip("4e 报告尚未生成")
+    text = REPORT_4E.read_text(encoding="utf-8")
+    assert "治理三项覆盖率" in text
+    assert "因治理条件出池" in text
+    assert "周期" in text
+    assert not re.search(r"\d% ≥ [\d.]+%，未通过", text)
+    assert "观测值 " in text and "，要求 " in text
+
+
+def test_4e_removed_companies_have_evidence():
+    if not REPORT_JSON_4E.exists():
+        pytest.skip("4e 报告尚未生成")
+    report = json.loads(REPORT_JSON_4E.read_text(encoding="utf-8"))
+    assert report["governance_coverage"]["audit"]["ratio"] == 1.0
+    assert report["governance_coverage"]["penalty"]["ratio"] == 1.0
+    for row in report.get("governance_removed") or []:
+        assert row["evidence"].strip()
+        assert row["condition"]
