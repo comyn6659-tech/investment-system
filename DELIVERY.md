@@ -5,75 +5,84 @@
 | 项目 | 内容 |
 |---|---|
 | 项目 | `/Users/comyn/Documents/deepseek-harness/投资/investment-system/` |
-| 本轮阶段 | 第四阶段第七批：**稳定收息型标准 + 所有制标记** |
-| 政策版本 | 个股 `equity-policy-v1.1`、好公司池 `quality-pool-v1.2-draft` 均未改；新增 `income-pool-v1-draft`（未批准） |
-| 本轮实现提交 | `83519b5` |
-| 上一轮 | `35c174a`（第四阶段第六批入口，实现 `c0ad6cb`） |
+| 本轮阶段 | 第四阶段第八批：**银行标准 + 银行估值预演** |
+| 政策版本 | 个股 `equity-policy-v1.1`、好公司池、收息池均未改；新增 `bank-pool-v1-draft`（未批准） |
+| 本轮实现提交 | `520800e` |
+| 上一轮 | `85fd2ce`（第四阶段第七批入口，实现 `83519b5`） |
 
 ## 1. 结果
 
 | 项 | 数值 |
 |---|---:|
-| 稳定收息型入池 | **142** |
-| 未入池 / 待定 / 范围外 | 3,110 / 0 / 1,973 |
-| 只差一条 | 244 |
-| 收息型财务候选（财务全过 + 只差一条） | 402 |
-| 与好公司池同时入池 | 59 |
-| 好公司池（未改） | 138 |
-| 新快照 | **`qps-d8fb7e3718675b93`**（69 张表、10.27 MB） |
-| 测试 | **563 passed** |
+| A 股上市银行 | 42 |
+| 评价范围（非 ST、完整年报 ≥ 7 年） | 36 |
+| 银行池入池 | **11** |
+| 未入池 / 待定 | 25 / 0 |
+| 只差一条 | 13 |
+| 范围外 | 5,189（非银行 4,990、ST 193、年报不足 7 年 6） |
+| 新快照 | **`qps-dc9c12160476db8b`**（71 张表、10.31 MB） |
+| 银行账本 | 1 条（`bph-13b62d2bcfb016c0`） |
+| 测试 | **579 passed** |
 
-## 2. 稳定收息型规则（`income-pool-v1-draft`，未批准）
+## 2. 银行规则（`bank-pool-v1-draft`，未批准）
 
-四组 11 条：利润稳（亏损年 0、ROE 平均 ≥ 8%、最低一年 ROE ≥ 5%、同比下滑 >30% 年数 ≤ 1）；
-分红稳（每个财年有现金分红、最近 5 年分红率 ≥ 40%）；分红有现金撑着（最近 5 年 FCF ÷ 分红 ≥ 1.0、
-最新财年净有息负债 / EBITDA < 4）；做好人三条与好公司池 v1.2 完全一致（测试比对）。
-敏感性报告 ROE 6/8/10%、分红率 30/40/50%、负债上限 3/4/5 倍，只报告不选用。
+五组 12 条：会赚钱（亏损年 0、ROE 平均 ≥ 10%、近 3 年 ROE ≥ 9%）；资产干净（不良率 ≤ 1.5%、
+5 年变化 ≤ +0.3 个百分点、拨备覆盖率 ≥ 200%）；资本厚（核心一级 ≥ 9.0%）；分红（每个财年
+有现金分红、近 5 年分红率 ≥ 25%）；做好人三条与好公司池 v1.2 完全一致（测试）。
+敏感性：不良率 1.3/1.5/1.8%、拨备 150/200/250%、核心一级 8.5/9.0/10.0%，只报告不选用。
 
-## 3. 数据、治理与所有制
+## 3. 数据、入池与所有制
 
-分红补到 2016–2020：20 个报告期（2016–2025），2016–2020 共 13,610 行；各年评价范围内公司有分红记录
-78.0%/81.4%/75.6%/73.9%/73.5%，无记录按 0；空派现 213 行为送转；表未覆盖财年才记待定。
-治理对 402 家候选 **审计 402/402、处罚 402/402、质押 402/402**，复用缓存、口径同 v1.2；6 家质押解析
-失败已逐家补足（孚日股份改用质押明细，控股股东质押 52.12% 未通过）。
-所有制：两池 + 30 只测试集共 **439** 家，标记覆盖率 **100%**，依据实际控制人性质；无实际控制人时用
-第一大股东；边界与人工复核见 `data/policy-inputs/ownership-review-v1.json`。分布：好公司池 央企 10 /
-地方国企 22 / 民企 93 / 外资 6 / 其他 7；收息池 央企 18 / 地方国企 38 / 民企 76 / 外资 3 / 其他 7。
-只标记，不影响判定（测试）。
+银行专项指标：东方财富 F10 `RPT_F10_FINANCE_MAINFINADATA`，42 家银行 2016 年起季度与年报
+**1,773 行**；36 家评价银行的 ROE、不良率、不良率 5 年变化、拨备、核心一级、分红、审计、
+处罚、质押均 **36/36（100%）**。审计改用银行报表 `companyType=3`；三季报多套股东表写法
+已适配，兴业/上海/民生质押补足；苏农银行控股股东质押 **69.72%** 未通过。
+入池 11 家：张家港行、苏州银行、招商银行、南京银行、兴业银行、农业银行、交通银行、
+工商银行、邮储银行、建设银行、中信银行；只差一条 13 家见报告 §3。
+所有制：42 家全部标记（央企 9 / 地方国企 29 / 民企 4）；银行池 7 / 3 / 1；只标记，不影响判定（测试）。
 
-## 4. 快照与账本
+## 4. 银行估值预演（N4）
 
-- 新快照 `qps-d8fb7e3718675b93`：财务 44 + 分红 20 + 治理 4 + 所有制 1 = 69 张表；逐表哈希校验。
-- 好公司池快照 `qps-3ebbd24be612bf7e`、`report.json`、`report-4e.json`、池账本 3 条均未改。
-- 新账本 `data/ledger/income-pool.jsonl` 追加 1 条（`income-pool-v1-draft`，142 家，
-  `pool_hash=iph-3a3ca849f50a9f58`），`--check` 1 条 0 问题；其他账本 7/3/4 条 0 问题。
+按个股政策 v1.1 `grades.banks`（三项证据 + 银行检查，最高 B 级）对 36 家银行逐家预演：
+**B 级 31 家、C 级 5 家、资料不足 0 家**。C 级 5 家（郑州、华夏、民生、光大、浙商）资本或
+拨备低于预演适用下限，模型拒绝给估值数字；其余列出路线、状态、等级、悲观/基准/乐观三档价值、
+未满足条件与预演结论。预演假设未获批准，**不写入正式结论账本，CLI 对 600036 仍为
+`insufficient_data`（测试）**。
 
-## 5. 验收自检（M1–M8）
+## 5. 快照与账本
+
+- 新快照 `qps-dc9c12160476db8b`：财务 44 + 分红 20 + 治理 4 + 所有制 1 + 银行指标 1 + 概况 1 = 71 张表。
+- 银行账本 `data/ledger/bank-pool.jsonl` 追加 1 条，`--check` 1 条 0 问题。
+- 好公司池 138、稳定收息池 142、既有账本（个股 7、候选 A 3、官方估值 4、好公司池 3、
+  收息池 1）均未改；个股结论账本不含银行。
+
+## 6. 验收自检（N1–N7）
 
 | 编号 | 结果 |
 |---|---|
-| M1 | 规则版本化、参数带依据；11 条条件均有等于/略差/缺年份测试 |
-| M2 | 分红 20 个报告期覆盖报告；缺失财年→待定有测试 |
-| M3 | 治理 402/402 覆盖；与 v1.2 口径一致有测试 |
-| M4 | 报告含首页、名单、只差一条、漏斗、敏感性、30 只、行业、两池交集 |
-| M5 | 所有制 439 家 100% 标记；不影响判定有测试 |
-| M6 | `--show 600519` 从快照复算；同快照重放逐家一致 |
-| M7 | 好公司池快照/报告/账本不变；其他账本不变；新账本只追加；**563 passed** |
-| M8 | 本文件一页以内，含复现命令、测试结果、提交 ID |
+| N1 | 规则版本化、参数带依据；12 条条件均有等于/略差/缺数据测试 |
+| N2 | 银行指标来源与覆盖率逐项报告；缺银行指标→待定有测试 |
+| N3 | 报告含首页、名单、只差一条、漏斗、敏感性、两家测试银行、所有制 |
+| N4 | 预演 36 家均有路线/状态/等级/三档价值/结论；正式账本与 CLI 不变（测试） |
+| N5 | 600036 2025 ROE/不良/拨备/核心一级与快照源逐项一致（测试）；`--show` 可复算 |
+| N6 | 既有池/账本/结论/指数不变；新账本只追加；**579 passed** |
+| N7 | 本文件一页以内，含复现命令、测试结果、提交 ID |
 
-## 6. 复现
+## 7. 复现
 
 ```bash
-.venv/bin/python tools/build_income_pool_data.py --build-preliminary --financial-candidates
-.venv/bin/python tools/build_income_pool_data.py --fetch-governance --workers 6
-.venv/bin/python tools/build_income_pool_data.py --fetch-ownership --build-tables --build-snapshot
-.venv/bin/python tools/run_income_pool.py --show 600519
-.venv/bin/python tools/run_income_pool.py
-.venv/bin/python tools/run_income_pool.py --check
+.venv/bin/python tools/build_bank_pool_data.py --fetch-bank --fetch-governance --workers 6
+.venv/bin/python tools/build_bank_pool_data.py --fetch-ownership
+.venv/bin/python tools/build_bank_pool_data.py --build-tables --build-snapshot
+.venv/bin/python tools/run_bank_pool.py --show 600036
+.venv/bin/python tools/run_bank_pool.py
+.venv/bin/python tools/run_bank_pool.py --check
+.venv/bin/python tools/run_bank_valuation_rehearsal.py
 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
 ```
 
-- 收息型报告：[docs/phase4g-income-pool-report.md](docs/phase4g-income-pool-report.md)
-- 详细交付：[docs/phase4g-delivery.md](docs/phase4g-delivery.md)
-- 政策：[data/policies/income-pool-v1-draft.json](data/policies/income-pool-v1-draft.json)
-- 快照说明：[data/income-pool/README.md](data/income-pool/README.md)
+- 银行池报告：[docs/phase4h-bank-pool-report.md](docs/phase4h-bank-pool-report.md)
+- 估值预演：[docs/phase4h-bank-valuation-rehearsal.md](docs/phase4h-bank-valuation-rehearsal.md)
+- 详细交付：[docs/phase4h-delivery.md](docs/phase4h-delivery.md)
+- 政策：[data/policies/bank-pool-v1-draft.json](data/policies/bank-pool-v1-draft.json)
+- 快照说明：[data/bank-pool/README.md](data/bank-pool/README.md)
