@@ -1,0 +1,462 @@
+{
+  "schema_version": "equity-policy/1",
+  "policy_id": "equity-policy-v1-draft",
+  "label": "个股正式政策 v1（草案，未批准）",
+  "status": "draft_unapproved",
+  "approved": false,
+  "version_date": "2026-11-12",
+  "source_document": "投资分析系统设计书 v1.1；设计方《个股正式政策 v1 草案与第四阶段第一批施工单》第一部分（2026-11-12）",
+  "scope": {
+    "applies_to": "equity",
+    "decision_use": "trial_report_only",
+    "note": "本政策只用于试运行报告的「预演结论」字段；CLI 输出仍为 research / undetermined，不产生正式结论。批准权在股东（决策②）。",
+    "approval": {
+      "approved": false,
+      "approver": "股东（决策②）",
+      "status": "草案，未批准",
+      "preconditions": [
+        "设计方复核试运行报告",
+        "独立 AI 审查",
+        "带证据提请股东决策②"
+      ],
+      "after_approval": "政策版本改为 approved、相关模型改为 validated 后，系统才输出正式结论，并逐条写入结论账本"
+    }
+  },
+  "parameters": {
+    "discount_rate": {
+      "risk_free": {
+        "kind": "derived_from_series",
+        "rule": "max(latest_10y_yield, mean_of_month_end_10y_yield_last_120_months)",
+        "series_file": "data/policy-trial/macro/cn-10y-yield.json",
+        "lookback_months": 120,
+        "basis": "设计方 §1：取「当日 10 年期国债收益率」与「近 10 年月末 10 年期国债收益率均值」中较高者。当前利率接近历史低点，价值判断不应依赖利率长期维持低位。2008 年以来均值约 3.63%（CEIC）。",
+        "source": {
+          "publisher": "中债收益率（东方财富汇总）",
+          "interface": "AKShare bond_zh_us_rate，中国国债到期收益率 10 年",
+          "retrieved_note": "由 tools/build_policy_trial_data.py 落库，月末值取每月最后一个有观测的交易日；内容哈希见 series_id"
+        }
+      },
+      "equity_risk_premium": {
+        "value": 0.0514,
+        "basis": "设计方 §1：采用 Damodaran 最近一次公布的中国总股权风险溢价（2026 年 1 月为 5.14%），版本化保存，每半年随其更新。外部独立来源，不由本项目调节，避免倒推。",
+        "source": "Damodaran, Country Default Spreads and Risk Premiums（中国总股权风险溢价，2026-01 版）",
+        "as_of": "2026-01",
+        "update_cycle": "semiannual"
+      },
+      "company_specific_premium": {
+        "value": 0.0,
+        "basis": "设计方 §1：取消公司特定溢价。主观加点使不同股票不可比，也最容易被用来倒推结果；公司差异改由确定性等级与安全边际体现。",
+        "source": "设计方 §1"
+      },
+      "cost_of_equity": {
+        "rule": "risk_free + equity_risk_premium + company_specific_premium",
+        "basis": "设计方 §1：股权成本 = 规范化无风险利率 + 中国股权风险溢价；公司特定溢价为 0。",
+        "source": "设计方 §1"
+      },
+      "cost_of_debt": {
+        "rule": "interest_expense / average_interest_bearing_debt",
+        "floor": "risk_free",
+        "average_basis": "本期与上期期末有息负债的算术平均",
+        "interest_bearing_debt": [
+          "short_loan",
+          "long_loan",
+          "bond_payable",
+          "current_portion_lt_debt",
+          "lease_liab"
+        ],
+        "basis": "设计方 §1：债务成本 = 公司实际利息费用 ÷ 平均有息负债，不低于规范化无风险利率。观测值，不拍脑袋。",
+        "source": "设计方 §1；科目口径与阶段二 FCFF 桥接表一致"
+      },
+      "capital_weights": {
+        "equity": "current_price * total_shares",
+        "debt": "book_interest_bearing_debt",
+        "basis": "设计方 §1：权重用权益市值与账面有息负债。",
+        "source": "设计方 §1"
+      },
+      "wacc": {
+        "rule": "E/(D+E)*cost_of_equity + D/(D+E)*cost_of_debt*(1-tax_rate)",
+        "basis": "FCFF 用 WACC，股息路线用股权成本；两者不混用（阶段二 §0 口径约定）。债务权重按市值权重计算。",
+        "source": "设计方 §1；阶段二模型规格 §0"
+      }
+    },
+    "forecast": {
+      "horizon_years": {
+        "value": 5,
+        "basis": "设计方 §2：预测期 5 年。",
+        "source": "设计方 §2"
+      },
+      "year_1": {
+        "rule": "latest_disclosed_intra_year_growth",
+        "fallback_rule": "capped_5y_revenue_cagr",
+        "basis": "设计方 §2：第 1 年用已披露年内数据或最近财年（沿用第二阶段做法）。实现上取最近一期累计营收同比（2026 年三季报 vs 2025 年三季报）；取不到时退回受上限约束的 5 年复合增速。",
+        "source": "设计方 §2；阶段二样本做法"
+      },
+      "year_2_to_5_growth_cap": {
+        "value": 0.1,
+        "basis": "设计方 §2：第 2–5 年增长不超过「过去 5 年实际复合增速」与 10% 的较低者；不使用无来源的分析师预期。",
+        "source": "设计方 §2"
+      },
+      "growth_basis": {
+        "rule": "5y_revenue_cagr",
+        "basis": "过去 5 年实际复合增速：以基准财年与 5 年前财年的营业收入计算 (R_t/R_{t-5})^(1/5)-1。",
+        "source": "设计方 §2"
+      },
+      "statement_ratios_basis": {
+        "rule": "average_of_last_3_fiscal_years",
+        "basis": "政策未逐项规定 EBIT 利润率、折旧摊销/收入、资本开支/收入、营运资本强度的数值来源。实现方统一取最近 3 个财年的算术平均，避免单年一次性项目主导预测；这是机械规则，不构成参数调整。",
+        "source": "实现规则（政策未规定处），随报告披露"
+      },
+      "ebit_definition": {
+        "rule": "pretax_profit + finance_expense",
+        "basis": "与阶段二 FCFF 桥接表一致：EBIT = 利润总额 + 净利息费用（财务费用净额）。",
+        "source": "阶段二模型规格 §2.2"
+      },
+      "tax_rate": {
+        "rule": "3y_average_effective_tax_rate",
+        "floor": 0.0,
+        "cap": 0.25,
+        "basis": "实际税率 = 所得税费用/利润总额，取最近 3 年平均；低于 0 记 0，高于法定 25% 记 25%。上限对应企业所得税法定税率，避免把一次性税收事项永续化。",
+        "source": "实现规则（政策未规定处），随报告披露"
+      },
+      "nwc_basis": {
+        "rule": "average_nwc_intensity_applied_to_incremental_revenue",
+        "basis": "营运资本 = 存货 + 应收票据及应收账款 − 应付票据及应付账款；强度 = 营运资本/营业收入，取最近 3 年平均；预测期 ΔNWC = 强度 × 营业收入增量。",
+        "source": "实现规则（政策未规定处），随报告披露"
+      },
+      "payout_path": {
+        "rule": "3y_average_ordinary_payout",
+        "exclude_special_dividends": true,
+        "assume_increase_without_commitment": false,
+        "basis": "设计方 §2：近 3 个财年平均派息率，剔除特别分红；除非公司有公开的明确分红承诺（附来源），不假设派息率上升。试运行未取得逐股分红承诺来源，因此一律不假设上升。",
+        "source": "设计方 §2；阶段二分红归集规则"
+      },
+      "statement_ratios_window": {
+        "value": 3,
+        "basis": "与「3 年算术平均」一致：取基准财年及其前两个财年。",
+        "source": "实现规则（政策未规定处），随报告披露"
+      },
+      "payout_window": {
+        "value": 3,
+        "basis": "近 3 个财年平均派息率（设计方 §2 原文）。",
+        "source": "设计方 §2"
+      },
+      "growth_window": {
+        "value": 5,
+        "basis": "过去 5 年实际复合增速（设计方 §2 原文「过去 5 年」）。",
+        "source": "设计方 §2"
+      }
+    },
+    "terminal": {
+      "growth_base": {
+        "value": 0.02,
+        "basis": "设计方 §2：终值增长 g 基准 2.0%。",
+        "source": "设计方 §2"
+      },
+      "growth_cap": {
+        "value": 0.025,
+        "upper_rule": "min(growth_cap, normalized_risk_free)",
+        "basis": "设计方 §2：上限取 2.5% 与规范化无风险利率中较低者。",
+        "source": "设计方 §2"
+      },
+      "consistency": {
+        "rule": "g <= latest_fy_roe * (1 - 3y_average_payout)",
+        "basis": "设计方 §2：终值增长且 g ≤ ROE × 留存率。留存率取政策派息率路径（3 年平均派息率）。",
+        "source": "设计方 §2"
+      },
+      "reinvestment": {
+        "rule": "terminal_reinvestment_rate = g / new_investment_return",
+        "terminal_payout_rule": "1 - g / new_investment_return",
+        "new_investment_return": {
+          "base": "cost_of_equity",
+          "pessimistic": "cost_of_equity",
+          "optimistic": "5y_average_roe"
+        },
+        "basis": "设计方 §2：终值期再投资率 = g ÷ 新投资回报率；基准情景新投资回报率 = 股权成本（新投资不产生超额回报，保守），乐观情景可用近 5 年平均 ROE；股息模型终值派息率 = 1 − g ÷ 新投资回报率，与现金流模型同口径。",
+        "source": "设计方 §2",
+        "implementation_note": "政策同时要求「不假设派息率上升」。试运行按终值再投资一致性公式（等式）执行，并在报告中并列显示终值隐含派息率与历史派息率；两者不一致时如实标注，不改参数。"
+      },
+      "roe_window": {
+        "value": 5,
+        "basis": "乐观情景新投资回报率用近 5 年平均 ROE（设计方 §2 原文「近 5 年平均 ROE」）。",
+        "source": "设计方 §2"
+      }
+    },
+    "scenarios": {
+      "pessimistic": {
+        "growth_adjustment": -0.02,
+        "terminal_growth": 0.015,
+        "new_investment_return": "cost_of_equity",
+        "discount_rate": "same_as_base",
+        "basis": "设计方 §3：悲观 = 基准各年增速 −2pp，终值增长 1.5%，折现率同基准。",
+        "source": "设计方 §3"
+      },
+      "base": {
+        "growth_adjustment": 0.0,
+        "terminal_growth": 0.02,
+        "new_investment_return": "cost_of_equity",
+        "discount_rate": "policy",
+        "basis": "设计方 §3：基准 = 第 2 节规则，终值增长 2.0%，折现率第 1 节。",
+        "source": "设计方 §3"
+      },
+      "optimistic": {
+        "growth_adjustment": 0.02,
+        "terminal_growth": 0.025,
+        "new_investment_return": "5y_average_roe",
+        "discount_rate": "same_as_base",
+        "basis": "设计方 §3：乐观 = 基准各年增速 +2pp，新投资回报率用近 5 年平均 ROE，终值增长 2.5%（受上限约束），折现率同基准。",
+        "source": "设计方 §3"
+      },
+      "discount_rate_is_scenario_variable": {
+        "value": false,
+        "basis": "设计方 §3：折现率是政策，不是情景变量；三档情景用同一折现率。",
+        "source": "设计方 §3"
+      }
+    },
+    "quality": {
+      "selection_thresholds": {
+        "capex_intensity_max": 0.1,
+        "cash_conversion_min": 0.7,
+        "dividend_payout_min": 0.55,
+        "basis": "设计方 §4：模型选择阈值（P6）采用第二阶段研究值为 v1 政策，版本化；修改需重新批准。",
+        "source": "阶段二 model-applicability/1（研究值），本政策原值采纳"
+      },
+      "cross_check_divergence": {
+        "rule": "abs(cross_check_value / primary_value - 1)",
+        "blocking": false,
+        "basis": "设计方 §4：交叉检查分歧（P7）输入确定性等级，不单独阻断。",
+        "source": "设计方 §4"
+      },
+      "bridge_tolerance": {
+        "value": 0.15,
+        "on_breach": "partial",
+        "basis": "设计方 §4：现金流勾稽（P8）超出 15% 结果为 partial；partial 不得给正式结论。",
+        "source": "设计方 §4"
+      },
+      "wording_band": {
+        "value": 0.05,
+        "usage": "wording_only",
+        "basis": "设计方 §4：措辞带宽 ±5%，只影响措辞。",
+        "source": "设计方 §4"
+      },
+      "share_count": {
+        "rule": "current_total_shares_minus_treasury_shares",
+        "basis": "设计方 §4：股本（P12）= 当前总股本减库存股。本次数据源未单列库存股，按 0 处理并在报告的数据说明中列示。",
+        "source": "设计方 §4"
+      },
+      "cash": {
+        "rule": "monetary_funds - restricted_cash - operating_cash_need",
+        "operating_cash_need": {
+          "value": 0.02,
+          "basis": "设计方 §4：可抵扣现金 = 货币资金 − 受限资金 − 经营所需现金（营业收入 × 2%）。",
+          "source": "设计方 §4"
+        },
+        "restricted_cash": {
+          "rule": "max(0, monetary_funds - min(available_cash_equivalent_fields))",
+          "disclosed": false,
+          "approximation": true,
+          "basis": "设计方 §4：受限资金未披露计为近似项。实现上用「货币资金 − 现金流量表期末现金及现金等价物余额」估算（含受限资金与三个月以上定期存款等非现金等价物）；来源有两个期末现金等价物口径时取较小值，估算偏保守，并把该估算金额对每股价值的影响计入近似项影响。",
+          "source": "设计方 §4；阶段二现金流量表科目"
+        }
+      },
+      "minority_interest": {
+        "book_value_allowed": true,
+        "approximation_if_profit_share_above": 0.15,
+        "impact_rule": "abs(earnings_multiple_value - book_value) / shares",
+        "basis": "设计方 §4：少数股东权益报表账面值可用；少数股东损益占合并净利润 > 15% 时计为近似项。近似影响按「与母公司相同市盈率定价」与账面值的差额计算。",
+        "source": "设计方 §4；实现规则（政策未规定量化方式）随报告披露"
+      },
+      "financial_subsidiary": {
+        "metric": "(loan_advance + accept_deposit_interbank) / total_assets",
+        "approximation_if_above": 0.05,
+        "routes": [
+          "equity_dcf_fcff"
+        ],
+        "impact_rule": "abs(bridge_reconciliation_gap) / abs(latest_fy_fcff) * base_value_per_share",
+        "basis": "设计方 §4：合并报表含吸收存款或发放贷款且合计 > 总资产 5% 时，现金流路线计为近似项。近似影响按 FCFF 与经营现金流的未解释勾稽差额（相对 FCFF）传导到每股价值。",
+        "source": "设计方 §4；阶段二勾稽表"
+      },
+      "approximation_impact": {
+        "rule": "sum_of_absolute_per_share_impacts",
+        "display": true,
+        "basis": "设计方 §4：所有近似项对每股价值的合计影响须计算并展示。合计取各项绝对影响之和（保守口径），并逐项列出。",
+        "source": "设计方 §4"
+      }
+    },
+    "grade": {
+      "A": {
+        "min_available_fiscal_years": 7,
+        "lookback_fiscal_years": 10,
+        "max_loss_years": 0,
+        "ocf_to_profit_min": 0.8,
+        "ocf_window_years": 5,
+        "net_debt_to_ebitda_max": 2.0,
+        "cross_check_divergence_max": 0.25,
+        "approximation_impact_max": 0.02,
+        "margin_of_safety": 0.25,
+        "basis": "设计方 §5：可得最近 10 个财年（至少 7 年）无亏损；近 5 年经营现金流合计 ≥ 归母净利润合计 × 0.8；非金融公司净负债/EBITDA < 2；交叉检查分歧 < 25%；近似项影响 < 每股价值 2%。安全边际 25%。",
+        "source": "设计方 §5"
+      },
+      "B": {
+        "lookback_fiscal_years": 7,
+        "max_loss_years": 1,
+        "ocf_to_profit_min": 0.6,
+        "ocf_window_years": 5,
+        "net_debt_to_ebitda_max": 3.0,
+        "cross_check_divergence_max": 0.4,
+        "approximation_impact_max": 0.05,
+        "margin_of_safety": 0.4,
+        "basis": "设计方 §5：最近 7 个财年至多 1 年亏损；现金流比 ≥ 0.6；净负债/EBITDA < 3；分歧 < 40%；近似项影响 < 5%。安全边际 40%。",
+        "source": "设计方 §5"
+      },
+      "C": {
+        "margin_of_safety": null,
+        "conclusion": "undetermined",
+        "basis": "设计方 §5：其余为 C 级，不给正式结论。",
+        "source": "设计方 §5"
+      },
+      "banks": {
+        "max_grade": "B",
+        "required_evidence": [
+          "capital_adequacy_ratio",
+          "npl_ratio",
+          "provision_coverage"
+        ],
+        "basis": "设计方 §5：银行只有从年报取得资本充足率、不良率、拨备覆盖率并通过第二阶段的银行检查时，最高 B 级；否则 C。",
+        "source": "设计方 §5"
+      },
+      "unsupported_families": {
+        "families": [
+          "insurance",
+          "broker",
+          "cyclical",
+          "distressed",
+          "holding"
+        ],
+        "conclusion": "undetermined",
+        "basis": "设计方 §5：保险、券商、强周期与困境公司沿用第二阶段「路线不支持」，不给正式结论。",
+        "source": "设计方 §5；阶段二 §6"
+      },
+      "net_debt": {
+        "rule": "interest_bearing_debt - available_cash",
+        "ebitda_rule": "ebit + depreciation + amortization",
+        "basis": "净负债 = 有息负债 − 可抵扣现金（与 §4 现金口径一致）；EBITDA = EBIT + 折旧摊销。",
+        "source": "实现规则，随报告披露"
+      },
+      "margin_sensitivity": {
+        "A": [
+          0.2,
+          0.25,
+          0.3
+        ],
+        "B": [
+          0.35,
+          0.4,
+          0.45
+        ],
+        "basis": "设计方 §5：25% / 40% 是政策选择，试运行时报告其敏感性。施工单 A.5 要求安全边际 20/25/30% 与 35/40/45% 的敏感性。",
+        "source": "设计方 §5；施工单 A.5"
+      }
+    },
+    "conclusion": {
+      "candidate_buy_point": {
+        "rule": "grade in (A,B) and status == complete and price <= base_value*(1-margin) and price <= pessimistic_value",
+        "basis": "设计方 §6：A 或 B 级、结果 complete，且 P ≤ V_基准 × (1 − M) 且 P ≤ V_悲观。",
+        "source": "设计方 §6"
+      },
+      "avoid": {
+        "rule": "grade in (A,B) and status == complete and price > optimistic_value",
+        "basis": "设计方 §6：A 或 B 级、结果 complete，且 P > V_乐观。",
+        "source": "设计方 §6"
+      },
+      "wait": {
+        "rule": "grade in (A,B) and status == complete and not candidate and not avoid",
+        "basis": "设计方 §6：其余情形为等待。",
+        "source": "设计方 §6"
+      },
+      "undetermined": {
+        "rule": "grade == C or status in (partial, insufficient_data, unsupported, engine_error)",
+        "basis": "设计方 §6：C 级、partial、资料不足、路线不支持、引擎错误为无法判断。",
+        "source": "设计方 §6"
+      },
+      "model_averaging": {
+        "value": false,
+        "basis": "设计方 §6：不对多个模型取平均或取高；主模型决定，交叉检查只影响等级。",
+        "source": "设计方 §6"
+      }
+    },
+    "sensitivity": {
+      "discount_rate_delta": {
+        "value": 0.005,
+        "basis": "施工单 A.5：报告折现率 ±0.5pp 敏感性。",
+        "source": "施工单 A.5"
+      },
+      "terminal_growth_delta": {
+        "value": 0.005,
+        "basis": "施工单 A.5：报告终值增长 ±0.5pp 敏感性。",
+        "source": "施工单 A.5"
+      },
+      "margin_grid": {
+        "A": [
+          0.2,
+          0.25,
+          0.3
+        ],
+        "B": [
+          0.35,
+          0.4,
+          0.45
+        ],
+        "basis": "施工单 A.5：安全边际 20/25/30% 与 35/40/45% 的敏感性下预演结论的变化。",
+        "source": "施工单 A.5"
+      }
+    }
+  },
+  "mechanical_implementation": {
+    "note": "政策未逐项规定、由实现方以机械规则补齐的输入（不是阈值调整）。全部登记在此，代码不得另设数字；报告逐项披露。",
+    "rules": [
+      "报表比率（EBIT 利润率、折旧摊销/收入、资本开支/收入、营运资本强度、实际税率）取最近 3 个财年算术平均",
+      "实际税率下限 0、上限 25%（法定税率）",
+      "第 1 年增速取最近一期累计营收同比；取不到时退回受 10% 上限约束的 5 年复合增速",
+      "有息负债科目在报表中未列示时按 0 处理，并在数据说明中列出未列示科目",
+      "库存股未单列，股本按当前总股本处理",
+      "受限资金按「货币资金 − 期末现金及现金等价物」估算，计为近似项",
+      "少数股东权益按账面值扣除；少数股东损益占比 > 15% 计为近似项，影响按相同市盈率定价与账面值差额计算",
+      "金融子公司近似影响按 FCFF 勾稽差额相对值传导到每股价值",
+      "乐观情景的新投资回报率（5 年平均 ROE）不高于终值增长 g 时，再投资率会超过 100%、终值分配为负；此时退回基准情景的股权成本并记录该退化"
+    ]
+  },
+  "sources": [
+    {
+      "name": "投资分析系统设计书 v1.1",
+      "role": "政策结构、契约与口径约定的上位文件",
+      "reference": "用户提供的设计书（2026-11-10）"
+    },
+    {
+      "name": "个股正式政策 v1 草案（设计方，2026-11-12）",
+      "role": "本政策逐条参数的直接来源",
+      "reference": "outputs/equity-policy-v1-draft-and-batch4a.md 第一部分"
+    },
+    {
+      "name": "中债 10 年期国债到期收益率",
+      "role": "规范化无风险利率的观测值",
+      "reference": "data/policy-trial/macro/cn-10y-yield.json（AKShare bond_zh_us_rate）"
+    },
+    {
+      "name": "Damodaran 中国总股权风险溢价 5.14%（2026-01）",
+      "role": "股权风险溢价",
+      "reference": "设计方给定的外部独立来源，版本化保存，每半年更新"
+    },
+    {
+      "name": "阶段二模型规格与适用性规则",
+      "role": "P6 模型选择阈值、分红归集与勾稽口径",
+      "reference": "docs/equity-model-spec.md、engine/evidence/applicability.py"
+    }
+  ],
+  "open_questions_for_designer": [
+    "终值再投资一致性与「不假设派息率上升」在一般情况下不能同时成立：由 g 与 ROI 推出的终值派息率可能高于近 3 年历史派息率。试运行按再投资一致性等式执行，并并列披露两个派息率；若设计方希望以「不上升」为准，需要明确改写终值公式。",
+    "政策未规定 EBIT 利润率、资本开支、折旧摊销、营运资本与税率的预测来源；试运行采用 3 年算术平均并在报告中披露，需设计方确认或改写。",
+    "「受限资金未披露计为近似项」未规定量化方式；试运行用货币资金与期末现金等价物之差估算，需设计方确认。",
+    "政策未规定交叉检查不可用（第二路线拒绝计算）时如何定级；试运行按「无法验证分歧 → 不能给 A/B → C」处理。",
+    "高杠杆企业的资本权重：601668 中国建筑账面有息负债 9,405 亿元、权益市值 1,884 亿元，债务权重 83.3%，WACC 被压到 3.11%，FCFF 基准价值 93.17 元/股（现价 4.56 元）。这不是数据错误，而是「权益市值 / 账面有息负债」权重与「债务成本下限为无风险利率」的机械结果；请设计方明确是否改用目标资本结构、或按信用风险给债务成本加利差。"
+  ]
+}

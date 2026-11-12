@@ -143,18 +143,21 @@ def build_index_payload(
     *,
     strategy_candidates: list[dict[str, Any]],
     profile: dict[str, Any] | None = None,
+    signal: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     payload = empty_index_payload()
     if profile is not None:
         payload["valuation_profile"] = profile
     payload["index_class"] = instrument.index_class.value if instrument.index_class else None
+    payload["candidate_a_signal"] = signal
     payload["strategy_state"] = {
-        "status": "not_implemented",
+        "status": "research_signal_only",
         "model_status": "research",
         "candidates": strategy_candidates,
+        "candidate_a_signal": signal,
         "note": (
-            "分位进出策略与回测留待下一批；本轮只输出描述性画像，"
-            "不产生入场/退出信号，也不给目标点位。"
+            "候选 A 已实现为研究信号并前向记账；规则与阈值未获批准，"
+            "信号只描述条件是否成立，不构成买卖建议，也不给目标点位。"
         ),
     }
     if snapshot is None:
@@ -348,7 +351,9 @@ def strategy_candidates() -> list[dict[str, Any]]:
             "model_status": "research",
             "entry": "PE-TTM 5年历史分位 ≤ 20",
             "exit": "PE 分位 ≥ 60，或持有满 12 个日历月",
-            "implemented": False,
+            "implemented": True,
+            "implemented_as": "research_signal_with_append_only_ledger",
+            "approved": False,
         },
         {
             "candidate": "B",

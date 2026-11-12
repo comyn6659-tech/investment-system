@@ -223,11 +223,15 @@ def _render_payload(payload: dict[str, Any]) -> list[str]:
         profile = payload.get("valuation_profile")
         if profile:
             lines.extend(_render_index_profile(profile))
-        lines.append("")
-        lines.append(
-            "【策略状态】分位进出策略与回测留待下一批：本轮只输出描述性画像，"
-            "不产生入场/退出信号，也不给目标点位。"
-        )
+        signal = payload.get("candidate_a_signal")
+        if signal:
+            lines.extend(_render_candidate_a_signal(signal))
+        else:
+            lines.append("")
+            lines.append(
+                "【策略状态】本轮未取得候选 A 研究信号所需的官方日频序列："
+                "不输出入场/退出条件，也不给目标点位。"
+            )
     elif ptype == "etf":
         underlying = payload.get("underlying_index") or {}
         lines.append("")
@@ -376,6 +380,86 @@ def _render_index_profile(profile: dict[str, Any]) -> list[str]:
     if note:
         lines.append(f"  · 用途：{note}")
     return lines
+
+
+_SIGNAL_LABEL = {
+    "entry": "入场条件成立",
+    "exit": "退出条件成立",
+    "none": "未触发",
+    "not_evaluable": "不可评估",
+}
+
+
+def _render_candidate_a_signal(signal: dict[str, Any]) -> list[str]:
+    lines: list[str] = ["", f"【{signal.get('label') or '候选 A 研究信号（未批准）'}】"]
+    rule = signal.get("rule") or {}
+    lines.append(
+        f"  规则（{rule.get('rule_version')}）：官方滚动市盈率周度分位 "
+        f"≤ {float(rule.get('entry_percentile') or 0):.0f} 为入场条件、"
+        f"≥ {float(rule.get('exit_percentile') or 0):.0f} 为退出条件；"
+        f"持有满 {rule.get('max_hold_months')} 个日历月到期；{rule.get('execution')}"
+    )
+    latest = signal.get("latest")
+    if latest:
+        percentile = latest.get("percentile_display")
+        lines.append(
+            f"  - 最新观察点：{latest.get('date')}（{latest.get('week')}，"
+            f"{'该周已结束' if latest.get('week_complete') else '该周尚未结束，信号为盘中临时值'}）"
+        )
+        lines.append(
+            f"  - 官方滚动市盈率：{_ratio_text(latest.get('pe'))}"
+            f" ｜ 5 年周度分位：{_pct_text(percentile) if percentile is not None else '未计算'}"
+            f"（可用周 {latest.get('valid_weeks')}/{latest.get('weeks_in_window')}）"
+        )
+        condition = _SIGNAL_LABEL.get(signal.get("signal"), signal.get("signal"))
+        lines.append(
+            f"  - 条件：入场条件 {'成立' if signal.get('entry_condition_met') else '未成立'}"
+            f"；退出条件 {'成立' if signal.get('exit_condition_met') else '未成立'}"
+            f" → 信号：{condition}"
+        )
+        if latest.get("reason"):
+            lines.append(f"  - 不可评估原因：{latest['reason']}")
+    else:
+        lines.append(f"  - 未计算：{signal.get('reason') or '缺少序列'}")
+    backtest = signal.get("backtest") or {}
+    if backtest.get("trades") is not None:
+        lines.append(
+            f"  - 回测记录（{'全收益' if backtest.get('return_basis') == 'total_return' else backtest.get('return_basis')}"
+            f" / T+{backtest.get('execution_lag')} / {float(backtest.get('cost_bp') or 0):.0f}bp）："
+            f"{backtest.get('start')}→{backtest.get('end')}，{backtest.get('trades')} 笔，"
+            f"累计 {_signed_pct(backtest.get('cumulative_return'))}，"
+            f"最大回撤 {_signed_pct(backtest.get('max_drawdown'))}；"
+            f"同期全收益买入持有 {_signed_pct(backtest.get('benchmark_total_return'))}，"
+            f"超额 {_signed_pct(backtest.get('excess_vs_total_return'))}"
+        )
+        lines.append(
+            f"  - 记录位置：{backtest.get('report_path')}"
+            f"（数据 {backtest.get('data_path')}，生成于 {backtest.get('generated_at')}）"
+        )
+    ledger = signal.get("ledger") or {}
+    if ledger.get("status") == "ok":
+        lines.append(
+            f"  - 只追加账本：{ledger.get('path')}（{ledger.get('records')} 条记录，"
+            f"最后 {ledger.get('last_week')} / {ledger.get('last_date')}，"
+            f"信号 {_SIGNAL_LABEL.get(ledger.get('last_signal'), ledger.get('last_signal'))}）"
+        )
+    elif ledger.get("status") == "empty":
+        lines.append(f"  - 只追加账本：{ledger.get('path')}（尚未写入观察点）")
+    lines.append(
+        "  · 说明：研究信号，规则与阈值未获批准；只描述条件是否成立，不跟踪持仓，"
+        "不构成买卖建议，也不给目标点位。"
+    )
+    return lines
+
+
+def _signed_pct(value: Any) -> str:
+    if value is None:
+        return "—"
+    try:
+        number = float(value) * 100.0
+    except (TypeError, ValueError):
+        return str(value)
+    return f"{number:+.2f}%"
 
 
 def _render_product_check(check: dict[str, Any]) -> list[str]:

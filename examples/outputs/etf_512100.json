@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-1971beddd275aa40",
-  "generated_at": "2026-11-12T00:41:27+08:00",
+  "analysis_id": "analysis-0201c66fea5a5796",
+  "generated_at": "2026-11-12T13:52:11+08:00",
   "instrument": {
     "instrument_id": "ETF:512100.SH",
     "display_name": "中证1000ETF南方",
@@ -102,16 +102,12 @@
       "PE 与 PB 分别计算，不拼综合分"
     ],
     "selection_reason": "ETF 本身不单独建模：产品资料单列，指数画像沿用其跟踪指数",
+    "research_signals": [],
     "not_selected": [
-      {
-        "model_id": "index_strategy_a_valuation_reversion",
-        "reason_code": "INDEX_STRATEGY_NOT_IMPLEMENTED",
-        "reason": "分位进出规则与回测留待下一批；本轮不实现状态机，也不给入场/退出信号"
-      },
       {
         "model_id": "index_strategy_b_cross_confirmation",
         "reason_code": "INDEX_STRATEGY_NOT_IMPLEMENTED",
-        "reason": "同上：交叉确认规则与回测留待下一批"
+        "reason": "候选 B（PE+PB 交叉确认）与正式策略状态尚未实现，本版不输出该信号"
       }
     ],
     "candidate_models": [],
@@ -966,7 +962,7 @@
       }
     }
   },
-  "code_version": "phase3-0.5.1",
+  "code_version": "phase4-0.1.0",
   "policy_version": "unapproved-phase2",
-  "model_version": "research-0.3.0"
+  "model_version": "research-0.4.0"
 }

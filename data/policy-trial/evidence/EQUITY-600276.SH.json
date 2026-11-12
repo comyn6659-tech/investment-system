@@ -1,0 +1,142 @@
+{
+  "schema_version": "business-evidence/1",
+  "instrument_id": "EQUITY:600276.SH",
+  "display_name": "恒瑞医药",
+  "as_of": "2026-11-11",
+  "prepared_at": "2026-11-12T13:46:57+08:00",
+  "version": "2026-11-11",
+  "industry_clue": "医药生物 / 化学制剂 / 化学制药",
+  "business_mix": {
+    "report_date": "2026-06-30",
+    "by_product": [
+      {
+        "segment": "销售商品",
+        "revenue_share": 0.902464,
+        "revenue": 13948104757.72,
+        "gross_margin": 0.854096
+      },
+      {
+        "segment": "许可收入",
+        "revenue_share": 0.092025,
+        "revenue": 1422301939.04,
+        "gross_margin": 0.984397
+      },
+      {
+        "segment": "其他",
+        "revenue_share": 0.005511,
+        "revenue": 85177031.35,
+        "gross_margin": 0.34168
+      }
+    ],
+    "by_region": [
+      {
+        "segment": "国内",
+        "revenue_share": 0.877455,
+        "revenue": 13561577485.43,
+        "gross_margin": 0.864887
+      },
+      {
+        "segment": "国外",
+        "revenue_share": 0.122545,
+        "revenue": 1894006242.68,
+        "gross_margin": 0.851637
+      }
+    ]
+  },
+  "annual_history": [
+    {
+      "fiscal_year": 2025,
+      "revenue": 31629416193.83,
+      "net_profit_parent": 7711054811.98
+    },
+    {
+      "fiscal_year": 2024,
+      "revenue": 27984605342.06,
+      "net_profit_parent": 6336527014.75
+    },
+    {
+      "fiscal_year": 2023,
+      "revenue": 22819784741.31,
+      "net_profit_parent": 4302435930.05
+    },
+    {
+      "fiscal_year": 2022,
+      "revenue": 21275270681.52,
+      "net_profit_parent": 3906375067.36
+    },
+    {
+      "fiscal_year": 2021,
+      "revenue": 25905526375.8,
+      "net_profit_parent": 4530217550.47
+    },
+    {
+      "fiscal_year": 2020,
+      "revenue": 27734598747.82,
+      "net_profit_parent": 6328383219.69
+    },
+    {
+      "fiscal_year": 2019,
+      "revenue": 23288576607.05,
+      "net_profit_parent": 5328027519.56
+    },
+    {
+      "fiscal_year": 2018,
+      "revenue": 17417901050.02,
+      "net_profit_parent": 4065609716.04
+    }
+  ],
+  "share_count_current": 6637199874.0,
+  "sources": [
+    {
+      "evidence_id": "ev-cninfo-company-profile",
+      "kind": "vendor_api",
+      "publisher": "巨潮资讯",
+      "interface": "AKShare stock_industry_change_cninfo + stock_share_change_cninfo",
+      "url": "https://webapi.cninfo.com.cn/#/company",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "证券简称",
+        "行业门类",
+        "行业大类",
+        "行业次类",
+        "行业中类",
+        "总股本"
+      ],
+      "note": "东方财富个股信息不可用时回退巨潮：行业取最近一次分类（优先申万口径），总股本取股本变动最近一条；行业分类只是线索，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_zygc_em（主营构成）",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_financial_abstract（关键指标）",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    }
+  ],
+  "notes": [
+    "本文件只记录可核实事实与出处；模型适用性判定见 engine/evidence/applicability.py。",
+    "行业分类只作为线索，不单独决定模型；判定不使用当前股价。"
+  ],
+  "evidence_id": "biz-dbfd618e710f6a84"
+}

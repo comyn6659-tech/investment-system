@@ -1,0 +1,141 @@
+{
+  "schema_version": "business-evidence/1",
+  "instrument_id": "EQUITY:601857.SH",
+  "display_name": "中国石油",
+  "as_of": "2026-11-11",
+  "prepared_at": "2026-11-12T13:46:57+08:00",
+  "version": "2026-11-11",
+  "industry_clue": "石油石化 / 炼油化工 / 炼化及贸易",
+  "business_mix": {
+    "report_date": "2026-09-30",
+    "by_product": [
+      {
+        "segment": "销售",
+        "revenue_share": 0.651309,
+        "revenue": 1511730000000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "天然气销售",
+        "revenue_share": 0.178586,
+        "revenue": 414509000000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "炼油化工和新材料",
+        "revenue_share": 0.128657,
+        "revenue": 298621000000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "油气和新能源",
+        "revenue_share": 0.040923,
+        "revenue": 94984000000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "总部及其他",
+        "revenue_share": 0.000526,
+        "revenue": 1220000000.0,
+        "gross_margin": null
+      }
+    ],
+    "by_region": []
+  },
+  "annual_history": [
+    {
+      "fiscal_year": 2025,
+      "revenue": 2864469000000.0,
+      "net_profit_parent": 157302000000.0
+    },
+    {
+      "fiscal_year": 2024,
+      "revenue": 2937981000000.0,
+      "net_profit_parent": 164676000000.0
+    },
+    {
+      "fiscal_year": 2023,
+      "revenue": 3012812000000.0,
+      "net_profit_parent": 161414000000.0
+    },
+    {
+      "fiscal_year": 2022,
+      "revenue": 3239167000000.0,
+      "net_profit_parent": 148738000000.0
+    },
+    {
+      "fiscal_year": 2021,
+      "revenue": 2614349000000.0,
+      "net_profit_parent": 92161000000.0
+    },
+    {
+      "fiscal_year": 2020,
+      "revenue": 1933836000000.0,
+      "net_profit_parent": 19002000000.0
+    },
+    {
+      "fiscal_year": 2019,
+      "revenue": 2516810000000.0,
+      "net_profit_parent": 45677000000.0
+    },
+    {
+      "fiscal_year": 2018,
+      "revenue": 2374934000000.0,
+      "net_profit_parent": 53030000000.0
+    }
+  ],
+  "share_count_current": 183020977818.00003,
+  "sources": [
+    {
+      "evidence_id": "ev-cninfo-company-profile",
+      "kind": "vendor_api",
+      "publisher": "巨潮资讯",
+      "interface": "AKShare stock_industry_change_cninfo + stock_share_change_cninfo",
+      "url": "https://webapi.cninfo.com.cn/#/company",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "证券简称",
+        "行业门类",
+        "行业大类",
+        "行业次类",
+        "行业中类",
+        "总股本"
+      ],
+      "note": "东方财富个股信息不可用时回退巨潮：行业取最近一次分类（优先申万口径），总股本取股本变动最近一条；行业分类只是线索，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_zygc_em（主营构成）",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_financial_abstract（关键指标）",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    }
+  ],
+  "notes": [
+    "本文件只记录可核实事实与出处；模型适用性判定见 engine/evidence/applicability.py。",
+    "行业分类只作为线索，不单独决定模型；判定不使用当前股价。"
+  ],
+  "evidence_id": "biz-da15e01e60f740ee"
+}

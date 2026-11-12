@@ -111,7 +111,7 @@ def test_model_version_must_match_registry():
 
 def test_unimplemented_model_cannot_carry_assumptions():
     data = json.loads((ASSUMPTIONS / "600519-fcff-base.json").read_text(encoding="utf-8"))
-    data["model_id"] = "index_strategy_a_valuation_reversion"
+    data["model_id"] = "index_strategy_b_cross_confirmation"
     data["model_version"] = "0.0.0-research"
     with pytest.raises(ValuationError) as excinfo:
         AssumptionSet.from_dict(data)

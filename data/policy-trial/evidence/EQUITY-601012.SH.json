@@ -1,0 +1,142 @@
+{
+  "schema_version": "business-evidence/1",
+  "instrument_id": "EQUITY:601012.SH",
+  "display_name": "隆基绿能",
+  "as_of": "2026-11-11",
+  "prepared_at": "2026-11-12T13:46:57+08:00",
+  "version": "2026-11-11",
+  "industry_clue": "电力设备 / 光伏电池组件 / 光伏设备",
+  "business_mix": {
+    "report_date": "2026-06-30",
+    "by_product": [
+      {
+        "segment": "光伏产品销售",
+        "revenue_share": 0.929855,
+        "revenue": 25148133858.52,
+        "gross_margin": -0.009723
+      },
+      {
+        "segment": "其他业务",
+        "revenue_share": 0.041727,
+        "revenue": 1128514107.9,
+        "gross_margin": 0.310022
+      },
+      {
+        "segment": "电站业务",
+        "revenue_share": 0.028418,
+        "revenue": 768561131.13,
+        "gross_margin": 0.334715
+      }
+    ],
+    "by_region": [
+      {
+        "segment": "境外",
+        "revenue_share": 0.597638,
+        "revenue": 16163243010.02,
+        "gross_margin": 0.01103
+      },
+      {
+        "segment": "境内",
+        "revenue_share": 0.402362,
+        "revenue": 10881966087.53,
+        "gross_margin": 0.016936
+      }
+    ]
+  },
+  "annual_history": [
+    {
+      "fiscal_year": 2025,
+      "revenue": 70347049950.42,
+      "net_profit_parent": -6419556843.85
+    },
+    {
+      "fiscal_year": 2024,
+      "revenue": 82582273118.72,
+      "net_profit_parent": -8592102400.42
+    },
+    {
+      "fiscal_year": 2023,
+      "revenue": 129497674192.2,
+      "net_profit_parent": 10751425556.38
+    },
+    {
+      "fiscal_year": 2022,
+      "revenue": 128998111551.18,
+      "net_profit_parent": 14811576797.86
+    },
+    {
+      "fiscal_year": 2021,
+      "revenue": 80607866874.19,
+      "net_profit_parent": 9085880513.3
+    },
+    {
+      "fiscal_year": 2020,
+      "revenue": 54583183588.46,
+      "net_profit_parent": 8552369160.81
+    },
+    {
+      "fiscal_year": 2019,
+      "revenue": 32897455384.24,
+      "net_profit_parent": 5279552073.55
+    },
+    {
+      "fiscal_year": 2018,
+      "revenue": 21987614949.84,
+      "net_profit_parent": 2557964089.73
+    }
+  ],
+  "share_count_current": 7578069833.0,
+  "sources": [
+    {
+      "evidence_id": "ev-cninfo-company-profile",
+      "kind": "vendor_api",
+      "publisher": "巨潮资讯",
+      "interface": "AKShare stock_industry_change_cninfo + stock_share_change_cninfo",
+      "url": "https://webapi.cninfo.com.cn/#/company",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "证券简称",
+        "行业门类",
+        "行业大类",
+        "行业次类",
+        "行业中类",
+        "总股本"
+      ],
+      "note": "东方财富个股信息不可用时回退巨潮：行业取最近一次分类（优先申万口径），总股本取股本变动最近一条；行业分类只是线索，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_zygc_em（主营构成）",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_financial_abstract（关键指标）",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    }
+  ],
+  "notes": [
+    "本文件只记录可核实事实与出处；模型适用性判定见 engine/evidence/applicability.py。",
+    "行业分类只作为线索，不单独决定模型；判定不使用当前股价。"
+  ],
+  "evidence_id": "biz-da749ff2cf035fce"
+}

@@ -1,0 +1,213 @@
+{
+  "schema_version": "business-evidence/1",
+  "instrument_id": "EQUITY:601899.SH",
+  "display_name": "紫金矿业",
+  "as_of": "2026-11-11",
+  "prepared_at": "2026-11-12T13:46:57+08:00",
+  "version": "2026-11-11",
+  "industry_clue": "有色金属 / 铜 / 工业金属",
+  "business_mix": {
+    "report_date": "2026-06-30",
+    "by_product": [
+      {
+        "segment": "贸易精炼等其他销售收入",
+        "revenue_share": 0.807847,
+        "revenue": 156866520000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "其他主营业务",
+        "revenue_share": 0.424511,
+        "revenue": 82430958702.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "冶炼产铜",
+        "revenue_share": 0.161848,
+        "revenue": 31427370000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "冶炼产锌",
+        "revenue_share": 0.019958,
+        "revenue": 3875390000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "矿山产银",
+        "revenue_share": 0.016183,
+        "revenue": 3142340000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "矿山产锌",
+        "revenue_share": 0.015526,
+        "revenue": 3014890000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "矿山产锂锂盐",
+        "revenue_share": 0.014831,
+        "revenue": 2879930000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "矿山产锂锂精矿",
+        "revenue_share": 0.005655,
+        "revenue": 1098040000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "其他(补充)",
+        "revenue_share": 0.004494,
+        "revenue": 872639928.0,
+        "gross_margin": 0.117486
+      },
+      {
+        "segment": "冶炼产碳酸锂",
+        "revenue_share": 0.003138,
+        "revenue": 609270000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "铁精矿",
+        "revenue_share": 0.001701,
+        "revenue": 330220000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "内部销售抵销数",
+        "revenue_share": -0.475692,
+        "revenue": -92369110000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "其中:铜精矿",
+        "revenue_share": 0.150557,
+        "revenue": 29234870000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "其中:金锭",
+        "revenue_share": 0.146047,
+        "revenue": 28359270000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "其中:金精矿",
+        "revenue_share": 0.082951,
+        "revenue": 16107270000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "其中:电解铜",
+        "revenue_share": 0.027561,
+        "revenue": 5351760000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "其中:电积铜",
+        "revenue_share": 0.021889,
+        "revenue": 4250430000.0,
+        "gross_margin": null
+      }
+    ],
+    "by_region": []
+  },
+  "annual_history": [
+    {
+      "fiscal_year": 2025,
+      "revenue": 349079082852.0,
+      "net_profit_parent": 51777327785.0
+    },
+    {
+      "fiscal_year": 2024,
+      "revenue": 303639957153.0,
+      "net_profit_parent": 32050602437.0
+    },
+    {
+      "fiscal_year": 2023,
+      "revenue": 293403242878.0,
+      "net_profit_parent": 21119419571.0
+    },
+    {
+      "fiscal_year": 2022,
+      "revenue": 270328998459.0,
+      "net_profit_parent": 20042045977.0
+    },
+    {
+      "fiscal_year": 2021,
+      "revenue": 225102488592.0,
+      "net_profit_parent": 15672870591.0
+    },
+    {
+      "fiscal_year": 2020,
+      "revenue": 171501338490.0,
+      "net_profit_parent": 6508553913.0
+    },
+    {
+      "fiscal_year": 2019,
+      "revenue": 136097978018.0,
+      "net_profit_parent": 4283957365.0
+    },
+    {
+      "fiscal_year": 2018,
+      "revenue": 105994246123.0,
+      "net_profit_parent": 4093773630.0
+    }
+  ],
+  "share_count_current": 26590798241.0,
+  "sources": [
+    {
+      "evidence_id": "ev-cninfo-company-profile",
+      "kind": "vendor_api",
+      "publisher": "巨潮资讯",
+      "interface": "AKShare stock_industry_change_cninfo + stock_share_change_cninfo",
+      "url": "https://webapi.cninfo.com.cn/#/company",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "证券简称",
+        "行业门类",
+        "行业大类",
+        "行业次类",
+        "行业中类",
+        "总股本"
+      ],
+      "note": "东方财富个股信息不可用时回退巨潮：行业取最近一次分类（优先申万口径），总股本取股本变动最近一条；行业分类只是线索，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_zygc_em（主营构成）",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_financial_abstract（关键指标）",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    }
+  ],
+  "notes": [
+    "本文件只记录可核实事实与出处；模型适用性判定见 engine/evidence/applicability.py。",
+    "行业分类只作为线索，不单独决定模型；判定不使用当前股价。"
+  ],
+  "evidence_id": "biz-3e316f893cbd32c3"
+}

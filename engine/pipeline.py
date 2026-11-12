@@ -42,6 +42,8 @@ from engine.series.models import (
     SeriesStore,
 )
 from engine.series.profile import POOL_METRICS, build_index_profile
+from engine.signals.candidate_a import build_candidate_a_signal
+from engine.signals.ledger import LedgerError, SignalLedger
 from engine.valuation.runner import run_research_valuation
 from engine.reporting.payload_builders import (
     collect_missing_data,
@@ -69,6 +71,8 @@ DEFAULT_EQUITY_LIST = PROJECT_ROOT / "data" / "registry" / "cn_a_equities.json"
 DEFAULT_SNAPSHOTS = PROJECT_ROOT / "data" / "snapshots"
 DEFAULT_EVIDENCE = PROJECT_ROOT / "data" / "evidence"
 DEFAULT_SERIES = PROJECT_ROOT / "data" / "series"
+DEFAULT_BACKTEST = PROJECT_ROOT / "data" / "backtest" / "candidate-a.json"
+DEFAULT_LEDGER = PROJECT_ROOT / "data" / "ledger" / "candidate-a-signals.jsonl"
 
 
 @dataclass(frozen=True)
@@ -78,6 +82,8 @@ class AnalyzerConfig:
     snapshot_dir: Path = DEFAULT_SNAPSHOTS
     evidence_dir: Path = DEFAULT_EVIDENCE
     series_dir: Path = DEFAULT_SERIES
+    backtest_path: Path = DEFAULT_BACKTEST
+    ledger_path: Path = DEFAULT_LEDGER
     assumptions_path: Path | None = None
     cross_check_assumptions_path: Path | None = None
 
@@ -408,11 +414,19 @@ class Analyzer:
     ) -> AnalysisResult:
         as_of = snapshot.as_of if snapshot is not None else generated_at[:10]
         profile = self._index_profile(instrument, as_of)
+        signal = build_candidate_a_signal(
+            self.series,
+            instrument.instrument_id,
+            as_of=as_of,
+            backtest_path=self.config.backtest_path,
+        )
+        signal["ledger"] = self._signal_ledger_info(instrument.instrument_id)
         return self._compose_index_result(
             instrument,
             resolution,
             snapshot,
             profile,
+            signal,
             intent=intent,
             generated_at=generated_at,
         )
@@ -423,6 +437,7 @@ class Analyzer:
         resolution: Resolution,
         snapshot: Snapshot | None,
         profile: dict,
+        signal: dict | None,
         *,
         intent: str,
         generated_at: str,
@@ -458,19 +473,19 @@ class Analyzer:
             codes.append(rc.INDEX_PROFILE_SERIES_MISSING)
         if profile.get("missing"):
             codes.append(rc.INDEX_PROFILE_COVERAGE_INSUFFICIENT)
-        codes.extend(
-            [
-                rc.INDEX_PROFILE_DESCRIPTIVE_ONLY,
-                rc.INDEX_STRATEGY_NOT_IMPLEMENTED,
-                rc.RESEARCH_PARAMETERS_UNAPPROVED,
-            ]
-        )
+        codes.extend([rc.INDEX_PROFILE_DESCRIPTIVE_ONLY, rc.RESEARCH_PARAMETERS_UNAPPROVED])
+        if signal is not None and signal.get("status") == "complete":
+            codes.append(rc.INDEX_SIGNAL_RESEARCH_ONLY)
+        else:
+            codes.append(rc.INDEX_STRATEGY_NOT_IMPLEMENTED)
         if snapshot is None:
             codes.append(rc.SNAPSHOT_NOT_FOUND)
 
         result.reason_codes = codes
-        result.model_plan = _index_profile_plan(profile)
-        result.payload = self._build_payload(instrument, snapshot, index_profile=profile)
+        result.model_plan = _index_profile_plan(profile, signal=signal)
+        result.payload = self._build_payload(
+            instrument, snapshot, index_profile=profile, candidate_a_signal=signal
+        )
         result.model_results = (
             [_index_profile_result(profile, instrument)]
             if computed
@@ -483,15 +498,17 @@ class Analyzer:
         result.conditions = [
             "画像只回答「当前值相对该供应商历史分布处于什么位置」，不是交易信号。",
             "月度参考样本与官方短历史分开使用；官方最新值不参与第三方历史排名。",
+            "候选 A 研究信号只描述周度分位条件是否成立，不代表建议持仓，也不构成买卖结论。",
         ]
         result.invalidation = [
             "供应商历史序列被修订或更换口径时，分位需要重算。",
             "若窗口内有效月份少于 54 个，对应分位将不再给出。",
-            "若未来引入经批准的策略规则，本画像需要重新评估其用途（当前无策略结论）。",
+            "官方日频序列被修订或规则版本变化时，研究信号与账本记录需要按新序列重放。",
         ]
         result.warnings = [
-            "本轮不实现分位进出策略、不生成波段买点，也不做回测。",
+            "候选 A 只以研究信号展示：规则与阈值未获批准，不构成买点，也不代替投资决策。",
             "PE/PB 的聚合方法与亏损样本处理在来源中未说明，只能作同源同列的描述性比较。",
+            "研究信号按官方日频滚动市盈率计算，与第三方月度画像不是同一条序列。",
         ]
         if profile_status == "partial":
             result.warnings.append("部分指标覆盖不足：对应分位未计算，已在缺失清单中说明。")
@@ -701,6 +718,39 @@ class Analyzer:
         return self._finalize(result, instrument)
 
     # --- 已配置的假设 ---------------------------------------------------
+    def _signal_ledger_info(self, instrument_id: str) -> dict:
+        """账本状态：只追加、已有记录不可修改；这里只读取，不写入。"""
+        path = Path(self.config.ledger_path)
+        try:
+            relative = str(path.relative_to(PROJECT_ROOT))
+        except ValueError:
+            relative = str(path)
+        try:
+            records = [
+                record
+                for record in SignalLedger(path).load()
+                if record.get("instrument_id") == instrument_id
+            ]
+        except LedgerError as exc:
+            return {"path": relative, "status": "unavailable", "note": str(exc)}
+        if not records:
+            return {
+                "path": relative,
+                "status": "empty",
+                "records": 0,
+                "note": "尚未写入任何观察点：运行 tools/update_signal_ledger.py 前向记录",
+            }
+        latest = max(records, key=lambda record: str(record["date"]))
+        return {
+            "path": relative,
+            "status": "ok",
+            "records": len(records),
+            "last_week": latest.get("week"),
+            "last_date": latest.get("date"),
+            "last_signal": latest.get("signal"),
+            "note": "只追加账本：每次运行把新出现的周度观察点写入，已有记录不可修改",
+        }
+
     def _configured_assumptions(self) -> AssumptionSet | None:
         if not hasattr(self, "_assumption_cache"):
             self._assumption_cache = (
@@ -791,6 +841,7 @@ class Analyzer:
         model_applicability: dict | None = None,
         index_profile: dict | None = None,
         product_check: dict | None = None,
+        candidate_a_signal: dict | None = None,
     ) -> dict:
         if instrument.asset_class == AssetClass.EQUITY:
             return build_equity_payload(
@@ -805,6 +856,7 @@ class Analyzer:
                 snapshot,
                 strategy_candidates=strategy_candidates(),
                 profile=index_profile,
+                signal=candidate_a_signal,
             )
         if instrument.asset_class == AssetClass.ETF:
             underlying = self.catalog.underlying(instrument)
@@ -878,7 +930,9 @@ class Analyzer:
         }
 
 
-def _index_profile_plan(profile: dict, *, note_asset: str | None = None) -> dict:
+def _index_profile_plan(
+    profile: dict, *, signal: dict | None = None, note_asset: str | None = None
+) -> dict:
     metrics = profile.get("metrics") or {}
     model = MODELS_BY_ID["index_valuation_profile"]
     return {
@@ -893,16 +947,25 @@ def _index_profile_plan(profile: dict, *, note_asset: str | None = None) -> dict
         ],
         "selection_reason": note_asset
         or "宽基指数用描述性估值画像：只给出当前值在历史分布中的位置，不产生波段信号",
-        "not_selected": [
+        "research_signals": [
             {
                 "model_id": "index_strategy_a_valuation_reversion",
-                "reason_code": rc.INDEX_STRATEGY_NOT_IMPLEMENTED,
-                "reason": "分位进出规则与回测留待下一批；本轮不实现状态机，也不给入场/退出信号",
-            },
+                "model_version": MODELS_BY_ID["index_strategy_a_valuation_reversion"].version,
+                "model_status": "research",
+                "approved": False,
+                "status": (signal or {}).get("status"),
+                "signal": (signal or {}).get("signal"),
+                "reason_code": rc.INDEX_SIGNAL_RESEARCH_ONLY,
+                "note": "候选 A 已实现为研究信号并前向记账；规则未批准，结论仍为 undetermined",
+            }
+        ]
+        if signal is not None
+        else [],
+        "not_selected": [
             {
                 "model_id": "index_strategy_b_cross_confirmation",
                 "reason_code": rc.INDEX_STRATEGY_NOT_IMPLEMENTED,
-                "reason": "同上：交叉确认规则与回测留待下一批",
+                "reason": "候选 B（PE+PB 交叉确认）与正式策略状态尚未实现，本版不输出该信号",
             },
         ],
         "candidate_models": [],

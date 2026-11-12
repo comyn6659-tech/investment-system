@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-e39e3900c9b64e78",
-  "generated_at": "2026-11-12T00:41:27+08:00",
+  "analysis_id": "analysis-1ebd498f4a23e015",
+  "generated_at": "2026-11-12T13:52:11+08:00",
   "instrument": {
     "instrument_id": "INDEX:000300.SH",
     "display_name": "沪深300",
@@ -84,8 +84,8 @@
   "decision": "undetermined",
   "reason_codes": [
     "INDEX_PROFILE_DESCRIPTIVE_ONLY",
-    "INDEX_STRATEGY_NOT_IMPLEMENTED",
     "RESEARCH_PARAMETERS_UNAPPROVED",
+    "INDEX_SIGNAL_RESEARCH_ONLY",
     "RESEARCH_SIGNAL_ONLY"
   ],
   "model_plan": {
@@ -99,16 +99,23 @@
       "PE 与 PB 分别计算，不拼综合分"
     ],
     "selection_reason": "宽基指数用描述性估值画像：只给出当前值在历史分布中的位置，不产生波段信号",
-    "not_selected": [
+    "research_signals": [
       {
         "model_id": "index_strategy_a_valuation_reversion",
-        "reason_code": "INDEX_STRATEGY_NOT_IMPLEMENTED",
-        "reason": "分位进出规则与回测留待下一批；本轮不实现状态机，也不给入场/退出信号"
-      },
+        "model_version": "0.4.0-research",
+        "model_status": "research",
+        "approved": false,
+        "status": "complete",
+        "signal": "exit",
+        "reason_code": "INDEX_SIGNAL_RESEARCH_ONLY",
+        "note": "候选 A 已实现为研究信号并前向记账；规则未批准，结论仍为 undetermined"
+      }
+    ],
+    "not_selected": [
       {
         "model_id": "index_strategy_b_cross_confirmation",
         "reason_code": "INDEX_STRATEGY_NOT_IMPLEMENTED",
-        "reason": "同上：交叉确认规则与回测留待下一批"
+        "reason": "候选 B（PE+PB 交叉确认）与正式策略状态尚未实现，本版不输出该信号"
       }
     ],
     "candidate_models": [],
@@ -158,12 +165,13 @@
   ],
   "conditions": [
     "画像只回答「当前值相对该供应商历史分布处于什么位置」，不是交易信号。",
-    "月度参考样本与官方短历史分开使用；官方最新值不参与第三方历史排名。"
+    "月度参考样本与官方短历史分开使用；官方最新值不参与第三方历史排名。",
+    "候选 A 研究信号只描述周度分位条件是否成立，不代表建议持仓，也不构成买卖结论。"
   ],
   "invalidation": [
     "供应商历史序列被修订或更换口径时，分位需要重算。",
     "若窗口内有效月份少于 54 个，对应分位将不再给出。",
-    "若未来引入经批准的策略规则，本画像需要重新评估其用途（当前无策略结论）。"
+    "官方日频序列被修订或规则版本变化时，研究信号与账本记录需要按新序列重放。"
   ],
   "evidence_refs": [
     {
@@ -223,8 +231,9 @@
   ],
   "missing_data": [],
   "warnings": [
-    "本轮不实现分位进出策略、不生成波段买点，也不做回测。",
-    "PE/PB 的聚合方法与亏损样本处理在来源中未说明，只能作同源同列的描述性比较。"
+    "候选 A 只以研究信号展示：规则与阈值未获批准，不构成买点，也不代替投资决策。",
+    "PE/PB 的聚合方法与亏损样本处理在来源中未说明，只能作同源同列的描述性比较。",
+    "研究信号按官方日频滚动市盈率计算，与第三方月度画像不是同一条序列。"
   ],
   "clarification": null,
   "payload": {
@@ -413,7 +422,7 @@
       }
     },
     "strategy_state": {
-      "status": "not_implemented",
+      "status": "research_signal_only",
       "model_status": "research",
       "candidates": [
         {
@@ -423,7 +432,9 @@
           "model_status": "research",
           "entry": "PE-TTM 5年历史分位 ≤ 20",
           "exit": "PE 分位 ≥ 60，或持有满 12 个日历月",
-          "implemented": false
+          "implemented": true,
+          "implemented_as": "research_signal_with_append_only_ledger",
+          "approved": false
         },
         {
           "candidate": "B",
@@ -435,7 +446,149 @@
           "implemented": false
         }
       ],
-      "note": "分位进出策略与回测留待下一批；本轮只输出描述性画像，不产生入场/退出信号，也不给目标点位。"
+      "candidate_a_signal": {
+        "model_id": "index_strategy_a_valuation_reversion",
+        "model_status": "research",
+        "is_trading_signal": false,
+        "research_signal": true,
+        "approved": false,
+        "label": "候选 A 研究信号（未批准）",
+        "rule": {
+          "entry_percentile": 20.0,
+          "exit_percentile": 60.0,
+          "window_years": 5,
+          "min_coverage": 0.9,
+          "max_hold_months": 12,
+          "execution": "信号在观察点收盘后形成，研究回测按下一交易日收盘成交（T+1）",
+          "rule_version": "candidate-a/1"
+        },
+        "as_of": "2026-11-10",
+        "series_ids": {
+          "close": "ser-0a043ec0defae285",
+          "pe": "ser-cbbf2d714e0e8c2a",
+          "total_return": "ser-a1211121f5c38cfa"
+        },
+        "backtest": {
+          "return_basis": "total_return",
+          "execution_lag": 1,
+          "cost_bp": 10.0,
+          "start": "2016-03-11",
+          "end": "2026-11-11",
+          "trades": 5,
+          "cumulative_return": 1.203403616825062,
+          "annualized_return": 0.07679939778164901,
+          "max_drawdown": -0.21948027161894146,
+          "benchmark_total_return": 0.7386895100180446,
+          "excess_vs_total_return": 0.4647141068070173,
+          "generated_at": "2026-11-12T00:40:50+08:00",
+          "report_path": "docs/phase3c-backtest.md",
+          "data_path": "data/backtest/candidate-a.json",
+          "note": "回测记录摘要，只用于说明该规则的历史测算结果；样本交易次数少、理论指数不可直接投资，不能据此推断规则好坏"
+        },
+        "status": "complete",
+        "signal": "exit",
+        "entry_condition_met": false,
+        "exit_condition_met": true,
+        "position_context": "只描述条件是否成立；本报告不跟踪实际持仓，也不产生买卖指令",
+        "latest": {
+          "week": "2026-W45",
+          "date": "2026-11-06",
+          "pe": 13.13,
+          "percentile": 67.71653543307086,
+          "evaluable": true,
+          "reason": null,
+          "window_start": "2021-11-06",
+          "weeks_in_window": 254,
+          "valid_weeks": 254,
+          "coverage": 1.0,
+          "pool_size": 254,
+          "percentile_display": 67.7,
+          "week_complete": true,
+          "note": "该观察点是所在 ISO 周最后一个已收盘交易日"
+        },
+        "reason": null,
+        "ledger": {
+          "path": "data/ledger/candidate-a-signals.jsonl",
+          "status": "ok",
+          "records": 1,
+          "last_week": "2026-W45",
+          "last_date": "2026-11-06",
+          "last_signal": "exit",
+          "note": "只追加账本：每次运行把新出现的周度观察点写入，已有记录不可修改"
+        }
+      },
+      "note": "候选 A 已实现为研究信号并前向记账；规则与阈值未获批准，信号只描述条件是否成立，不构成买卖建议，也不给目标点位。"
+    },
+    "candidate_a_signal": {
+      "model_id": "index_strategy_a_valuation_reversion",
+      "model_status": "research",
+      "is_trading_signal": false,
+      "research_signal": true,
+      "approved": false,
+      "label": "候选 A 研究信号（未批准）",
+      "rule": {
+        "entry_percentile": 20.0,
+        "exit_percentile": 60.0,
+        "window_years": 5,
+        "min_coverage": 0.9,
+        "max_hold_months": 12,
+        "execution": "信号在观察点收盘后形成，研究回测按下一交易日收盘成交（T+1）",
+        "rule_version": "candidate-a/1"
+      },
+      "as_of": "2026-11-10",
+      "series_ids": {
+        "close": "ser-0a043ec0defae285",
+        "pe": "ser-cbbf2d714e0e8c2a",
+        "total_return": "ser-a1211121f5c38cfa"
+      },
+      "backtest": {
+        "return_basis": "total_return",
+        "execution_lag": 1,
+        "cost_bp": 10.0,
+        "start": "2016-03-11",
+        "end": "2026-11-11",
+        "trades": 5,
+        "cumulative_return": 1.203403616825062,
+        "annualized_return": 0.07679939778164901,
+        "max_drawdown": -0.21948027161894146,
+        "benchmark_total_return": 0.7386895100180446,
+        "excess_vs_total_return": 0.4647141068070173,
+        "generated_at": "2026-11-12T00:40:50+08:00",
+        "report_path": "docs/phase3c-backtest.md",
+        "data_path": "data/backtest/candidate-a.json",
+        "note": "回测记录摘要，只用于说明该规则的历史测算结果；样本交易次数少、理论指数不可直接投资，不能据此推断规则好坏"
+      },
+      "status": "complete",
+      "signal": "exit",
+      "entry_condition_met": false,
+      "exit_condition_met": true,
+      "position_context": "只描述条件是否成立；本报告不跟踪实际持仓，也不产生买卖指令",
+      "latest": {
+        "week": "2026-W45",
+        "date": "2026-11-06",
+        "pe": 13.13,
+        "percentile": 67.71653543307086,
+        "evaluable": true,
+        "reason": null,
+        "window_start": "2021-11-06",
+        "weeks_in_window": 254,
+        "valid_weeks": 254,
+        "coverage": 1.0,
+        "pool_size": 254,
+        "percentile_display": 67.7,
+        "week_complete": true,
+        "note": "该观察点是所在 ISO 周最后一个已收盘交易日"
+      },
+      "reason": null,
+      "ledger": {
+        "path": "data/ledger/candidate-a-signals.jsonl",
+        "status": "ok",
+        "records": 1,
+        "last_week": "2026-W45",
+        "last_date": "2026-11-06",
+        "last_signal": "exit",
+        "note": "只追加账本：每次运行把新出现的周度观察点写入，已有记录不可修改"
+      }
     },
     "valuation_profile": {
       "payload_version": "index-profile/1",
@@ -747,7 +900,7 @@
       "is_trading_signal": false
     }
   },
-  "code_version": "phase3-0.5.1",
+  "code_version": "phase4-0.1.0",
   "policy_version": "unapproved-phase2",
-  "model_version": "research-0.3.0"
+  "model_version": "research-0.4.0"
 }

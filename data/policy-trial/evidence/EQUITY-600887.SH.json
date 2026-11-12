@@ -1,0 +1,178 @@
+{
+  "schema_version": "business-evidence/1",
+  "instrument_id": "EQUITY:600887.SH",
+  "display_name": "伊利股份",
+  "as_of": "2026-11-11",
+  "prepared_at": "2026-11-12T13:46:57+08:00",
+  "version": "2026-11-11",
+  "industry_clue": "食品饮料 / 乳品 / 饮料乳品",
+  "business_mix": {
+    "report_date": "2026-06-30",
+    "by_product": [
+      {
+        "segment": "液体乳",
+        "revenue_share": 0.56878,
+        "revenue": 36590165256.23,
+        "gross_margin": 0.341513
+      },
+      {
+        "segment": "奶粉及奶制品",
+        "revenue_share": 0.261854,
+        "revenue": 16845309973.63,
+        "gross_margin": 0.412537
+      },
+      {
+        "segment": "冷饮产品",
+        "revenue_share": 0.141036,
+        "revenue": 9072995934.4,
+        "gross_margin": 0.390568
+      },
+      {
+        "segment": "其他",
+        "revenue_share": 0.019685,
+        "revenue": 1266349966.6,
+        "gross_margin": 0.127194
+      },
+      {
+        "segment": "其他(补充)",
+        "revenue_share": 0.008645,
+        "revenue": 556115416.52,
+        "gross_margin": 0.515797
+      }
+    ],
+    "by_region": [
+      {
+        "segment": "华北",
+        "revenue_share": 0.285196,
+        "revenue": 18346939588.38,
+        "gross_margin": 0.363902
+      },
+      {
+        "segment": "华南",
+        "revenue_share": 0.241542,
+        "revenue": 15538593978.27,
+        "gross_margin": 0.382897
+      },
+      {
+        "segment": "华中",
+        "revenue_share": 0.181787,
+        "revenue": 11694556094.42,
+        "gross_margin": 0.387815
+      },
+      {
+        "segment": "华东",
+        "revenue_share": 0.144328,
+        "revenue": 9284747908.62,
+        "gross_margin": 0.365964
+      },
+      {
+        "segment": "其他",
+        "revenue_share": 0.138502,
+        "revenue": 8909983561.17,
+        "gross_margin": 0.290757
+      },
+      {
+        "segment": "其他(补充)",
+        "revenue_share": 0.008645,
+        "revenue": 556115416.52,
+        "gross_margin": 0.515797
+      }
+    ]
+  },
+  "annual_history": [
+    {
+      "fiscal_year": 2025,
+      "revenue": 115931105774.99,
+      "net_profit_parent": 11565166497.81
+    },
+    {
+      "fiscal_year": 2024,
+      "revenue": 115779554649.3,
+      "net_profit_parent": 8452859993.18
+    },
+    {
+      "fiscal_year": 2023,
+      "revenue": 126179458590.36,
+      "net_profit_parent": 10428540457.94
+    },
+    {
+      "fiscal_year": 2022,
+      "revenue": 123171044056.27,
+      "net_profit_parent": 9431064679.78
+    },
+    {
+      "fiscal_year": 2021,
+      "revenue": 110595203162.81,
+      "net_profit_parent": 8704915103.95
+    },
+    {
+      "fiscal_year": 2020,
+      "revenue": 96885641951.94,
+      "net_profit_parent": 7078176787.81
+    },
+    {
+      "fiscal_year": 2019,
+      "revenue": 90223075471.27,
+      "net_profit_parent": 6933763430.47
+    },
+    {
+      "fiscal_year": 2018,
+      "revenue": 79553277524.49,
+      "net_profit_parent": 6439749610.82
+    }
+  ],
+  "share_count_current": 6325360667.0,
+  "sources": [
+    {
+      "evidence_id": "ev-cninfo-company-profile",
+      "kind": "vendor_api",
+      "publisher": "巨潮资讯",
+      "interface": "AKShare stock_industry_change_cninfo + stock_share_change_cninfo",
+      "url": "https://webapi.cninfo.com.cn/#/company",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "证券简称",
+        "行业门类",
+        "行业大类",
+        "行业次类",
+        "行业中类",
+        "总股本"
+      ],
+      "note": "东方财富个股信息不可用时回退巨潮：行业取最近一次分类（优先申万口径），总股本取股本变动最近一条；行业分类只是线索，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_zygc_em（主营构成）",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_financial_abstract（关键指标）",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    }
+  ],
+  "notes": [
+    "本文件只记录可核实事实与出处；模型适用性判定见 engine/evidence/applicability.py。",
+    "行业分类只作为线索，不单独决定模型；判定不使用当前股价。"
+  ],
+  "evidence_id": "biz-8abec02d9f81c779"
+}

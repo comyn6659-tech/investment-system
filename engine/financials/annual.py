@@ -52,6 +52,10 @@ _ANNUAL_FIELDS = (
     "share_capital",
     "eps_basic",
     "loan_advance",
+    # 政策试运行新增：期末现金等价物用于估算受限资金；吸收存款用于金融子公司判定
+    "cash_equivalents_end",
+    "cash_flow_end_cce",
+    "accept_deposit_interbank",
 )
 
 

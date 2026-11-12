@@ -53,6 +53,8 @@ PAYLOAD_SCHEMAS: dict[str, set[str]] = {
         "valuation_facts",
         "history_coverage",
         "strategy_state",
+        # 阶段四：候选 A 研究信号（未批准；只描述条件是否成立）
+        "candidate_a_signal",
         # 阶段三研究画像（有版本）：描述性统计，不是交易信号
         "valuation_profile",
     },
@@ -75,7 +77,7 @@ PAYLOAD_SCHEMAS: dict[str, set[str]] = {
 # 可选字段：旧结果（阶段一）没有这些字段仍然合法，新结果可以带上
 PAYLOAD_OPTIONAL_FIELDS: dict[str, set[str]] = {
     "equity": {"research_valuation", "dividend_summary"},
-    "index": {"valuation_profile"},
+    "index": {"valuation_profile", "candidate_a_signal"},
     "etf": {"product_check"},
     "none": set(),
 }
@@ -103,7 +105,8 @@ def empty_index_payload() -> dict[str, Any]:
         "level": None,
         "valuation_facts": {},
         "history_coverage": {},
-        "strategy_state": {"status": "not_implemented", "model_status": "research"},
+        "strategy_state": {"status": "research_signal_only", "model_status": "research"},
+        "candidate_a_signal": None,
         "valuation_profile": None,
     }
 

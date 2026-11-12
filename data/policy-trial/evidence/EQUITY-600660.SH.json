@@ -1,0 +1,141 @@
+{
+  "schema_version": "business-evidence/1",
+  "instrument_id": "EQUITY:600660.SH",
+  "display_name": "福耀玻璃",
+  "as_of": "2026-11-11",
+  "prepared_at": "2026-11-12T13:46:57+08:00",
+  "version": "2026-11-11",
+  "industry_clue": "汽车 / 车身附件及饰件 / 汽车零部件",
+  "business_mix": {
+    "report_date": "2026-06-30",
+    "by_product": [
+      {
+        "segment": "汽车玻璃",
+        "revenue_share": 0.922583,
+        "revenue": 20270178051.0,
+        "gross_margin": 0.324458
+      },
+      {
+        "segment": "浮法玻璃",
+        "revenue_share": 0.14386,
+        "revenue": 3160754339.0,
+        "gross_margin": 0.415761
+      },
+      {
+        "segment": "其他",
+        "revenue_share": 0.096447,
+        "revenue": 2119039546.0,
+        "gross_margin": 0.225842
+      },
+      {
+        "segment": "其他(补充)",
+        "revenue_share": 0.015667,
+        "revenue": 344231591.0,
+        "gross_margin": 0.7302
+      },
+      {
+        "segment": "减:内部抵销",
+        "revenue_share": -0.178557,
+        "revenue": -3923098915.0,
+        "gross_margin": null
+      }
+    ],
+    "by_region": []
+  },
+  "annual_history": [
+    {
+      "fiscal_year": 2025,
+      "revenue": 45787435563.0,
+      "net_profit_parent": 9312304150.0
+    },
+    {
+      "fiscal_year": 2024,
+      "revenue": 39251657267.0,
+      "net_profit_parent": 7497976123.0
+    },
+    {
+      "fiscal_year": 2023,
+      "revenue": 33160996641.0,
+      "net_profit_parent": 5629256054.0
+    },
+    {
+      "fiscal_year": 2022,
+      "revenue": 28098754166.0,
+      "net_profit_parent": 4755595541.0
+    },
+    {
+      "fiscal_year": 2021,
+      "revenue": 23603063361.0,
+      "net_profit_parent": 3146167091.0
+    },
+    {
+      "fiscal_year": 2020,
+      "revenue": 19906593468.0,
+      "net_profit_parent": 2600776459.0
+    },
+    {
+      "fiscal_year": 2019,
+      "revenue": 21103877523.0,
+      "net_profit_parent": 2898433273.0
+    },
+    {
+      "fiscal_year": 2018,
+      "revenue": 20224985720.0,
+      "net_profit_parent": 4120487402.0
+    }
+  ],
+  "share_count_current": 2609743532.0,
+  "sources": [
+    {
+      "evidence_id": "ev-cninfo-company-profile",
+      "kind": "vendor_api",
+      "publisher": "巨潮资讯",
+      "interface": "AKShare stock_industry_change_cninfo + stock_share_change_cninfo",
+      "url": "https://webapi.cninfo.com.cn/#/company",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "证券简称",
+        "行业门类",
+        "行业大类",
+        "行业次类",
+        "行业中类",
+        "总股本"
+      ],
+      "note": "东方财富个股信息不可用时回退巨潮：行业取最近一次分类（优先申万口径），总股本取股本变动最近一条；行业分类只是线索，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_zygc_em（主营构成）",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_financial_abstract（关键指标）",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    }
+  ],
+  "notes": [
+    "本文件只记录可核实事实与出处；模型适用性判定见 engine/evidence/applicability.py。",
+    "行业分类只作为线索，不单独决定模型；判定不使用当前股价。"
+  ],
+  "evidence_id": "biz-47e55e3bd3f2bda0"
+}

@@ -203,3 +203,23 @@
 | H4 | 停复牌与盘口价差未取得 | 不能断言可交易 |
 | H5 | 净值披露时刻未知 | 同日折溢价只能事后计算 |
 | H6 | 非首批宽基无序列 | 返回 `insufficient_data` + 缺口 |
+
+---
+
+# 第四阶段第一批验收清单（个股政策试运行 + 指数研究信号）
+
+对应文件：`outputs/equity-policy-v1-draft-and-batch4a.md` 第二部分与冻结验收条件 L1–L8。
+本批只写试运行报告的「预演结论」，不改 CLI 的 research/undetermined，不升级 validated，不调指数阈值。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| L1 | 政策文件集中、版本化；每个参数带来源或理由；代码无散落阈值 | `data/policies/equity-policy-v1-draft.json`、`engine/policy/equity.py` | `test_policy_is_versioned_draft_and_cannot_self_approve`、`test_every_parameter_has_source_or_reason`、`test_policy_module_has_no_hardcoded_policy_numbers`、`test_changing_policy_changes_behavior` | ✅ |
+| L2 | 折现率、终值、再投资一致性、情景按第一部分实现，各有手算测试；600519 两模型分歧报告并解释 | `engine/policy/valuation.py`、`docs/phase4a-equity-policy-trial.md` §1/§6 | `test_normalized_risk_free_*`、`test_discount_rate_build_matches_hand_calculation`、`test_cost_of_debt_floors_at_risk_free`、`test_growth_paths_*`、`test_terminal_growth_is_capped_by_*`、`test_fcff_value_matches_hand_calculation`、`test_dividend_value_matches_hand_calculation`、`test_terminal_payout_equals_one_minus_g_over_roi`、`test_maotai_two_model_divergence_under_new_rules` | ✅ |
+| L3 | 确定性等级与结论映射按第 5、6 节实现，边界条件有测试；C 级、partial 一律无法判断 | `engine/policy/grading.py` | `test_grade_a_*`、`test_grade_b_*`、`test_grade_c_*`、`test_grade_boundary_net_debt_to_ebitda`、`test_bank_without_risk_evidence_cannot_exceed_c`、`test_conclusion_boundaries`、`test_conclusion_requires_pessimistic_condition`、`test_grade_c_and_partial_are_always_undetermined`、`test_margin_sensitivity_grid_*` | ✅ |
+| L4 | 30 只测试集全部有结果（含资料不足等如实状态），快照与来源可重放 | `data/policy-trial/snapshots/`、`data/policy-trial/evidence/`、`engine/policy/trial.py` | `test_trial_covers_all_thirty_codes`、`test_trial_snapshots_replay`；报告 §2 数据表逐只列出快照与状态 | ✅ |
+| L5 | 试运行报告字段齐全，含全集分布与安全边际敏感性 | `tools/run_equity_policy_trial.py`、`data/policy-trial/trial-report.json` | `test_trial_complete_records_have_full_fields`、`test_trial_distribution_and_margin_sensitivity`、`test_trial_markdown_contains_required_sections` | ✅ |
+| L6 | 指数研究信号与只追加账本按 B 节实现，有测试；重复运行不重复写入、不改旧记录 | `engine/signals/candidate_a.py`、`engine/signals/ledger.py`、`tools/update_signal_ledger.py` | `test_candidate_a_signal_for_csi300`、`test_classify_signal_boundaries`、`test_ledger_append_is_idempotent`、`test_ledger_refuses_to_rewrite_history`、`test_ledger_detects_tampered_record`、`test_ledger_update_command_is_idempotent`、`test_index_report_contains_research_signal` | ✅ |
+| L7 | CLI、research/undetermined 不变；全部既有测试通过 | `engine/pipeline.py`（指数分支新增信号）、`engine/valuation/runner.py`（未改） | `test_index_signal_cannot_become_price_judgement`、`test_research_payload_cannot_be_combined_with_candidate`；全部既有回归通过 | ✅ |
+| L8 | DELIVERY.md 汇总并链接上述内容、复现命令、测试结果、提交 ID | `DELIVERY.md` | 入口文件 §1–§8 | ✅ |
+
+**不作为通过条件**：候选买点数量、哪些股票被判为便宜。本批按事实交付，分布见试运行报告 §4。

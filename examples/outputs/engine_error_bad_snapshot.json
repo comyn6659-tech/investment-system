@@ -1,7 +1,7 @@
 {
   "schema_version": "analysis-result/1",
-  "analysis_id": "analysis-c1eaf397c12c4232",
-  "generated_at": "2026-11-12T00:41:26+08:00",
+  "analysis_id": "analysis-c0938ec6fd559fa8",
+  "generated_at": "2026-11-12T13:52:10+08:00",
   "instrument": {
     "instrument_id": "INDEX:000300.SH",
     "display_name": "沪深300",
@@ -112,7 +112,7 @@
     "valuation_facts": {},
     "history_coverage": {},
     "strategy_state": {
-      "status": "not_implemented",
+      "status": "research_signal_only",
       "model_status": "research",
       "candidates": [
         {
@@ -122,7 +122,9 @@
           "model_status": "research",
           "entry": "PE-TTM 5年历史分位 ≤ 20",
           "exit": "PE 分位 ≥ 60，或持有满 12 个日历月",
-          "implemented": false
+          "implemented": true,
+          "implemented_as": "research_signal_with_append_only_ledger",
+          "approved": false
         },
         {
           "candidate": "B",
@@ -134,11 +136,13 @@
           "implemented": false
         }
       ],
-      "note": "分位进出策略与回测留待下一批；本轮只输出描述性画像，不产生入场/退出信号，也不给目标点位。"
+      "candidate_a_signal": null,
+      "note": "候选 A 已实现为研究信号并前向记账；规则与阈值未获批准，信号只描述条件是否成立，不构成买卖建议，也不给目标点位。"
     },
+    "candidate_a_signal": null,
     "valuation_profile": null
   },
-  "code_version": "phase3-0.5.1",
+  "code_version": "phase4-0.1.0",
   "policy_version": "unapproved-phase2",
-  "model_version": "research-0.3.0"
+  "model_version": "research-0.4.0"
 }

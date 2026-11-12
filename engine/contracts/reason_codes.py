@@ -225,7 +225,13 @@ INDEX_PROFILE_DESCRIPTIVE_ONLY = _register(
 INDEX_STRATEGY_NOT_IMPLEMENTED = _register(
     "INDEX_STRATEGY_NOT_IMPLEMENTED",
     "model",
-    "分位进出策略与回测尚未实现，本轮不产生入场/退出信号",
+    "该指数策略尚未实现（候选 B 与正式策略状态），本版不输出该信号",
+)
+INDEX_SIGNAL_RESEARCH_ONLY = _register(
+    "INDEX_SIGNAL_RESEARCH_ONLY",
+    "model",
+    "候选 A 只输出研究信号且规则未获批准，不构成买卖结论",
+    blocks_candidate=False,
 )
 INDEX_PROFILE_COVERAGE_INSUFFICIENT = _register(
     "INDEX_PROFILE_COVERAGE_INSUFFICIENT",

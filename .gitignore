@@ -12,6 +12,9 @@ __pycache__/
 # 本项目的独立缓存：大体积原始数据不入版本控制
 data/cache/*
 !data/cache/.gitkeep
+data/policy-trial/cache/
+data/policy-trial/logs/
+data/*/build.log
 
 # 工具产物
 reports/_runtime/

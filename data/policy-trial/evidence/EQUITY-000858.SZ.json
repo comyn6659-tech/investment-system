@@ -1,0 +1,136 @@
+{
+  "schema_version": "business-evidence/1",
+  "instrument_id": "EQUITY:000858.SZ",
+  "display_name": "五 粮 液",
+  "as_of": "2026-11-11",
+  "prepared_at": "2026-11-12T13:46:57+08:00",
+  "version": "2026-11-11",
+  "industry_clue": "食品饮料 / 白酒Ⅲ / 白酒Ⅱ",
+  "business_mix": {
+    "report_date": "2026-06-30",
+    "by_product": [
+      {
+        "segment": "酒类产品",
+        "revenue_share": 0.945452,
+        "revenue": 26866607488.06,
+        "gross_margin": 0.846088
+      },
+      {
+        "segment": "非酒类产品",
+        "revenue_share": 0.054548,
+        "revenue": 1550067053.71,
+        "gross_margin": 0.055245
+      }
+    ],
+    "by_region": [
+      {
+        "segment": "酒类产品-境内",
+        "revenue_share": 0.945452,
+        "revenue": 26866607488.06,
+        "gross_margin": 0.846088
+      },
+      {
+        "segment": "非酒类产品",
+        "revenue_share": 0.054548,
+        "revenue": 1550067053.71,
+        "gross_margin": 0.055245
+      }
+    ]
+  },
+  "annual_history": [
+    {
+      "fiscal_year": 2025,
+      "revenue": 40528509770.23,
+      "net_profit_parent": 8954257202.51
+    },
+    {
+      "fiscal_year": 2024,
+      "revenue": 89175178322.7,
+      "net_profit_parent": 31853172533.98
+    },
+    {
+      "fiscal_year": 2023,
+      "revenue": 83272067317.19,
+      "net_profit_parent": 30210585269.3
+    },
+    {
+      "fiscal_year": 2022,
+      "revenue": 73968640704.54,
+      "net_profit_parent": 26689983647.2
+    },
+    {
+      "fiscal_year": 2021,
+      "revenue": 66209053612.11,
+      "net_profit_parent": 23377074353.4
+    },
+    {
+      "fiscal_year": 2020,
+      "revenue": 57321059453.15,
+      "net_profit_parent": 19954809594.52
+    },
+    {
+      "fiscal_year": 2019,
+      "revenue": 50118105877.14,
+      "net_profit_parent": 17402164190.16
+    },
+    {
+      "fiscal_year": 2018,
+      "revenue": 40030189599.87,
+      "net_profit_parent": 13384246683.6
+    }
+  ],
+  "share_count_current": 3881608005.0,
+  "sources": [
+    {
+      "evidence_id": "ev-cninfo-company-profile",
+      "kind": "vendor_api",
+      "publisher": "巨潮资讯",
+      "interface": "AKShare stock_industry_change_cninfo + stock_share_change_cninfo",
+      "url": "https://webapi.cninfo.com.cn/#/company",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "证券简称",
+        "行业门类",
+        "行业大类",
+        "行业次类",
+        "行业中类",
+        "总股本"
+      ],
+      "note": "东方财富个股信息不可用时回退巨潮：行业取最近一次分类（优先申万口径），总股本取股本变动最近一条；行业分类只是线索，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_zygc_em（主营构成）",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_financial_abstract（关键指标）",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    }
+  ],
+  "notes": [
+    "本文件只记录可核实事实与出处；模型适用性判定见 engine/evidence/applicability.py。",
+    "行业分类只作为线索，不单独决定模型；判定不使用当前股价。"
+  ],
+  "evidence_id": "biz-a101745fe2f5ce18"
+}

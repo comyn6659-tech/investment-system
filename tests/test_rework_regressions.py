@@ -565,7 +565,10 @@ def test_f3_default_analysis_uses_registered_snapshot(analyzer, snapshot_dir):
 
 # --- F1：合法研究结果必须仍可输出（正例） ------------------------------------
 def _research_result(analyzer):
+    from engine.models.registry import MODELS_BY_ID
     from engine.contracts.enums import AnalysisStatus as AS
+
+    model_version = MODELS_BY_ID["index_strategy_a_valuation_reversion"].version
     from engine.contracts.enums import Decision as D
     from engine.contracts.enums import ModelStatus as MS
 
@@ -588,7 +591,7 @@ def _research_result(analyzer):
         {
             "result_type": "research_signal",
             "model_id": "index_strategy_a_valuation_reversion",
-            "model_version": "0.0.0-research",
+            "model_version": model_version,
             "model_status": "research",
             "pe_percentile_5y": 18.2,
             "note": "研究测算，不是买点",
@@ -628,6 +631,7 @@ def test_f1_research_signal_must_match_model_plan(analyzer):
 
 
 def test_f1_research_signal_not_allowed_on_unsupported(analyzer):
+    from engine.models.registry import MODELS_BY_ID
     result = analyzer.analyze("工商银行")
     # 该样例只验证 research_signal 契约：清掉真实画像，避免与改写的 model_results 冲突
     result.payload["valuation_profile"] = None
@@ -635,7 +639,7 @@ def test_f1_research_signal_not_allowed_on_unsupported(analyzer):
         {
             "result_type": "research_signal",
             "model_id": "index_strategy_a_valuation_reversion",
-            "model_version": "0.0.0-research",
+            "model_version": MODELS_BY_ID["index_strategy_a_valuation_reversion"].version,
             "model_status": "research",
             "value": 1,
         }

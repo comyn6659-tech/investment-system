@@ -40,6 +40,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 from engine.data.facts import Fact, SourceRef  # noqa: E402
 from engine.data.snapshot import Snapshot, SnapshotStore  # noqa: E402
 from engine.data.timeutil import parse_instant  # noqa: E402
+from company_profile import company_profile  # noqa: E402
 from market_time import (  # noqa: E402
     BuildError,
     as_date,
@@ -56,7 +57,9 @@ CACHE_DIR = ROOT / "data" / "cache"
 DEFAULT_CODES = ("600519", "600900", "601398")
 BANK_CODES = frozenset({"601398"})
 
-_PERIODS = 12  # 保留最近 12 个报告期（覆盖 3 个完整年度）
+_PERIODS = 12  # 默认保留最近 12 个报告期（覆盖 3 个完整年度）
+# 政策试运行需要 10 个完整财年（含同比基期），由调用方显式传入 periods=44；
+# 默认值保持不变，已签收快照不受影响。
 
 
 # --- 来源 -------------------------------------------------------------------
@@ -120,6 +123,28 @@ def _sources(code: str, now: str) -> dict[str, SourceRef]:
             url="https://quote.eastmoney.com/",
             retrieved_at=now,
             notes="不复权日线；用于取已收盘交易日的收盘价，不做复权处理",
+        ),
+        "price_sina": SourceRef(
+            source_id="sina.stock_zh_a_daily",
+            publisher="新浪财经",
+            interface="AKShare stock_zh_a_daily（不复权日线）",
+            url="https://finance.sina.com.cn/",
+            retrieved_at=now,
+            notes=(
+                "东方财富 push2 行情被限流时的回退路径；不复权日线收盘价，"
+                "与东方财富口径同为未复权成交价"
+            ),
+        ),
+        "cninfo_profile": SourceRef(
+            source_id="cninfo.company_profile",
+            publisher="巨潮资讯",
+            interface="AKShare stock_share_change_cninfo + stock_industry_change_cninfo",
+            url="https://webapi.cninfo.com.cn/#/company",
+            retrieved_at=now,
+            notes=(
+                "东方财富个股信息不可用时的回退路径：总股本取股本变动最近一条（万股→股），"
+                "行业取最近一次分类（优先申万口径）"
+            ),
         ),
         "bank_probe": SourceRef(
             source_id="bank.metric_probe",
@@ -316,6 +341,9 @@ _CASH_FIELDS = (
     ("OPERATE_RECE_REDUCE", "operating_receivables_decrease", "operating_receivables_decrease", "经营性应收项目的减少（减：增加）"),
     ("OPERATE_PAYABLE_ADD", "operating_payables_add", "operating_payables_add", "经营性应付项目的增加（减：减少）"),
     ("DEFER_TAX", "deferred_tax", "deferred_tax", "递延所得税资产/负债变动"),
+    # 期末现金及现金等价物余额：用于估算「受限资金 + 非现金等价物」
+    ("END_CASH_EQUIVALENTS", "cash_equivalents_end", "cash_and_equivalents_end", "期末现金及现金等价物余额"),
+    ("END_CCE", "cash_flow_end_cce", "cash_flow_end_cash_equivalents", "现金流量表期末现金及现金等价物余额（另一口径）"),
 )
 
 _BALANCE_FIELDS = (
@@ -336,6 +364,8 @@ _BALANCE_FIELDS = (
     ("ACCOUNTS_PAY", "payables", "accounts_payable", "应付账款"),
     ("SHARE_CAPITAL", "share_capital", "share_capital", "股本（元；A股面值每股 1 元）"),
     ("LOAN_ADVANCE", "loan_advance", "loan_advance", "发放贷款及垫款（银行专用）"),
+    # 合并范围含金融子公司时出现（吸收存款及同业存放），用于政策 §4 的金融子公司判定
+    ("ACCEPT_DEPOSIT_INTERBANK", "accept_deposit_interbank", "accept_deposit_and_interbank", "吸收存款及同业存放"),
 )
 
 
@@ -367,11 +397,12 @@ def _fiscal_label(report_time: str | None) -> str | None:
     return None
 
 
-def _collect_dividends(c: _Collector, code: str) -> dict:
+def _collect_dividends(c: _Collector, code: str, *, cache: Path | None = None) -> dict:
+    cache = cache or CACHE_DIR
     cninfo = ak.stock_dividend_cninfo(symbol=code)
-    cninfo.to_csv(CACHE_DIR / f"equity_dividend_cninfo_{code}.csv", index=False)
+    cninfo.to_csv(cache / f"equity_dividend_cninfo_{code}.csv", index=False)
     detail = ak.stock_history_dividend_detail(symbol=code, indicator="分红")
-    detail.to_csv(CACHE_DIR / f"equity_dividend_detail_{code}.csv", index=False)
+    detail.to_csv(cache / f"equity_dividend_detail_{code}.csv", index=False)
     detail_by_date = {}
     for _, row in detail.iterrows():
         key = _text(row.get("公告日期"))
@@ -530,23 +561,46 @@ def _point_in_time_block(facts: list[Fact]) -> dict:
 
 # --- 主构建 -----------------------------------------------------------------
 def build_equity_snapshot(
-    code: str, *, expected_as_of: str | None = None, now: datetime | None = None
+    code: str,
+    *,
+    expected_as_of: str | None = None,
+    now: datetime | None = None,
+    periods: int = _PERIODS,
+    cache_dir: Path | None = None,
+    price_source: str = "em",
 ) -> Snapshot:
+    cache = Path(cache_dir) if cache_dir is not None else CACHE_DIR
+    cache.mkdir(parents=True, exist_ok=True)
     now = now or datetime.now(TZ)
     c = _Collector(code, now)
     venue = "SH" if code.startswith(("6", "9")) else "SZ"
     is_bank = code in BANK_CODES
 
     # 1) 价格：市场日期以不复权日线最后一根为准
-    hist = _with_retry(
-        f"{code} 日线",
-        lambda: ak.stock_zh_a_hist(
-            symbol=code, period="daily", start_date="20240101", end_date="20301231", adjust=""
-        ),
-    )
+    if price_source == "sina":
+        hist = _with_retry(
+            f"{code} 日线（新浪）",
+            lambda: ak.stock_zh_a_daily(
+                symbol=f"{venue.lower()}{code}",
+                start_date="20240101",
+                end_date="20301231",
+                adjust="",
+            ),
+        )
+        hist = hist.rename(columns={"date": "日期", "close": "收盘"})
+        hist["日期"] = pd.to_datetime(hist["日期"]).dt.strftime("%Y-%m-%d")
+        price_key = "price_sina"
+    else:
+        hist = _with_retry(
+            f"{code} 日线",
+            lambda: ak.stock_zh_a_hist(
+                symbol=code, period="daily", start_date="20240101", end_date="20301231", adjust=""
+            ),
+        )
+        price_key = "price"
     if hist.empty:
         raise BuildError(f"{code} 日线为空，无法确定市场日期")
-    hist.to_csv(CACHE_DIR / f"equity_hist_{code}.csv", index=False)
+    hist.to_csv(cache / f"equity_hist_{code}.csv", index=False)
     hist, market_date, dropped = select_bar(hist, "日期", expected_as_of, f"{code} 日线")
     market_date_str = market_date.isoformat()
     status = bar_status(market_date, now)
@@ -558,7 +612,7 @@ def build_equity_snapshot(
         "price.close",
         "market_close_price",
         close,
-        source="price",
+        source=price_key,
         period=market_date_str,
         available_at=f"{market_date_str}T15:00:00+08:00" if status == "closed" else None,
         unit="CNY_per_share",
@@ -570,7 +624,7 @@ def build_equity_snapshot(
         "price.trade_date",
         "price_trade_date",
         market_date_str,
-        source="price",
+        source=price_key,
         period=market_date_str,
         available_at=f"{market_date_str}T15:00:00+08:00" if status == "closed" else None,
         transform="不复权日线行情日期",
@@ -579,51 +633,61 @@ def build_equity_snapshot(
         "price.bar_status",
         "price_bar_status",
         status,
-        source="price",
+        source=price_key,
         period=market_date_str,
         transform="按交易所收盘时间判定",
         notes="intraday 表示最新一根未收盘，不能当收盘价使用",
     )
 
-    # 2) 公司资料与股本
-    info = _with_retry(f"{code} 个股信息", lambda: ak.stock_individual_info_em(symbol=code))
-    info_map = dict(zip(info["item"], info["value"]))
-    for fact_id, metric, key in (
-        ("profile.name", "security_name", "股票简称"),
-        ("profile.industry", "industry", "行业"),
+    # 2) 公司资料与股本（东方财富不可用时回退巨潮，来源如实记录）
+    profile = company_profile(code, as_of=market_date_str, cache_dir=cache)
+    profile_source = "stock_info" if profile["source_id"] == "em.stock_individual_info" else "cninfo_profile"
+    for fact_id, metric, field in (
+        ("profile.name", "security_name", "name"),
+        ("profile.industry", "industry", "industry"),
     ):
-        value = _text(info_map.get(key))
+        value = profile.get(field)
         if value is None:
-            c.add_missing(fact_id, metric, source="stock_info", notes="个股信息接口未返回该字段")
+            c.add_missing(
+                fact_id,
+                metric,
+                source=profile_source,
+                notes=f"{profile['method']} 未返回该字段",
+            )
         else:
             c.add(
                 fact_id,
                 metric,
                 value,
-                source="stock_info",
-                transform="个股信息当前值",
+                source=profile_source,
+                transform=f"{profile['method']} 当前值",
                 notes="当前快照值，无历史版本；可获得时间未知",
             )
-    listing = _text(info_map.get("上市时间"))
+    listing = profile.get("listing_date")
     if listing:
         c.add(
             "profile.listing_date",
             "listing_date",
             normalize_date_text(listing),
-            source="stock_info",
-            transform="个股信息『上市时间』，统一为 YYYY-MM-DD",
+            source=profile_source,
+            transform=f"{profile['method']}『上市时间』，统一为 YYYY-MM-DD",
         )
-    total_shares = _f(info_map.get("总股本"))
+    total_shares = profile.get("total_shares")
     if total_shares is None:
-        c.add_missing("profile.total_shares", "total_shares", source="stock_info", notes="未取得总股本")
+        c.add_missing(
+            "profile.total_shares",
+            "total_shares",
+            source=profile_source,
+            notes="未取得总股本",
+        )
     else:
         c.add(
             "profile.total_shares",
             "total_shares",
             total_shares,
-            source="stock_info",
+            source=profile_source,
             unit="shares",
-            transform="个股信息『总股本』",
+            transform=f"{profile['method']}『总股本』",
             notes=(
                 "当前总股本（A股总股本），用于把股权价值换算为每股价值；"
                 f"未标注股本变动生效日，抓取时间 {c.stamp}"
@@ -641,11 +705,11 @@ def build_equity_snapshot(
         f"{code} 现金流量表", lambda: ak.stock_cash_flow_sheet_by_report_em(symbol=f"{venue}{code}")
     )
     for frame, name in ((profit, "profit"), (balance, "balance"), (cash, "cash_flow")):
-        frame.to_csv(CACHE_DIR / f"equity_{name}_{code}.csv", index=False)
+        frame.to_csv(cache / f"equity_{name}_{code}.csv", index=False)
 
-    profit = profit.sort_values("REPORT_DATE", ascending=False).head(_PERIODS)
-    balance = balance.sort_values("REPORT_DATE", ascending=False).head(_PERIODS)
-    cash = cash.sort_values("REPORT_DATE", ascending=False).head(_PERIODS)
+    profit = profit.sort_values("REPORT_DATE", ascending=False).head(periods)
+    balance = balance.sort_values("REPORT_DATE", ascending=False).head(periods)
+    cash = cash.sort_values("REPORT_DATE", ascending=False).head(periods)
 
     notice_by_period: dict[str, str | None] = {}
     for frame in (profit, balance, cash):
@@ -757,7 +821,7 @@ def build_equity_snapshot(
             )
 
     # 4) 分红
-    dividend_block = _collect_dividends(c, code)
+    dividend_block = _collect_dividends(c, code, cache=cache)
 
     # 5) 银行专项缺口
     bank_block = None
@@ -777,7 +841,7 @@ def build_equity_snapshot(
             "rows_after_market_date_dropped": dropped,
         },
         "price": {
-            "source_id": "em.stock_zh_a_hist",
+            "source_id": c.src[price_key].source_id,
             "price_type": "close_unadjusted",
             "trade_date": market_date_str,
             "bar_status": status,
@@ -809,8 +873,14 @@ def build_equity_snapshot(
         },
         "share_count": {
             "current_total_shares": total_shares,
-            "source_id": "em.stock_individual_info",
+            "source_id": profile["source_id"],
+            "source_method": profile["method"],
             "note": "当前总股本用于每股换算；历史加权股数由归母净利润/基本每股收益推导后交叉核对",
+        },
+        "company_profile": {
+            "source_id": profile["source_id"],
+            "method": profile["method"],
+            "notes": list(profile["notes"]),
         },
         "bank_specific": bank_block,
         **_point_in_time_block(c.facts),

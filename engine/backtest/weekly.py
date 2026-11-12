@@ -124,6 +124,62 @@ class WeeklyPercentile:
         }
 
 
+def weekly_percentile_at(
+    ordered: Sequence[WeeklyObservation],
+    index: int,
+    *,
+    window_years: int = WINDOW_YEARS,
+    min_coverage: float = MIN_COVERAGE,
+) -> WeeklyPercentile:
+    """计算第 `index` 个观察点的 5 年分位（`ordered` 必须按日期升序）。
+
+    单点计算与全序列计算共用这一份逻辑：指数报告的最新研究信号与回测的
+    历史分位必须同源，避免两套口径。
+    """
+    obs = ordered[index]
+    window_start = _years_before(obs.date, window_years)
+    # 当前周不入池：窗口取 (t-5y, t) 之间的观测
+    pool_window = [
+        other for other in ordered[:index] if window_start < other.date < obs.date
+    ]
+    # R1：池内取「每周最后一个正值」，不是「观察日的值」
+    valid = [o for o in pool_window if o.week_pe is not None and o.week_pe > 0]
+    weeks_in_window = len(pool_window)
+    coverage = (len(valid) / weeks_in_window) if weeks_in_window else None
+
+    reason = None
+    if obs.pe is None:
+        reason = "观察点没有滚动市盈率"
+    elif obs.pe <= 0:
+        reason = "观察点滚动市盈率非正，不给分位"
+    elif ordered[0].date > window_start:
+        reason = f"5 年窗口未覆盖：序列自 {ordered[0].date} 起，窗口需要从 {window_start} 起"
+    elif weeks_in_window == 0:
+        reason = "窗口内没有交易日"
+    elif len(valid) < weeks_in_window * min_coverage:
+        reason = (
+            f"覆盖不足：可用周 {len(valid)}/{weeks_in_window}"
+            f"（{len(valid) / weeks_in_window:.1%} < {min_coverage:.0%}）"
+        )
+
+    percentile = None
+    if reason is None:
+        percentile = percentile_of(obs.pe, [o.week_pe for o in valid])
+    return WeeklyPercentile(
+        week=obs.week,
+        date=obs.date,
+        pe=obs.pe,
+        percentile=percentile,
+        evaluable=percentile is not None,
+        reason=reason,
+        window_start=window_start,
+        weeks_in_window=weeks_in_window,
+        valid_weeks=len(valid),
+        coverage=coverage,
+        pool_size=len(valid),
+    )
+
+
 def weekly_percentiles(
     observations: Sequence[WeeklyObservation],
     *,
@@ -132,54 +188,12 @@ def weekly_percentiles(
 ) -> list[WeeklyPercentile]:
     """逐周计算 5 年分位；不插补，不可评估就明确记原因。"""
     ordered = sorted(observations, key=lambda o: o.date)
-    out: list[WeeklyPercentile] = []
-    for index, obs in enumerate(ordered):
-        window_start = _years_before(obs.date, window_years)
-        # 当前周不入池：窗口取 (t-5y, t) 之间的观测
-        pool_window = [
-            other
-            for other in ordered[:index]
-            if window_start < other.date < obs.date
-        ]
-        # R1：池内取「每周最后一个正值」，不是「观察日的值」
-        valid = [o for o in pool_window if o.week_pe is not None and o.week_pe > 0]
-        weeks_in_window = len(pool_window)
-        coverage = (len(valid) / weeks_in_window) if weeks_in_window else None
-
-        reason = None
-        if obs.pe is None:
-            reason = "观察点没有滚动市盈率"
-        elif obs.pe <= 0:
-            reason = "观察点滚动市盈率非正，不给分位"
-        elif ordered[0].date > window_start:
-            reason = f"5 年窗口未覆盖：序列自 {ordered[0].date} 起，窗口需要从 {window_start} 起"
-        elif weeks_in_window == 0:
-            reason = "窗口内没有交易日"
-        elif len(valid) < weeks_in_window * min_coverage:
-            reason = (
-                f"覆盖不足：可用周 {len(valid)}/{weeks_in_window}"
-                f"（{len(valid) / weeks_in_window:.1%} < {min_coverage:.0%}）"
-            )
-
-        percentile = None
-        if reason is None:
-            percentile = percentile_of(obs.pe, [o.week_pe for o in valid])
-        out.append(
-            WeeklyPercentile(
-                week=obs.week,
-                date=obs.date,
-                pe=obs.pe,
-                percentile=percentile,
-                evaluable=percentile is not None,
-                reason=reason,
-                window_start=window_start,
-                weeks_in_window=weeks_in_window,
-                valid_weeks=len(valid),
-                coverage=coverage,
-                pool_size=len(valid),
-            )
+    return [
+        weekly_percentile_at(
+            ordered, index, window_years=window_years, min_coverage=min_coverage
         )
-    return out
+        for index in range(len(ordered))
+    ]
 
 
 __all__ = [
@@ -192,5 +206,6 @@ __all__ = [
     "WeeklyPercentile",
     "build_weekly_observations",
     "iso_week",
+    "weekly_percentile_at",
     "weekly_percentiles",
 ]

@@ -1,0 +1,196 @@
+{
+  "schema_version": "business-evidence/1",
+  "instrument_id": "EQUITY:601318.SH",
+  "display_name": "中国平安",
+  "as_of": "2026-11-11",
+  "prepared_at": "2026-11-12T13:46:57+08:00",
+  "version": "2026-11-11",
+  "industry_clue": "非银金融 / 保险",
+  "business_mix": {
+    "report_date": "2026-06-30",
+    "by_product": [
+      {
+        "segment": "寿险及健康险",
+        "revenue_share": 0.468401,
+        "revenue": 269395000000.0,
+        "gross_margin": 0.255324
+      },
+      {
+        "segment": "财产保险",
+        "revenue_share": 0.311301,
+        "revenue": 179041000000.0,
+        "gross_margin": 0.073413
+      },
+      {
+        "segment": "银行",
+        "revenue_share": 0.122783,
+        "revenue": 70617000000.0,
+        "gross_margin": 0.436552
+      },
+      {
+        "segment": "资产管理",
+        "revenue_share": 0.074177,
+        "revenue": 42662000000.0,
+        "gross_margin": 0.33592
+      },
+      {
+        "segment": "金融赋能",
+        "revenue_share": 0.039105,
+        "revenue": 22491000000.0,
+        "gross_margin": 0.015784
+      },
+      {
+        "segment": "其他业务及合并抵销",
+        "revenue_share": -0.015767,
+        "revenue": -9068000000.0,
+        "gross_margin": null
+      }
+    ],
+    "by_region": [
+      {
+        "segment": "其他主营业务",
+        "revenue_share": 0.543603,
+        "revenue": 312647000000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "广东",
+        "revenue_share": 0.18091,
+        "revenue": 104048000000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "浙江",
+        "revenue_share": 0.076938,
+        "revenue": 44250000000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "江苏",
+        "revenue_share": 0.069037,
+        "revenue": 39706000000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "北京",
+        "revenue_share": 0.048997,
+        "revenue": 28180000000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "山东",
+        "revenue_share": 0.045855,
+        "revenue": 26373000000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "四川",
+        "revenue_share": 0.017342,
+        "revenue": 9974000000.0,
+        "gross_margin": null
+      },
+      {
+        "segment": "上海",
+        "revenue_share": 0.017318,
+        "revenue": 9960000000.0,
+        "gross_margin": null
+      }
+    ]
+  },
+  "annual_history": [
+    {
+      "fiscal_year": 2025,
+      "revenue": 1050506000000.0,
+      "net_profit_parent": 134778000000.0
+    },
+    {
+      "fiscal_year": 2024,
+      "revenue": 1028925000000.0,
+      "net_profit_parent": 126607000000.0
+    },
+    {
+      "fiscal_year": 2023,
+      "revenue": 913789000000.0,
+      "net_profit_parent": 85665000000.0
+    },
+    {
+      "fiscal_year": 2022,
+      "revenue": 880355000000.0,
+      "net_profit_parent": 111008000000.0
+    },
+    {
+      "fiscal_year": 2021,
+      "revenue": 1180444000000.0,
+      "net_profit_parent": 101618000000.0
+    },
+    {
+      "fiscal_year": 2020,
+      "revenue": 1218315000000.0,
+      "net_profit_parent": 143099000000.0
+    },
+    {
+      "fiscal_year": 2019,
+      "revenue": 1168867000000.0,
+      "net_profit_parent": 149407000000.0
+    },
+    {
+      "fiscal_year": 2018,
+      "revenue": 976832000000.0,
+      "net_profit_parent": 107404000000.0
+    }
+  ],
+  "share_count_current": 18107641995.0,
+  "sources": [
+    {
+      "evidence_id": "ev-cninfo-company-profile",
+      "kind": "vendor_api",
+      "publisher": "巨潮资讯",
+      "interface": "AKShare stock_industry_change_cninfo + stock_share_change_cninfo",
+      "url": "https://webapi.cninfo.com.cn/#/company",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "证券简称",
+        "行业门类",
+        "行业大类",
+        "行业次类",
+        "行业中类",
+        "总股本"
+      ],
+      "note": "东方财富个股信息不可用时回退巨潮：行业取最近一次分类（优先申万口径），总股本取股本变动最近一条；行业分类只是线索，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_zygc_em（主营构成）",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_financial_abstract（关键指标）",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    }
+  ],
+  "notes": [
+    "本文件只记录可核实事实与出处；模型适用性判定见 engine/evidence/applicability.py。",
+    "行业分类只作为线索，不单独决定模型；判定不使用当前股价。"
+  ],
+  "evidence_id": "biz-7fa5655936d6e929"
+}

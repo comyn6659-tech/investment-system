@@ -130,14 +130,21 @@ MODELS: tuple[ModelDescriptor, ...] = (
     ),
     ModelDescriptor(
         model_id="index_strategy_a_valuation_reversion",
-        version="0.0.0-research",
+        version="0.4.0-research",
         applies_to="index",
         status="research",
-        implemented=False,
-        required_fields=("index.pe_ttm_weekly_5y_history",),
-        supports=("境内 A 股宽基指数",),
-        failure_status="unsupported",
-        notes="候选 A：PE-TTM 5 年分位 20 进 / 60 出 / 12 个月到期。阈值是研究起点，不是有效规则。",
+        implemented=True,
+        required_fields=(
+            "series.official_close.daily",
+            "series.official_pe_rolling.daily",
+        ),
+        supports=("境内 A 股宽基指数（首批沪深300 / 中证500 / 中证1000）",),
+        failure_status="insufficient_data",
+        notes=(
+            "候选 A：官方滚动市盈率周度分位 20 进 / 60 出 / 12 个月到期，"
+            "T+1 收盘执行（研究回测口径）。已实现为研究信号 + 只追加账本；"
+            "阈值与规则未获批准，不构成买卖建议。"
+        ),
     ),
     ModelDescriptor(
         model_id="index_strategy_b_cross_confirmation",

@@ -28,6 +28,9 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "tools"))
+
+from company_profile import company_profile  # noqa: E402
 
 from engine.data.snapshot import canonical_json  # noqa: E402
 from engine.evidence.models import BusinessEvidence  # noqa: E402
@@ -85,22 +88,40 @@ def build_evidence(code: str, *, as_of: str, now: datetime) -> dict:
     venue = _venue(code)
     sources: list[dict] = []
 
-    info = ak.stock_individual_info_em(symbol=code)
-    info_map = dict(zip(info["item"], info["value"]))
-    name = str(info_map.get("股票简称") or code)
-    industry = str(info_map.get("行业")) if info_map.get("行业") is not None else None
-    sources.append(
-        {
-            "evidence_id": "ev-em-stock-info",
-            "kind": "vendor_api",
-            "publisher": "东方财富",
-            "interface": "AKShare stock_individual_info_em",
-            "url": "https://quote.eastmoney.com/",
-            "retrieved_at": stamp,
-            "fields_cited": ["股票简称", "行业", "上市时间", "总股本"],
-            "note": "行业分类只是模型选择的线索之一，不单独决定模型",
-        }
-    )
+    profile = company_profile(code, as_of=as_of, cache_dir=CACHE_DIR)
+    name = str(profile.get("name") or code)
+    industry = profile.get("industry")
+    if profile["source_id"] == "em.stock_individual_info":
+        sources.append(
+            {
+                "evidence_id": "ev-em-stock-info",
+                "kind": "vendor_api",
+                "publisher": "东方财富",
+                "interface": "AKShare stock_individual_info_em",
+                "url": "https://quote.eastmoney.com/",
+                "retrieved_at": stamp,
+                "fields_cited": ["股票简称", "行业", "上市时间", "总股本"],
+                "note": "行业分类只是模型选择的线索之一，不单独决定模型",
+            }
+        )
+    else:
+        sources.append(
+            {
+                "evidence_id": "ev-cninfo-company-profile",
+                "kind": "vendor_api",
+                "publisher": "巨潮资讯",
+                "interface": (
+                    "AKShare stock_industry_change_cninfo + stock_share_change_cninfo"
+                ),
+                "url": "https://webapi.cninfo.com.cn/#/company",
+                "retrieved_at": stamp,
+                "fields_cited": ["证券简称", "行业门类", "行业大类", "行业次类", "行业中类", "总股本"],
+                "note": (
+                    "东方财富个股信息不可用时回退巨潮：行业取最近一次分类（优先申万口径），"
+                    "总股本取股本变动最近一条；行业分类只是线索，不单独决定模型"
+                ),
+            }
+        )
 
     zygc = ak.stock_zygc_em(symbol=f"{venue}{code}")
     zygc.to_csv(CACHE_DIR / f"business_zygc_{code}.csv", index=False)
@@ -172,7 +193,7 @@ def build_evidence(code: str, *, as_of: str, now: datetime) -> dict:
         }
     )
 
-    total_shares = _f(info_map.get("总股本"))
+    total_shares = profile.get("total_shares")
     payload = {
         "schema_version": "business-evidence/1",
         "instrument_id": f"EQUITY:{code}.{venue}",

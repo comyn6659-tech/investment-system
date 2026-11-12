@@ -1,0 +1,164 @@
+{
+  "schema_version": "business-evidence/1",
+  "instrument_id": "EQUITY:600309.SH",
+  "display_name": "万华化学",
+  "as_of": "2026-11-11",
+  "prepared_at": "2026-11-12T13:46:57+08:00",
+  "version": "2026-11-11",
+  "industry_clue": "化学制品",
+  "business_mix": {
+    "report_date": "2026-06-30",
+    "by_product": [
+      {
+        "segment": "石化系列",
+        "revenue_share": 0.400094,
+        "revenue": 47737564642.46,
+        "gross_margin": 0.068039
+      },
+      {
+        "segment": "聚氨酯系列",
+        "revenue_share": 0.376786,
+        "revenue": 44956593927.71,
+        "gross_margin": 0.270499
+      },
+      {
+        "segment": "精细化学品及新材料系列",
+        "revenue_share": 0.188975,
+        "revenue": 22547699276.28,
+        "gross_margin": 0.16276
+      },
+      {
+        "segment": "其他",
+        "revenue_share": 0.109351,
+        "revenue": 13047355618.69,
+        "gross_margin": 0.07982
+      },
+      {
+        "segment": "其他(补充)",
+        "revenue_share": 0.007267,
+        "revenue": 867109002.25,
+        "gross_margin": 0.286859
+      },
+      {
+        "segment": "产品间抵销",
+        "revenue_share": -0.082474,
+        "revenue": -9840458672.54,
+        "gross_margin": null
+      }
+    ],
+    "by_region": [
+      {
+        "segment": "境内",
+        "revenue_share": 0.515008,
+        "revenue": 61448623169.0,
+        "gross_margin": 0.192087
+      },
+      {
+        "segment": "境外",
+        "revenue_share": 0.477725,
+        "revenue": 57000131623.6,
+        "gross_margin": 0.146174
+      },
+      {
+        "segment": "其他(补充)",
+        "revenue_share": 0.007267,
+        "revenue": 867109002.25,
+        "gross_margin": 0.286859
+      }
+    ]
+  },
+  "annual_history": [
+    {
+      "fiscal_year": 2025,
+      "revenue": 203234573814.42,
+      "net_profit_parent": 12527201094.15
+    },
+    {
+      "fiscal_year": 2024,
+      "revenue": 182069119160.94,
+      "net_profit_parent": 13033066612.84
+    },
+    {
+      "fiscal_year": 2023,
+      "revenue": 175360935668.36,
+      "net_profit_parent": 16815755534.31
+    },
+    {
+      "fiscal_year": 2022,
+      "revenue": 165565484373.68997,
+      "net_profit_parent": 16233626024.32
+    },
+    {
+      "fiscal_year": 2021,
+      "revenue": 145537817628.55002,
+      "net_profit_parent": 24648748123.08
+    },
+    {
+      "fiscal_year": 2020,
+      "revenue": 73432968475.63,
+      "net_profit_parent": 10041428014.6
+    },
+    {
+      "fiscal_year": 2019,
+      "revenue": 68050668650.78,
+      "net_profit_parent": 10129985097.55
+    },
+    {
+      "fiscal_year": 2018,
+      "revenue": 72837108238.47,
+      "net_profit_parent": 15566255853.88
+    }
+  ],
+  "share_count_current": 3130471626.0,
+  "sources": [
+    {
+      "evidence_id": "ev-em-stock-info",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_individual_info_em",
+      "url": "https://quote.eastmoney.com/",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "股票简称",
+        "行业",
+        "上市时间",
+        "总股本"
+      ],
+      "note": "行业分类只是模型选择的线索之一，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_zygc_em（主营构成）",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_financial_abstract（关键指标）",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    }
+  ],
+  "notes": [
+    "本文件只记录可核实事实与出处；模型适用性判定见 engine/evidence/applicability.py。",
+    "行业分类只作为线索，不单独决定模型；判定不使用当前股价。"
+  ],
+  "evidence_id": "biz-c65cebf255f16d64"
+}

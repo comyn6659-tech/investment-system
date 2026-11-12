@@ -1,0 +1,220 @@
+{
+  "schema_version": "business-evidence/1",
+  "instrument_id": "EQUITY:600436.SH",
+  "display_name": "片仔癀",
+  "as_of": "2026-11-11",
+  "prepared_at": "2026-11-12T13:46:57+08:00",
+  "version": "2026-11-11",
+  "industry_clue": "制造业 / 医药制造业",
+  "business_mix": {
+    "report_date": "2026-06-30",
+    "by_product": [
+      {
+        "segment": "医药行业",
+        "revenue_share": 0.908015,
+        "revenue": 4152209200.0,
+        "gross_margin": 0.391702
+      },
+      {
+        "segment": "化妆品业",
+        "revenue_share": 0.067729,
+        "revenue": 309716100.0,
+        "gross_margin": 0.581598
+      },
+      {
+        "segment": "其他",
+        "revenue_share": 0.02029,
+        "revenue": 92785200.0,
+        "gross_margin": 0.121221
+      },
+      {
+        "segment": "其他(补充)",
+        "revenue_share": 0.003965,
+        "revenue": 18133117.93,
+        "gross_margin": 0.191175
+      },
+      {
+        "segment": "其中:医药行业-医药制造业",
+        "revenue_share": 0.536157,
+        "revenue": 2451760300.0,
+        "gross_margin": 0.606204
+      },
+      {
+        "segment": "其中:医药制造业-肝病用药",
+        "revenue_share": 0.513516,
+        "revenue": 2348230100.0,
+        "gross_margin": 0.627661
+      },
+      {
+        "segment": "其中:医药行业-医药流通业",
+        "revenue_share": 0.371858,
+        "revenue": 1700448900.0,
+        "gross_margin": 0.082427
+      },
+      {
+        "segment": "其中:医药制造业-心脑血管用药",
+        "revenue_share": 0.016932,
+        "revenue": 77426500.0,
+        "gross_margin": 0.101545
+      },
+      {
+        "segment": "其中:医药制造业-其他",
+        "revenue_share": 0.005708,
+        "revenue": 26103700.0,
+        "gross_margin": 0.172803
+      }
+    ],
+    "by_region": [
+      {
+        "segment": "华东地区",
+        "revenue_share": 0.631141,
+        "revenue": 2886108000.0,
+        "gross_margin": 0.4254
+      },
+      {
+        "segment": "华南地区",
+        "revenue_share": 0.144804,
+        "revenue": 662168300.0,
+        "gross_margin": 0.28638
+      },
+      {
+        "segment": "华北地区",
+        "revenue_share": 0.062232,
+        "revenue": 284578700.0,
+        "gross_margin": 0.367742
+      },
+      {
+        "segment": "华中地区",
+        "revenue_share": 0.04761,
+        "revenue": 217712900.0,
+        "gross_margin": 0.31081
+      },
+      {
+        "segment": "境外地区",
+        "revenue_share": 0.042098,
+        "revenue": 192507700.0,
+        "gross_margin": 0.681345
+      },
+      {
+        "segment": "西南地区",
+        "revenue_share": 0.032952,
+        "revenue": 150685800.0,
+        "gross_margin": 0.30265
+      },
+      {
+        "segment": "西北地区",
+        "revenue_share": 0.023037,
+        "revenue": 105342700.0,
+        "gross_margin": 0.275676
+      },
+      {
+        "segment": "东北地区",
+        "revenue_share": 0.01216,
+        "revenue": 55606400.0,
+        "gross_margin": 0.400947
+      },
+      {
+        "segment": "其他(补充)",
+        "revenue_share": 0.003965,
+        "revenue": 18133117.93,
+        "gross_margin": 0.191175
+      }
+    ]
+  },
+  "annual_history": [
+    {
+      "fiscal_year": 2025,
+      "revenue": 9001411806.06,
+      "net_profit_parent": 2158633048.42
+    },
+    {
+      "fiscal_year": 2024,
+      "revenue": 10787863091.37,
+      "net_profit_parent": 2977002486.34
+    },
+    {
+      "fiscal_year": 2023,
+      "revenue": 10058497338.92,
+      "net_profit_parent": 2797351515.7
+    },
+    {
+      "fiscal_year": 2022,
+      "revenue": 8694001504.35,
+      "net_profit_parent": 2472344731.55
+    },
+    {
+      "fiscal_year": 2021,
+      "revenue": 8021550451.33,
+      "net_profit_parent": 2431899933.57
+    },
+    {
+      "fiscal_year": 2020,
+      "revenue": 6510781957.23,
+      "net_profit_parent": 1671518667.38
+    },
+    {
+      "fiscal_year": 2019,
+      "revenue": 5722273431.36,
+      "net_profit_parent": 1374376823.8
+    },
+    {
+      "fiscal_year": 2018,
+      "revenue": 4766156893.31,
+      "net_profit_parent": 1142932917.56
+    }
+  ],
+  "share_count_current": 603317210.0,
+  "sources": [
+    {
+      "evidence_id": "ev-cninfo-company-profile",
+      "kind": "vendor_api",
+      "publisher": "巨潮资讯",
+      "interface": "AKShare stock_industry_change_cninfo + stock_share_change_cninfo",
+      "url": "https://webapi.cninfo.com.cn/#/company",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "证券简称",
+        "行业门类",
+        "行业大类",
+        "行业次类",
+        "行业中类",
+        "总股本"
+      ],
+      "note": "东方财富个股信息不可用时回退巨潮：行业取最近一次分类（优先申万口径），总股本取股本变动最近一条；行业分类只是线索，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_zygc_em（主营构成）",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_financial_abstract（关键指标）",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    }
+  ],
+  "notes": [
+    "本文件只记录可核实事实与出处；模型适用性判定见 engine/evidence/applicability.py。",
+    "行业分类只作为线索，不单独决定模型；判定不使用当前股价。"
+  ],
+  "evidence_id": "biz-44cbaf2458267f68"
+}

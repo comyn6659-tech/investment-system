@@ -1,0 +1,172 @@
+{
+  "schema_version": "business-evidence/1",
+  "instrument_id": "EQUITY:002415.SZ",
+  "display_name": "海康威视",
+  "as_of": "2026-11-11",
+  "prepared_at": "2026-11-12T13:46:57+08:00",
+  "version": "2026-11-11",
+  "industry_clue": "计算机 / 安防设备 / 计算机设备",
+  "business_mix": {
+    "report_date": "2026-06-30",
+    "by_product": [
+      {
+        "segment": "主业1产品及服务",
+        "revenue_share": 0.65388,
+        "revenue": 30616341900.37,
+        "gross_margin": 0.539058
+      },
+      {
+        "segment": "机器人业务",
+        "revenue_share": 0.086024,
+        "revenue": 4027882511.41,
+        "gross_margin": null
+      },
+      {
+        "segment": "热成像业务",
+        "revenue_share": 0.063306,
+        "revenue": 2964146065.61,
+        "gross_margin": null
+      },
+      {
+        "segment": "智能家居业务",
+        "revenue_share": 0.060167,
+        "revenue": 2817179848.17,
+        "gross_margin": null
+      },
+      {
+        "segment": "汽车电子业务",
+        "revenue_share": 0.059028,
+        "revenue": 2763828320.43,
+        "gross_margin": null
+      },
+      {
+        "segment": "存储业务",
+        "revenue_share": 0.041527,
+        "revenue": 1944390380.66,
+        "gross_margin": null
+      },
+      {
+        "segment": "主业建造工程",
+        "revenue_share": 0.022136,
+        "revenue": 1036484458.97,
+        "gross_margin": 0.158647
+      },
+      {
+        "segment": "其他创新业务2",
+        "revenue_share": 0.013931,
+        "revenue": 652284361.45,
+        "gross_margin": null
+      }
+    ],
+    "by_region": [
+      {
+        "segment": "境内",
+        "revenue_share": 0.635567,
+        "revenue": 29758876223.84,
+        "gross_margin": 0.491044
+      },
+      {
+        "segment": "境外",
+        "revenue_share": 0.364433,
+        "revenue": 17063661623.23,
+        "gross_margin": 0.514721
+      }
+    ]
+  },
+  "annual_history": [
+    {
+      "fiscal_year": 2025,
+      "revenue": 92507796069.94,
+      "net_profit_parent": 14195371894.42
+    },
+    {
+      "fiscal_year": 2024,
+      "revenue": 92495525118.3,
+      "net_profit_parent": 11977327023.54
+    },
+    {
+      "fiscal_year": 2023,
+      "revenue": 89341177610.4,
+      "net_profit_parent": 14107726276.26
+    },
+    {
+      "fiscal_year": 2022,
+      "revenue": 83166321681.14,
+      "net_profit_parent": 12837704462.49
+    },
+    {
+      "fiscal_year": 2021,
+      "revenue": 81420053539.27,
+      "net_profit_parent": 16800411032.05
+    },
+    {
+      "fiscal_year": 2020,
+      "revenue": 63503450891.78,
+      "net_profit_parent": 13385526714.15
+    },
+    {
+      "fiscal_year": 2019,
+      "revenue": 57658110065.22,
+      "net_profit_parent": 12414587690.45
+    },
+    {
+      "fiscal_year": 2018,
+      "revenue": 49837132481.61,
+      "net_profit_parent": 11352132255.21
+    }
+  ],
+  "share_count_current": 9164871550.0,
+  "sources": [
+    {
+      "evidence_id": "ev-cninfo-company-profile",
+      "kind": "vendor_api",
+      "publisher": "巨潮资讯",
+      "interface": "AKShare stock_industry_change_cninfo + stock_share_change_cninfo",
+      "url": "https://webapi.cninfo.com.cn/#/company",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "证券简称",
+        "行业门类",
+        "行业大类",
+        "行业次类",
+        "行业中类",
+        "总股本"
+      ],
+      "note": "东方财富个股信息不可用时回退巨潮：行业取最近一次分类（优先申万口径），总股本取股本变动最近一条；行业分类只是线索，不单独决定模型"
+    },
+    {
+      "evidence_id": "ev-em-zygc",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_zygc_em（主营构成）",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/Index",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "报告日期",
+        "分类类型",
+        "主营构成",
+        "收入比例",
+        "毛利率"
+      ],
+      "note": "按最新报告期披露的主营构成；收入比例为占比，不是金额"
+    },
+    {
+      "evidence_id": "ev-em-financial-abstract",
+      "kind": "vendor_api",
+      "publisher": "东方财富",
+      "interface": "AKShare stock_financial_abstract（关键指标）",
+      "url": "https://data.eastmoney.com/bbsj/",
+      "retrieved_at": "2026-11-12T13:46:57+08:00",
+      "fields_cited": [
+        "营业总收入",
+        "归母净利润"
+      ],
+      "note": "按年报期（YYYY1231）取值；原表为中文金额文本，已换算为元"
+    }
+  ],
+  "notes": [
+    "本文件只记录可核实事实与出处；模型适用性判定见 engine/evidence/applicability.py。",
+    "行业分类只作为线索，不单独决定模型；判定不使用当前股价。"
+  ],
+  "evidence_id": "biz-4cdd4862acf3f761"
+}
