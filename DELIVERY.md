@@ -5,154 +5,132 @@
 | 项目 | 内容 |
 |---|---|
 | 项目 | `/Users/comyn/Documents/deepseek-harness/投资/investment-system/` |
-| 本轮阶段 | 第四阶段 **4a-R**：按 Fable 审查逐条决定修订个股政策（R1–R14）并重跑 30 只 |
-| 代码版本 | `phase4-0.2.0` |
-| 政策版本 | 引擎 `unapproved-phase2`；个股草案 `equity-policy-v1.1-draft`（`pol-0d399706138ab5ed`，`draft_unapproved`，未批准）；v1 文件保留 |
-| 模型版本 | `research-0.4.0`（全部 `research`，未升级 `validated`） |
-| 本轮实现提交 | `7ccf8f6` |
+| 本轮阶段 | 第四阶段第二批：**启用个股正式结论**（决策②批准 v1.1） |
+| 代码版本 | `phase4-1.0.0` |
+| 政策版本 | 个股 `equity-policy-v1.1`（`pol-6d1a5387780fe6a2`，`approved=true`，批准日 2026-11-12，复核日 2027-05-31）；v1.1 草案与 v1 保留 |
+| 模型版本 | 个股政策结果 `validated-1.0.0`（FCFF / 股息折现）；其余路径 `research-0.4.0` |
+| 模型状态 | 只有 `equity_dcf_fcff`、`equity_dividend_discount` 为 `validated`；银行股息、指数画像、候选 A、ETF 保持原状态 |
+| 本轮实现提交 | `71d1beb` |
 | 工作区 | 干净（`git status --short` 为空） |
-| 上一轮 | `3ad76cd`（M1–M5 收尾入口）、`3a910c0`（收尾实现） |
+| 上一轮 | `28f3fb6`（4a-R 入口，实现 `7ccf8f6`） |
 
-## 1. 本轮范围：只做 R1–R14 + 重跑 30 只
+## 1. 决策②与批准落地（P1、P2）
 
-| 编号 | 修订 | 结果 |
-|---|---|---|
-| R1 | FCFF 终值的新投资回报率基准/悲观取 WACC，与折现率同口径；股息路线仍取股权成本 | 万华基准价值 104.78 → 60.46；FCFF 终值 g 自动抵消 |
-| R2 | 终值连续性护栏：默认路线、显式期 FCFF ≤ 0、终值占比 ≥ 90% | 万华、比亚迪三项全触发；中国建筑触发默认路线；均 partial / 无法判断 |
-| R3 | 期末现金只用 `END_CCE`；`END_CASH_EQUIVALENTS` 还原为分项 | 30 只快照重建；茅台 1,264.3 亿元，非现金等价物代理 0 |
-| R4 | 近似项分方向：只把可能让价值变低的计入等级；报告列出每股金额（§3.7） | 茅台非现金等价物只披露；少数股东 3.0% 计入 |
-| R5 | 少数股东取消 15% 触发线 | 海康 5.8% 超 B 级上限 → C；茅台 3.0% → B |
-| R6 | 股息路线同样做现金流勾稽，并加 3 年分红覆盖条件 | 片仔癀 261.2% → partial；福耀覆盖不足 → C |
-| R7 | 第 1 年封顶 10%；稳态取 5 年与 3 年 CAGR 较低者；第 2–5 年线性过渡 | 万华第 1 年 28.9% → 10.0%；宁德 56.2% → 10.0% |
-| R8 | 悲观情景加入近 5 年最低 EBIT / 净利率 | 7 只 A/B 的起约束条件逐只列出；比亚迪悲观价值 ≤ 0 不展示 |
-| R9 | 资本权重与杠杆护栏改用净有息负债；报告 30/40/50% 敏感性（§3.6） | 中国建筑净债务 6,230 亿元、净权重 76.8%、WACC 3.49%；仅它在三档都触发 |
-| R10 | 派息率用总额对总额（期末股数还原），修正送转失真；P6 选路使用同一口径 | 比亚迪 64.7% → 22.9%；路线 股息折现 → FCFF |
-| R11 | 基期异常触发 partial / 无法判断；000858 更正后数据标 restated | 000858 状态 partial；`available_at=2026-04-30`，原值 609.45 亿元入备注 |
-| R12 | 报告：分表、终值占比、起约束条件、门槛距离、读法、漂移、倍数表 | 报告 §1.1、§3.1/3.2、§3.3、§5、§6 全部落地 |
-| R13 | 缺数据不得默认通过；营运资本/利息费用缺失逐只披露 | 中国移动缺 2016/2017 → A 不通过、B 通过 |
-| R14 | 债务权重 < 1% 时债务成本显示「不适用（债务可忽略）」 | 9 只显示该文案，计算不变 |
-
-**不做**：不改 ERP（5.14%）、不改无风险利率规则、不改安全边际 25%/40%、不增加银行数据、
-不动指数与 ETF、不改账本、不升级 `validated`、不输出正式结论。
-
-## 2. 试运行结果（30 只，v1 → v1.1）
-
-| 维度 | v1 | v1.1 |
-|---|---|---|
-| 预演结论 | 候选 0、等待 7、回避 4、无法判断 19 | 候选 **0**、等待 3、回避 4、无法判断 23 |
-| 确定性等级 | A 5、B 6、C 19 | A 4、B 4、C 22 |
-| 状态 | complete 16、partial 2、insufficient 2、unsupported 10 | complete 11、partial 7、insufficient 2、unsupported 10 |
-
-达到 A/B 级（可给预演结论）的 8 只：贵州茅台（B，等待）、海天味业（A，回避）、
-双汇发展（A，回避）、美的集团（A，等待）、宁德时代（B，等待）、恒瑞医药（B，回避）、
-中国移动（B，回避）；格力电器等级 A 但状态 partial（勾稽 −30.2%），按研究参考分表。
-
-主要变化（逐只对照见报告 §7）：
-
-- 万华化学：R1/R2 后基准价值 60.46 元、终值占比 117.6%、显式期 FCFF −612.1 亿元，
-  三项护栏全触发 → 研究参考。
-- 比亚迪：R10 修正派息率后改走 FCFF；终值占比 160.5%，R2 触发；R8 悲观价值 ≤ 0 → 研究参考。
-- 海天味业 C → A：定期存款不再被当作受限资金计入等级（R3/R4）。
-- 片仔癀 A → C：R6 股息路线也做勾稽，差额 261.2% → partial。
-- 中国移动 A → B：R13 的 10 年窗口缺 2016/2017；福耀 A → C：R6 分红覆盖不足；
-  海康 A → C：R5 少数股东差额 5.8%。
-- 伊利 B → C：交叉检查分歧 44.1%（规则未改，FCFF 口径随 R1/R7 变化）。
-
-**候选买点仍为 0**：按 v1.1 倍数表，A 级约需 6.2–14.6 倍、B 级约 5.0–11.7 倍市盈率。
-这是严格度的正常结果，不作为验收条件；是否接受由股东在决策②判断。
-
-## 3. N1–N9 验收
-
-| 编号 | 结果 |
+| 项 | 内容 |
 |---|---|
-| N1 | R1–R14 均在政策文件有参数与依据；17 项 R 系列测试（含边界）；`test_policy_module_has_no_hardcoded_policy_numbers` |
-| N2 | 万华 partial / C / 无法判断；三项 R2 原因码齐全 |
-| N3 | 茅台 `END_CCE` 1,264.3 亿元、代理 0；等级 B、基准 1,144.66 元、候选门槛 686.80 元 |
-| N4 | 手算测试通过；报告 §3.5 实测未触发 R2 的 FCFF 基准价值对 g ±0.5pp 最大变动 **0.49%**（< 1%；全部 FCFF 1.07%，仅比亚迪且已判不可用） |
-| N5 | 比亚迪 64.7% → 22.9%，新旧并列；路线改为 FCFF |
-| N6 | 报告满足 R12 全部条目（分表、终值占比、起约束、门槛距离、读法、漂移、倍数表；另有 §3.6 杠杆三档、§3.7 近似项明细） |
-| N7 | 30 只全部有结果；报告 §7 共 30 行对照（状态、等级、三档价值、结论、原因） |
-| N8 | 指数信号、账本、CLI、回测不变；账本 3 条 0 问题；CLI 仍 `research` / `undetermined`；**459 passed** |
-| N9 | 本文件汇总、复现命令、提交 ID |
+| 决定 | A：按现状批准 `equity-policy-v1.1-draft`，安全边际 A 25% / B 40% 不变 |
+| 批准文件 | `data/policies/equity-policy-v1.1.json`：`status=approved`、`approved=true`；参数与草案逐项相同（测试比对） |
+| 批准记录 | `approval.approved_by=股东`、`approved_at=2026-11-12`、`decision=决策②`、`review_date=2027-05-31`、依据与已知缺口/局限 |
+| 复核安排 | 无风险利率与 ERP 每半年更新（下一次 2027-05）；结论账本首次复盘 2027-05；规则每年复核；规则修改须重新批准 |
+| 模型状态 | 只把政策实际使用的 FCFF / 股息折现改为 `validated`，并在模型中记录批准依据；测试断言 validated 集合恰好为这两个 |
+| 不做 | 未改任何政策参数、未扩股票池、未改指数/ETF/回测、未做对话入口、未翻译条件名 |
 
-## 4. 未变化项（回归证据）
+`POLICY_VERSION = "equity-policy-v1.1"`；个股政策结果 `model_version="validated-1.0.0"`，
+指数/ETF/研究路径仍报 `unapproved-phase2` / `research-0.4.0`，避免混淆。
+
+## 2. 30 只正式结论（P3、P4）
+
+| 结论 | 数量 | 标的 |
+|---|---|---|
+| 候选买点 | 0 | — |
+| 等待 | 3 | 贵州茅台（B）、美的集团（A）、宁德时代（B） |
+| 回避 | 4 | 海天味业（A）、双汇发展（A）、恒瑞医药（B）、中国移动（B） |
+| 无法判断 | 23 | C 级、partial、路线不支持、资料不足 |
+
+- **与试运行 v1.1 预演结论 30/30 一致，0 差异**；CLI 与试运行共用
+  `engine.policy.trial.evaluate_company`（测试用 monkeypatch 证明）。
+- 7 只正式结论的候选门槛：茅台 686.80、海天 13.06、双汇 11.21、美的 57.74、
+  宁德 145.23、恒瑞 11.67、中国移动 46.09（元/股）。
+- 格力电器等级 A 但状态 partial（勾稽 −30.2%），按 `undetermined`，不写账本。
+- 逐只三档价值、现价、距门槛与原因见 [docs/phase4b-equity-conclusions.md](docs/phase4b-equity-conclusions.md)。
+
+CLI 文本/JSON 均包含：结论、等级及含义（数据完整度与模型稳定性，不是公司质量）、
+三档价值及用途、起约束条件、距候选门槛百分比、主要未满足条件、政策版本与快照 ID、
+“不构成投资建议”。C / partial / 不支持 / 资料不足一律 `undetermined` 并给原因码。
+
+## 3. 数据新鲜度护栏（P5）
+
+| 检查 | 规则 | 结果 |
+|---|---|---|
+| 价格 | 价格日期距分析日 > 3 个交易日 | 30 只 `as_of=2026-11-11`、分析日 2026-11-12，全部通过 |
+| 年报 | 分析日 ≥ 4 月 30 日应包含上一年年报 | 30 只最新年报均为 2025，全部通过 |
+| 字段 | 政策所需价格/股本/年报字段 | 4 只金融类缺 2025 年报字段，但它们本来就不支持/资料不足，不出正式结论 |
+
+三种情形各有测试；价格过期端到端测试结果为 `partial` / `undetermined` + `STALE_PRICE`。
+规则写在批准文件的 `runtime_parameters.freshness`，**不属于投资参数**，不参与 P1 的逐参数比较。
+
+## 4. 结论账本（P6）
+
+文件：`data/ledger/equity-conclusions.jsonl`（`equity-conclusion-ledger/1`）。
+
+- **首次写入 7 条** = 30 只中给出正式结论的数量；重复运行新增 0、跳过 7。
+- 每条含：分析日期、代码、政策版本/哈希、快照 ID、价格及日期、三档价值、等级、
+  安全边际、结论、起约束条件、内容哈希 `concl-…`。
+- 同一标的 + 同一分析日 + 同一快照：内容一致跳过；内容不同报冲突；`undetermined` 不写。
+- `.venv/bin/python -m engine.cli --check-conclusions` 可发现改写/重复，返回 0/1。
+
+## 5. 未变化项（P7）
 
 | 检查项 | 结果 |
 |---|---|
-| 指数候选 A 信号 | 三只指数 2026-W45 仍为退出条件成立；分位 67.72 / 68.90 / 62.01 |
-| 账本 | `data/ledger/candidate-a-signals.jsonl` 仍 3 条；`update_signal_ledger.py --check` 0 问题 |
-| CLI | 沪深300：`analysis_status=complete`、`model_status=research`、`decision=undetermined` |
+| 指数信号 | 三只指数 2026-W45 仍为退出条件成立；沪深300 分位 67.72%；`decision=undetermined`、`model_status=research` |
+| 指数账本 | `data/ledger/candidate-a-signals.jsonl` 仍 3 条，`--check` 0 问题 |
+| ETF | 产品检查逻辑未改，既有测试全过 |
 | 回测数据 | `data/backtest/candidate-a.json` 未改 |
 | 旧项目 | `/Users/comyn/Documents/deepseek-harness/投资/valuation/` 未修改、未删除 |
-| ETF / 银行 | ETF 逻辑未改；两家银行仍资料不足 |
-
-## 5. 数据
-
-| 项目 | 内容 |
-|---|---|
-| 个股快照 | 30 只按 R3 重建，`as_of=2026-11-11`；manifest 30 条、一致性 0 问题 |
-| 现金口径 | `cash_equivalents_end` 只来自 `END_CCE`；`cash_equivalents_component` 保留分项 |
-| 000858 重述 | 2025 年一季度/中报/三季报 `restated=true`，`available_at=2026-04-30` |
-| 重建幂等 | 重复运行产生相同快照 ID（已验证） |
-| v1 对照 | `data/policy-trial/trial-report-v1.json`、`docs/phase4a-equity-policy-trial-v1.md` 保留 |
-| 无风险利率 | `data/policy-trial/macro/cn-10y-yield.json`（120 个月末 + 最新值） |
 
 ## 6. 测试
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
-# 459 passed
+# 480 passed
 ```
 
 | 文件 | 项数 | 内容 |
 |---|---|---|
-| `tests/test_equity_policy.py` | 55 | L1–L5 + M3/M4 + 17 项 R1–R14（终值与 g 抵消、三项护栏边界、END_CCE、近似项方向、少数股东、股息勾稽与覆盖、增长封顶/稳态/插值、最低利润率、净债务、派息率、重述、报告门槛、窗口缺口、债务成本显示） |
-| `tests/test_index_signal.py` | 17 | 指数信号与账本（未改） |
-| 既有回归 | 387 | 阶段一/二/三全部保留 |
+| `tests/test_equity_conclusion.py` | 21 | P1–P7：批准一致性、模型状态、30/30、CLI 字段、新鲜度三情形与端到端、账本追加/跳过/冲突/篡改、指数与回测不变 |
+| `tests/test_equity_policy.py` | 55 | 4a-R 政策与试运行回归 |
+| `tests/test_index_signal.py` | 17 | 指数信号与账本 |
+| 既有回归 | 387 | 阶段一/二/三 |
 
 ## 7. 可复现命令
 
 ```bash
 cd /Users/comyn/Documents/deepseek-harness/投资/investment-system
-.venv/bin/python tools/rebuild_policy_trial_snapshots.py    # R3/R11 重建快照（幂等、不联网）
-.venv/bin/python tools/run_equity_policy_trial.py           # 生成报告与 JSON
-.venv/bin/python tools/update_signal_ledger.py --check      # 账本完整性
+.venv/bin/python tools/run_equity_conclusions.py --date 2026-11-12   # 30 只结论 + 首次写账本
+.venv/bin/python -m engine.cli '贵州茅台' --analysis-date 2026-11-12  # 单只 CLI（正式结论）
+.venv/bin/python -m engine.cli --check-conclusions                    # 结论账本校验
+.venv/bin/python tools/update_signal_ledger.py --check                # 指数信号账本校验
 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
 ```
 
-## 8. 与批准的关系
+## 8. 与复核、复盘的关系
 
-本轮只完成施工单 4a-R。之后：设计方验收 N1–N9（独立复算）→ Fable 只做定向复核
-（只检查 F1–F8、F10 是否被 R1–R14 解决，以及修订是否引入新的同类问题，不再全面审查）→
-带证据提请股东决策②。批准之前，系统仍不输出正式结论，`decision` 恒为 `undetermined`。
-
-决策②需要股东决定的三件事：严格度（A 级约 6–15 倍、B 级约 5–12 倍市盈率才出现候选买点）、
-已知局限（同一股权成本、ERP 与规范化利率口径、只能前向验证）、是否批准 v1.1 作为正式政策。
+决策②已批准 v1.1；本轮只负责把批准落地为可运行的正式结论。按批准记录：
+2027-05 首次复盘结论账本并更新无风险利率/ERP；规则每年复核；任何规则修改须重新批准；
+不因单只股票结果改规则。已知缺口（v1.1 未经 Fable 定向复核）以结论账本 + 6 个月复盘补救。
 
 ## 9. 提交记录
 
 | 提交 | 内容 |
 |---|---|
-| `7ccf8f6` | **本轮实现**：政策 v1.1（R1–R14）+ 30 只快照重建 + 试运行重跑 + 报告/测试 |
-| `3ad76cd` | M1–M5 收尾入口（记录 `3a910c0`） |
+| `71d1beb` | **本轮实现**：批准落地 + 模型 validated + CLI 正式结论 + 新鲜度 + 结论账本 + 30 只 |
+| `28f3fb6` | 4a-R 交付入口（实现 `7ccf8f6`） |
+| `3ad76cd` | 4a 收尾入口（实现 `3a910c0`） |
 | `b7ef983` / `9bc31ac` | 第四阶段第一批（政策 v1 试运行 + 候选 A 信号与账本） |
 | `1866e2b` / `106a9b8` | 第三阶段收尾（已签收） |
-| `698bd50` / `a5620ae` / `2f824df` / `1bb379c` | 第三阶段各批（已签收） |
-| `82b8d4c` / `317506e` / `5c4c1c9` 等 | 阶段二、阶段一（已签收） |
 
 ## 10. 详细材料
 
 | 内容 | 文件 |
 |---|---|
-| 本轮实现与 N1–N9 验收报告（含 R1–R14 逐项、关键数字、数据重建） | [docs/phase4a-r-delivery.md](docs/phase4a-r-delivery.md) |
-| 个股政策 v1.1 试运行报告（自动生成，含 v1→v1.1 逐只对照） | [docs/phase4a-equity-policy-trial.md](docs/phase4a-equity-policy-trial.md) |
-| v1 试运行报告（对照，保留） | [docs/phase4a-equity-policy-trial-v1.md](docs/phase4a-equity-policy-trial-v1.md) |
-| 政策文件 v1.1（每参数带依据） | [data/policies/equity-policy-v1.1-draft.json](data/policies/equity-policy-v1.1-draft.json) |
-| 政策文件 v1（保留） | [data/policies/equity-policy-v1-draft.json](data/policies/equity-policy-v1-draft.json) |
-| 政策目录说明（R1–R14 摘要） | [data/policies/README.md](data/policies/README.md) |
-| 试运行机器可读结果 | [data/policy-trial/trial-report.json](data/policy-trial/trial-report.json) |
-| v1 对照结果 | [data/policy-trial/trial-report-v1.json](data/policy-trial/trial-report-v1.json) |
-| 快照重建工具 | [tools/rebuild_policy_trial_snapshots.py](tools/rebuild_policy_trial_snapshots.py) |
-| 信号账本与规则 | [data/ledger/candidate-a-signals.jsonl](data/ledger/candidate-a-signals.jsonl)、[data/ledger/README.md](data/ledger/README.md) |
-| 验收清单（阶段一/二/三 + L1–L8 + M1–M5 + N1–N9） | [docs/acceptance-checklist.md](docs/acceptance-checklist.md) |
-| 上一轮交付（M1–M5） | [docs/phase4a-delivery.md](docs/phase4a-delivery.md) |
+| 本轮实现与 P1–P8 验收报告 | [docs/phase4b-delivery.md](docs/phase4b-delivery.md) |
+| 30 只正式结论表（自动生成） | [docs/phase4b-equity-conclusions.md](docs/phase4b-equity-conclusions.md) |
+| 已批准政策文件 | [data/policies/equity-policy-v1.1.json](data/policies/equity-policy-v1.1.json) |
+| v1.1 草案（保留） | [data/policies/equity-policy-v1.1-draft.json](data/policies/equity-policy-v1.1-draft.json) |
+| 政策目录说明 | [data/policies/README.md](data/policies/README.md) |
+| 结论账本 | [data/ledger/equity-conclusions.jsonl](data/ledger/equity-conclusions.jsonl)、[data/ledger/README.md](data/ledger/README.md) |
+| 30 只运行结果（机器可读） | [data/policy-trial/conclusion-run.json](data/policy-trial/conclusion-run.json) |
+| 个股政策试运行报告（v1.1） | [docs/phase4a-equity-policy-trial.md](docs/phase4a-equity-policy-trial.md) |
+| 验收清单（阶段一/二/三 + L1–L8 + M1–M5 + N1–N9 + P1–P8） | [docs/acceptance-checklist.md](docs/acceptance-checklist.md) |
+| 上一轮交付（4a-R） | [docs/phase4a-r-delivery.md](docs/phase4a-r-delivery.md) |
