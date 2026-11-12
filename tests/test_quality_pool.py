@@ -643,7 +643,9 @@ def test_condition_reason_wording_is_not_misleading(policy_v11):
 
 
 REPORT_4E = ROOT / "docs" / "phase4e-quality-pool-report.md"
-REPORT_JSON_4E = ROOT / "data" / "quality-pool" / "report.json"
+REPORT_JSON_4E = ROOT / "data" / "quality-pool" / "report-4e.json"
+REPORT_4F = ROOT / "docs" / "phase4f-quality-pool-report.md"
+REPORT_JSON_4F = ROOT / "data" / "quality-pool" / "report.json"
 
 
 def test_4e_report_has_governance_sections_and_no_misleading_wording():
@@ -666,3 +668,190 @@ def test_4e_removed_companies_have_evidence():
     for row in report.get("governance_removed") or []:
         assert row["evidence"].strip()
         assert row["condition"]
+
+
+# ---------------------------------------------------------------------------
+# 第四阶段第六批：quality-pool-v1.2（K1/K2/K3）
+# ---------------------------------------------------------------------------
+
+V12_POLICY = ROOT / "data" / "policies" / "quality-pool-v1.2-draft.json"
+
+
+@pytest.fixture(scope="module")
+def policy_v12():
+    return load_policy(V12_POLICY)
+
+
+def test_v12_policy_keeps_v11_thresholds(policy_v11, policy_v12):
+    assert policy_v12.policy_id == "quality-pool-v1.2-draft"
+    assert policy_v12.approved is False
+    assert policy_v12.untested_conditions() == []
+    assert len(policy_v12.conditions()) == 11
+    assert policy_v11.parameter_values() == policy_v12.parameter_values()
+    assert "只计下列主体" in policy_v12.raw["definitions"]["penalty"]["definition"]
+    assert "第一大股东" in policy_v12.raw["definitions"]["pledge_ratio"]["no_controller"]
+
+
+def test_v12_penalty_subject_unknown_is_pending(policy_v12):
+    from engine.quality.models import GovernancePenalty
+
+    event = GovernancePenalty(
+        date="2024-05-01",
+        event_type="行政处罚",
+        title="关于收到行政处罚决定书的公告",
+        reason="信息披露违法违规",
+        info_disclosure=True,
+        counted=False,
+        subject_role="unknown",
+    )
+    result = evaluate_company(
+        _governance_company(penalties=(event,), penalty_subject_unknown=True), policy_v12
+    )
+    condition = _condition(result, "no_penalty")
+    assert condition.status == CONDITION_PENDING
+    assert "主体身份不明" in (condition.reason or "")
+    assert result.status != STATUS_IN_POOL
+
+
+def test_v12_penalty_other_shareholder_is_recorded_not_counted(policy_v12):
+    from engine.quality.models import GovernancePenalty
+
+    event = GovernancePenalty(
+        date="2022-05-28",
+        event_type="行政处罚",
+        title="关于公司股东收到行政处罚决定书的公告",
+        info_disclosure=True,
+        counted=False,
+        subject="上海瀛翊投资中心（有限合伙）",
+        subject_role="other_shareholder",
+    )
+    result = evaluate_company(_governance_company(penalties=(event,)), policy_v12)
+    assert _condition(result, "no_penalty").status == CONDITION_PASS
+    assert _condition(result, "no_penalty").value == 0
+
+
+def test_v12_pledge_boundary_exactly_50_and_above(policy_v12):
+    equal = evaluate_company(
+        _governance_company(controlling_pledge_ratio=0.5), policy_v12
+    )
+    assert _condition(equal, "pledge_ratio").status == CONDITION_PASS
+    above = evaluate_company(
+        _governance_company(controlling_pledge_ratio=0.5000001), policy_v12
+    )
+    assert _condition(above, "pledge_ratio").status == CONDITION_FAIL
+
+
+def test_4f_snapshot_pledge_ledger_covers_all_candidates():
+    manifest = json.loads((ROOT / "data" / "quality-pool" / "manifest.json").read_text(encoding="utf-8"))
+    snapshot, companies, _stats = load_snapshot_dir(
+        ROOT / "data" / "quality-pool" / manifest["current"]
+    )
+    assert snapshot["snapshot_id"] == "qps-3ebbd24be612bf7e"
+    by_code = {company.code: company for company in companies}
+    candidate_report = json.loads(
+        (ROOT / "data" / "quality-pool" / "report-4d.json").read_text(encoding="utf-8")
+    )
+    candidates = {item["code"] for item in candidate_report["in_pool"]}
+    candidates |= {item["code"] for item in candidate_report["near_misses"]}
+    assert len(candidates) == 252
+    assert all(by_code[code].pledge_available for code in candidates)
+
+    grid = by_code["000651"]
+    assert grid.pledge_subject_role == "第一大股东（无控股股东）"
+    assert grid.controlling_pledge_ratio is not None
+    assert grid.controlling_pledge_ratio > 0.5
+    assert "董明珠" in (grid.pledge_detail or "")
+
+    wuxi = by_code["603259"]
+    assert wuxi.controlling_pledge_ratio == 0.0
+    assert wuxi.pledge_subject_role == "第一大股东（无控股股东）"
+    assert any(item.subject_role == "other_shareholder" for item in wuxi.penalties)
+    assert not any(item.counted for item in wuxi.penalties)
+
+
+def test_4f_report_sections_counts_and_comparison():
+    if not REPORT_JSON_4F.exists() or not REPORT_4F.exists():
+        pytest.skip("4f 报告尚未生成")
+    report = json.loads(REPORT_JSON_4F.read_text(encoding="utf-8"))
+    assert report["meta"]["policy_id"] == "quality-pool-v1.2-draft"
+    assert report["meta"]["snapshot_id"] == "qps-3ebbd24be612bf7e"
+    assert report["counts"]["in_pool"] == 138
+    assert report["counts"]["pending"] == 0
+    assert len(report["in_pool"]) == 138
+    assert len(report["near_misses"]) == 110
+    for key in ("audit", "penalty", "pledge"):
+        assert report["governance_coverage"][key]["ratio"] == 1.0
+
+    k1 = report["pledge_sources"]["k1"]
+    assert len(k1) == 18
+    assert sum(1 for row in k1 if row["batch4d"] == "第四批入池") == 14
+    assert report["pledge_sources"]["remaining_pending"] == 0
+    assert len(report["pledge_sources"]["k2"]) == 8
+    assert {row["code"] for row in report["pledge_sources"]["k2"]} >= {"000651", "603259"}
+
+    comparison = report["governance_comparison"]
+    assert comparison["count"] == 27
+    codes = {row["code"] for row in comparison["rows"]}
+    assert {"000651", "603259", "002833", "002555"} <= codes
+    for row in comparison["rows"]:
+        assert row["batch4e"] != row["batch4f"]
+        assert row["reason"].strip()
+        assert row["changes"]
+
+    text = REPORT_4F.read_text(encoding="utf-8")
+    for heading in (
+        "第五批 → 第六批状态变化",
+        "质押补数来源",
+        "无控股股东：第一大股东口径",
+        "计入的处罚：主体与身份",
+    ):
+        assert heading in text
+    assert not re.search(r"\d% ≥ [\d.]+%，未通过", text)
+
+
+def test_4e_snapshot_and_report_are_preserved():
+    manifest = json.loads(
+        (ROOT / "data" / "quality-pool" / "snapshot-qps-1c1edb9a5fc01bc3" / "manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert manifest["snapshot_id"] == "qps-1c1edb9a5fc01bc3"
+    report = json.loads(REPORT_JSON_4E.read_text(encoding="utf-8") if REPORT_JSON_4E.exists() else "{}")
+    if not report:
+        pytest.skip("4e 报告尚未保留")
+    assert report["meta"]["policy_id"] == "quality-pool-v1.1-draft"
+    assert report["meta"]["snapshot_id"] == "qps-1c1edb9a5fc01bc3"
+    assert report["counts"]["in_pool"] == 120
+    assert report["counts"]["pending"] == 18
+
+
+def test_4f_pool_ledger_has_three_records_and_only_appends():
+    rows = [
+        json.loads(line)
+        for line in (ROOT / "data" / "ledger" / "quality-pool.jsonl").read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    assert len(rows) == 3
+    assert [row["policy_id"] for row in rows] == [
+        "quality-pool-v1-draft",
+        "quality-pool-v1.1-draft",
+        "quality-pool-v1.2-draft",
+    ]
+    assert rows[2]["snapshot_id"] == "qps-3ebbd24be612bf7e"
+    assert rows[2]["counts"]["in_pool"] == 138
+    assert rows[2]["pool_hash"] == "qph-fc548bf288b854fe"
+
+
+def test_pledge_row_parser_handles_q3_formats():
+    from tools.build_governance_data import _parse_pledge_row
+
+    region = (
+        "股东名称 股东性质 持股比例 持股数量 持有有限售条件 质押、标记或冻结情况 股份状态 数量 "
+        "甲股份有限公司 国有法人 28.43% 2,169,178,713 - - - "
+        "乙有限公司 国有法人 15.35% 859,566,532 0 质押 859,566,532 "
+        "丙有限公司 境内非国有法人 116,062,505 26.35 111,540,705 无 "
+    )
+    assert _parse_pledge_row(region, 2169178713)["pledged_shares"] == 0
+    assert _parse_pledge_row(region, 859566532)["pledged_shares"] == 859566532
+    assert _parse_pledge_row(region, 116062505)["pledged_shares"] == 0
+    assert _parse_pledge_row(region, 999)["status"] == "missing"

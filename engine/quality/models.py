@@ -108,6 +108,9 @@ class GovernancePenalty:
     url: str | None = None
     info_disclosure: bool = False
     counted: bool = False
+    subject: str | None = None
+    subject_role: str | None = None
+    subject_basis: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -119,12 +122,15 @@ class GovernancePenalty:
             "url": self.url,
             "info_disclosure": self.info_disclosure,
             "counted": self.counted,
+            "subject": self.subject,
+            "subject_role": self.subject_role,
+            "subject_basis": self.subject_basis,
         }
 
     @classmethod
     def from_dict(cls, payload: Mapping[str, Any]) -> "GovernancePenalty":
         return cls(
-            date=str(payload.get("date") or ""),
+            date=str(payload.get("date") or payload.get("event_date") or ""),
             event_type=str(payload.get("event_type") or ""),
             title=str(payload.get("title") or ""),
             reason=payload.get("reason"),
@@ -132,6 +138,9 @@ class GovernancePenalty:
             url=payload.get("url"),
             info_disclosure=str(payload.get("info_disclosure")).lower() in ("true", "1", "yes"),
             counted=str(payload.get("counted")).lower() in ("true", "1", "yes"),
+            subject=payload.get("subject"),
+            subject_role=payload.get("subject_role"),
+            subject_basis=payload.get("subject_basis"),
         )
 
 
@@ -159,6 +168,10 @@ class Company:
     pledge_report_date: str | None = None
     pledge_available: bool = False
     pledge_note: str | None = None
+    pledge_subject_role: str | None = None
+    pledge_detail: str | None = None
+    pledge_source_url: str | None = None
+    penalty_subject_unknown: bool = False
     governance_in_scope: bool = False
 
     @property
@@ -192,6 +205,10 @@ class Company:
             "pledge_report_date": self.pledge_report_date,
             "pledge_available": self.pledge_available,
             "pledge_note": self.pledge_note,
+            "pledge_subject_role": self.pledge_subject_role,
+            "pledge_detail": self.pledge_detail,
+            "pledge_source_url": self.pledge_source_url,
+            "penalty_subject_unknown": self.penalty_subject_unknown,
             "governance_in_scope": self.governance_in_scope,
         }
 
@@ -233,6 +250,10 @@ class Company:
             pledge_report_date=payload.get("pledge_report_date"),
             pledge_available=bool(payload.get("pledge_available")),
             pledge_note=payload.get("pledge_note"),
+            pledge_subject_role=payload.get("pledge_subject_role"),
+            pledge_detail=payload.get("pledge_detail"),
+            pledge_source_url=payload.get("pledge_source_url"),
+            penalty_subject_unknown=bool(payload.get("penalty_subject_unknown")),
             governance_in_scope=bool(payload.get("governance_in_scope")),
         )
 

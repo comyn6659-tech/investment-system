@@ -239,7 +239,7 @@ def render_markdown(report: Mapping[str, Any], run: PoolRun, policy: QualityPoli
 
     removed = report.get("governance_removed") or []
     if removed:
-        lines.append("## 1c. 因治理条件出池的公司")
+        lines.append("## 1c. 因治理条件未通过（相对第四批入池名单）")
         lines.append("")
         lines.append("| 代码 | 名称 | 条件 | 证据 |")
         lines.append("|---|---|---|---|")
@@ -249,13 +249,97 @@ def render_markdown(report: Mapping[str, Any], run: PoolRun, policy: QualityPoli
             )
         lines.append("")
 
+    comparison = report.get("governance_comparison") or {}
+    if comparison:
+        lines.append("## 1d. 第五批 → 第六批状态变化（只列变化）")
+        lines.append("")
+        lines.append(
+            f"共 {comparison.get('count', 0)} 家状态变化。"
+            + "；".join(
+                f"{key} {value} 家"
+                for key, value in (comparison.get("by_change") or {}).items()
+            )
+        )
+        lines.append("")
+        if comparison.get("rows"):
+            lines.append("| 代码 | 名称 | 第五批 | 第六批 | 变化条件 | 依据 |")
+            lines.append("|---|---|---|---|---|---|")
+            for row in comparison["rows"]:
+                reason = (row.get("reason") or "").replace("|", "／")
+                if len(reason) > 260:
+                    reason = reason[:258] + "…"
+                lines.append(
+                    f"| {row['code']} | {row['name']} | {row['batch4e']} | "
+                    f"{row['batch4f']} | {len(row.get('changes') or [])} 条 | {reason} |"
+                )
+        else:
+            lines.append("无状态变化。")
+        lines.append("")
+
+    pledge_sources = report.get("pledge_sources") or {}
+    k1_rows = pledge_sources.get("k1") or []
+    if k1_rows:
+        lines.append("## 1e. 质押补数来源（K1：14 家第四批入池 + 4 家只差一条）")
+        lines.append("")
+        lines.append(
+            "| 代码 | 名称 | 第四批 | 质押主体（口径） | 比例 | 最终来源 | 说明 |"
+        )
+        lines.append("|---|---|---|---|---:|---|---|")
+        for row in k1_rows:
+            note = (row.get("note") or "").replace("|", "／")
+            if len(note) > 160:
+                note = note[:158] + "…"
+            lines.append(
+                f"| {row['code']} | {row['name']} | {row.get('batch4d') or '—'} | "
+                f"{row.get('subject') or '—'}"
+                f"（{row.get('role') or '—'}） | {_fmt(row.get('ratio'), 'ratio')} | "
+                f"{row.get('source') or '—'} | {note} |"
+            )
+        lines.append("")
+        lines.append(
+            f"仍取不到的第一大股东/控股股东质押：{pledge_sources.get('remaining_pending', 0)} 家。"
+        )
+        lines.append("")
+
+    k2_rows = pledge_sources.get("k2") or []
+    if k2_rows:
+        lines.append("## 1f. 无控股股东：第一大股东口径（K2）")
+        lines.append("")
+        lines.append("| 代码 | 名称 | 第一大股东（含一致行动人） | 比例 | 来源 | 说明 |")
+        lines.append("|---|---|---|---:|---|---|")
+        for row in k2_rows:
+            note = (row.get("note") or "").replace("|", "／")
+            if len(note) > 200:
+                note = note[:198] + "…"
+            lines.append(
+                f"| {row['code']} | {row['name']} | {row.get('subject') or '—'} | "
+                f"{_fmt(row.get('ratio'), 'ratio')} | {row.get('source') or '—'} | {note} |"
+            )
+        lines.append("")
+
+    penalty_subjects = report.get("penalty_subjects") or []
+    if penalty_subjects:
+        lines.append("## 1g. 计入的处罚：主体与身份（K3）")
+        lines.append("")
+        lines.append("| 代码 | 名称 | 日期 | 类型 | 主体 | 身份 | 依据 |")
+        lines.append("|---|---|---|---|---|---|---|")
+        for row in penalty_subjects:
+            basis = (row.get("basis") or "").replace("|", "／")
+            if len(basis) > 150:
+                basis = basis[:148] + "…"
+            lines.append(
+                f"| {row['code']} | {row['name']} | {row['date']} | {row['event_type']} | "
+                f"{row['subject']} | {row['role']} | {basis} |"
+            )
+        lines.append("")
+
     lines.append("## 2. 入池名单")
     lines.append("")
     if not report["in_pool"]:
         lines.append("本版没有公司通过全部已检验条件。")
     else:
         lines.append(
-            "| 代码 | 名称 | 行业 | 板块 | 周期 | 窗口 | ROE均值 | ROE≥10%占比 | 近3年ROE | 现金转换 | 5年FCF(元) | 亏损年 | 净负债/EBITDA | 分红率 | 审计非标年 | 处罚件数 | 控股质押 |"
+            "| 代码 | 名称 | 行业 | 板块 | 周期 | 窗口 | ROE均值 | ROE≥10%占比 | 近3年ROE | 现金转换 | 5年FCF(元) | 亏损年 | 净负债/EBITDA | 分红率 | 审计非标年 | 处罚件数 | 质押比例 |"
         )
         lines.append("|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
         for row in report["in_pool"]:

@@ -1,0 +1,32 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "balance-2018",
+  "file": "balance-2018.csv.gz",
+  "rows": 5207,
+  "columns": [
+    "SECUCODE",
+    "SECURITY_CODE",
+    "SECURITY_NAME_ABBR",
+    "NOTICE_DATE",
+    "REPORT_DATE",
+    "TOTAL_PARENT_EQUITY",
+    "TOTAL_EQUITY",
+    "MONETARYFUNDS",
+    "SHORT_LOAN",
+    "NONCURRENT_LIAB_1YEAR",
+    "LONG_LOAN",
+    "BOND_PAYABLE",
+    "LEASE_LIAB",
+    "TOTAL_ASSETS"
+  ],
+  "content_hash": "ea25a01e8b23413f5d4590672e947e29372d63c4a1d8d0be252bcb73f02f5be2",
+  "size_bytes": 283404,
+  "kind": "balance",
+  "report_date": "2018-12-31",
+  "source_id": "eastmoney.f10.balance",
+  "publisher": "东方财富",
+  "interface": "RPT_F10_FINANCE_GBALANCE",
+  "url": "https://datacenter.eastmoney.com/securities/api/data/v1/get",
+  "fetched_at": "2026-11-12T20:38:35+08:00",
+  "definition_note": "合并报表；金额单位元；按报告期一次取全市场。"
+}

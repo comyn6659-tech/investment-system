@@ -106,6 +106,10 @@ def _missing_text(missing: Iterable[str]) -> str:
         "ebitda_missing": "EBITDA 缺利息费用",
         "ebitda_nonpositive": "EBITDA ≤ 0",
         "net_debt_missing": "有息负债或货币资金缺失",
+        "missing_audit_opinion": "缺审计意见",
+        "missing_penalty_data": "处罚/立案检索未完成",
+        "penalty_subject_unknown": "主体身份不明",
+        "missing_pledge_data": "质押数据不可得",
         "untested": "本版未检验",
     }
     return "、".join(dict.fromkeys(labels.get(item, item) for item in missing))

@@ -1,0 +1,29 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "income-2022",
+  "file": "income-2022.csv.gz",
+  "rows": 5517,
+  "columns": [
+    "SECUCODE",
+    "SECURITY_CODE",
+    "SECURITY_NAME_ABBR",
+    "NOTICE_DATE",
+    "REPORT_DATE",
+    "PARENT_NETPROFIT",
+    "TOTAL_PROFIT",
+    "FE_INTEREST_EXPENSE",
+    "FINANCE_EXPENSE",
+    "OPERATE_PROFIT",
+    "TOTAL_OPERATE_INCOME"
+  ],
+  "content_hash": "7eaa84b21ce90bb371e6c12bd39904ccf016b0a8b758dab39716c2d0b4d0f55d",
+  "size_bytes": 309848,
+  "kind": "income",
+  "report_date": "2022-12-31",
+  "source_id": "eastmoney.f10.income",
+  "publisher": "东方财富",
+  "interface": "RPT_F10_FINANCE_GINCOME",
+  "url": "https://datacenter.eastmoney.com/securities/api/data/v1/get",
+  "fetched_at": "2026-11-12T21:00:06+08:00",
+  "definition_note": "合并报表；金额单位元；按报告期一次取全市场。"
+}

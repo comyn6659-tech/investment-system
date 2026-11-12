@@ -1,9 +1,9 @@
 {
-  "current": "snapshot-qps-1c1edb9a5fc01bc3",
-  "snapshot_id": "qps-1c1edb9a5fc01bc3",
-  "content_hash": "1c1edb9a5fc01bc367f6a51a78015654b20f83cc28e0fcc3c244e2dbaa4aab47",
+  "current": "snapshot-qps-3ebbd24be612bf7e",
+  "snapshot_id": "qps-3ebbd24be612bf7e",
+  "content_hash": "3ebbd24be612bf7e5bd682f736cf7ed6245d32fadebce7ba3baa464babe21751",
   "as_of": "2026-11-12",
   "tables": 48,
-  "total_bytes": 9765327,
-  "written_at": "2026-11-12T23:06:19+08:00"
+  "total_bytes": 9769019,
+  "written_at": "2026-11-13T02:16:30+08:00"
 }

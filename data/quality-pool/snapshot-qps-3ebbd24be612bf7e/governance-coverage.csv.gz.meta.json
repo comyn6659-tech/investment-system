@@ -1,0 +1,23 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "governance-coverage",
+  "file": "governance-coverage.csv.gz",
+  "rows": 252,
+  "columns": [
+    "code",
+    "audit_available",
+    "penalty_available",
+    "pledge_available",
+    "penalty_subject_unknown",
+    "audit_years",
+    "notes"
+  ],
+  "content_hash": "dfaf5bae36d118bbdb7a61c3f2d4114750dc216aa48c7ad7759c02da01f16ea8",
+  "size_bytes": 844,
+  "kind": "governance_coverage",
+  "source_id": "mixed",
+  "publisher": "本项目",
+  "interface": "逐家采集结果汇总",
+  "url": "",
+  "definition_note": "252 家候选的治理三项可得性与处罚主体待定标记。"
+}

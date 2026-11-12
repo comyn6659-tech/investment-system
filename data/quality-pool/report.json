@@ -1,12 +1,12 @@
 {
   "meta": {
     "as_of": "2026-11-12",
-    "policy_id": "quality-pool-v1.1-draft",
-    "policy_digest": "caba3b0e7011c1a7ffc534d4eea89cca1243969763df07970697b6b09eca6a68",
+    "policy_id": "quality-pool-v1.2-draft",
+    "policy_digest": "d584af0e9825e8e4a987d4d5ac5bff6efcb2991d6a07bae16620d8b9cbd79201",
     "policy_status": "draft_unapproved",
     "approved": false,
-    "snapshot_id": "qps-1c1edb9a5fc01bc3",
-    "generated_at": "2026-11-12T23:07:03+08:00",
+    "snapshot_id": "qps-3ebbd24be612bf7e",
+    "generated_at": "2026-11-13T02:16:31+08:00",
     "window": {
       "start_fy": 2016,
       "end_fy": 2025,
@@ -17,9 +17,9 @@
   },
   "counts": {
     "total": 5225,
-    "in_pool": 120,
+    "in_pool": 138,
     "not_in_pool": 3114,
-    "pending": 18,
+    "pending": 0,
     "out_of_scope": 1973,
     "out_of_scope_breakdown": {
       "FINANCIAL_INDUSTRY": 122,
@@ -29,6 +29,45 @@
   },
   "untested_conditions": [],
   "in_pool": [
+    {
+      "code": "600729",
+      "name": "重百集团",
+      "board": "主板",
+      "industry": "一般零售",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 0.15275750150314688,
+      "roe_above_share": 0.9,
+      "roe_recent_average": 0.1803645936597297,
+      "cash_conversion": 1.2821018233650334,
+      "fcf_total": 6066442417.62,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.3878819913308985,
+      "dividend_payout": 0.6251968951717164,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
     {
       "code": "002690",
       "name": "美亚光电",
@@ -537,6 +576,45 @@
       }
     },
     {
+      "code": "600183",
+      "name": "生益科技",
+      "board": "主板",
+      "industry": "元件",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 0.1656149675815438,
+      "roe_above_share": 0.9,
+      "roe_recent_average": 0.13863484446401284,
+      "cash_conversion": 1.3275859169911042,
+      "fcf_total": 6337182817.93,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.30467583737497833,
+      "dividend_payout": 0.7435330470935543,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
       "code": "600563",
       "name": "法拉电子",
       "board": "主板",
@@ -943,6 +1021,45 @@
       "loss_years": 0,
       "net_debt_to_ebitda": 0.0,
       "dividend_payout": 0.40808755686841114,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
+      "code": "000513",
+      "name": "丽珠集团",
+      "board": "主板",
+      "industry": "化学制药",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 0.17419734556166938,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.14449764496081755,
+      "cash_conversion": 1.4447901432373023,
+      "fcf_total": 9833828810.44,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.0,
+      "dividend_payout": 0.6404338822664513,
       "audit_nonstandard_years": 0,
       "penalty_count": 0,
       "pledge_ratio": 0.0,
@@ -1551,6 +1668,45 @@
       }
     },
     {
+      "code": "300760",
+      "name": "迈瑞医疗",
+      "board": "创业板",
+      "industry": "医疗器械",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 8,
+      "available_years": 8,
+      "roe_average": 0.31201313523029733,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.30485057658085574,
+      "cash_conversion": 1.1180444997270769,
+      "fcf_total": 44774949518.0,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.0,
+      "dividend_payout": 0.3895038936478534,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
       "code": "603658",
       "name": "安图生物",
       "board": "主板",
@@ -1668,6 +1824,84 @@
       }
     },
     {
+      "code": "300015",
+      "name": "爱尔眼科",
+      "board": "创业板",
+      "industry": "医疗服务",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 0.1923693198115495,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.1735433598622241,
+      "cash_conversion": 1.6864283519871672,
+      "fcf_total": 17036304647.899998,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.2462972860133425,
+      "dividend_payout": 0.34579807916780236,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.19087422878854748,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
+      "code": "603259",
+      "name": "药明康德",
+      "board": "主板",
+      "industry": "医疗服务",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 8,
+      "available_years": 8,
+      "roe_average": 0.17446022975997413,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.21063483005216432,
+      "cash_conversion": 1.1167224236667044,
+      "fcf_total": 26241930114.770004,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.0,
+      "dividend_payout": 0.3001021240386421,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
       "code": "600511",
       "name": "国药股份",
       "board": "主板",
@@ -1684,6 +1918,84 @@
       "loss_years": 0,
       "net_debt_to_ebitda": 0.0,
       "dividend_payout": 0.3011627408425395,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
+      "code": "603233",
+      "name": "大参林",
+      "board": "主板",
+      "industry": "医药商业",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 9,
+      "available_years": 9,
+      "roe_average": 0.18212876178666967,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.1618300377734421,
+      "cash_conversion": 3.2938771660804673,
+      "fcf_total": 10854864070.97,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.0,
+      "dividend_payout": 0.5086559481290408,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
+      "code": "002508",
+      "name": "老板电器",
+      "board": "主板",
+      "industry": "厨卫电器",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 0.21298582693866716,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.14241173364716894,
+      "cash_conversion": 1.199456462187165,
+      "fcf_total": 7189242087.27,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.0,
+      "dividend_payout": 0.31705700042608054,
       "audit_nonstandard_years": 0,
       "penalty_count": 0,
       "pledge_ratio": 0.0,
@@ -1918,6 +2230,45 @@
       "loss_years": 0,
       "net_debt_to_ebitda": 0.0,
       "dividend_payout": 0.3992382398625107,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
+      "code": "002032",
+      "name": "苏泊尔",
+      "board": "主板",
+      "industry": "小家电",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 0.29181767450785684,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.33575709875626253,
+      "cash_conversion": 1.1843295875326374,
+      "fcf_total": 11533927202.470001,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.0,
+      "dividend_payout": 1.0015586706403112,
       "audit_nonstandard_years": 0,
       "penalty_count": 0,
       "pledge_ratio": 0.0,
@@ -2448,6 +2799,45 @@
       }
     },
     {
+      "code": "600660",
+      "name": "福耀玻璃",
+      "board": "主板",
+      "industry": "汽车零部件",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 0.1790752412208809,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.22132844872967813,
+      "cash_conversion": 1.3121359807567097,
+      "fcf_total": 18233479342.0,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.0,
+      "dividend_payout": 0.6407962078246104,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
       "code": "603040",
       "name": "新坐标",
       "board": "主板",
@@ -2503,6 +2893,45 @@
       "loss_years": 0,
       "net_debt_to_ebitda": 0.027207743431336712,
       "dividend_payout": 0.7922003196964291,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
+      "code": "601138",
+      "name": "工业富联",
+      "board": "主板",
+      "industry": "消费电子",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 8,
+      "available_years": 8,
+      "roe_average": 0.20306145488866462,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.17859299952255892,
+      "cash_conversion": 0.8044445558666703,
+      "fcf_total": 44402569000.0,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.004048386983234839,
+      "dividend_payout": 0.5395558680168867,
       "audit_nonstandard_years": 0,
       "penalty_count": 0,
       "pledge_ratio": 0.0,
@@ -2838,6 +3267,45 @@
       }
     },
     {
+      "code": "600803",
+      "name": "新奥股份",
+      "board": "主板",
+      "industry": "燃气Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 0.22836239498994093,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.24306807927402965,
+      "cash_conversion": 2.6684918085508182,
+      "fcf_total": 28216180000.0,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.8674380652381591,
+      "dividend_payout": 0.39406383278608365,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.08025525958680449,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
       "code": "603871",
       "name": "嘉友国际",
       "board": "主板",
@@ -2854,6 +3322,45 @@
       "loss_years": 0,
       "net_debt_to_ebitda": 0.0,
       "dividend_payout": 0.38294617821769866,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
+      "code": "000708",
+      "name": "中信特钢",
+      "board": "主板",
+      "industry": "特钢Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 0.18412366350477988,
+      "roe_above_share": 0.9,
+      "roe_recent_average": 0.14065717903609584,
+      "cash_conversion": 1.9649811255449718,
+      "fcf_total": 54782812220.229996,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 1.694037809815969,
+      "dividend_payout": 0.5129779544824169,
       "audit_nonstandard_years": 0,
       "penalty_count": 0,
       "pledge_ratio": 0.0,
@@ -3267,6 +3774,45 @@
       }
     },
     {
+      "code": "000333",
+      "name": "美的集团",
+      "board": "主板",
+      "industry": "白色家电",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 0.2370843901586514,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.20777214893629173,
+      "cash_conversion": 1.3853611265639472,
+      "fcf_total": 202036597000.0,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.0,
+      "dividend_payout": 0.6311408184323127,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
       "code": "000921",
       "name": "海信家电",
       "board": "主板",
@@ -3403,6 +3949,45 @@
       "audit_nonstandard_years": 0,
       "penalty_count": 0,
       "pledge_ratio": 0.11053631327541638,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
+      "code": "000858",
+      "name": "五粮液",
+      "board": "主板",
+      "industry": "白酒Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 0.21386425796464978,
+      "roe_above_share": 0.9,
+      "roe_recent_average": 0.18704865247650038,
+      "cash_conversion": 1.293260756810264,
+      "fcf_total": 145683954301.36,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.0,
+      "dividend_payout": 0.5521373748884131,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
       "cycle_label": "非金融企业",
       "is_cyclical": false,
       "failing_conditions": [],
@@ -3676,6 +4261,45 @@
       "audit_nonstandard_years": 0,
       "penalty_count": 0,
       "pledge_ratio": 0.34445006876915,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
+      "code": "300124",
+      "name": "汇川技术",
+      "board": "创业板",
+      "industry": "自动化设备",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 0.20160286594532054,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.17895282558454126,
+      "cash_conversion": 1.0112746622191733,
+      "fcf_total": 13132514849.68,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.0,
+      "dividend_payout": 0.2463726461036549,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.045931873264844325,
       "cycle_label": "非金融企业",
       "is_cyclical": false,
       "failing_conditions": [],
@@ -4066,6 +4690,45 @@
       "audit_nonstandard_years": 0,
       "penalty_count": 0,
       "pledge_ratio": 0.0,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
+      "code": "300627",
+      "name": "华测导航",
+      "board": "创业板",
+      "industry": "通信设备",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 9,
+      "available_years": 9,
+      "roe_average": 0.17312304075445992,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.17293791866612004,
+      "cash_conversion": 1.0230159714443907,
+      "fcf_total": 1591123880.6,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 0.0,
+      "dividend_payout": 0.45655901186185377,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.14883057938950242,
       "cycle_label": "非金融企业",
       "is_cyclical": false,
       "failing_conditions": [],
@@ -4593,6 +5256,45 @@
       }
     },
     {
+      "code": "600887",
+      "name": "伊利股份",
+      "board": "主板",
+      "industry": "饮料乳品",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 0.2251294519996842,
+      "roe_above_share": 1.0,
+      "roe_recent_average": 0.19127684009897872,
+      "cash_conversion": 1.7150574516645547,
+      "fcf_total": 56022456940.840004,
+      "loss_years": 0,
+      "net_debt_to_ebitda": 1.359936631345431,
+      "dividend_payout": 0.6960177951269907,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.3533098278962039,
+      "cycle_label": "非金融企业",
+      "is_cyclical": false,
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "untested_count": 0,
+      "condition_status": {
+        "roe_average": "pass",
+        "roe_consistency": "pass",
+        "roe_recent": "pass",
+        "cash_conversion": "pass",
+        "fcf_positive": "pass",
+        "loss_years": "pass",
+        "net_debt_ebitda": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass",
+        "dividend_payout": "pass"
+      }
+    },
+    {
       "code": "603156",
       "name": "养元饮品",
       "board": "主板",
@@ -4712,25 +5414,25 @@
   ],
   "near_misses": [
     {
-      "code": "002555",
-      "name": "三七互娱",
-      "industry": "游戏Ⅱ",
-      "condition_id": "audit_opinion",
-      "label": "最近 5 年审计意见均为标准无保留",
-      "value": 2.0,
-      "threshold": 0.0,
-      "distance_abs": 2.0,
-      "distance_rel": null,
-      "unit": "years",
-      "reason": "观测值 2 年，要求 = 0 年，未通过",
-      "untested_count": 0
-    },
-    {
       "code": "002714",
       "name": "牧原股份",
       "industry": "养殖业",
       "condition_id": "loss_years",
       "label": "窗口内亏损年数",
+      "value": 1.0,
+      "threshold": 0.0,
+      "distance_abs": 1.0,
+      "distance_rel": null,
+      "unit": "years",
+      "reason": "观测值 1 年，要求 = 0 年，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "002833",
+      "name": "弘亚数控",
+      "industry": "专用设备",
+      "condition_id": "audit_opinion",
+      "label": "最近 5 年审计意见均为标准无保留",
       "value": 1.0,
       "threshold": 0.0,
       "distance_abs": 1.0,
@@ -5370,6 +6072,20 @@
       "untested_count": 0
     },
     {
+      "code": "300759",
+      "name": "康龙化成",
+      "industry": "医疗服务",
+      "condition_id": "roe_average",
+      "label": "窗口内 ROE 平均值",
+      "value": 0.13556285411067195,
+      "threshold": 0.15,
+      "distance_abs": -0.01443714588932804,
+      "distance_rel": -0.09624763926218693,
+      "unit": "ratio",
+      "reason": "观测值 13.56%，要求 ≥ 15.00%，未通过",
+      "untested_count": 0
+    },
+    {
       "code": "603365",
       "name": "水星家纺",
       "industry": "服装家纺",
@@ -5499,6 +6215,20 @@
       "code": "300577",
       "name": "开润股份",
       "industry": "服装家纺",
+      "condition_id": "roe_consistency",
+      "label": "ROE ≥ 10% 的年份占比",
+      "value": 0.7,
+      "threshold": 0.8,
+      "distance_abs": -0.10000000000000009,
+      "distance_rel": -0.1250000000000001,
+      "unit": "ratio",
+      "reason": "观测值 70.00%，要求 ≥ 80.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "600066",
+      "name": "宇通客车",
+      "industry": "商用车",
       "condition_id": "roe_consistency",
       "label": "ROE ≥ 10% 的年份占比",
       "value": 0.7,
@@ -5650,6 +6380,20 @@
       "untested_count": 0
     },
     {
+      "code": "603596",
+      "name": "伯特利",
+      "industry": "汽车零部件",
+      "condition_id": "dividend_payout",
+      "label": "最近 5 年现金分红率",
+      "value": 0.16950275120519032,
+      "threshold": 0.2,
+      "distance_abs": -0.030497248794809695,
+      "distance_rel": -0.15248624397404847,
+      "unit": "ratio",
+      "reason": "观测值 16.95%，要求 ≥ 20.00%，未通过",
+      "untested_count": 0
+    },
+    {
       "code": "601633",
       "name": "长城汽车",
       "industry": "乘用车",
@@ -5720,6 +6464,20 @@
       "untested_count": 0
     },
     {
+      "code": "600176",
+      "name": "中国巨石",
+      "industry": "玻璃玻纤",
+      "condition_id": "roe_recent",
+      "label": "最近 3 个财年 ROE 平均值",
+      "value": 0.09969035176550321,
+      "threshold": 0.12,
+      "distance_abs": -0.020309648234496783,
+      "distance_rel": -0.16924706862080652,
+      "unit": "ratio",
+      "reason": "观测值 9.97%，要求 ≥ 12.00%，未通过",
+      "untested_count": 0
+    },
+    {
       "code": "601298",
       "name": "青岛港",
       "industry": "航运港口",
@@ -5745,6 +6503,20 @@
       "distance_rel": -0.17969449098832246,
       "unit": "ratio",
       "reason": "观测值 12.30%，要求 ≥ 15.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "002138",
+      "name": "顺络电子",
+      "industry": "元件",
+      "condition_id": "roe_average",
+      "label": "窗口内 ROE 平均值",
+      "value": 0.12114990234644803,
+      "threshold": 0.15,
+      "distance_abs": -0.028850097653551968,
+      "distance_rel": -0.19233398435701313,
+      "unit": "ratio",
+      "reason": "观测值 12.11%，要求 ≥ 15.00%，未通过",
       "untested_count": 0
     },
     {
@@ -5986,6 +6758,20 @@
       "untested_count": 0
     },
     {
+      "code": "300638",
+      "name": "广和通",
+      "industry": "通信设备",
+      "condition_id": "cash_conversion",
+      "label": "最近 5 年现金转换率",
+      "value": 0.564977431039976,
+      "threshold": 0.8,
+      "distance_abs": -0.23502256896002405,
+      "distance_rel": -0.29377821120003006,
+      "unit": "ratio",
+      "reason": "观测值 56.50%，要求 ≥ 80.00%，未通过",
+      "untested_count": 0
+    },
+    {
       "code": "002595",
       "name": "豪迈科技",
       "industry": "专用设备",
@@ -6140,6 +6926,20 @@
       "untested_count": 0
     },
     {
+      "code": "000651",
+      "name": "格力电器",
+      "industry": "白色家电",
+      "condition_id": "pledge_ratio",
+      "label": "控股股东最新质押比例",
+      "value": 0.8737639990541879,
+      "threshold": 0.5,
+      "distance_abs": -0.3737639990541879,
+      "distance_rel": -0.7475279981083758,
+      "unit": "ratio",
+      "reason": "观测值 87.38%，要求 ≤ 50.00%，未通过",
+      "untested_count": 0
+    },
+    {
       "code": "601975",
       "name": "招商南油",
       "industry": "航运港口",
@@ -6250,9 +7050,9 @@
       "group_id": "governance",
       "label": "控股股东最新质押比例",
       "untested": false,
-      "independent_fail_count": 4,
+      "independent_fail_count": 5,
       "sequential_eliminated": 2,
-      "sequential_pending": 19,
+      "sequential_pending": 0,
       "remaining_after": 147
     },
     {
@@ -6272,21 +7072,21 @@
       "values": [
         {
           "value": 0.12,
-          "in_pool": 162,
+          "in_pool": 182,
           "not_in_pool": 3070,
-          "pending": 20
+          "pending": 0
         },
         {
           "value": 0.15,
-          "in_pool": 120,
+          "in_pool": 138,
           "not_in_pool": 3114,
-          "pending": 18
+          "pending": 0
         },
         {
           "value": 0.18,
-          "in_pool": 57,
-          "not_in_pool": 3182,
-          "pending": 13
+          "in_pool": 69,
+          "not_in_pool": 3183,
+          "pending": 0
         }
       ],
       "note": null
@@ -6296,21 +7096,21 @@
       "values": [
         {
           "value": 0.7,
-          "in_pool": 122,
+          "in_pool": 140,
           "not_in_pool": 3112,
-          "pending": 18
+          "pending": 0
         },
         {
           "value": 0.8,
-          "in_pool": 120,
+          "in_pool": 138,
           "not_in_pool": 3114,
-          "pending": 18
+          "pending": 0
         },
         {
           "value": 0.9,
-          "in_pool": 108,
+          "in_pool": 125,
           "not_in_pool": 3127,
-          "pending": 17
+          "pending": 0
         }
       ],
       "note": null
@@ -6320,21 +7120,21 @@
       "values": [
         {
           "value": 0.3,
-          "in_pool": 116,
-          "not_in_pool": 3118,
-          "pending": 18
+          "in_pool": 133,
+          "not_in_pool": 3119,
+          "pending": 0
         },
         {
           "value": 0.5,
-          "in_pool": 120,
+          "in_pool": 138,
           "not_in_pool": 3114,
-          "pending": 18
+          "pending": 0
         },
         {
           "value": 0.7,
-          "in_pool": 121,
+          "in_pool": 139,
           "not_in_pool": 3113,
-          "pending": 18
+          "pending": 0
         }
       ],
       "note": null
@@ -6606,7 +7406,7 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
           "value": 0.0,
@@ -6639,8 +7439,8 @@
       "name": "五粮液",
       "board": "主板",
       "industry": "白酒Ⅱ",
-      "status": "pending",
-      "reason": "控股股东最新质押比例：missing_pledge_data",
+      "status": "in_pool",
+      "reason": null,
       "conditions": [
         {
           "condition_id": "roe_average",
@@ -6763,15 +7563,13 @@
           "condition_id": "pledge_ratio",
           "group_id": "governance",
           "label": "控股股东最新质押比例",
-          "status": "pending",
-          "value": null,
+          "status": "pass",
+          "value": 0.0,
           "threshold": 0.5,
-          "distance_abs": null,
-          "distance_rel": null,
-          "reason": "missing_pledge_data",
-          "missing": [
-            "missing_pledge_data"
-          ],
+          "distance_abs": 0.5,
+          "distance_rel": 1.0,
+          "reason": "观测值 0.00%，要求 ≤ 50.00%，通过",
+          "missing": [],
           "unit": "ratio"
         },
         {
@@ -6901,14 +7699,12 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
-          "value": null,
-          "missing": [
-            "missing_pledge_data"
-          ],
-          "note": "no_periodic_pledge_table"
+          "value": 0.0,
+          "missing": [],
+          "note": "2026-09-30"
         },
         "cycle": {
           "family": "non_financial",
@@ -6936,8 +7732,8 @@
       "name": "伊利股份",
       "board": "主板",
       "industry": "饮料乳品",
-      "status": "pending",
-      "reason": "控股股东最新质押比例：missing_pledge_data",
+      "status": "in_pool",
+      "reason": null,
       "conditions": [
         {
           "condition_id": "roe_average",
@@ -7060,15 +7856,13 @@
           "condition_id": "pledge_ratio",
           "group_id": "governance",
           "label": "控股股东最新质押比例",
-          "status": "pending",
-          "value": null,
+          "status": "pass",
+          "value": 0.3533098278962039,
           "threshold": 0.5,
-          "distance_abs": null,
-          "distance_rel": null,
-          "reason": "missing_pledge_data",
-          "missing": [
-            "missing_pledge_data"
-          ],
+          "distance_abs": 0.1466901721037961,
+          "distance_rel": 0.2933803442075922,
+          "reason": "观测值 35.33%，要求 ≤ 50.00%，通过",
+          "missing": [],
           "unit": "ratio"
         },
         {
@@ -7198,14 +7992,12 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
-          "value": null,
-          "missing": [
-            "missing_pledge_data"
-          ],
-          "note": "no_controller_with_company_pledge"
+          "value": 0.3533098278962039,
+          "missing": [],
+          "note": "2026-09-30"
         },
         "cycle": {
           "family": "non_financial",
@@ -7493,7 +8285,7 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
           "value": 0.0,
@@ -7786,7 +8578,7 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
           "value": 0.0,
@@ -8079,7 +8871,7 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
           "value": 0.18886753103666767,
@@ -8112,8 +8904,8 @@
       "name": "美的集团",
       "board": "主板",
       "industry": "白色家电",
-      "status": "pending",
-      "reason": "控股股东最新质押比例：missing_pledge_data",
+      "status": "in_pool",
+      "reason": null,
       "conditions": [
         {
           "condition_id": "roe_average",
@@ -8236,15 +9028,13 @@
           "condition_id": "pledge_ratio",
           "group_id": "governance",
           "label": "控股股东最新质押比例",
-          "status": "pending",
-          "value": null,
+          "status": "pass",
+          "value": 0.0,
           "threshold": 0.5,
-          "distance_abs": null,
-          "distance_rel": null,
-          "reason": "missing_pledge_data",
-          "missing": [
-            "missing_pledge_data"
-          ],
+          "distance_abs": 0.5,
+          "distance_rel": 1.0,
+          "reason": "观测值 0.00%，要求 ≤ 50.00%，通过",
+          "missing": [],
           "unit": "ratio"
         },
         {
@@ -8374,14 +9164,12 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
-          "value": null,
-          "missing": [
-            "missing_pledge_data"
-          ],
-          "note": "no_periodic_pledge_table"
+          "value": 0.0,
+          "missing": [],
+          "note": "2026-09-30"
         },
         "cycle": {
           "family": "non_financial",
@@ -8409,8 +9197,8 @@
       "name": "格力电器",
       "board": "主板",
       "industry": "白色家电",
-      "status": "pending",
-      "reason": "控股股东最新质押比例：missing_pledge_data",
+      "status": "not_in_pool",
+      "reason": "控股股东最新质押比例：观测值 87.38%，要求 ≤ 50.00%，未通过",
       "conditions": [
         {
           "condition_id": "roe_average",
@@ -8533,15 +9321,13 @@
           "condition_id": "pledge_ratio",
           "group_id": "governance",
           "label": "控股股东最新质押比例",
-          "status": "pending",
-          "value": null,
+          "status": "fail",
+          "value": 0.8737639990541879,
           "threshold": 0.5,
-          "distance_abs": null,
-          "distance_rel": null,
-          "reason": "missing_pledge_data",
-          "missing": [
-            "missing_pledge_data"
-          ],
+          "distance_abs": -0.3737639990541879,
+          "distance_rel": -0.7475279981083758,
+          "reason": "观测值 87.38%，要求 ≤ 50.00%，未通过",
+          "missing": [],
           "unit": "ratio"
         },
         {
@@ -8671,14 +9457,12 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
-          "value": null,
-          "missing": [
-            "missing_pledge_data"
-          ],
-          "note": "no_controller_with_company_pledge"
+          "value": 0.8737639990541879,
+          "missing": [],
+          "note": "2026-09-30"
         },
         "cycle": {
           "family": "non_financial",
@@ -8706,8 +9490,8 @@
       "name": "福耀玻璃",
       "board": "主板",
       "industry": "汽车零部件",
-      "status": "pending",
-      "reason": "控股股东最新质押比例：missing_pledge_data",
+      "status": "in_pool",
+      "reason": null,
       "conditions": [
         {
           "condition_id": "roe_average",
@@ -8830,15 +9614,13 @@
           "condition_id": "pledge_ratio",
           "group_id": "governance",
           "label": "控股股东最新质押比例",
-          "status": "pending",
-          "value": null,
+          "status": "pass",
+          "value": 0.0,
           "threshold": 0.5,
-          "distance_abs": null,
-          "distance_rel": null,
-          "reason": "missing_pledge_data",
-          "missing": [
-            "missing_pledge_data"
-          ],
+          "distance_abs": 0.5,
+          "distance_rel": 1.0,
+          "reason": "观测值 0.00%，要求 ≤ 50.00%，通过",
+          "missing": [],
           "unit": "ratio"
         },
         {
@@ -8968,14 +9750,12 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
-          "value": null,
-          "missing": [
-            "missing_pledge_data"
-          ],
-          "note": "no_periodic_pledge_table"
+          "value": 0.0,
+          "missing": [],
+          "note": "2026-09-30"
         },
         "cycle": {
           "family": "non_financial",
@@ -9566,7 +10346,7 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
           "value": 0.0,
@@ -9859,7 +10639,7 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
           "value": 0.07812416527113285,
@@ -10140,7 +10920,7 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
           "value": 0.024075591693534088,
@@ -10738,7 +11518,7 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
           "value": 0.0,
@@ -11031,7 +11811,7 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
           "value": 0.0718516940628479,
@@ -11324,7 +12104,7 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
           "value": 0.0,
@@ -12237,7 +13017,7 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
           "value": 0.0,
@@ -12833,7 +13613,7 @@
         "penalty_count": {
           "value": 0,
           "missing": [],
-          "note": "无"
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
         },
         "pledge_ratio": {
           "value": 0.0,
@@ -13838,17 +14618,17 @@
   "industry_distribution": [
     {
       "industry": "化学制药",
-      "in_pool": 8,
+      "in_pool": 9,
       "evaluated": 97
     },
     {
       "industry": "医疗器械",
-      "in_pool": 8,
+      "in_pool": 9,
       "evaluated": 58
     },
     {
       "industry": "白酒Ⅱ",
-      "in_pool": 8,
+      "in_pool": 9,
       "evaluated": 19
     },
     {
@@ -13857,14 +14637,14 @@
       "evaluated": 55
     },
     {
+      "industry": "汽车零部件",
+      "in_pool": 6,
+      "evaluated": 148
+    },
+    {
       "industry": "通用设备",
       "in_pool": 6,
       "evaluated": 124
-    },
-    {
-      "industry": "汽车零部件",
-      "in_pool": 5,
-      "evaluated": 148
     },
     {
       "industry": "家居用品",
@@ -13877,6 +14657,11 @@
       "evaluated": 25
     },
     {
+      "industry": "饮料乳品",
+      "in_pool": 4,
+      "evaluated": 16
+    },
+    {
       "industry": "专用设备",
       "in_pool": 3,
       "evaluated": 104
@@ -13885,6 +14670,21 @@
       "industry": "休闲食品",
       "in_pool": 3,
       "evaluated": 14
+    },
+    {
+      "industry": "元件",
+      "in_pool": 3,
+      "evaluated": 36
+    },
+    {
+      "industry": "小家电",
+      "in_pool": 3,
+      "evaluated": 10
+    },
+    {
+      "industry": "消费电子",
+      "in_pool": 3,
+      "evaluated": 47
     },
     {
       "industry": "生物制品",
@@ -13897,19 +14697,19 @@
       "evaluated": 86
     },
     {
+      "industry": "白色家电",
+      "in_pool": 3,
+      "evaluated": 9
+    },
+    {
       "industry": "装修建材",
       "in_pool": 3,
       "evaluated": 25
     },
     {
-      "industry": "饮料乳品",
+      "industry": "通信设备",
       "in_pool": 3,
-      "evaluated": 16
-    },
-    {
-      "industry": "元件",
-      "in_pool": 2,
-      "evaluated": 36
+      "evaluated": 56
     },
     {
       "industry": "农化制品",
@@ -13932,9 +14732,14 @@
       "evaluated": 43
     },
     {
-      "industry": "小家电",
+      "industry": "医疗服务",
       "in_pool": 2,
-      "evaluated": 10
+      "evaluated": 29
+    },
+    {
+      "industry": "医药商业",
+      "in_pool": 2,
+      "evaluated": 22
     },
     {
       "industry": "工程机械",
@@ -13947,14 +14752,14 @@
       "evaluated": 38
     },
     {
-      "industry": "消费电子",
+      "industry": "特钢Ⅱ",
       "in_pool": 2,
-      "evaluated": 47
+      "evaluated": 10
     },
     {
-      "industry": "白色家电",
+      "industry": "自动化设备",
       "in_pool": 2,
-      "evaluated": 9
+      "evaluated": 36
     },
     {
       "industry": "计算机设备",
@@ -13962,9 +14767,9 @@
       "evaluated": 53
     },
     {
-      "industry": "通信设备",
-      "in_pool": 2,
-      "evaluated": 56
+      "industry": "一般零售",
+      "in_pool": 1,
+      "evaluated": 54
     },
     {
       "industry": "光伏设备",
@@ -13987,9 +14792,9 @@
       "evaluated": 8
     },
     {
-      "industry": "医药商业",
+      "industry": "厨卫电器",
       "in_pool": 1,
-      "evaluated": 22
+      "evaluated": 5
     },
     {
       "industry": "塑料",
@@ -14032,14 +14837,14 @@
       "evaluated": 9
     },
     {
+      "industry": "燃气Ⅱ",
+      "in_pool": 1,
+      "evaluated": 22
+    },
+    {
       "industry": "物流",
       "in_pool": 1,
       "evaluated": 35
-    },
-    {
-      "industry": "特钢Ⅱ",
-      "in_pool": 1,
-      "evaluated": 10
     },
     {
       "industry": "电机Ⅱ",
@@ -14060,11 +14865,6 @@
       "industry": "纺织制造",
       "in_pool": 1,
       "evaluated": 20
-    },
-    {
-      "industry": "自动化设备",
-      "in_pool": 1,
-      "evaluated": 36
     },
     {
       "industry": "航空装备Ⅱ",
@@ -14158,16 +14958,23 @@
     {
       "id": "eastmoney.announcement",
       "publisher": "东方财富",
-      "interface": "公告检索（立案/行政处罚/公开谴责/纪律处分）",
+      "interface": "公告检索（立案/行政处罚/公开谴责/纪律处分）+ 正文核对",
       "url": "https://np-anotice-stock.eastmoney.com/api/security/ann",
-      "note": "最近 5 年；正文核对信息披露类。"
+      "note": "最近 5 年；逐条判定主体身份与信息披露类事项。"
     },
     {
       "id": "gw.f10.controller",
       "publisher": "国网 F10",
       "interface": "个股控股股东",
       "url": "http://webf10.gw.com.cn/",
-      "note": "只用于控股股东名称；质押比例取定期报告 PDF。"
+      "note": "只用于控股股东名称；名称过期时按年报/第一大股东口径补正。"
+    },
+    {
+      "id": "eastmoney.pledge.detail",
+      "publisher": "东方财富",
+      "interface": "重要股东股权质押明细",
+      "url": "https://data.eastmoney.com/gpzy/pledgeDetail.aspx",
+      "note": "定期报告股东表取不到时补足；累计质押比例 × 总股本 ÷ 持股数。"
     }
   ],
   "snapshot_untested_conditions": [],
@@ -14182,57 +14989,21 @@
       "total": 252,
       "available": 252,
       "ratio": 1.0,
-      "note": "东方财富公告检索：立案/行政处罚/公开谴责/纪律处分"
+      "note": "东方财富公告检索 + 正文主体判定"
     },
     "pledge": {
       "total": 252,
-      "available": 227,
-      "ratio": 0.9007936507936508,
-      "note": "公司整体质押为 0 直接记 0；否则最新定期报告前十名股东表"
+      "available": 252,
+      "ratio": 1.0,
+      "note": "定期报告股东表；无控股股东按第一大股东口径"
     }
   },
   "governance_removed": [
     {
-      "code": "000333",
-      "name": "美的集团",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
-    },
-    {
-      "code": "000513",
-      "name": "丽珠集团",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
-    },
-    {
       "code": "000651",
       "name": "格力电器",
       "condition": "控股股东最新质押比例",
-      "evidence": "无控股股东，且公司整体质押 >0，控股股东口径不适用"
-    },
-    {
-      "code": "000708",
-      "name": "中信特钢",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
-    },
-    {
-      "code": "000858",
-      "name": "五粮液",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
-    },
-    {
-      "code": "002032",
-      "name": "苏泊尔",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
-    },
-    {
-      "code": "002508",
-      "name": "老板电器",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
+      "evidence": "珠海明骏投资合伙企业(有限合伙)；口径：第一大股东（无控股股东）；质押 87.38%；珠海明骏投资合伙企业(有限合伙)（第一大股东）859,566,532 股，质押 859,566,532 股；董明珠 124,184,839 股，质押 0 股；合计口径。2026 年三季报：珠海明骏投资合伙企业（有限合伙）与董明珠为一致行动人。"
     },
     {
       "code": "002555",
@@ -14241,112 +15012,837 @@
       "evidence": "2023 带强调事项段的无保留意见；2024 带强调事项段的无保留意见"
     },
     {
+      "code": "002555",
+      "name": "三七互娱",
+      "condition": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责",
+      "evidence": "计入：2025-12-06 行政处罚：三七互娱网络科技集团股份有限公司及李卫伟等 6 名责任人（公司本身）；2025-12-05 纪律处分：三七互娱网络科技集团股份有限公司及李卫伟等责任人（公司本身）；2025-11-01 行政处罚：三七互娱网络科技集团股份有限公司及李卫伟等责任人（公司本身）；2023-06-28 立案：三七互娱网络科技集团股份有限公司（公司本身）"
+    },
+    {
       "code": "002833",
       "name": "弘亚数控",
       "condition": "最近 5 年审计意见均为标准无保留",
       "evidence": "2022 带强调事项段的无保留意见"
     },
     {
-      "code": "002833",
-      "name": "弘亚数控",
-      "condition": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责",
-      "evidence": " 弘亚数控:关于实际控制人收到中国证券监督管理委员会立案告知书的公告（https://data.eastmoney.com/notices/detail/002833/AN202211221580491792.html）"
-    },
-    {
-      "code": "300015",
-      "name": "爱尔眼科",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
-    },
-    {
-      "code": "300124",
-      "name": "汇川技术",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
-    },
-    {
-      "code": "300627",
-      "name": "华测导航",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
-    },
-    {
-      "code": "300760",
-      "name": "迈瑞医疗",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
-    },
-    {
-      "code": "600183",
-      "name": "生益科技",
-      "condition": "控股股东最新质押比例",
-      "evidence": "无控股股东，且公司整体质押 >0，控股股东口径不适用"
-    },
-    {
       "code": "600233",
       "name": "圆通速递",
       "condition": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责",
-      "evidence": " 关于对圆通速递股份有限公司时任董事兼副总裁张益忠予以公开谴责的决定（https://data.eastmoney.com/notices/detail/600233/AN202312151614282825.html）"
-    },
-    {
-      "code": "600660",
-      "name": "福耀玻璃",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
-    },
-    {
-      "code": "600729",
-      "name": "重百集团",
-      "condition": "控股股东最新质押比例",
-      "evidence": "无控股股东，且公司整体质押 >0，控股股东口径不适用"
-    },
-    {
-      "code": "600803",
-      "name": "新奥股份",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
-    },
-    {
-      "code": "600887",
-      "name": "伊利股份",
-      "condition": "控股股东最新质押比例",
-      "evidence": "无控股股东，且公司整体质押 >0，控股股东口径不适用"
-    },
-    {
-      "code": "601138",
-      "name": "工业富联",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
-    },
-    {
-      "code": "603233",
-      "name": "大参林",
-      "condition": "控股股东最新质押比例",
-      "evidence": "最新定期报告股东表未取得（PDF 接口或解析失败）"
-    },
-    {
-      "code": "603259",
-      "name": "药明康德",
-      "condition": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责",
-      "evidence": " 上交所:关于对无锡药明康德新药开发股份有限公司股东上海瀛翊投资中心(有限合伙)、股东执行事务合伙人江苏瑞联投资基金管理有限公司及其执行董事暨法定代表人陈志杰予以纪律处分的决定（〔2022〕52 号）"
-    },
-    {
-      "code": "603259",
-      "name": "药明康德",
-      "condition": "控股股东最新质押比例",
-      "evidence": "无控股股东，且公司整体质押 >0，控股股东口径不适用"
+      "evidence": "计入：2023-12-15 公开谴责：张益忠（时任董监高）；只记录：2023-12-16 行政处罚：时任董事（公告所述）（时任董监高）；2023-11-23 立案：时任董事（公告所述）（时任董监高）"
     },
     {
       "code": "603360",
       "name": "百傲化学",
       "condition": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责",
-      "evidence": " 百傲化学:大连百傲化学股份有限公司关于收到中国证券监督管理委员会立案告知书的公告（https://data.eastmoney.com/notices/detail/603360/AN202604271821637398.html）"
+      "evidence": "计入：2026-04-28 立案：大连百傲化学股份有限公司（公司本身）"
     },
     {
       "code": "603816",
       "name": "顾家家居",
       "condition": "控股股东最新质押比例",
-      "evidence": "68.38%（2025）"
+      "evidence": "宁波盈峰睿和投资管理有限公司；口径：控股股东；质押 68.38%；最新定期报告前十名股东表「质押、标记或冻结情况」"
+    }
+  ],
+  "governance_comparison": {
+    "count": 27,
+    "by_change": {
+      "待定→入池": 17,
+      "未入池→只差一条": 7,
+      "未入池→入池": 1,
+      "只差一条→未入池": 1,
+      "待定→只差一条": 1
+    },
+    "rows": [
+      {
+        "code": "600729",
+        "name": "重百集团",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "天津滨海新区物美津融商贸有限公司；口径：第一大股东（无控股股东）；质押 0.00%；天津滨海新区物美津融商贸有限公司（第一大股东）116,062,505 股，质押 0 股；合计口径。"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（天津滨海新区物美津融商贸有限公司；口径：第一大股东（无控股股东）；质押 0.00%；天津滨海新区物美津融商贸有限公司（第一大股东）116,062,505 股，质押 0 股；合计口径。）"
+      },
+      {
+        "code": "002833",
+        "name": "弘亚数控",
+        "batch4e": "未入池",
+        "batch4f": "只差一条",
+        "changes": [
+          {
+            "condition_id": "no_penalty",
+            "label": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责",
+            "from": "fail",
+            "to": "pass",
+            "detail": "只记录：2022-11-23 立案：李茂洪、刘雨华（实际控制人）"
+          }
+        ],
+        "reason": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责：不通过→通过（只记录：2022-11-23 立案：李茂洪、刘雨华（实际控制人））"
+      },
+      {
+        "code": "600183",
+        "name": "生益科技",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "广东省广新控股集团有限公司；口径：第一大股东（无控股股东）；质押 0.00%；广东省广新控股集团有限公司（第一大股东）547,979,502 股，质押 0 股；合计口径。"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（广东省广新控股集团有限公司；口径：第一大股东（无控股股东）；质押 0.00%；广东省广新控股集团有限公司（第一大股东）547,979,502 股，质押 0 股；合计口径。）"
+      },
+      {
+        "code": "000513",
+        "name": "丽珠集团",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "健康元药业集团股份有限公司；口径：控股股东；质押 0.00%；健康元药业集团股份有限公司 221,376,789 股，质押 0 股（0.00%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（健康元药业集团股份有限公司；口径：控股股东；质押 0.00%；健康元药业集团股份有限公司 221,376,789 股，质押 0 股（0.00%））"
+      },
+      {
+        "code": "300760",
+        "name": "迈瑞医疗",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "Smartco Development Limited；口径：控股股东；质押 0.00%；Smartco Development Limited 327,072,335 股，质押 0 股（0.00%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（Smartco Development Limited；口径：控股股东；质押 0.00%；Smartco Development Limited 327,072,335 股，质押 0 股（0.00%））"
+      },
+      {
+        "code": "300015",
+        "name": "爱尔眼科",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "爱尔医疗投资集团有限公司；口径：控股股东；质押 19.09%；爱尔医疗投资集团有限公司 3,202,323,587 股，质押 611,241,045 股（19.09%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（爱尔医疗投资集团有限公司；口径：控股股东；质押 19.09%；爱尔医疗投资集团有限公司 3,202,323,587 股，质押 611,241,045 股（19.09%））"
+      },
+      {
+        "code": "603259",
+        "name": "药明康德",
+        "batch4e": "未入池",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "no_penalty",
+            "label": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责",
+            "from": "fail",
+            "to": "pass",
+            "detail": "只记录：2022-05-28 行政处罚：上海瀛翊投资中心（有限合伙）（其他股东（非控股、非一致行动人））；2022-05-14 行政处罚：上海瀛翊投资中心（有限合伙）（其他股东（非控股、非一致行动人））；2022-05-13 纪律处分：上海瀛翊投资中心（有限合伙）及其执行事务合伙人、执行董事（其他股东（非控股、非一致行动人））"
+          },
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "G&C VI Limited；口径：第一大股东（无控股股东）；质押 0.00%；G&C VI Limited（第一大股东）127,309,054 股，质押 0 股；G&C IV Hong Kong Limited 93,135,472 股，质押 0 股；G&C V Limited 65,076,978 股，质押 0 股；G&C VII Limited 33,696,017 股，质押 0 股；北京中民银孚投资管理有限公司-嘉兴宇祥投资合伙企业(有限合伙) 77,511,585 股，质押 0 股；上海厚燊投资中心(有限合伙) 31,051,061 股，质押 0 股；合计口径。2026 年三季报：G&C VI/IV/V/VII、嘉兴宇祥、上海厚燊存在一致行动关系。"
+          }
+        ],
+        "reason": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责：不通过→通过（只记录：2022-05-28 行政处罚：上海瀛翊投资中心（有限合伙）（其他股东（非控股、非一致行动人））；2022-05-14 行政处罚：上海瀛翊投资中心（有限合伙）（其他股东（非控股、非一致行动人））；2022-05-13 纪律处分：上海瀛翊投资中心（有限合伙）及其执行事务合伙人、执行董事（其他股东（非控股、非一致行动人）））；控股股东最新质押比例：待定→通过（G&C VI Limited；口径：第一大股东（无控股股东）；质押 0.00%；G&C VI Limited（第一大股东）127,309,054 股，质押 0 股；G&C IV Hong Kong Limited 93,135,472 股，质押 0 股；G&C V Limited 65,076,978 股，质押 0 股；G&C VII Limited 33,696,017 股，质押 0 股；北京中民银孚投资管理有限公司-嘉兴宇祥投资合伙企业(有限合伙) 77,511,585 股，质押 0 股；上海厚燊投资中心(有限合伙) 31,051,061 股，质押 0 股；合计口径。2026 年三季报：G&C VI/IV/V/VII、嘉兴宇祥、上海厚燊存在一致行动关系。）"
+      },
+      {
+        "code": "603233",
+        "name": "大参林",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "柯云峰；口径：控股股东；质押 0.00%；柯云峰 242,591,847 股，质押 0 股（0.00%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（柯云峰；口径：控股股东；质押 0.00%；柯云峰 242,591,847 股，质押 0 股（0.00%））"
+      },
+      {
+        "code": "002508",
+        "name": "老板电器",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "杭州老板实业集团有限公司；口径：控股股东；质押 0.00%；杭州老板实业集团有限公司 471,510,000 股，质押 0 股（0.00%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（杭州老板实业集团有限公司；口径：控股股东；质押 0.00%；杭州老板实业集团有限公司 471,510,000 股，质押 0 股（0.00%））"
+      },
+      {
+        "code": "002032",
+        "name": "苏泊尔",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "SEB INTERNATIONALE S.A.S；口径：控股股东；质押 0.00%；SEB INTERNATIONALE S.A.S 666,681,904 股，质押 0 股（0.00%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（SEB INTERNATIONALE S.A.S；口径：控股股东；质押 0.00%；SEB INTERNATIONALE S.A.S 666,681,904 股，质押 0 股（0.00%））"
+      },
+      {
+        "code": "600660",
+        "name": "福耀玻璃",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "三益发展有限公司；口径：控股股东；质押 0.00%；三益发展有限公司 390,578,816 股，质押 0 股（0.00%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（三益发展有限公司；口径：控股股东；质押 0.00%；三益发展有限公司 390,578,816 股，质押 0 股（0.00%））"
+      },
+      {
+        "code": "601138",
+        "name": "工业富联",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "China Galaxy Enterprise Limited；口径：控股股东；质押 0.00%；China Galaxy Enterprise Limited 7,293,115,611 股，质押 0 股（0.00%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（China Galaxy Enterprise Limited；口径：控股股东；质押 0.00%；China Galaxy Enterprise Limited 7,293,115,611 股，质押 0 股（0.00%））"
+      },
+      {
+        "code": "002555",
+        "name": "三七互娱",
+        "batch4e": "只差一条",
+        "batch4f": "未入池",
+        "changes": [
+          {
+            "condition_id": "no_penalty",
+            "label": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责",
+            "from": "pass",
+            "to": "fail",
+            "detail": "计入：2025-12-06 行政处罚：三七互娱网络科技集团股份有限公司及李卫伟等 6 名责任人（公司本身）；2025-12-05 纪律处分：三七互娱网络科技集团股份有限公司及李卫伟等责任人（公司本身）；2025-11-01 行政处罚：三七互娱网络科技集团股份有限公司及李卫伟等责任人（公司本身）；2023-06-28 立案：三七互娱网络科技集团股份有限公司（公司本身）"
+          }
+        ],
+        "reason": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责：通过→不通过（计入：2025-12-06 行政处罚：三七互娱网络科技集团股份有限公司及李卫伟等 6 名责任人（公司本身）；2025-12-05 纪律处分：三七互娱网络科技集团股份有限公司及李卫伟等责任人（公司本身）；2025-11-01 行政处罚：三七互娱网络科技集团股份有限公司及李卫伟等责任人（公司本身）；2023-06-28 立案：三七互娱网络科技集团股份有限公司（公司本身））"
+      },
+      {
+        "code": "600803",
+        "name": "新奥股份",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "ENN GROUP INTERNATIONAL INVESTMENT LIMITED；口径：控股股东；质押 8.03%；ENN GROUP INTERNATIONAL INVESTMENT LIMITED 1,370,626,680 股，质押 110,000,000 股（8.03%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（ENN GROUP INTERNATIONAL INVESTMENT LIMITED；口径：控股股东；质押 8.03%；ENN GROUP INTERNATIONAL INVESTMENT LIMITED 1,370,626,680 股，质押 110,000,000 股（8.03%））"
+      },
+      {
+        "code": "000708",
+        "name": "中信特钢",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "中信泰富特钢投资有限公司；口径：控股股东；质押 0.00%；中信泰富特钢投资有限公司 3,787,987,284 股，质押 0 股（0.00%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（中信泰富特钢投资有限公司；口径：控股股东；质押 0.00%；中信泰富特钢投资有限公司 3,787,987,284 股，质押 0 股（0.00%））"
+      },
+      {
+        "code": "000333",
+        "name": "美的集团",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "美的控股有限公司；口径：控股股东；质押 0.00%；美的控股有限公司 2,169,178,713 股，质押 0 股（0.00%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（美的控股有限公司；口径：控股股东；质押 0.00%；美的控股有限公司 2,169,178,713 股，质押 0 股（0.00%））"
+      },
+      {
+        "code": "000651",
+        "name": "格力电器",
+        "batch4e": "待定",
+        "batch4f": "只差一条",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "fail",
+            "detail": "珠海明骏投资合伙企业(有限合伙)；口径：第一大股东（无控股股东）；质押 87.38%；珠海明骏投资合伙企业(有限合伙)（第一大股东）859,566,532 股，质押 859,566,532 股；董明珠 124,184,839 股，质押 0 股；合计口径。2026 年三季报：珠海明骏投资合伙企业（有限合伙）与董明珠为一致行动人。"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→不通过（珠海明骏投资合伙企业(有限合伙)；口径：第一大股东（无控股股东）；质押 87.38%；珠海明骏投资合伙企业(有限合伙)（第一大股东）859,566,532 股，质押 859,566,532 股；董明珠 124,184,839 股，质押 0 股；合计口径。2026 年三季报：珠海明骏投资合伙企业（有限合伙）与董明珠为一致行动人。）"
+      },
+      {
+        "code": "000858",
+        "name": "五粮液",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "宜宾发展控股集团有限公司；口径：控股股东；质押 0.00%；宜宾发展控股集团有限公司 1,336,548,020 股，质押 0 股（0.00%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（宜宾发展控股集团有限公司；口径：控股股东；质押 0.00%；宜宾发展控股集团有限公司 1,336,548,020 股，质押 0 股（0.00%））"
+      },
+      {
+        "code": "300124",
+        "name": "汇川技术",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "深圳市汇川投资有限公司；口径：第一大股东（无控股股东）；质押 4.59%；深圳市汇川投资有限公司（第一大股东）466,043,804 股，质押 6,880,000 股；朱兴明 55,592,388 股，质押 17,079,727 股；合计口径。2025 年年报：朱兴明、朱瀚玥、深圳市汇川投资有限公司为一致行动人；朱瀚玥持股未在前十名列示，分母不含其持股（口径偏保守）。"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（深圳市汇川投资有限公司；口径：第一大股东（无控股股东）；质押 4.59%；深圳市汇川投资有限公司（第一大股东）466,043,804 股，质押 6,880,000 股；朱兴明 55,592,388 股，质押 17,079,727 股；合计口径。2025 年年报：朱兴明、朱瀚玥、深圳市汇川投资有限公司为一致行动人；朱瀚玥持股未在前十名列示，分母不含其持股（口径偏保守）。）"
+      },
+      {
+        "code": "300627",
+        "name": "华测导航",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "赵延平；口径：控股股东；质押 14.88%；赵延平 155,102,534 股，质押 23,084,000 股（14.88%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（赵延平；口径：控股股东；质押 14.88%；赵延平 155,102,534 股，质押 23,084,000 股（14.88%））"
+      },
+      {
+        "code": "600887",
+        "name": "伊利股份",
+        "batch4e": "待定",
+        "batch4f": "入池",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "呼和浩特投资有限责任公司；口径：第一大股东（无控股股东）；质押 35.33%；呼和浩特投资有限责任公司（第一大股东）538,535,826 股，质押 190,270,000 股；合计口径。"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（呼和浩特投资有限责任公司；口径：第一大股东（无控股股东）；质押 35.33%；呼和浩特投资有限责任公司（第一大股东）538,535,826 股，质押 190,270,000 股；合计口径。）"
+      },
+      {
+        "code": "300759",
+        "name": "康龙化成",
+        "batch4e": "未入池",
+        "batch4f": "只差一条",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "深圳市信中康成投资合伙企业(有限合伙)；口径：第一大股东（无控股股东）；质押 0.00%；深圳市信中康成投资合伙企业(有限合伙)（第一大股东）197,754,733 股，质押 0 股；合计口径。"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（深圳市信中康成投资合伙企业(有限合伙)；口径：第一大股东（无控股股东）；质押 0.00%；深圳市信中康成投资合伙企业(有限合伙)（第一大股东）197,754,733 股，质押 0 股；合计口径。）"
+      },
+      {
+        "code": "600066",
+        "name": "宇通客车",
+        "batch4e": "未入池",
+        "batch4f": "只差一条",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "郑州宇通集团有限公司；口径：控股股东；质押 0.00%；郑州宇通集团有限公司 834,755,347 股，质押 0 股（0.00%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（郑州宇通集团有限公司；口径：控股股东；质押 0.00%；郑州宇通集团有限公司 834,755,347 股，质押 0 股（0.00%））"
+      },
+      {
+        "code": "603596",
+        "name": "伯特利",
+        "batch4e": "未入池",
+        "batch4f": "只差一条",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "YUAN,YONGBIN；口径：控股股东；质押 0.00%；YUAN,YONGBIN 163,694,423 股，质押 0 股（0.00%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（YUAN,YONGBIN；口径：控股股东；质押 0.00%；YUAN,YONGBIN 163,694,423 股，质押 0 股（0.00%））"
+      },
+      {
+        "code": "600176",
+        "name": "中国巨石",
+        "batch4e": "未入池",
+        "batch4f": "只差一条",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "中国建材股份有限公司；口径：控股股东；质押 0.00%；中国建材股份有限公司 1,175,554,160 股，质押 0 股（0.00%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（中国建材股份有限公司；口径：控股股东；质押 0.00%；中国建材股份有限公司 1,175,554,160 股，质押 0 股（0.00%））"
+      },
+      {
+        "code": "002138",
+        "name": "顺络电子",
+        "batch4e": "未入池",
+        "batch4f": "只差一条",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "新余市恒顺通电子科技开发有限公司；口径：第一大股东（无控股股东）；质押 42.51%；新余市恒顺通电子科技开发有限公司（第一大股东）55,502,000 股，质押 34,134,000 股；中量投资产管理有限公司-中量投成长10号私募证券投资基金 24,789,860 股，质押 0 股；合计口径。2026 年三季报：中量投成长 10 号与恒顺通全部股东及核心管理人员签署《一致行动协议》。"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（新余市恒顺通电子科技开发有限公司；口径：第一大股东（无控股股东）；质押 42.51%；新余市恒顺通电子科技开发有限公司（第一大股东）55,502,000 股，质押 34,134,000 股；中量投资产管理有限公司-中量投成长10号私募证券投资基金 24,789,860 股，质押 0 股；合计口径。2026 年三季报：中量投成长 10 号与恒顺通全部股东及核心管理人员签署《一致行动协议》。）"
+      },
+      {
+        "code": "300638",
+        "name": "广和通",
+        "batch4e": "未入池",
+        "batch4f": "只差一条",
+        "changes": [
+          {
+            "condition_id": "pledge_ratio",
+            "label": "控股股东最新质押比例",
+            "from": "pending",
+            "to": "pass",
+            "detail": "张天瑜；口径：控股股东；质押 24.26%；张天瑜 281,512,495 股，质押 68,299,300 股（24.26%）"
+          }
+        ],
+        "reason": "控股股东最新质押比例：待定→通过（张天瑜；口径：控股股东；质押 24.26%；张天瑜 281,512,495 股，质押 68,299,300 股（24.26%））"
+      }
+    ]
+  },
+  "pledge_sources": {
+    "k1": [
+      {
+        "code": "000333",
+        "name": "美的集团",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "美的控股有限公司",
+        "role": "控股股东",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610291831184591_1.pdf",
+        "note": "美的控股有限公司 2,169,178,713 股，质押 0 股（0.00%）"
+      },
+      {
+        "code": "000513",
+        "name": "丽珠集团",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "健康元药业集团股份有限公司",
+        "role": "控股股东",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610231830839762_1.pdf",
+        "note": "健康元药业集团股份有限公司 221,376,789 股，质押 0 股（0.00%）"
+      },
+      {
+        "code": "000708",
+        "name": "中信特钢",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "中信泰富特钢投资有限公司",
+        "role": "控股股东",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610221830800908_1.pdf",
+        "note": "中信泰富特钢投资有限公司 3,787,987,284 股，质押 0 股（0.00%）"
+      },
+      {
+        "code": "000858",
+        "name": "五粮液",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "宜宾发展控股集团有限公司",
+        "role": "控股股东",
+        "ratio": 0.0,
+        "source": "https://data.eastmoney.com/gpzy/pledgeDetail.aspx",
+        "note": "宜宾发展控股集团有限公司 1,336,548,020 股，质押 0 股（0.00%）"
+      },
+      {
+        "code": "002032",
+        "name": "苏泊尔",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "SEB INTERNATIONALE S.A.S",
+        "role": "控股股东",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610221830807174_1.pdf",
+        "note": "SEB INTERNATIONALE S.A.S 666,681,904 股，质押 0 股（0.00%）"
+      },
+      {
+        "code": "002508",
+        "name": "老板电器",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "杭州老板实业集团有限公司",
+        "role": "控股股东",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610271831035477_1.pdf",
+        "note": "杭州老板实业集团有限公司 471,510,000 股，质押 0 股（0.00%）"
+      },
+      {
+        "code": "300015",
+        "name": "爱尔眼科",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "爱尔医疗投资集团有限公司",
+        "role": "控股股东",
+        "ratio": 0.19087422878854748,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610291831173536_1.pdf",
+        "note": "爱尔医疗投资集团有限公司 3,202,323,587 股，质押 611,241,045 股（19.09%）"
+      },
+      {
+        "code": "300124",
+        "name": "汇川技术",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "深圳市汇川投资有限公司",
+        "role": "第一大股东（无控股股东）",
+        "ratio": 0.045931873264844325,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610261830925480_1.pdf",
+        "note": "深圳市汇川投资有限公司（第一大股东）466,043,804 股，质押 6,880,000 股；朱兴明 55,592,388 股，质押 17,079,727 股；合计口径。2025 年年报：朱兴明、朱瀚玥、深圳市汇川投资有限公司为一致行动人；朱瀚玥持股未在前十名列示，分母不含其持股（口径偏保守）。"
+      },
+      {
+        "code": "300627",
+        "name": "华测导航",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "赵延平",
+        "role": "控股股东",
+        "ratio": 0.14883057938950242,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610221830806959_1.pdf",
+        "note": "赵延平 155,102,534 股，质押 23,084,000 股（14.88%）"
+      },
+      {
+        "code": "300638",
+        "name": "广和通",
+        "batch4d": "只差一条",
+        "batch4e": "只差一条",
+        "subject": "张天瑜",
+        "role": "控股股东",
+        "ratio": 0.24261551871791695,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610291831179843_1.pdf",
+        "note": "张天瑜 281,512,495 股，质押 68,299,300 股（24.26%）"
+      },
+      {
+        "code": "300760",
+        "name": "迈瑞医疗",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "Smartco Development Limited",
+        "role": "控股股东",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610291831179830_1.pdf",
+        "note": "Smartco Development Limited 327,072,335 股，质押 0 股（0.00%）"
+      },
+      {
+        "code": "600066",
+        "name": "宇通客车",
+        "batch4d": "只差一条",
+        "batch4e": "只差一条",
+        "subject": "郑州宇通集团有限公司",
+        "role": "控股股东",
+        "ratio": 0.0,
+        "source": "https://data.eastmoney.com/gpzy/pledgeDetail.aspx",
+        "note": "郑州宇通集团有限公司 834,755,347 股，质押 0 股（0.00%）"
+      },
+      {
+        "code": "600176",
+        "name": "中国巨石",
+        "batch4d": "只差一条",
+        "batch4e": "只差一条",
+        "subject": "中国建材股份有限公司",
+        "role": "控股股东",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610191830680666_1.pdf",
+        "note": "中国建材股份有限公司 1,175,554,160 股，质押 0 股（0.00%）"
+      },
+      {
+        "code": "600660",
+        "name": "福耀玻璃",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "三益发展有限公司",
+        "role": "控股股东",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610201830718634_1.pdf",
+        "note": "三益发展有限公司 390,578,816 股，质押 0 股（0.00%）"
+      },
+      {
+        "code": "600803",
+        "name": "新奥股份",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "ENN GROUP INTERNATIONAL INVESTMENT LIMITED",
+        "role": "控股股东",
+        "ratio": 0.08025525958680449,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610301831235351_1.pdf",
+        "note": "ENN GROUP INTERNATIONAL INVESTMENT LIMITED 1,370,626,680 股，质押 110,000,000 股（8.03%）"
+      },
+      {
+        "code": "601138",
+        "name": "工业富联",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "China Galaxy Enterprise Limited",
+        "role": "控股股东",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610291831168765_1.pdf",
+        "note": "China Galaxy Enterprise Limited 7,293,115,611 股，质押 0 股（0.00%）"
+      },
+      {
+        "code": "603233",
+        "name": "大参林",
+        "batch4d": "第四批入池",
+        "batch4e": "入池",
+        "subject": "柯云峰",
+        "role": "控股股东",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610291831176350_1.pdf",
+        "note": "柯云峰 242,591,847 股，质押 0 股（0.00%）"
+      },
+      {
+        "code": "603596",
+        "name": "伯特利",
+        "batch4d": "只差一条",
+        "batch4e": "只差一条",
+        "subject": "YUAN,YONGBIN",
+        "role": "控股股东",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610291831185015_1.pdf",
+        "note": "YUAN,YONGBIN 163,694,423 股，质押 0 股（0.00%）"
+      }
+    ],
+    "k2": [
+      {
+        "code": "000651",
+        "name": "格力电器",
+        "subject": "珠海明骏投资合伙企业(有限合伙)",
+        "ratio": 0.8737639990541879,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610261830946065_1.pdf",
+        "note": "珠海明骏投资合伙企业(有限合伙)（第一大股东）859,566,532 股，质押 859,566,532 股；董明珠 124,184,839 股，质押 0 股；合计口径。2026 年三季报：珠海明骏投资合伙企业（有限合伙）与董明珠为一致行动人。"
+      },
+      {
+        "code": "002138",
+        "name": "顺络电子",
+        "subject": "新余市恒顺通电子科技开发有限公司",
+        "ratio": 0.42512404121663144,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610291831182164_1.pdf",
+        "note": "新余市恒顺通电子科技开发有限公司（第一大股东）55,502,000 股，质押 34,134,000 股；中量投资产管理有限公司-中量投成长10号私募证券投资基金 24,789,860 股，质押 0 股；合计口径。2026 年三季报：中量投成长 10 号与恒顺通全部股东及核心管理人员签署《一致行动协议》。"
+      },
+      {
+        "code": "300124",
+        "name": "汇川技术",
+        "subject": "深圳市汇川投资有限公司",
+        "ratio": 0.045931873264844325,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610261830925480_1.pdf",
+        "note": "深圳市汇川投资有限公司（第一大股东）466,043,804 股，质押 6,880,000 股；朱兴明 55,592,388 股，质押 17,079,727 股；合计口径。2025 年年报：朱兴明、朱瀚玥、深圳市汇川投资有限公司为一致行动人；朱瀚玥持股未在前十名列示，分母不含其持股（口径偏保守）。"
+      },
+      {
+        "code": "300759",
+        "name": "康龙化成",
+        "subject": "深圳市信中康成投资合伙企业(有限合伙)",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610271831036925_1.pdf",
+        "note": "深圳市信中康成投资合伙企业(有限合伙)（第一大股东）197,754,733 股，质押 0 股；合计口径。"
+      },
+      {
+        "code": "600183",
+        "name": "生益科技",
+        "subject": "广东省广新控股集团有限公司",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610291831182346_1.pdf",
+        "note": "广东省广新控股集团有限公司（第一大股东）547,979,502 股，质押 0 股；合计口径。"
+      },
+      {
+        "code": "600729",
+        "name": "重百集团",
+        "subject": "天津滨海新区物美津融商贸有限公司",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610281831100316_1.pdf",
+        "note": "天津滨海新区物美津融商贸有限公司（第一大股东）116,062,505 股，质押 0 股；合计口径。"
+      },
+      {
+        "code": "600887",
+        "name": "伊利股份",
+        "subject": "呼和浩特投资有限责任公司",
+        "ratio": 0.3533098278962039,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610291831182299_1.pdf",
+        "note": "呼和浩特投资有限责任公司（第一大股东）538,535,826 股，质押 190,270,000 股；合计口径。"
+      },
+      {
+        "code": "603259",
+        "name": "药明康德",
+        "subject": "G&C VI Limited",
+        "ratio": 0.0,
+        "source": "https://pdf.dfcfw.com/pdf/H2_AN202610261830927103_1.pdf",
+        "note": "G&C VI Limited（第一大股东）127,309,054 股，质押 0 股；G&C IV Hong Kong Limited 93,135,472 股，质押 0 股；G&C V Limited 65,076,978 股，质押 0 股；G&C VII Limited 33,696,017 股，质押 0 股；北京中民银孚投资管理有限公司-嘉兴宇祥投资合伙企业(有限合伙) 77,511,585 股，质押 0 股；上海厚燊投资中心(有限合伙) 31,051,061 股，质押 0 股；合计口径。2026 年三季报：G&C VI/IV/V/VII、嘉兴宇祥、上海厚燊存在一致行动关系。"
+      }
+    ],
+    "remaining_pending": 0
+  },
+  "penalty_subjects": [
+    {
+      "code": "002555",
+      "name": "三七互娱",
+      "date": "2025-12-06",
+      "event_type": "行政处罚",
+      "subject": "三七互娱网络科技集团股份有限公司及李卫伟等 6 名责任人",
+      "role": "公司本身",
+      "basis": "《行政处罚决定书》[2025]146 号：2014–2020 年年报股东持股虚假记载、关联交易重大遗漏；公司、实控人及时任董监高被罚。"
+    },
+    {
+      "code": "002555",
+      "name": "三七互娱",
+      "date": "2025-12-05",
+      "event_type": "纪律处分",
+      "subject": "三七互娱网络科技集团股份有限公司及李卫伟等责任人",
+      "role": "公司本身",
+      "basis": "深证上〔2025〕1340 号：公司及李卫伟等被公开谴责，胡宇航被通报批评；事由为前述信息披露违规。"
+    },
+    {
+      "code": "002555",
+      "name": "三七互娱",
+      "date": "2025-11-01",
+      "event_type": "行政处罚",
+      "subject": "三七互娱网络科技集团股份有限公司及李卫伟等责任人",
+      "role": "公司本身",
+      "basis": "《行政处罚事先告知书》处罚字[2025]71 号：涉嫌信息披露违法违规。"
+    },
+    {
+      "code": "002555",
+      "name": "三七互娱",
+      "date": "2023-06-28",
+      "event_type": "立案",
+      "subject": "三七互娱网络科技集团股份有限公司",
+      "role": "公司本身",
+      "basis": "证监立案字 03720230061–63 号：公司、李卫伟、曾开天因涉嫌信息披露违法违规被立案。"
+    },
+    {
+      "code": "600233",
+      "name": "圆通速递",
+      "date": "2023-12-15",
+      "event_type": "公开谴责",
+      "subject": "张益忠",
+      "role": "时任董监高",
+      "basis": "上交所〔2023〕155 号：时任董事兼副总裁张益忠短线交易且未准确披露交易主体，予以公开谴责。"
+    },
+    {
+      "code": "600763",
+      "name": "通策医疗",
+      "date": "2023-02-15",
+      "event_type": "纪律处分",
+      "subject": "通策医疗股份有限公司；吕建明（实际控制人暨时任董事长）",
+      "role": "公司本身",
+      "basis": "上交所〔2023〕13 号：关联交易构成非经营性资金往来、信息披露不准确；吕建明被公开谴责，公司及时任高管被通报批评。"
+    },
+    {
+      "code": "600763",
+      "name": "通策医疗",
+      "date": "2022-12-24",
+      "event_type": "行政处罚",
+      "subject": "吕建明",
+      "role": "实际控制人",
+      "basis": "浙江证监局《行政处罚决定书》〔2022〕46 号：作为实控人未及时告知公司，导致公司未及时履行信息披露义务。"
+    },
+    {
+      "code": "600763",
+      "name": "通策医疗",
+      "date": "2022-11-19",
+      "event_type": "立案",
+      "subject": "吕建明",
+      "role": "实际控制人",
+      "basis": "证监立案字 01120220021 号：实际控制人吕建明涉嫌信息披露违法违规被立案。"
+    },
+    {
+      "code": "603360",
+      "name": "百傲化学",
+      "date": "2026-04-28",
+      "event_type": "立案",
+      "subject": "大连百傲化学股份有限公司",
+      "role": "公司本身",
+      "basis": "证监立案字 0212026001 号：公司涉嫌信息披露违法违规被立案。"
     }
   ]
 }

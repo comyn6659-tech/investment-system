@@ -23,6 +23,7 @@ EBITDA_NONPOSITIVE = "ebitda_nonpositive"
 NET_DEBT_MISSING = "net_debt_missing"
 AUDIT_MISSING = "missing_audit_opinion"
 PENALTY_MISSING = "missing_penalty_data"
+PENALTY_SUBJECT_UNKNOWN = "penalty_subject_unknown"
 PLEDGE_MISSING = "missing_pledge_data"
 
 # 这些原因属于公司事实/口径不适用，条件应记为「不通过」，而不是「待定」。
@@ -244,14 +245,22 @@ def compute_metrics(company: Company, policy: QualityPolicy) -> dict[str, Any]:
             note="非标准年份：" + ("、".join(str(y) for y in nonstandard) if nonstandard else "无"),
         )
 
+    counted = [item for item in company.penalties if item.counted]
     if not company.penalty_available:
         penalty_metric = MetricValue(None, (PENALTY_MISSING,), "处罚/立案公告检索未完成")
-    else:
-        counted = [item for item in company.penalties if item.counted]
+    elif counted:
         penalty_metric = MetricValue(
             len(counted),
-            note="；".join(item.title for item in counted[:3]) if counted else "无",
+            note="；".join(item.title for item in counted[:3]),
         )
+    elif company.penalty_subject_unknown:
+        penalty_metric = MetricValue(
+            None,
+            (PENALTY_SUBJECT_UNKNOWN,),
+            "存在公告但无法判断主体身份，按待定处理",
+        )
+    else:
+        penalty_metric = MetricValue(0, note="无计入的立案/处罚/公开谴责（其他主体只记录）")
 
     if not company.pledge_available:
         pledge_metric = MetricValue(None, (PLEDGE_MISSING,), company.pledge_note or "控股股东质押数据不可得")

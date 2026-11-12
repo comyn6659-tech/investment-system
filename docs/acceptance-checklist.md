@@ -325,3 +325,18 @@
 | J6 | 报告措辞修正到位（测试扫描旧句式） | `engine/quality/evaluator.py`、`engine/quality/report.py` | `test_condition_reason_wording_is_not_misleading`、`test_4e_report_has_governance_sections_and_no_misleading_wording` | ✅ |
 | J7 | 第四批快照、两本既有账本、个股结论、指数与 ETF 结果不变；入池账本只追加；全部测试通过 | 旧快照/`report-4d.json` 未改 | 个股 7 条、候选 A 3 条、官方估值 4 条 0 问题；池账本 2 条 0 问题；**532 passed** | ✅ |
 | J8 | DELIVERY.md 一页以内汇总，含复现命令、测试结果、提交 ID | `DELIVERY.md`、`docs/phase4e-delivery.md` | 入口 §1–§8 | ✅ |
+
+---
+
+# 第四阶段第六批验收清单（好公司池收尾，K1–K5）
+
+对应文件：`batch4f-closeout-instructions.md` 冻结验收条件。范围：按 K1–K3 重跑 252 家候选，
+出第六批快照与报告、第五批→第六批对照表、入池账本追加；不改阈值、不扩候选、不改个股/指数/ETF。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| K1 | 14 家质押表解析失败逐家给出最终来源或无法取得原因；剩余待定 ≤ 14 | `tools/build_governance_data.py`、`data/policy-inputs/governance-review-v1.json`、报告 §1e | 18 行来源表（14 家第四批入池 + 4 家只差一条），逐家 URL/接口；剩余待定 **0** | ✅ |
+| K2 | 无控股股东按第一大股东（含一致行动人合计）口径；50% 等于/略高有边界测试；格力附数据与来源 | `engine/quality/metrics.py`、`tools/build_governance_data.py`、政策 `pledge_ratio.no_controller` | `test_v12_pledge_boundary_exactly_50_and_above`；格力：珠海明骏 859,566,532/859,566,532 = 100%，含董明珠合计 87.38%，来源 2026 三季报 PDF | ✅ |
+| K3 | 每条计入处罚标明主体与身份；药明康德按身份重判；主体不明 → 待定（测试） | 政策 `definitions.penalty`、`engine/quality/metrics.py`、报告 §1g | `test_v12_penalty_subject_unknown_is_pending`、`test_v12_penalty_other_shareholder_is_recorded_not_counted`；9 条计入记录均有主体/身份/文号；药明康德 3 条股东事项改只记录，回池 | ✅ |
+| K4 | 对照表齐全；第五批快照与报告不变；既有账本不变、池账本只追加；全部测试通过 | 报告 §1d、`data/quality-pool/report-4e.json`、`snapshot-qps-1c1edb9a5fc01bc3/` | 第五批 120 家/18 家待定、快照 id 不变；池账本 3 条 0 问题；个股 7 条/候选 A 3 条/官方估值 4 条 0 问题；**541 passed** | ✅ |
+| K5 | DELIVERY.md 一页以内，含复现命令、测试结果、提交 ID | `DELIVERY.md`、`docs/phase4f-delivery.md` | 入口 §1–§7；实现提交与交付提交见文件 | ✅ |

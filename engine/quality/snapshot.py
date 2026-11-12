@@ -194,10 +194,17 @@ def load_snapshot_dir(path: Path) -> tuple[dict[str, Any], list[Any], dict[str, 
                     penalties=tuple(
                         GovernancePenalty.from_dict(row)
                         for row in penalties.get(company.code, [])
-                        if _truthy(row.get("counted"))
                     ),
                     penalty_available=_truthy(cov.get("penalty_available")),
-                    controlling_shareholder=pledge_row.get("controller") or None,
+                    penalty_subject_unknown=any(
+                        _truthy(row.get("subject_unknown"))
+                        for row in penalties.get(company.code, [])
+                    ),
+                    controlling_shareholder=(
+                        pledge_row.get("subject")
+                        or pledge_row.get("controller")
+                        or None
+                    ),
                     controlling_pledge_ratio=(
                         float(pledge_row["pledge_ratio"])
                         if pledge_row.get("pledge_ratio") not in (None, "")
@@ -206,6 +213,9 @@ def load_snapshot_dir(path: Path) -> tuple[dict[str, Any], list[Any], dict[str, 
                     pledge_report_date=pledge_row.get("report_date") or None,
                     pledge_available=_truthy(cov.get("pledge_available")),
                     pledge_note=pledge_row.get("note") or None,
+                    pledge_subject_role=pledge_row.get("subject_role") or None,
+                    pledge_detail=pledge_row.get("detail") or None,
+                    pledge_source_url=pledge_row.get("source_url") or None,
                     governance_in_scope=bool(cov),
                 )
             )

@@ -20,7 +20,11 @@ from typing import Any, Iterator, Mapping
 POLICY_SCHEMA_VERSION = "quality-pool-policy/1.0"
 SUPPORTED_SCHEMA_VERSIONS = ("quality-pool-policy/1.0",)
 POLICY_ID = "quality-pool-v1-draft"
-SUPPORTED_POLICY_IDS = ("quality-pool-v1-draft", "quality-pool-v1.1-draft")
+SUPPORTED_POLICY_IDS = (
+    "quality-pool-v1-draft",
+    "quality-pool-v1.1-draft",
+    "quality-pool-v1.2-draft",
+)
 POLICY_STATUS_DRAFT = "draft_unapproved"
 SUPPORTED_OPERATORS = (">=", ">", "<=", "<", "==")
 

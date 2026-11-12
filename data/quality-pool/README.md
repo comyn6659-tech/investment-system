@@ -1,15 +1,16 @@
 # 好公司池固定快照
 
-本目录保存**固定快照**与清单；第四批快照（`snapshot-qps-e6fd0031c30f1e01`）保留不改，
-第五批新增治理表后生成新快照。原始下载缓存位于 `data/cache/quality-pool/`，
-已被 `.gitignore` 排除，不提交 git。
+本目录保存**固定快照**与清单；第四批、第五批快照与报告保留不改，
+第六批补治理口径后生成新快照。原始下载缓存位于 `data/cache/quality-pool/`
+与 `data/cache/governance/`，已被 `.gitignore` 排除，不提交 git。
 
 ## 当前快照
 
 | snapshot_id | 内容 | 状态 |
 |---|---|---|
 | `qps-e6fd0031c30f1e01` | 第四批：财务/分红/名单/公司整体质押，44 张表 | 保留不改，v1 政策复核 |
-| `qps-1c1edb9a5fc01bc3` | 第五批：在第四批 44 张表上增加 4 张治理表，48 张表 | 当前快照，v1.1 政策使用 |
+| `qps-1c1edb9a5fc01bc3` | 第五批：44 张表 + 4 张治理表，48 张表 | 保留不改，`report-4e.json` |
+| `qps-3ebbd24be612bf7e` | 第六批：治理表补 K1–K3 口径，48 张表 | 当前快照，v1.2 政策使用 |
 
 ## 目录结构
 
@@ -22,9 +23,9 @@ data/quality-pool/
 │   ├── industry.csv.gz               # 最新年报行业（识别金融业）
 │   ├── pledge.csv.gz                 # 公司整体质押比例（旁证，不参与规则）
 │   ├── governance-audit.csv.gz       # 252 家候选：2021–2025 审计意见
-│   ├── governance-penalty.csv.gz     # 252 家候选：处罚/立案/公开谴责公告
-│   ├── governance-pledge.csv.gz      # 252 家候选：控股股东质押
-│   ├── governance-coverage.csv.gz    # 252 家候选治理三项可得性
+│   ├── governance-penalty.csv.gz     # 252 家候选：处罚公告与主体身份
+│   ├── governance-pledge.csv.gz      # 252 家候选：控股股东/第一大股东质押
+│   ├── governance-coverage.csv.gz    # 252 家候选治理三项可得性与主体待定标记
 │   ├── balance-2015.csv.gz …         # 资产负债表，按报告期
 │   ├── income-2016.csv.gz …          # 利润表，按报告期
 │   ├── cashflow-2016.csv.gz …        # 现金流量表，按报告期
@@ -52,5 +53,5 @@ data/quality-pool/
 
 ## 原始缓存大小
 
-压缩后的原始表格与固定快照合计约 **7 MB**（见 `manifest.json` 的 `total_bytes`），
-远低于 1 GB 上限；若未来超过 1 GB，工具应先停下并报告实际大小。
+当前快照 `manifest.json` 的 `total_bytes` 约 9.32 MB；三个固定快照合计约 30 MB，
+原始缓存约 12 MB，远低于 1 GB 上限。若未来超过 1 GB，工具应先停下并报告实际大小。
