@@ -1,8 +1,8 @@
 {
   "schema_version": "index-series/1",
   "instrument_id": "INDEX:399006.SZ",
-  "metric": "official_pb_ratio_1",
-  "field": "市净率（官方当前快照）",
+  "metric": "official_pe_ratio_1",
+  "field": "滚动市盈率（官方当前快照）",
   "frequency": "daily_short",
   "source": {
     "source_id": "cnindex.index_list",
@@ -15,16 +15,16 @@
   "observations": [
     {
       "date": "2026-11-11",
-      "value": 4.07
+      "value": 25.1325
     }
   ],
   "unit": "ratio",
-  "transform": "官网指数列表『PB』原值，未做换算",
+  "transform": "官网指数列表『PE滚动』原值，未做换算",
   "aggregation_method": "unknown",
   "denominator_basis": "unknown",
   "loss_sample_handling": "unknown",
   "revision_availability": "unknown",
-  "notes": "只有最新一个交易日，作为并列事实；不参与分位。；只保留发布日 2010-06-01 及之后的记录，基日 2010-06-01 之前的基点行已丢弃",
-  "series_id": "ser-6081301e8f8db931",
+  "notes": "只有最新一个交易日，作为并列事实；样本不足，不参与分位、不生成信号、不回测。",
+  "series_id": "ser-f095f95747459e08",
   "observation_count": 1
 }

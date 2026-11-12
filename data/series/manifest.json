@@ -265,7 +265,7 @@
       "file": "ser-7ac07cf786e292e2.json"
     },
     {
-      "series_id": "ser-6081301e8f8db931",
+      "series_id": "ser-a24d0755e9075454",
       "instrument_id": "INDEX:399006.SZ",
       "metric": "official_pb_ratio_1",
       "frequency": "daily_short",
@@ -274,10 +274,10 @@
       "start_date": "2026-11-11",
       "end_date": "2026-11-11",
       "observation_count": 1,
-      "file": "ser-6081301e8f8db931.json"
+      "file": "ser-a24d0755e9075454.json"
     },
     {
-      "series_id": "ser-26370efe035d2f02",
+      "series_id": "ser-f095f95747459e08",
       "instrument_id": "INDEX:399006.SZ",
       "metric": "official_pe_ratio_1",
       "frequency": "daily_short",
@@ -286,7 +286,7 @@
       "start_date": "2026-11-11",
       "end_date": "2026-11-11",
       "observation_count": 1,
-      "file": "ser-26370efe035d2f02.json"
+      "file": "ser-f095f95747459e08.json"
     },
     {
       "series_id": "ser-d50212f068f47cd2",

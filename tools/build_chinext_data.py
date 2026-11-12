@@ -306,9 +306,14 @@ def _series(
         revision_availability="unknown",
         notes=notes
         + (
-            f"；全收益指数代码 {code}，只保留发布日 {LAUNCH_DATE} 及之后的记录"
-            if tr
-            else f"；只保留发布日 {LAUNCH_DATE} 及之后的记录，基日 {LAUNCH_DATE} 之前的基点行已丢弃"
+            (
+                f"；全收益指数代码 {code}，只保留发布日 {LAUNCH_DATE} 及之后的记录"
+                if tr
+                else f"；只保留发布日 {LAUNCH_DATE} 及之后的记录，"
+                f"基日 {LAUNCH_DATE} 之前的基点行已丢弃"
+            )
+            if unit == "index_point"
+            else ""
         ),
     )
 
