@@ -1,1755 +1,2539 @@
 {
   "meta": {
-    "as_of": "2026-11-12",
-    "snapshot_id": "qps-dc9c12160476db8b",
-    "policy": "equity-policy-v1.1 grades.banks",
-    "max_grade": "B",
-    "bank_pool_policy": "bank-pool-v1-draft",
-    "rehearsal_input": "bank-valuation-rehearsal-v1",
-    "generated_at": "2026-11-12",
-    "warning": "预演，不写入正式结论账本；银行估值模型仍为 research，是否启用由股东在决策③决定。"
-  },
-  "settings": {
-    "version": "bank-valuation-rehearsal-v1",
-    "approved": false,
-    "reviewed_at": "2026-11-13",
-    "source": "batch4h 第二部分 C；个股政策 v1.1 grades.banks 银行条款",
-    "required_cet1_ratio": 0.085,
-    "required_cet1_basis": "监管底线核心一级 7.5% + 1.0 个百分点安全垫；研究假设，未获批准",
-    "required_provision_coverage": 1.5,
-    "required_provision_basis": "监管拨备覆盖率 120–150% 的上沿；研究假设，未获批准",
-    "rwa_density": 0.65,
-    "rwa_density_basis": "风险加权资产 ≈ 总资产 × 65%；研究假设，用于资本一致性检查",
-    "rwa_growth": 0.03,
-    "horizon_years": 5,
-    "scenarios": {
-      "bear": {
-        "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-        "net_profit_growth": [
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0
-        ],
-        "payout_adjust": 0.0,
-        "cost_of_equity": 0.095,
-        "terminal_growth": 0.015
+    "as_of": "2026-11-13",
+    "generated_at": "2026-11-13T04:02:47+08:00",
+    "policy": "equity-policy-v1.1",
+    "policy_digest": "pol-6d1a5387780fe6a2",
+    "bank_check": "bank-check-v1-draft",
+    "bank_check_approved": false,
+    "risk_free": 0.027629358333333333,
+    "equity_risk_premium": 0.0514,
+    "cost_of_equity": 0.07902935833333333,
+    "risk_free_detail": {
+      "rule": "max(latest_10y_yield, mean_of_month_end_10y_yield_last_120_months)",
+      "series_id": "macro-066aace4ee2deff0",
+      "series_file": "data/policy-trial/macro/cn-10y-yield.json",
+      "latest": {
+        "date": "2026-11-11",
+        "pct": 1.6039
       },
-      "base": {
-        "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-        "net_profit_growth": [
-          0.02,
-          0.03,
-          0.03,
-          0.03,
-          0.03
-        ],
-        "payout_adjust": 0.0,
-        "cost_of_equity": 0.09,
-        "terminal_growth": 0.02
+      "month_end_mean": {
+        "start": "2016-11-30",
+        "end": "2026-10-30",
+        "months": 120,
+        "pct": 2.762935833333333
       },
-      "bull": {
-        "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-        "net_profit_growth": [
-          0.04,
-          0.04,
-          0.04,
-          0.04,
-          0.04
-        ],
-        "payout_adjust": 0.02,
-        "cost_of_equity": 0.085,
-        "terminal_growth": 0.025
-      }
+      "normalized_pct": 2.762935833333333,
+      "normalized": 0.027629358333333333,
+      "chosen_because": "month_end_mean"
     },
-    "notes": [
-      "本文件只是预演假设，approved=false；银行估值模型仍为 research，是否启用由股东在决策③决定。",
-      "派息率以最近 5 个财年实际分红合计 ÷ 归母净利润合计为基准，情景中只做小幅调整，不超过 90%。",
-      "预演不写入正式结论账本，不改变 CLI 结论。"
-    ]
+    "inputs": "data/bank-pool/valuation-inputs.csv.gz",
+    "warning": "预演，不写入正式结论账本；银行估值模型仍为 research，是否启用由股东在决策③决定。"
   },
   "summary": {
     "total": 36,
     "grade_b": 31,
     "grade_c": 5,
-    "insufficient": 0
+    "insufficient": 0,
+    "candidate_buy_point": 19,
+    "wait": 12,
+    "avoid": 0,
+    "undetermined": 5
   },
   "banks": [
     {
       "code": "000001",
       "name": "平安银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 11.79,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 10.903696713669337,
+        "base": 18.274520993699607,
+        "optimistic": 22.405547615257973
+      },
+      "terminal_share": 0.8713600168046557,
+      "threshold_price": 10.964712596219764,
+      "conclusion": "wait",
+      "binding": "安全边际",
+      "distance": 0.07526758193960914,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "等待（未触发候选买点，也未高于乐观价值）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 5.735839729386634,
-          "payout": 0.21941636371805728,
-          "issues": []
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "悲观价值",
+          "distance": -0.006553548155041167,
+          "values": {
+            "pessimistic": 11.796057818663511,
+            "base": 19.779626736305115,
+            "optimistic": 24.985176114887444
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 7.261220939236319,
-          "payout": 0.21941636371805728,
-          "issues": []
+          "delta": 0.0,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.07526758193960914,
+          "values": {
+            "pessimistic": 10.903696713669337,
+            "base": 18.274520993699607,
+            "optimistic": 22.405547615257973
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 9.590563196622346,
-          "payout": 0.23941636371805727,
-          "issues": []
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.15893653103224414,
+          "values": {
+            "pessimistic": 10.121408151520852,
+            "base": 16.955199421057248,
+            "optimistic": 20.269847094288362
+          }
         }
       ],
-      "unmet_conditions": [
-        "最近 5 年现金分红率：观测值 21.94%，要求 ≥ 25.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 5.74 / 7.26 / 9.59 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.02415862041562,
+        "cagr5": -0.030603621225862687,
+        "cagr3": -0.09931757461511037
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "002142",
       "name": "宁波银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 33.6,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 53.40937824011538,
+        "base": 64.59388786896594,
+        "optimistic": 85.03834888117999
+      },
+      "terminal_share": 0.9234971594641658,
+      "threshold_price": 38.75633272137956,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.13304490800119262,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 10.363362651821062,
-          "payout": 0.19606861021377672,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.84% 降至 9.56%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.20215069409012865,
+          "values": {
+            "pessimistic": 58.02190280598971,
+            "base": 70.18869300906056,
+            "optimistic": 95.3191393893924
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 13.119380847196318,
-          "payout": 0.19606861021377672,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.84% 降至 9.56%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.13304490800119262,
+          "values": {
+            "pessimistic": 53.40937824011538,
+            "base": 64.59388786896594,
+            "optimistic": 85.03834888117999
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 17.500344205271787,
-          "payout": 0.2160686102137767,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.84% 降至 9.56%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.061886052398167024,
+          "values": {
+            "pessimistic": 49.369775582305365,
+            "base": 59.69424092153919,
+            "optimistic": 76.53524553242417
+          }
         }
       ],
-      "unmet_conditions": [
-        "最近 5 年现金分红率：观测值 19.61%，要求 ≥ 25.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 10.36 / 13.12 / 17.50 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.1,
+        "cagr5": 0.11850385556761855,
+        "cagr3": 0.07532930913927327
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "002807",
       "name": "江阴银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 4.41,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 6.17889253778227,
+        "base": 8.950207939262052,
+        "optimistic": 11.13639334971201
+      },
+      "terminal_share": 0.9183785797377344,
+      "threshold_price": 5.370124763557231,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.17879002925087228,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 2.0700939443912763,
-          "payout": 0.22983052491255462,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.09% 降至 13.64%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.2439470275351212,
+          "values": {
+            "pessimistic": 6.709592762220437,
+            "base": 9.721541039694058,
+            "optimistic": 12.472361291801446
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 2.620611837912639,
-          "payout": 0.22983052491255462,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.09% 降至 13.64%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.17879002925087228,
+          "values": {
+            "pessimistic": 6.17889253778227,
+            "base": 8.950207939262052,
+            "optimistic": 11.13639334971201
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 3.44818162420281,
-          "payout": 0.2498305249125546,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.09% 降至 13.64%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.11174690323752434,
+          "values": {
+            "pessimistic": 5.714076916392525,
+            "base": 8.274668590280678,
+            "optimistic": 10.031271001967749
+          }
         }
       ],
-      "unmet_conditions": [
-        "最近 5 年现金分红率：观测值 22.98%，要求 ≥ 25.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 2.07 / 2.62 / 3.45 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.05531471406103,
+        "cagr5": 0.04241139583584652,
+        "cagr3": 0.02953750698512403
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "002839",
       "name": "张家港行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 4.44,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 4.19245997150135,
+        "base": 6.863412515267874,
+        "optimistic": 8.540020544907776
+      },
+      "terminal_share": 0.8912128223060743,
+      "threshold_price": 4.118047509160724,
+      "conclusion": "wait",
+      "binding": "安全边际",
+      "distance": 0.07818085879851622,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "等待（未触发候选买点，也未高于乐观价值）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 2.4376530834830987,
-          "payout": 0.2530334859804209,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 11.08% 降至 11.05%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.00534189141018937,
+          "values": {
+            "pessimistic": 4.542742536409416,
+            "base": 7.439742295462152,
+            "optimistic": 9.54136806107926
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 3.0859191413066656,
-          "payout": 0.2530334859804209,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 11.08% 降至 11.05%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.07818085879851622,
+          "values": {
+            "pessimistic": 4.19245997150135,
+            "base": 6.863412515267874,
+            "optimistic": 8.540020544907776
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 4.030622275446075,
-          "payout": 0.27303348598042093,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 11.08% 降至 11.05%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.16381228491966282,
+          "values": {
+            "pessimistic": 3.885507767701016,
+            "base": 6.358413720053504,
+            "optimistic": 7.711314889071662
+          }
         }
       ],
-      "unmet_conditions": [],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 2.44 / 3.09 / 4.03 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": -0.05521454640594001,
+        "cagr5": 0.025039302847862377,
+        "cagr3": -0.005593459338429696
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "002936",
       "name": "郑州银行",
       "route": "bank_dividend_discount",
-      "status": "risk_check_failed",
+      "status": "complete",
       "grade": "C",
-      "grade_cap": "B",
-      "values": [],
+      "price": 1.79,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 1.4783754515702117,
+        "base": 1.7810490103378371,
+        "optimistic": 1.1287350177661735
+      },
+      "terminal_share": 0.98460469920953,
+      "threshold_price": 1.0686294062027022,
+      "conclusion": "undetermined",
+      "binding": null,
+      "distance": 0.6750428068048739,
+      "bank_check_passed": false,
+      "loss_years_7": 0,
+      "data_complete": true,
       "unmet_conditions": [
-        "窗口内 ROE 平均值：观测值 6.01%，要求 ≥ 10.00%，未通过",
-        "最近 3 个财年 ROE 平均值：观测值 3.22%，要求 ≥ 9.00%，未通过",
-        "最新不良贷款率：观测值 1.67%，要求 ≤ 1.50%，未通过",
-        "最新拨备覆盖率：观测值 199.18%，要求 ≥ 200.00%，未通过",
-        "最新核心一级资本充足率：观测值 8.42%，要求 ≥ 9.00%，未通过",
-        "窗口内每个财年都有现金分红：观测值 5 年，要求 = 0 年，未通过",
-        "最近 5 年现金分红率：观测值 1.61%，要求 ≥ 25.00%，未通过"
+        "核心一级资本充足率 8.42% < 8.5%"
       ],
-      "risk_checks_passed": false,
-      "rehearsal_conclusion": "C 级预演（核心一级资本充足率或拨备覆盖率低于预演适用下限（8.5% / 150%））；不给出估值数字。",
-      "error": "核心一级资本充足率或拨备覆盖率低于预演适用下限（8.5% / 150%）"
+      "rehearsal_conclusion": "无法判断（C 级或银行检查未通过）",
+      "sensitivity": [
+        {
+          "delta": -0.005,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": 0.5347667654535926,
+          "values": {
+            "pessimistic": 1.6133999951995155,
+            "base": 1.9438349855403758,
+            "optimistic": 1.2697465284655343
+          }
+        },
+        {
+          "delta": 0.0,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": 0.6750428068048739,
+          "values": {
+            "pessimistic": 1.4783754515702117,
+            "base": 1.7810490103378371,
+            "optimistic": 1.1287350177661735
+          }
+        },
+        {
+          "delta": 0.005,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": 0.8205904129220929,
+          "values": {
+            "pessimistic": 1.360270290170563,
+            "base": 1.6386625526303906,
+            "optimistic": 1.0122028263021052
+          }
+        }
+      ],
+      "growth": {
+        "year1": 0.032586773097939996,
+        "cagr5": -0.024222858010862214,
+        "cagr3": -0.05064550950096902
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "002948",
       "name": "青岛银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 6.3,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 8.572986790149333,
+        "base": 12.78115062906149,
+        "optimistic": 15.651969130337378
+      },
+      "terminal_share": 0.9184377508659224,
+      "threshold_price": 7.668690377436893,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.17847772045457788,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 2.6632995612411303,
-          "payout": 0.25111629150928355,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.11% 降至 8.76%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.2436829085883121,
+          "values": {
+            "pessimistic": 9.3097726164986,
+            "base": 13.88306587175155,
+            "optimistic": 17.528230679981196
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 3.371573728335504,
-          "payout": 0.25111629150928355,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.11% 降至 8.76%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.17847772045457788,
+          "values": {
+            "pessimistic": 8.572986790149333,
+            "base": 12.78115062906149,
+            "optimistic": 15.651969130337378
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 4.406188072140177,
-          "payout": 0.27111629150928357,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.11% 降至 8.76%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.11137830889190192,
+          "values": {
+            "pessimistic": 7.9276498246431615,
+            "base": 11.816051875693756,
+            "optimistic": 14.099822263502766
+          }
         }
       ],
-      "unmet_conditions": [
-        "最新核心一级资本充足率：观测值 8.76%，要求 ≥ 9.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 2.66 / 3.37 / 4.41 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.1,
+        "cagr5": 0.06692747880902084,
+        "cagr3": 0.0776555346098069
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "002958",
       "name": "青农商行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 2.99,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 3.623231171294615,
+        "base": 5.370353670073022,
+        "optimistic": 5.995766144864371
+      },
+      "terminal_share": 0.9088032651673694,
+      "threshold_price": 3.222212202043813,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.07206607991134883,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 1.175288105979815,
-          "payout": 0.17541676389557856,
-          "issues": []
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.1450686235331723,
+          "values": {
+            "pessimistic": 3.931365296762916,
+            "base": 5.828927877144877,
+            "optimistic": 6.703146984407468
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 1.4878425840689626,
-          "payout": 0.17541676389557856,
-          "issues": []
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.07206607991134883,
+          "values": {
+            "pessimistic": 3.623231171294615,
+            "base": 5.370353670073022,
+            "optimistic": 5.995766144864371
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 2.006306822562661,
-          "payout": 0.19541676389557855,
-          "issues": []
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.0029512995153113675,
+          "values": {
+            "pessimistic": 3.35330697026488,
+            "base": 4.968669302030509,
+            "optimistic": 5.4104111107362485
+          }
         }
       ],
-      "unmet_conditions": [
-        "窗口内 ROE 平均值：观测值 9.21%，要求 ≥ 10.00%，未通过",
-        "最近 3 个财年 ROE 平均值：观测值 7.63%，要求 ≥ 9.00%，未通过",
-        "最新不良贷款率：观测值 1.73%，要求 ≤ 1.50%，未通过",
-        "窗口内每个财年都有现金分红：观测值 1 年，要求 = 0 年，未通过",
-        "最近 5 年现金分红率：观测值 17.54%，要求 ≥ 25.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 1.18 / 1.49 / 2.01 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": -0.00986782933666,
+        "cagr5": 0.00934313272389442,
+        "cagr3": 0.0027813379014673956
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "002966",
       "name": "苏州银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 9.46,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 9.531411304087724,
+        "base": 15.815692328563351,
+        "optimistic": 19.45314086827175
+      },
+      "terminal_share": 0.8841312824053862,
+      "threshold_price": 9.48941539713801,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.0030998113062772337,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 3.9245606801023256,
-          "payout": 0.27569606469627683,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.77% 降至 9.39%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.07991465563776745,
+          "values": {
+            "pessimistic": 10.323398376045542,
+            "base": 17.136091519418244,
+            "optimistic": 21.720119995529558
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 4.968252868304934,
-          "payout": 0.27569606469627683,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.77% 降至 9.39%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.0030998113062772337,
+          "values": {
+            "pessimistic": 9.531411304087724,
+            "base": 15.815692328563351,
+            "optimistic": 19.45314086827175
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 6.4501276977758115,
-          "payout": 0.29569606469627685,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.77% 降至 9.39%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.07560405936764836,
+          "values": {
+            "pessimistic": 8.83722200234533,
+            "base": 14.658429864922555,
+            "optimistic": 17.57653278886645
+          }
         }
       ],
-      "unmet_conditions": [],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 3.92 / 4.97 / 6.45 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.1,
+        "cagr5": 0.035780049572437855,
+        "cagr3": 0.016518617548329617
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "600000",
       "name": "浦发银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 10.21,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 10.361133954746883,
+        "base": 15.550091302470413,
+        "optimistic": 16.23098395484486
+      },
+      "terminal_share": 0.8890175462116735,
+      "threshold_price": 9.330054781482248,
+      "conclusion": "wait",
+      "binding": "安全边际",
+      "distance": 0.09431297448158782,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "等待（未触发候选买点，也未高于乐观价值）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 4.331924763968089,
-          "payout": 0.2424193813453102,
-          "issues": []
+          "delta": -0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.009677910502365217,
+          "values": {
+            "pessimistic": 11.225361379443553,
+            "base": 16.853559426886964,
+            "optimistic": 18.097821158716286
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 5.483950787914556,
-          "payout": 0.2424193813453102,
-          "issues": []
+          "delta": 0.0,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.09431297448158782,
+          "values": {
+            "pessimistic": 10.361133954746883,
+            "base": 15.550091302470413,
+            "optimistic": 16.23098395484486
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 7.185744326931228,
-          "payout": 0.2624193813453102,
-          "issues": []
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.181068445036636,
+          "values": {
+            "pessimistic": 9.603750343343895,
+            "base": 14.407858188217723,
+            "optimistic": 14.685233039332728
+          }
         }
       ],
-      "unmet_conditions": [
-        "最近 3 个财年 ROE 平均值：观测值 6.08%，要求 ≥ 9.00%，未通过",
-        "最新拨备覆盖率：观测值 195.66%，要求 ≥ 200.00%，未通过",
-        "最近 5 年现金分红率：观测值 24.24%，要求 ≥ 25.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 4.33 / 5.48 / 7.19 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.044247051708500004,
+        "cagr5": -0.023953166903237233,
+        "cagr3": -0.026605219481355746
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "600015",
       "name": "华夏银行",
       "route": "bank_dividend_discount",
-      "status": "risk_check_failed",
+      "status": "complete",
       "grade": "C",
-      "grade_cap": "B",
-      "values": [],
+      "price": 6.6,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 15.657251349921944,
+        "base": 20.79865087620155,
+        "optimistic": 23.848918514440374
+      },
+      "terminal_share": 0.9065825845519921,
+      "threshold_price": 12.479190525720929,
+      "conclusion": "undetermined",
+      "binding": null,
+      "distance": -0.4711195420570987,
+      "bank_check_passed": false,
+      "loss_years_7": 0,
+      "data_complete": true,
       "unmet_conditions": [
-        "最近 3 个财年 ROE 平均值：观测值 8.62%，要求 ≥ 9.00%，未通过",
-        "最新拨备覆盖率：观测值 144.21%，要求 ≥ 200.00%，未通过",
-        "最新核心一级资本充足率：观测值 8.98%，要求 ≥ 9.00%，未通过",
-        "最近 5 年现金分红率：观测值 23.52%，要求 ≥ 25.00%，未通过"
+        "拨备覆盖率 144.21% < 150%"
       ],
-      "risk_checks_passed": false,
-      "rehearsal_conclusion": "C 级预演（核心一级资本充足率或拨备覆盖率低于预演适用下限（8.5% / 150%））；不给出估值数字。",
-      "error": "核心一级资本充足率或拨备覆盖率低于预演适用下限（8.5% / 150%）"
+      "rehearsal_conclusion": "无法判断（C 级或银行检查未通过）",
+      "sensitivity": [
+        {
+          "delta": -0.005,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": -0.5126623793802261,
+          "values": {
+            "pessimistic": 16.986693617245745,
+            "base": 22.571620852932913,
+            "optimistic": 26.664461442588284
+          }
+        },
+        {
+          "delta": 0.0,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": -0.4711195420570987,
+          "values": {
+            "pessimistic": 15.657251349921944,
+            "base": 20.79865087620155,
+            "optimistic": 23.848918514440374
+          }
+        },
+        {
+          "delta": 0.005,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": -0.4284378665178685,
+          "values": {
+            "pessimistic": 14.492567000902923,
+            "base": 19.24550167972926,
+            "optimistic": 21.51899658526215
+          }
+        }
+      ],
+      "growth": {
+        "year1": 0.1,
+        "cagr5": -0.0072279294734540755,
+        "cagr3": -0.006775867237422739
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "600016",
       "name": "民生银行",
       "route": "bank_dividend_discount",
-      "status": "risk_check_failed",
+      "status": "complete",
       "grade": "C",
-      "grade_cap": "B",
-      "values": [],
+      "price": 3.39,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 5.517136394301071,
+        "base": 6.414804203770544,
+        "optimistic": 6.045298448431241
+      },
+      "terminal_share": 0.8855954815206935,
+      "threshold_price": 3.848882522262326,
+      "conclusion": "undetermined",
+      "binding": null,
+      "distance": -0.11922487101336632,
+      "bank_check_passed": false,
+      "loss_years_7": 0,
+      "data_complete": true,
       "unmet_conditions": [
-        "窗口内 ROE 平均值：观测值 9.04%，要求 ≥ 10.00%，未通过",
-        "最近 3 个财年 ROE 平均值：观测值 5.40%，要求 ≥ 9.00%，未通过",
-        "最新拨备覆盖率：观测值 142.21%，要求 ≥ 200.00%，未通过"
+        "拨备覆盖率 142.21% < 150%"
       ],
-      "risk_checks_passed": false,
-      "rehearsal_conclusion": "C 级预演（核心一级资本充足率或拨备覆盖率低于预演适用下限（8.5% / 150%））；不给出估值数字。",
-      "error": "核心一级资本充足率或拨备覆盖率低于预演适用下限（8.5% / 150%）"
+      "rehearsal_conclusion": "无法判断（C 级或银行检查未通过）",
+      "sensitivity": [
+        {
+          "delta": -0.005,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": -0.18712179385578565,
+          "values": {
+            "pessimistic": 5.97551535479834,
+            "base": 6.950610752378349,
+            "optimistic": 6.729387126032402
+          }
+        },
+        {
+          "delta": 0.0,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": -0.11922487101336632,
+          "values": {
+            "pessimistic": 5.517136394301071,
+            "base": 6.414804203770544,
+            "optimistic": 6.045298448431241
+          }
+        },
+        {
+          "delta": 0.005,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": -0.049662575271107734,
+          "values": {
+            "pessimistic": 5.115408614935672,
+            "base": 5.9452567614200875,
+            "optimistic": 5.478671375141244
+          }
+        }
+      ],
+      "growth": {
+        "year1": 0.0188463629745,
+        "cagr5": -0.050327565221773285,
+        "cagr3": 0.0009092677811097793
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "600036",
       "name": "招商银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 42.63,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 50.02067207969483,
+        "base": 67.7559595664537,
+        "optimistic": 89.47630699944992
+      },
+      "terminal_share": 0.8686826624351511,
+      "threshold_price": 40.65357573987222,
+      "conclusion": "wait",
+      "binding": "安全边际",
+      "distance": 0.0486162465209512,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "等待（未触发候选买点，也未高于乐观价值）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 23.504827595691694,
-          "payout": 0.33171736364548265,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.86% 降至 14.39%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.031060175273925017,
+          "values": {
+            "pessimistic": 54.110681101306554,
+            "base": 73.32756708610492,
+            "optimistic": 99.84349885248668
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 29.75566863149215,
-          "payout": 0.33171736364548265,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.86% 降至 14.39%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.0486162465209512,
+          "values": {
+            "pessimistic": 50.02067207969483,
+            "base": 67.7559595664537,
+            "optimistic": 89.47630699944992
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 38.189586915749594,
-          "payout": 0.3517173636454827,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.86% 降至 14.39%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.13008641503980645,
+          "values": {
+            "pessimistic": 46.43461154624611,
+            "base": 62.87129820731215,
+            "optimistic": 80.89353430674852
+          }
         }
       ],
-      "unmet_conditions": [],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 23.50 / 29.76 / 38.19 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.053424548564160006,
+        "cagr5": 0.03047899896465922,
+        "cagr3": -0.007059931760955318
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "600908",
       "name": "无锡银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 6.01,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 8.012971568743898,
+        "base": 11.668997299069769,
+        "optimistic": 14.513439234006746
+      },
+      "terminal_share": 0.9159168174085432,
+      "threshold_price": 7.001398379441861,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.14160005269131593,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 2.6797329696705483,
-          "payout": 0.2140415092426,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 11.79% 降至 11.60%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.20955990995442375,
+          "values": {
+            "pessimistic": 8.699460167992743,
+            "base": 12.672265479461084,
+            "optimistic": 16.250859315164167
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 3.3923774144600243,
-          "payout": 0.2140415092426,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 11.79% 降至 11.60%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.14160005269131593,
+          "values": {
+            "pessimistic": 8.012971568743898,
+            "base": 11.668997299069769,
+            "optimistic": 14.513439234006746
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 4.49002430286396,
-          "payout": 0.23404150924259998,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 11.79% 降至 11.60%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.07169651376883257,
+          "values": {
+            "pessimistic": 7.411683281469024,
+            "base": 10.79029306173725,
+            "optimistic": 13.07617745023213
+          }
         }
       ],
-      "unmet_conditions": [
-        "最近 5 年现金分红率：观测值 21.40%，要求 ≥ 25.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 2.68 / 3.39 / 4.49 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.0325279188033,
+        "cagr5": 0.04345705034469605,
+        "cagr3": 0.02461748598896296
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "600919",
       "name": "江苏银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 12.94,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 20.235193462170603,
+        "base": 28.216581487729666,
+        "optimistic": 36.39563382211203
+      },
+      "terminal_share": 0.8963934008235299,
+      "threshold_price": 16.9299488926378,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.23567400692939355,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 6.711450019478617,
-          "payout": 0.3000100091198842,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.12% 降至 8.67%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.29521905209457355,
+          "values": {
+            "pessimistic": 21.93807331963805,
+            "base": 30.600524504474354,
+            "optimistic": 40.69870006944716
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 8.496283667829656,
-          "payout": 0.3000100091198842,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.12% 降至 8.67%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.23567400692939355,
+          "values": {
+            "pessimistic": 20.235193462170603,
+            "base": 28.216581487729666,
+            "optimistic": 36.39563382211203
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 10.969995894122043,
-          "payout": 0.3200100091198842,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.12% 降至 8.67%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.1745651649596146,
+          "values": {
+            "pessimistic": 18.742943492328788,
+            "base": 26.12764297209663,
+            "optimistic": 32.83465783632091
+          }
         }
       ],
-      "unmet_conditions": [
-        "最新核心一级资本充足率：观测值 8.67%，要求 ≥ 9.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 6.71 / 8.50 / 10.97 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.1,
+        "cagr5": 0.11069602409494816,
+        "cagr3": 0.07611448868065995
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "600926",
       "name": "杭州银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 17.26,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 19.43862412117813,
+        "base": 33.290504560774046,
+        "optimistic": 43.67978155154014
+      },
+      "terminal_share": 0.9119023596961271,
+      "threshold_price": 19.974302736464427,
+      "conclusion": "candidate_buy_point",
+      "binding": "悲观价值",
+      "distance": -0.13588973654180603,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 7.253547848215977,
-          "payout": 0.2322152644657615,
-          "issues": []
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "悲观价值",
+          "distance": -0.20408553463813595,
+          "values": {
+            "pessimistic": 21.09829195300835,
+            "base": 36.14291223314788,
+            "optimistic": 48.912058233002114
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 9.182546236320775,
-          "payout": 0.2322152644657615,
-          "issues": []
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "悲观价值",
+          "distance": -0.13588973654180603,
+          "values": {
+            "pessimistic": 19.43862412117813,
+            "base": 33.290504560774046,
+            "optimistic": 43.67978155154014
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 12.072393138183408,
-          "payout": 0.2522152644657615,
-          "issues": []
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "悲观价值",
+          "distance": -0.06577385627437116,
+          "values": {
+            "pessimistic": 17.984778173289776,
+            "base": 30.791973506486563,
+            "optimistic": 39.351379235384805
+          }
         }
       ],
-      "unmet_conditions": [
-        "最近 5 年现金分红率：观测值 23.22%，要求 ≥ 25.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 7.25 / 9.18 / 12.07 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.055011095910290006,
+        "cagr5": 0.0935861937406619,
+        "cagr3": 0.05617251607290297
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "600928",
       "name": "西安银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 3.79,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 7.52927182694082,
+        "base": 8.285851878014313,
+        "optimistic": 9.435486242099868
+      },
+      "terminal_share": 0.9456549953069842,
+      "threshold_price": 4.971511126808587,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.2376563376148062,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 1.4935564770210308,
-          "payout": 0.21051626057705314,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 10.07% 降至 9.51%，分配空间在收窄",
-              "blocking": false
-            },
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.72% 升至 1.81%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.2995434542229547,
+          "values": {
+            "pessimistic": 8.19310203997506,
+            "base": 9.017927956771864,
+            "optimistic": 10.58793787498263
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 1.8907508013716523,
-          "payout": 0.21051626057705314,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 10.07% 降至 9.51%，分配空间在收窄",
-              "blocking": false
-            },
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.72% 升至 1.81%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.2376563376148062,
+          "values": {
+            "pessimistic": 7.52927182694082,
+            "base": 8.285851878014313,
+            "optimistic": 9.435486242099868
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 2.506108416982861,
-          "payout": 0.23051626057705313,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 10.07% 降至 9.51%，分配空间在收窄",
-              "blocking": false
-            },
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.72% 升至 1.81%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.17375480823952594,
+          "values": {
+            "pessimistic": 6.948167049718736,
+            "base": 7.645026839076419,
+            "optimistic": 8.482550213472337
+          }
         }
       ],
-      "unmet_conditions": [
-        "窗口内 ROE 平均值：观测值 9.47%，要求 ≥ 10.00%，未通过",
-        "最近 3 个财年 ROE 平均值：观测值 7.98%，要求 ≥ 9.00%，未通过",
-        "最新不良贷款率：观测值 1.81%，要求 ≤ 1.50%，未通过",
-        "不良贷款率 5 年变化：观测值 0.47 个百分点，要求 ≤ 0.30 个百分点，未通过",
-        "最近 5 年现金分红率：观测值 21.05%，要求 ≥ 25.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 1.49 / 1.89 / 2.51 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.09692979667504,
+        "cagr5": 0.06902293611442412,
+        "cagr3": 0.14912441234349094
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601009",
       "name": "南京银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 12.57,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 23.784045426987547,
+        "base": 26.455909750853813,
+        "optimistic": 34.070581619550346
+      },
+      "terminal_share": 0.8963509769184737,
+      "threshold_price": 15.873545850512286,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.20811643986939887,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 6.297004036077206,
-          "payout": 0.3000293729633973,
-          "issues": []
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.26980601255895786,
+          "values": {
+            "pessimistic": 25.785487968651122,
+            "base": 28.69100589751372,
+            "optimistic": 38.098096691169324
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 7.97162049820889,
-          "payout": 0.3000293729633973,
-          "issues": []
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.20811643986939887,
+          "values": {
+            "pessimistic": 23.784045426987547,
+            "base": 26.455909750853813,
+            "optimistic": 34.070581619550346
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 10.292534338510958,
-          "payout": 0.32002937296339734,
-          "issues": []
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.14480711386989475,
+          "values": {
+            "pessimistic": 22.030160762614223,
+            "base": 24.497397417326926,
+            "optimistic": 30.737623364317216
+          }
         }
       ],
-      "unmet_conditions": [],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 6.30 / 7.97 / 10.29 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.1,
+        "cagr5": 0.10013837826775718,
+        "cagr3": 0.07582367616247643
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601077",
       "name": "渝农商行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 7.21,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 8.617055303473713,
+        "base": 12.962126727698774,
+        "optimistic": 15.257217656262622
+      },
+      "terminal_share": 0.8840888208811251,
+      "threshold_price": 7.777276036619264,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.07294019576368993,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 3.816125043010448,
-          "payout": 0.3003071430071488,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.24% 降至 12.53%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.14435581695330646,
+          "values": {
+            "pessimistic": 9.332755967270776,
+            "base": 14.043999719461544,
+            "optimistic": 17.027085101123028
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 4.830980009271411,
-          "payout": 0.3003071430071488,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.24% 降至 12.53%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.07294019576368993,
+          "values": {
+            "pessimistic": 8.617055303473713,
+            "base": 12.962126727698774,
+            "optimistic": 15.257217656262622
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 6.237145062548006,
-          "payout": 0.3203071430071488,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.24% 降至 12.53%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.00022677969575446433,
+          "values": {
+            "pessimistic": 7.9897455343154125,
+            "base": 12.013942148521412,
+            "optimistic": 13.791993602347354
+          }
         }
       ],
-      "unmet_conditions": [
-        "窗口内 ROE 平均值：观测值 9.97%，要求 ≥ 10.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 3.82 / 4.83 / 6.24 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.08472524078053001,
+        "cagr5": 0.0032577379816958185,
+        "cagr3": -0.003952875240722631
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601128",
       "name": "常熟银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 6.41,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 10.901952836972068,
+        "base": 15.251217832012717,
+        "optimistic": 19.696760521286688
+      },
+      "terminal_share": 0.9263816893506045,
+      "threshold_price": 9.15073069920763,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.29950949156934015,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 3.0223561193365436,
-          "payout": 0.21961307989707457,
-          "issues": []
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.35547680371599166,
+          "values": {
+            "pessimistic": 11.845932816852088,
+            "base": 16.57556065464824,
+            "optimistic": 22.08034724549699
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 3.8261172862133552,
-          "payout": 0.21961307989707457,
-          "issues": []
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.29950949156934015,
+          "values": {
+            "pessimistic": 10.901952836972068,
+            "base": 15.251217832012717,
+            "optimistic": 19.696760521286688
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 5.053127317251553,
-          "payout": 0.23961307989707456,
-          "issues": []
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.24185997329567066,
+          "values": {
+            "pessimistic": 10.075282474936323,
+            "base": 14.091504150986845,
+            "optimistic": 17.72539169339802
+          }
         }
       ],
-      "unmet_conditions": [
-        "最近 5 年现金分红率：观测值 21.96%，要求 ≥ 25.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 3.02 / 3.83 / 5.05 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.03814519987455,
+        "cagr5": 0.12037859623097868,
+        "cagr3": 0.09670448736688231
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601166",
       "name": "兴业银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 19.58,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 32.045491017596596,
+        "base": 35.472531550968014,
+        "optimistic": 44.18794559373606
+      },
+      "terminal_share": 0.8823869966193214,
+      "threshold_price": 21.283518930580808,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.08003934575560911,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 12.104146890154967,
-          "payout": 0.277884545084076,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.75% 降至 9.52%，分配空间在收窄",
-              "blocking": false
-            },
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.07% 升至 1.08%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.15077035499109304,
+          "values": {
+            "pessimistic": 34.70042976861191,
+            "base": 38.42698323725035,
+            "optimistic": 49.333072037486545
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 15.323106815570686,
-          "payout": 0.277884545084076,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.75% 降至 9.52%，分配空间在收窄",
-              "blocking": false
-            },
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.07% 升至 1.08%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.08003934575560911,
+          "values": {
+            "pessimistic": 32.045491017596596,
+            "base": 35.472531550968014,
+            "optimistic": 44.18794559373606
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 19.882914737405116,
-          "payout": 0.297884545084076,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.75% 降至 9.52%，分配空间在收窄",
-              "blocking": false
-            },
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.07% 升至 1.08%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.00759881502428672,
+          "values": {
+            "pessimistic": 29.718472715248822,
+            "base": 32.883206738746445,
+            "optimistic": 39.929076137834755
+          }
         }
       ],
-      "unmet_conditions": [],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 12.10 / 15.32 / 19.88 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.00215835369711,
+        "cagr5": 0.009281778022170117,
+        "cagr3": -0.014653308390804365
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601169",
       "name": "北京银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 6.01,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 10.115157992430193,
+        "base": 11.150429122077433,
+        "optimistic": 12.79027041618474
+      },
+      "terminal_share": 0.8949717123506657,
+      "threshold_price": 6.69025747324646,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.1016788181870023,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 3.078190377070674,
-          "payout": 0.2723027378726035,
-          "issues": []
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.17153769948227038,
+          "values": {
+            "pessimistic": 10.96433059815026,
+            "base": 12.090672877217186,
+            "optimistic": 14.284544243261385
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 3.896800028499312,
-          "payout": 0.2723027378726035,
-          "issues": []
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.1016788181870023,
+          "values": {
+            "pessimistic": 10.115157992430193,
+            "base": 11.150429122077433,
+            "optimistic": 12.79027041618474
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 5.063358037677453,
-          "payout": 0.2923027378726035,
-          "issues": []
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.03000980566863687,
+          "values": {
+            "pessimistic": 9.371040470800319,
+            "base": 10.326564871690676,
+            "optimistic": 11.553419078262422
+          }
         }
       ],
-      "unmet_conditions": [
-        "最近 3 个财年 ROE 平均值：观测值 8.03%，要求 ≥ 9.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 3.08 / 3.90 / 5.06 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.06255330697061,
+        "cagr5": 0.011362649588566587,
+        "cagr3": 0.00877465224762397
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601229",
       "name": "上海银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 8.33,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 13.484739042618454,
+        "base": 16.799212275678805,
+        "optimistic": 20.459665224594705
+      },
+      "terminal_share": 0.8815323431074992,
+      "threshold_price": 10.079527365407282,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.17357236128071063,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 5.682460244131995,
-          "payout": 0.2826052820417523,
-          "issues": [
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.18% 升至 1.99%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.2370716620081429,
+          "values": {
+            "pessimistic": 14.601250586137986,
+            "base": 18.197427781849562,
+            "optimistic": 22.834920126310934
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 7.193645788195955,
-          "payout": 0.2826052820417523,
-          "issues": [
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.18% 升至 1.99%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.17357236128071063,
+          "values": {
+            "pessimistic": 13.484739042618454,
+            "base": 16.799212275678805,
+            "optimistic": 20.459665224594705
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 9.32384236270029,
-          "payout": 0.3026052820417523,
-          "issues": [
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.18% 升至 1.99%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.10854314327032799,
+          "values": {
+            "pessimistic": 12.506102544326685,
+            "base": 15.5737579766503,
+            "optimistic": 18.493384466425542
+          }
         }
       ],
-      "unmet_conditions": [
-        "最新不良贷款率：观测值 1.99%，要求 ≤ 1.50%，未通过",
-        "不良贷款率 5 年变化：观测值 0.80 个百分点，要求 ≤ 0.30 个百分点，未通过",
-        "最新拨备覆盖率：观测值 163.76%，要求 ≥ 200.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 5.68 / 7.19 / 9.32 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": -0.0128966129039,
+        "cagr5": 0.015345224739449659,
+        "cagr3": 0.010240989474074258
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601288",
       "name": "农业银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 7.26,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 8.269221729420027,
+        "base": 10.894627631718933,
+        "optimistic": 13.317406722790862
+      },
+      "terminal_share": 0.8878481421917859,
+      "threshold_price": 6.5367765790313594,
+      "conclusion": "wait",
+      "binding": "安全边际",
+      "distance": 0.11063915252795886,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "等待（未触发候选买点，也未高于乐观价值）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 2.9690459458143925,
-          "payout": 0.3000498675607437,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 11.42% 降至 10.90%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.024784313612566056,
+          "values": {
+            "pessimistic": 8.958827252457107,
+            "base": 11.807362621842955,
+            "optimistic": 14.873275905504359
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 3.758629879570848,
-          "payout": 0.3000498675607437,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 11.42% 降至 10.90%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.11063915252795886,
+          "values": {
+            "pessimistic": 8.269221729420027,
+            "base": 10.894627631718933,
+            "optimistic": 13.317406722790862
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 4.852923188624101,
-          "payout": 0.3200498675607437,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 11.42% 降至 10.90%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.1986454847258694,
+          "values": {
+            "pessimistic": 7.664822770452845,
+            "base": 10.094727885924732,
+            "optimistic": 12.029539076448312
+          }
         }
       ],
-      "unmet_conditions": [],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 2.97 / 3.76 / 4.85 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.1,
+        "cagr5": 0.019680757174447727,
+        "cagr3": 0.014498306863286237
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601328",
       "name": "交通银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 8.45,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 10.99745729380702,
+        "base": 13.434908596613027,
+        "optimistic": 15.870501917355837
+      },
+      "terminal_share": 0.8861685588676291,
+      "threshold_price": 8.060945157967817,
+      "conclusion": "wait",
+      "binding": "安全边际",
+      "distance": 0.04826417180715126,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "等待（未触发候选买点，也未高于乐观价值）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 3.87031447729644,
-          "payout": 0.30057056062488346,
-          "issues": []
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.03264179647130783,
+          "values": {
+            "pessimistic": 11.912891570180069,
+            "base": 14.558550578224995,
+            "optimistic": 17.71562801337648
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 4.899580506057763,
-          "payout": 0.30057056062488346,
-          "issues": []
+          "delta": 0.0,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.04826417180715126,
+          "values": {
+            "pessimistic": 10.99745729380702,
+            "base": 13.434908596613027,
+            "optimistic": 15.870501917355837
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 6.3253671165918774,
-          "payout": 0.3205705606248835,
-          "issues": []
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.13117766528383434,
+          "values": {
+            "pessimistic": 10.195112134867115,
+            "base": 12.450151523986776,
+            "optimistic": 14.343040381016106
+          }
         }
       ],
-      "unmet_conditions": [],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 3.87 / 4.90 / 6.33 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.08018232362443,
+        "cagr5": 0.014880326052895132,
+        "cagr3": 0.010627986472350859
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601398",
       "name": "工商银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 8.69,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 9.402950439172091,
+        "base": 12.326146815731024,
+        "optimistic": 15.0209278153472
+      },
+      "terminal_share": 0.8827033985011087,
+      "threshold_price": 7.395688089438614,
+      "conclusion": "wait",
+      "binding": "安全边际",
+      "distance": 0.1750089910375916,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "等待（未触发候选买点，也未高于乐观价值）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 3.6908575782683473,
-          "payout": 0.2999478508408228,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.10% 降至 13.07%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.0846081566151311,
+          "values": {
+            "pessimistic": 10.182756374333922,
+            "base": 13.353516885336024,
+            "optimistic": 16.767350560501363
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 4.672399089841214,
-          "payout": 0.2999478508408228,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.10% 降至 13.07%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.1750089910375916,
+          "values": {
+            "pessimistic": 9.402950439172091,
+            "base": 12.326146815731024,
+            "optimistic": 15.0209278153472
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 6.0328567970689,
-          "payout": 0.31994785084082283,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.10% 降至 13.07%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.2676090785276759,
+          "values": {
+            "pessimistic": 8.71943578952499,
+            "base": 11.425709691315623,
+            "optimistic": 13.575205760390425
+          }
         }
       ],
-      "unmet_conditions": [],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 3.69 / 4.67 / 6.03 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.08736961507933999,
+        "cagr5": -0.010268019402176365,
+        "cagr3": -0.014468361787284278
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601577",
       "name": "长沙银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 10.02,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 19.47584765550409,
+        "base": 22.97163054852713,
+        "optimistic": 29.158125852620064
+      },
+      "terminal_share": 0.9182647190648877,
+      "threshold_price": 13.782978329116277,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.2730163422782911,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 5.099409838931465,
-          "payout": 0.21257243763078315,
-          "issues": []
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.33068971151431126,
+          "values": {
+            "pessimistic": 21.14834295264496,
+            "base": 24.95105825697625,
+            "optimistic": 32.66009681552493
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 6.455539772230782,
-          "payout": 0.21257243763078315,
-          "issues": []
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.2730163422782911,
+          "values": {
+            "pessimistic": 19.47584765550409,
+            "base": 22.97163054852713,
+            "optimistic": 29.158125852620064
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 8.549357861839479,
-          "payout": 0.23257243763078314,
-          "issues": []
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.21367493069477106,
+          "values": {
+            "pessimistic": 18.010989422395657,
+            "base": 21.238035835173832,
+            "optimistic": 26.261362377136933
+          }
         }
       ],
-      "unmet_conditions": [
-        "最近 5 年现金分红率：观测值 21.26%，要求 ≥ 25.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 5.10 / 6.46 / 8.55 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.03275859489903,
+        "cagr5": 0.0716361890836461,
+        "cagr3": 0.03659114449148282
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601658",
       "name": "邮储银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 5.62,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 7.823988435867991,
+        "base": 8.860730855888534,
+        "optimistic": 10.77340677325622
+      },
+      "terminal_share": 0.886863878285083,
+      "threshold_price": 5.31643851353312,
+      "conclusion": "wait",
+      "binding": "安全边际",
+      "distance": 0.05709865461514463,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "等待（未触发候选买点，也未高于乐观价值）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 2.5981027395325755,
-          "payout": 0.3000086908706256,
-          "issues": [
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 0.90% 升至 0.99%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.024537889476756725,
+          "values": {
+            "pessimistic": 8.475705767963147,
+            "base": 9.602286511817804,
+            "optimistic": 12.03017887917147
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 3.2890385548828043,
-          "payout": 0.3000086908706256,
-          "issues": [
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 0.90% 升至 0.99%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.05709865461514463,
+          "values": {
+            "pessimistic": 7.823988435867991,
+            "base": 8.860730855888534,
+            "optimistic": 10.77340677325622
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 4.246650743046166,
-          "payout": 0.3200086908706256,
-          "issues": [
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 0.90% 升至 0.99%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.14076784493710148,
+          "values": {
+            "pessimistic": 7.252791478915102,
+            "base": 8.210843869975243,
+            "optimistic": 9.733093596661895
+          }
         }
       ],
-      "unmet_conditions": [],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 2.60 / 3.29 / 4.25 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.06235853327297,
+        "cagr5": 0.04445342231029081,
+        "cagr3": 0.020258205580865107
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601818",
       "name": "光大银行",
       "route": "bank_dividend_discount",
-      "status": "risk_check_failed",
+      "status": "complete",
       "grade": "C",
-      "grade_cap": "B",
-      "values": [],
+      "price": 3.16,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 4.666508897268825,
+        "base": 5.677255308029615,
+        "optimistic": 6.556259546022309
+      },
+      "terminal_share": 0.884441071297962,
+      "threshold_price": 3.406353184817769,
+      "conclusion": "undetermined",
+      "binding": null,
+      "distance": -0.07232167994668703,
+      "bank_check_passed": false,
+      "loss_years_7": 0,
+      "data_complete": true,
       "unmet_conditions": [
-        "最近 3 个财年 ROE 平均值：观测值 7.77%，要求 ≥ 9.00%，未通过",
-        "最新不良贷款率：观测值 1.54%，要求 ≤ 1.50%，未通过",
-        "最新拨备覆盖率：观测值 143.67%，要求 ≥ 200.00%，未通过"
+        "拨备覆盖率 143.67% < 150%"
       ],
-      "risk_checks_passed": false,
-      "rehearsal_conclusion": "C 级预演（核心一级资本充足率或拨备覆盖率低于预演适用下限（8.5% / 150%））；不给出估值数字。",
-      "error": "核心一级资本充足率或拨备覆盖率低于预演适用下限（8.5% / 150%）"
+      "rehearsal_conclusion": "无法判断（C 级或银行检查未通过）",
+      "sensitivity": [
+        {
+          "delta": -0.005,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": -0.143751748616901,
+          "values": {
+            "pessimistic": 5.053666255566602,
+            "base": 6.150864142682234,
+            "optimistic": 7.315016810230857
+          }
+        },
+        {
+          "delta": 0.0,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": -0.07232167994668703,
+          "values": {
+            "pessimistic": 4.666508897268825,
+            "base": 5.677255308029615,
+            "optimistic": 6.556259546022309
+          }
+        },
+        {
+          "delta": 0.005,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": 0.0008467820064741449,
+          "values": {
+            "pessimistic": 4.327197011683407,
+            "base": 5.262210721313583,
+            "optimistic": 5.928135686273029
+          }
+        }
+      ],
+      "growth": {
+        "year1": 0.0028535058873399998,
+        "cagr5": -0.02392905249578614,
+        "cagr3": -0.05908562545840268
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601838",
       "name": "成都银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 20.33,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 31.436955501683407,
+        "base": 44.41182983089062,
+        "optimistic": 60.004125242544156
+      },
+      "terminal_share": 0.8952705598794365,
+      "threshold_price": 26.64709789853437,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.23706513642079652,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 10.919307629864653,
-          "payout": 0.29280069969275535,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.06% 降至 8.85%，分配空间在收窄",
-              "blocking": false
-            },
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 0.66% 升至 0.68%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.29643551392743805,
+          "values": {
+            "pessimistic": 34.078891476120134,
+            "base": 48.15952766814154,
+            "optimistic": 67.11804080306878
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 13.823173056548217,
-          "payout": 0.29280069969275535,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.06% 降至 8.85%，分配空间在收窄",
-              "blocking": false
-            },
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 0.66% 升至 0.68%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.23706513642079652,
+          "values": {
+            "pessimistic": 31.436955501683407,
+            "base": 44.41182983089062,
+            "optimistic": 60.004125242544156
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 17.87528578372853,
-          "payout": 0.31280069969275537,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.06% 降至 8.85%，分配空间在收窄",
-              "blocking": false
-            },
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 0.66% 升至 0.68%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.17614670357918105,
+          "values": {
+            "pessimistic": 29.121779657066163,
+            "base": 41.12787249931199,
+            "optimistic": 54.117558450272384
+          }
         }
       ],
-      "unmet_conditions": [
-        "最新核心一级资本充足率：观测值 8.85%，要求 ≥ 9.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 10.92 / 13.82 / 17.88 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.09835134434074,
+        "cagr5": 0.1008390232021108,
+        "cagr3": 0.05254470079390616
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601860",
       "name": "紫金银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 2.53,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 2.6324327754752295,
+        "base": 2.9186491770112544,
+        "optimistic": 3.3443366585430074
+      },
+      "terminal_share": 0.8927269834424,
+      "threshold_price": 1.7511895062067526,
+      "conclusion": "wait",
+      "binding": "安全边际",
+      "distance": 0.44473227542359295,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "等待（未触发候选买点，也未高于乐观价值）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 0.7791322688640694,
-          "payout": 0.19263140796569767,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 10.78% 降至 10.55%，分配空间在收窄",
-              "blocking": false
-            },
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.24% 升至 1.33%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.33266987136720805,
+          "values": {
+            "pessimistic": 2.852684347576461,
+            "base": 3.164074432282857,
+            "optimistic": 3.733981920910902
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 0.986333616702269,
-          "payout": 0.19263140796569767,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 10.78% 降至 10.55%，分配空间在收窄",
-              "blocking": false
-            },
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.24% 升至 1.33%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.44473227542359295,
+          "values": {
+            "pessimistic": 2.6324327754752295,
+            "base": 2.9186491770112544,
+            "optimistic": 3.3443366585430074
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 1.3178737096309066,
-          "payout": 0.21263140796569766,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 10.78% 降至 10.55%，分配空间在收窄",
-              "blocking": false
-            },
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.24% 升至 1.33%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.5596448061703074,
+          "values": {
+            "pessimistic": 2.439433204161893,
+            "base": 2.703607032822204,
+            "optimistic": 3.0218231663125756
+          }
         }
       ],
-      "unmet_conditions": [
-        "窗口内 ROE 平均值：观测值 9.16%，要求 ≥ 10.00%，未通过",
-        "最近 3 个财年 ROE 平均值：观测值 7.90%，要求 ≥ 9.00%，未通过",
-        "最新拨备覆盖率：观测值 178.86%，要求 ≥ 200.00%，未通过",
-        "最近 5 年现金分红率：观测值 19.26%，要求 ≥ 25.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 0.78 / 0.99 / 1.32 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": -0.02590070961853,
+        "cagr5": -0.01655332437840451,
+        "cagr3": -0.029599687339130765
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601916",
       "name": "浙商银行",
       "route": "bank_dividend_discount",
-      "status": "risk_check_failed",
+      "status": "complete",
       "grade": "C",
-      "grade_cap": "B",
-      "values": [],
+      "price": 2.93,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 4.3398544610928695,
+        "base": 4.7955631382076325,
+        "optimistic": 5.494152881301373
+      },
+      "terminal_share": 0.8862746815691027,
+      "threshold_price": 2.8773378829245795,
+      "conclusion": "undetermined",
+      "binding": null,
+      "distance": 0.018302375048805164,
+      "bank_check_passed": false,
+      "loss_years_7": 0,
+      "data_complete": true,
       "unmet_conditions": [
-        "窗口内 ROE 平均值：观测值 9.50%，要求 ≥ 10.00%，未通过",
-        "最近 3 个财年 ROE 平均值：观测值 8.25%，要求 ≥ 9.00%，未通过",
-        "最新拨备覆盖率：观测值 155.96%，要求 ≥ 200.00%，未通过",
-        "最新核心一级资本充足率：观测值 8.38%，要求 ≥ 9.00%，未通过",
-        "窗口内每个财年都有现金分红：观测值 1 年，要求 = 0 年，未通过",
-        "最近 5 年现金分红率：观测值 24.27%，要求 ≥ 25.00%，未通过"
+        "核心一级资本充足率 8.38% < 8.5%"
       ],
-      "risk_checks_passed": false,
-      "rehearsal_conclusion": "C 级预演（核心一级资本充足率或拨备覆盖率低于预演适用下限（8.5% / 150%））；不给出估值数字。",
-      "error": "核心一级资本充足率或拨备覆盖率低于预演适用下限（8.5% / 150%）"
+      "rehearsal_conclusion": "无法判断（C 级或银行检查未通过）",
+      "sensitivity": [
+        {
+          "delta": -0.005,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": -0.06026963379578576,
+          "values": {
+            "pessimistic": 4.700912395938369,
+            "base": 5.1965260557219555,
+            "optimistic": 6.130712835076283
+          }
+        },
+        {
+          "delta": 0.0,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": 0.018302375048805164,
+          "values": {
+            "pessimistic": 4.3398544610928695,
+            "base": 4.7955631382076325,
+            "optimistic": 5.494152881301373
+          }
+        },
+        {
+          "delta": 0.005,
+          "conclusion": "undetermined",
+          "binding": null,
+          "distance": 0.09881638025742912,
+          "values": {
+            "pessimistic": 4.023413844655062,
+            "base": 4.444175952481955,
+            "optimistic": 4.96716755013528
+          }
+        }
+      ],
+      "growth": {
+        "year1": 0.00141014898531,
+        "cagr5": 0.05556825107477614,
+        "cagr3": 0.007737848542021197
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601939",
       "name": "建设银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 12.01,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 12.029034743117128,
+        "base": 16.06777416419638,
+        "optimistic": 19.903167302285937
+      },
+      "terminal_share": 0.88403470968156,
+      "threshold_price": 9.640664498517827,
+      "conclusion": "wait",
+      "binding": "安全边际",
+      "distance": 0.24576475012136756,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "等待（未触发候选买点，也未高于乐观价值）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 4.628308297347119,
-          "payout": 0.3002376131571495,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.48% 降至 14.39%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.14980002392726366,
+          "values": {
+            "pessimistic": 13.028102778167385,
+            "base": 17.408824360863747,
+            "optimistic": 22.223735430114758
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 5.859154144380512,
-          "payout": 0.3002376131571495,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.48% 降至 14.39%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.24576475012136756,
+          "values": {
+            "pessimistic": 12.029034743117128,
+            "base": 16.06777416419638,
+            "optimistic": 19.903167302285937
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 7.564701718012859,
-          "payout": 0.3202376131571495,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 14.48% 降至 14.39%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.3440829252352904,
+          "values": {
+            "pessimistic": 11.153350349908871,
+            "base": 14.892434306583144,
+            "optimistic": 17.98226701516205
+          }
         }
       ],
-      "unmet_conditions": [],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 4.63 / 5.86 / 7.56 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.1,
+        "cagr5": 0.0013697806739982887,
+        "cagr3": -0.009753821976495547
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601988",
       "name": "中国银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 7.04,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 8.455551108515705,
+        "base": 9.606380297354775,
+        "optimistic": 11.513578307470786
+      },
+      "terminal_share": 0.8888751753516717,
+      "threshold_price": 5.763828178412865,
+      "conclusion": "wait",
+      "binding": "安全边际",
+      "distance": 0.22141045535790815,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "等待（未触发候选买点，也未高于乐观价值）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 2.696070462624067,
-          "payout": 0.300409321192054,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 12.20% 降至 12.04%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.12690904346152743,
+          "values": {
+            "pessimistic": 9.16141370244354,
+            "base": 10.411961285972154,
+            "optimistic": 12.857275930942363
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 3.4130596774808915,
-          "payout": 0.300409321192054,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 12.20% 降至 12.04%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.22141045535790815,
+          "values": {
+            "pessimistic": 8.455551108515705,
+            "base": 9.606380297354775,
+            "optimistic": 11.513578307470786
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 4.4064136409627634,
-          "payout": 0.320409321192054,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 12.20% 降至 12.04%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.3182921782315302,
+          "values": {
+            "pessimistic": 7.836919060893929,
+            "base": 8.900404270829725,
+            "optimistic": 10.401306866510927
+          }
         }
       ],
-      "unmet_conditions": [
-        "最新拨备覆盖率：观测值 198.30%，要求 ≥ 200.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 2.70 / 3.41 / 4.41 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.07158125748162,
+        "cagr5": 0.03084841435407104,
+        "cagr3": 0.0399219351857909
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601997",
       "name": "贵阳银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 5.92,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 11.7881011294255,
+        "base": 15.209421776394665,
+        "optimistic": 18.41221877848598
+      },
+      "terminal_share": 0.9128803639577533,
+      "threshold_price": 9.125653065836799,
+      "conclusion": "candidate_buy_point",
+      "binding": "安全边际",
+      "distance": -0.35127930491217385,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 3.286713474903356,
-          "payout": 0.1923890385232589,
-          "issues": [
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.58% 升至 1.74%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.40249509608706124,
+          "values": {
+            "pessimistic": 12.794568800812758,
+            "base": 16.51311412182873,
+            "optimistic": 20.60663325938091
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 4.160777467851337,
-          "payout": 0.1923890385232589,
-          "issues": [
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.58% 升至 1.74%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.35127930491217385,
+          "values": {
+            "pessimistic": 11.7881011294255,
+            "base": 15.209421776394665,
+            "optimistic": 18.41221877848598
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 5.5600142759060525,
-          "payout": 0.21238903852325888,
-          "issues": [
-            {
-              "code": "BANK_ASSET_QUALITY_DETERIORATING",
-              "message": "不良率由 1.58% 升至 1.74%：需要用拨备与资本吸收，股息路径应下调",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "安全边际",
+          "distance": -0.2986223008399609,
+          "values": {
+            "pessimistic": 10.90650837335283,
+            "base": 14.06755116178182,
+            "optimistic": 16.596774822845326
+          }
         }
       ],
-      "unmet_conditions": [
-        "最近 3 个财年 ROE 平均值：观测值 8.71%，要求 ≥ 9.00%，未通过",
-        "最新不良贷款率：观测值 1.74%，要求 ≤ 1.50%，未通过",
-        "最近 5 年现金分红率：观测值 19.24%，要求 ≥ 25.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 3.29 / 4.16 / 5.56 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.1,
+        "cagr5": -0.0416668009478669,
+        "cagr3": -0.05985285010501207
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "601998",
       "name": "中信银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 9.16,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 10.183317301086905,
+        "base": 13.73432123794159,
+        "optimistic": 16.593448271429526
+      },
+      "terminal_share": 0.8888917784171788,
+      "threshold_price": 8.240592742764953,
+      "conclusion": "wait",
+      "binding": "安全边际",
+      "distance": 0.11157052483175622,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "等待（未触发候选买点，也未高于乐观价值）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 4.1475891329899,
-          "payout": 0.2746574799378665,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.72% 降至 9.43%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": -0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.025597355331174132,
+          "values": {
+            "pessimistic": 11.032862514752138,
+            "base": 14.885633808734745,
+            "optimistic": 18.530907578796114
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 5.25059319658428,
-          "payout": 0.2746574799378665,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.72% 降至 9.43%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.0,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.11157052483175622,
+          "values": {
+            "pessimistic": 10.183317301086905,
+            "base": 13.73432123794159,
+            "optimistic": 16.593448271429526
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 6.818424781255962,
-          "payout": 0.2946574799378665,
-          "issues": [
-            {
-              "code": "BANK_CAPITAL_BUFFER_NARROWING",
-              "message": "核心一级资本充足率由 9.72% 降至 9.43%，分配空间在收窄",
-              "blocking": false
-            }
-          ]
+          "delta": 0.005,
+          "conclusion": "wait",
+          "binding": "安全边际",
+          "distance": 0.1997000437354648,
+          "values": {
+            "pessimistic": 9.43878783214914,
+            "base": 12.725403109206674,
+            "optimistic": 14.98977345289471
+          }
         }
       ],
-      "unmet_conditions": [],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 4.15 / 5.25 / 6.82 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.03327763765621,
+        "cagr5": 0.01759402616625172,
+        "cagr3": 0.001704819761137788
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     },
     {
       "code": "603323",
       "name": "苏农银行",
       "route": "bank_dividend_discount",
-      "status": "ok",
+      "status": "complete",
       "grade": "B",
-      "grade_cap": "B",
-      "values": [
+      "price": 4.56,
+      "price_date": "2026-11-12",
+      "values": {
+        "pessimistic": 5.1417898465461755,
+        "base": 9.12068462162191,
+        "optimistic": 11.259391630972246
+      },
+      "terminal_share": 0.9230864315114594,
+      "threshold_price": 5.472410772973146,
+      "conclusion": "candidate_buy_point",
+      "binding": "悲观价值",
+      "distance": -0.16672921877124292,
+      "bank_check_passed": true,
+      "loss_years_7": 0,
+      "data_complete": true,
+      "unmet_conditions": [],
+      "rehearsal_conclusion": "候选买点（B 级，现价 ≤ 基准 × 60% 且 ≤ 悲观）",
+      "sensitivity": [
         {
-          "scenario": "bear",
-          "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-          "value_per_share": 2.1839386220930663,
-          "payout": 0.19944629117878834,
-          "issues": []
+          "delta": -0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "悲观价值",
+          "distance": -0.23309032386709616,
+          "values": {
+            "pessimistic": 5.585218682887362,
+            "base": 9.909902347721761,
+            "optimistic": 12.614285150522527
+          }
         },
         {
-          "scenario": "base",
-          "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-          "value_per_share": 2.764732210264334,
-          "payout": 0.19944629117878834,
-          "issues": []
+          "delta": 0.0,
+          "conclusion": "candidate_buy_point",
+          "binding": "悲观价值",
+          "distance": -0.16672921877124292,
+          "values": {
+            "pessimistic": 5.1417898465461755,
+            "base": 9.12068462162191,
+            "optimistic": 11.259391630972246
+          }
         },
         {
-          "scenario": "bull",
-          "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-          "value_per_share": 3.6821798401876653,
-          "payout": 0.21944629117878833,
-          "issues": []
+          "delta": 0.005,
+          "conclusion": "candidate_buy_point",
+          "binding": "悲观价值",
+          "distance": -0.09841148904114827,
+          "values": {
+            "pessimistic": 4.753459269815542,
+            "base": 8.429566157533769,
+            "optimistic": 10.138729460132547
+          }
         }
       ],
-      "unmet_conditions": [
-        "窗口内 ROE 平均值：观测值 9.85%，要求 ≥ 10.00%，未通过",
-        "最近 5 年现金分红率：观测值 19.94%，要求 ≥ 25.00%，未通过",
-        "控股股东最新质押比例：观测值 69.72%，要求 ≤ 50.00%，未通过"
-      ],
-      "risk_checks_passed": true,
-      "rehearsal_conclusion": "B 级预演；悲观/基准/乐观每股价值 2.18 / 2.76 / 3.68 元；只作预演，未写入正式结论账本。",
-      "error": null
+      "growth": {
+        "year1": 0.00030487795413,
+        "cagr5": 0.023382838868710953,
+        "cagr3": 0.014256244649198946
+      },
+      "discount": {
+        "risk_free": 0.027629358333333333,
+        "equity_risk_premium": 0.0514,
+        "cost_of_equity": 0.07902935833333333
+      }
     }
   ]
 }

@@ -1,0 +1,25 @@
+{
+  "version": "bank-check-v1-draft",
+  "approved": false,
+  "reviewed_at": "2026-11-13",
+  "source": "batch4h-r 第 2 条；个股政策 v1.1 grades.banks",
+  "required_evidence": [
+    "cet1_ratio",
+    "npl_ratio",
+    "provision_coverage"
+  ],
+  "required_evidence_labels": {
+    "cet1_ratio": "最新核心一级资本充足率",
+    "npl_ratio": "最新不良贷款率",
+    "provision_coverage": "最新拨备覆盖率"
+  },
+  "cet1_min": 0.085,
+  "cet1_min_basis": "监管底线核心一级 7.5% + 1.0 个百分点安全垫；设计方 2026-11-13 定，决策③时一并提请批准",
+  "provision_min": 1.5,
+  "provision_min_basis": "监管拨备覆盖率 120–150% 的上沿；设计方 2026-11-13 定，决策③时一并提请批准",
+  "margin_of_safety": 0.4,
+  "margin_basis": "个股政策 v1.1 grade.B.margin_of_safety = 40%；银行最高 B 级，不评 A",
+  "max_loss_years_7": 1,
+  "loss_basis": "个股政策 v1.1 grade.B：最近 7 个财年至多 1 年亏损",
+  "note": "银行检查：三项证据齐全，且核心一级 ≥ 8.5%、拨备覆盖率 ≥ 150%；参数未获批准，决策③时一并提请。"
+}

@@ -372,20 +372,23 @@ def test_bank_valuation_rehearsal_report():
     if not REHEARSAL.exists():
         pytest.skip("预演报告尚未生成")
     payload = json.loads((BANK_DIR / "valuation-rehearsal.json").read_text(encoding="utf-8"))
-    assert payload["meta"]["max_grade"] == "B"
+    assert payload["meta"]["policy"] == "equity-policy-v1.1"
+    assert payload["meta"]["bank_check"] == "bank-check-v1-draft"
     assert len(payload["banks"]) == 36
     assert payload["summary"]["grade_b"] + payload["summary"]["grade_c"] + payload["summary"]["insufficient"] == 36
     for row in payload["banks"]:
         assert row["route"] == "bank_dividend_discount"
-        assert row["status"] in ("ok", "risk_check_failed", "insufficient_data")
+        assert row["status"] in ("complete", "insufficient_data")
         assert row["grade"] in ("B", "C")
         assert row["rehearsal_conclusion"]
-        if row["status"] == "ok":
-            assert len(row["values"]) == 3
-            assert all(item["value_per_share"] > 0 for item in row["values"])
+        if row["status"] == "complete":
+            assert set(row["values"]) == {"pessimistic", "base", "optimistic"}
+            assert all(value > 0 for value in row["values"].values())
+            assert len(row["sensitivity"]) == 3
     text = REHEARSAL.read_text(encoding="utf-8")
     assert "不写入正式结论账本" in text
-    assert "最高 B 级" in text
+    assert "安全边际门槛价" in text
+    assert "股权成本 ±0.5pp" in text
 
 
 def test_bank_ledger_and_other_ledgers_unchanged():

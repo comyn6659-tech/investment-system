@@ -41,9 +41,17 @@ data/bank-pool/
 
 ## 估值预演
 
-`valuation-rehearsal.json` 只用个股政策 v1.1 的银行条款做预演：三项证据（核心一级、
-不良率、拨备覆盖率）来自本快照；预演假设（核心一级下限 8.5%、拨备下限 150%、
-风险加权资产 ≈ 总资产 × 65% 等）见 `data/policy-inputs/bank-valuation-rehearsal-v1.json`。
+`valuation-rehearsal.json` 按**已批准个股政策 v1.1 的股息折现路线**重跑：
+
+- 折现率：规范化无风险利率 + ERP（当前 7.9029%），三情景同一折现率；
+- 增长：R7（第 1 年封顶 10%、稳态 = min(10%, 5 年与 3 年复合增速)、第 2–5 年线性过渡）；
+- 派息率：R10 总额口径近 3 年平均；终值：R1；悲观：R8；
+- 银行检查：`data/policy-inputs/bank-check-v1-draft.json`（三项证据 + 核心一级 ≥ 8.5% +
+  拨备覆盖率 ≥ 150%），通过且最近 7 个财年至多 1 年亏损、数据完整 → B，否则 C；
+- 输入表：`valuation-inputs.csv.gz`（营收/净利润/ROE/净利率/派息率/现价与日期），
+  由 `tools/build_bank_valuation_inputs.py` 生成；银行池快照、报告与账本不变。
+
+旧版 `data/policy-inputs/bank-valuation-rehearsal-v1.json` 保留为历史，**不再被读取**。
 **预演不写入正式结论账本，不改变 CLI 结论；银行估值模型仍为 research。**
 
 ## 校验
