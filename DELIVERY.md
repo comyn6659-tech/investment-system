@@ -5,105 +5,153 @@
 | 项目 | 内容 |
 |---|---|
 | 项目 | `/Users/comyn/Documents/deepseek-harness/投资/investment-system/` |
-| 本轮阶段 | 第三阶段第三批收尾（R1 周度池口径、R2 分区间基准） |
-| 代码版本 | `phase3-0.5.1` |
-| 政策版本 | `unapproved-phase2`（没有任何模型或参数升级为 `validated`） |
-| 模型版本 | `research-0.3.0`（个股 3 个 + 指数画像 1 个，全部 `research`） |
-| 本轮提交 | `106a9b8` |
+| 本轮阶段 | 第四阶段第一批（A. 个股政策 v1 草案试运行；B. 指数候选 A 研究信号与账本） |
+| 代码版本 | `phase4-0.1.0` |
+| 政策版本 | 引擎 `unapproved-phase2`；个股草案 `equity-policy-v1-draft`（`draft_unapproved`，未批准） |
+| 模型版本 | `research-0.4.0`（个股 3 个 + 指数画像 + 候选 A 研究信号，全部 `research`） |
+| 本轮提交 | `9bc31ac`（实现 + 数据 + 文档） |
 | 工作区 | 干净（`git status --short` 为空） |
-| 上一轮已签收 | `698bd50`（候选 A 回测）、`f60935b`（交付入口） |
+| 上一轮已签收 | `1866e2b`（第三阶段关闭）、`106a9b8`（R1/R2 收尾） |
 
-## 1. 本轮完成范围（只做 R1、R2）
+## 1. 本轮完成范围
 
-| 编号 | 问题 | 修复 | 结果 |
-|---|---|---|---|
-| R1 | 周度参考池取「每周最后一个交易日的值」，该日缺 PE 就让整周作废 | 参考池改为每周**最后一个正值**滚动市盈率；观察点自身仍取当日值，缺失或非正不给分位 | 沪深300 / 中证500 可评估周 545 → **547**，评估起点 2016-03-25 → **2016-03-11**；中证1000 不变 |
-| R2 | 开发 / 留出区间没有各自的同期基准 | 两个区间分别计算同期全收益与价格买入持有基准及超额 | 两区间均有基准字段，可由序列复算（有回归） |
+| 编号 | 内容 | 结果 |
+|---|---|---|
+| A | 按设计方草案实现 `equity-policy-v1-draft`：规范化无风险利率、股权风险溢价、取消公司特定溢价、增长与终值规则、终值再投资一致性、机械情景、近似项影响、确定性等级、结论映射 | 政策文件集中版本化；代码无散落阈值；结论只写试运行报告的「预演结论」字段 |
+| A | 30 只固定测试集试运行（尽量 10 个财年、至少 7 个） | 30/30 有结果；28 只 11 年、1 只 12 年、1 只 16 年；无低于 10 年 |
+| A | 试运行报告：每只路线、状态、三档价值、近似影响、等级与未满足条件、安全边际、预演结论、折现率/终值 ±0.5pp 敏感性；全集分布；安全边际 20/25/30% 与 35/40/45% 敏感性；600519 两模型分歧 | [docs/phase4a-equity-policy-trial.md](docs/phase4a-equity-policy-trial.md) |
+| B | 指数报告新增「候选 A 研究信号」：最新周度观察点、官方滚动 PE、5 年周度分位、入场/退出条件、回测摘要与链接 | 三只指数均有信号；`decision` 仍为 `undetermined` |
+| B | 只追加信号账本 + 更新/校验命令 | `data/ledger/candidate-a-signals.jsonl`，首次写入 3 条（2026-W45） |
 
-**三只指数的全部交易未变**：54 组口径组合（2 口径 × 2 时滞 × 3 成本 × 3 指数）逐笔比对为 0 处差异。
-未做其他改动：未调阈值、未加指标、未改 CLI、未升级 `validated`。
+**不做**：未输出正式结论；未改 CLI 的 `research` / `undetermined`；未升级 `validated`；未调指数阈值（20/60/12 个月不变）；未做 ETF 回测；未改第二阶段研究估值数值路径。
 
-## 2. 修正后的基准与分区间结果（K2 / K4）
+## 2. A. 试运行结果摘要
 
-全样本同期全收益买入持有：沪深300 **+73.87%**、中证500 **+41.39%**、中证1000 +36.16%
-（修正前 64.11% / 28.16% / 36.16%——起点挪两周，基准变动 10–13 个百分点，
-说明「策略 vs 全期买入持有」对起点很敏感，不宜当作主要证据）。
+| 维度 | 分布（30 只） |
+|---|---|
+| 预演结论 | 候选买点 **0**、等待 7、回避 4、无法判断 19 |
+| 确定性等级 | A **5**、B **6**、C 19 |
+| 状态 | complete 16、partial 2、insufficient_data 2、unsupported 10 |
+| 企业族 | 非金融 18、明显周期 6、困境 2、银行 2、保险 1、券商 1 |
 
-| 指数 | 区间 | 策略 | 同期全收益买入持有 | 超额 | 同期价格买入持有 | 超额 |
-|---|---|---|---|---|---|---|
-| 沪深300 | 开发 2016-03-11→2021-01-01 | +78.03% | +92.36% | −14.32% | +72.66% | +5.37% |
-| 沪深300 | 留出 2021-01-01→2026-11-11 | +23.77% | −10.58% | +34.34% | −22.63% | +46.39% |
-| 中证500 | 开发 | −6.30% | +21.78% | −28.08% | +15.58% | −21.88% |
-| 中证500 | 留出 | +27.37% | +14.03% | +13.33% | +3.55% | +23.82% |
-| 中证1000 | 开发 2019-10-18→2021-01-01 | +27.58% | +26.99% | +0.59% | +25.87% | +1.71% |
-| 中证1000 | 留出 | +24.99% | +4.81% | +20.18% | −1.90% | +26.89% |
+达到 A/B 级的 11 只（安全边际 A 25% / B 40%）：
 
-主结果（全收益、T+1、成本 10bp）：沪深300 5 笔 +120.34%、中证500 6 笔 +19.34%、
-中证1000 4 笔 +59.46%；交易与退出原因未变。
-
-## 3. 数据（K1，未变）
-
-| 指数 | 发布日 | 序列起始 | 交易日 | 有 PE 天数 | 首个 PE |
+| 代码 | 名称 | 等级 | 预演结论 | 基准价值 | 现价 |
 |---|---|---|---|---|---|
-| 沪深300 | 2005-04-08 | 2005-04-08 | 5246 | 3668 | 2011-06-28 |
-| 中证500 | 2007-01-15 | 2007-01-15 | 4818 | 3669 | 2011-06-28 |
-| 中证1000 | 2014-10-17 | 2014-10-17 | 2935 | 2935 | 2014-10-17 |
+| 600519 | 贵州茅台 | B | 等待 | 1,227.36 | 1,402.30 |
+| 000895 | 双汇发展 | A | 回避 | 15.30 | 24.24 |
+| 600436 | 片仔癀 | A | 回避 | 43.81 | 130.24 |
+| 600660 | 福耀玻璃 | A | 等待 | 57.91 | 55.75 |
+| 002415 | 海康威视 | A | 等待 | 28.97 | 34.25 |
+| 600941 | 中国移动 | A | 等待 | 90.85 | 99.93 |
+| 600887 | 伊利股份 | B | 回避 | 20.66 | 30.61 |
+| 000333 | 美的集团 | B | 等待 | 92.30 | 87.68 |
+| 600309 | 万华化学 | B | 等待 | 104.78 | 69.90 |
+| 300750 | 宁德时代 | B | 等待 | 357.29 | 246.66 |
+| 600276 | 恒瑞医药 | B | 回避 | 19.03 | 48.22 |
 
-## 4. 可复现命令
+**候选买点为 0**：政策给的 25%/40% 下没有标的同时满足「P ≤ V_基准 ×(1−M)」与「P ≤ V_悲观」。
+安全边际若一律按 20–30% 计，600309、300750 会进入候选买点；按 35–45% 计则为 0。
+候选买点数量不作为验收条件，按事实交付。
+
+折现率：规范化无风险利率 **2.7629%**（最新 1.6039% 与近 10 年月末均值 2.7629% 取高者），
+股权风险溢价 5.14%，股权成本 **7.9029%**。600519 两模型：FCFF 1,227.36、股息折现 1,087.25，
+分歧 **−11.42%**（第二阶段约 24%，终值再投资一致性规则缩小了分歧）。
+
+C 级 19 只的主要原因是：路线不支持 10（周期 6、困境 2、保险 1、券商 1）、银行缺风险证据 2、
+交叉检查分歧 3、近似项影响 2、杠杆条件 1、多项同时不满足 1（中国建筑）。
+
+**关键异常（报告 §5.1）**：601668 中国建筑账面有息负债 9,405 亿元、权益市值 1,884 亿元，
+债务权重 83.3%，WACC 3.11%，FCFF 价值 93.17 元/股（现价 4.56 元）。这不是数据错误，
+是「债务权重用账面值 + 债务成本下限为无风险利率」的机械结果；该标的勾稽差额 −273.6%，
+已按 partial 输出。高杠杆企业的 WACC 设定已列入待设计方确认的问题。
+
+## 3. B. 指数研究信号与账本
+
+指数报告（文本与 JSON）新增 `payload.candidate_a_signal`：
+
+| 指数 | 观察周 | 观察日 | 官方滚动 PE | 5 年周度分位 | 信号 |
+|---|---|---|---|---|---|
+| 沪深300 | 2026-W45 | 2026-11-06 | 13.13 | 67.7% | 退出条件成立 |
+| 中证500 | 2026-W45 | 2026-11-06 | 22.18 | 68.9% | 退出条件成立 |
+| 中证1000 | 2026-W45 | 2026-11-06 | 26.01 | 62.0% | 退出条件成立 |
+
+- 信号与回测共用同一份周度分位函数；本批把逐周分位重构成单点函数，并用回测的 1102 个观察点
+  逐条比对，0 差异；
+- 原因码新增 `INDEX_SIGNAL_RESEARCH_ONLY`（非阻断）；`decision` 仍为 `undetermined`，
+  `model_plan.not_selected` 只剩候选 B；
+- 账本只记录**已结束自然周**；同一标的同一周重复运行内容一致则跳过、不一致报冲突；
+  `record_id` 为内容哈希，历史被改写会被 `--check` 发现。
+
+## 4. 数据
+
+| 项目 | 内容 |
+|---|---|
+| 个股快照 | `data/policy-trial/snapshots/` 30 只，`as_of=2026-11-11`，manifest 自检 0 问题 |
+| 业务证据 | `data/policy-trial/evidence/` 30 份（行业、主营构成、近 8 年收入与归母净利润） |
+| 无风险利率 | `data/policy-trial/macro/cn-10y-yield.json`（中债 10 年期，120 个月末 + 最新值，内容哈希） |
+| 数据来源 | 合并报表（东方财富）；分红（巨潮）；价格（新浪不复权日线，push2 被限流时的回退）；公司资料（巨潮股本变动与行业分类） |
+| 来源回退记录 | 每只快照的 `coverage` 中记录实际使用的来源；未用其他数据凑 |
+| 旧项目 | 未修改、未删除（`/Users/comyn/Documents/deepseek-harness/投资/valuation/` 只读参考） |
+
+## 5. 可复现命令
 
 ```bash
 cd /Users/comyn/Documents/deepseek-harness/投资/investment-system
-.venv/bin/python tools/build_official_series.py     # 采集 9 条官方日频序列（本轮未重跑）
-.venv/bin/python tools/run_candidate_a_backtest.py  # 跑回测，生成 JSON 与报告
+.venv/bin/python tools/build_policy_trial_data.py --as-of 2026-11-11   # 30 只快照 + 宏观序列（需网络）
+.venv/bin/python tools/run_equity_policy_trial.py                     # 试运行报告 + JSON
+.venv/bin/python tools/update_signal_ledger.py                        # 追加新周度观察点
+.venv/bin/python tools/update_signal_ledger.py --check                # 账本完整性
 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
 ```
 
-## 5. 测试命令与实际结果
+## 6. 测试命令与实际结果
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
-# 387 passed
+# 435 passed
 ```
 
 | 文件 | 项数 | 内容 |
 |---|---|---|
-| `tests/test_backtest.py` | 26 | 原 21 项 + R1 三项（池内最后正值、观察点当日值、可评估周与起点对齐复验表）+ R2 两项（分区间基准字段与超额、基准可由序列复算） |
-| 既有回归 | 361 | 阶段一/二/三首轮与批二全部保留 |
+| `tests/test_equity_policy.py` | 34 | L1 政策集中/版本化/无散落阈值（5）；L2 折现率、增长、终值、再投资、情景、FCFF/DDM 手算与 600519 分歧（11）；L3 等级与结论边界（13）；L4/L5 报告覆盖与快照重放（5） |
+| `tests/test_index_signal.py` | 14 | 信号边界与真实序列（4）、回测摘要一致性（1）、账本追加/冲突/篡改/重复（6）、命令幂等（1）、指数报告与不可成为价格判断（2） |
+| 既有回归 | 387 | 阶段一/二/三全部保留，全部通过 |
 
 **未通过项：无。**
 
-## 6. 与签收结论的关系
+## 7. 与批准的关系
 
-设计方判断未变：证据不足以作为正式买点规则，第一版指数部分不给正式买点，
-规则冻结、作为研究信号展示并前向记录。本批只收尾口径，未改规则、未调参。
+本批只完成「草案试运行 + 研究信号」。政策的批准权在股东（决策②）：设计方复核、
+独立 AI 审查、带证据提请决策②之后，政策版本才改为 approved、相关模型才改为 validated，
+系统才开始输出正式结论。本批没有、也不能通过这些步骤。
 
-## 7. 提交记录
+## 8. 提交记录
 
 | 提交 | 内容 |
 |---|---|
-| `106a9b8` | **本轮**：R1/R2 收尾 + 5 项新回归 + 文档与入口 |
-| `698bd50` | 阶段三批三：候选 A 周度研究回测 |
-| `a5620ae` | 阶段三批二：事后诊断 + 数据可行性调查 |
-| `2f824df` | 阶段三首轮收尾：W1/W2/E1 修复 |
-| `1bb379c` | 阶段三首轮：指数画像 + ETF 产品资料检查 |
-| `1bb379c` | 阶段三首轮：指数画像 + ETF 产品资料检查 + 24/20 项新回归 |
-| `82b8d4c` | 交付入口（阶段二） |
-| `317506e` | S1 / S2 修复（阶段二收尾，已签收） |
-| `a8c8f7a` | 报告补业务构成 |
-| `b2d2d36` / `978e968` / `5455985` / `5c4c1c9` | 阶段二首轮与阶段一 |
+| `9bc31ac` | **本轮**：政策草案试运行 + 候选 A 研究信号与账本 + 30 只数据 + 48 项新测试 + 文档与示例 |
+| `1866e2b` | 交付入口（第三阶段收尾） |
+| `106a9b8` | 第三阶段批三收尾 R1/R2（已签收） |
+| `698bd50` | 第三阶段批三：候选 A 周度研究回测 |
+| `a5620ae` | 第三阶段批二：事后诊断 + 数据可行性 |
+| `2f824df` | 第三阶段首轮收尾：W1/W2/E1 |
+| `1bb379c` | 第三阶段首轮：指数画像 + ETF 产品资料检查 |
+| `82b8d4c` / `317506e` | 阶段二交付与 S1/S2 修复（已签收） |
+| `5c4c1c9` 等 | 阶段一（已签收） |
 
-历史交付报告保留在 `docs/` 中，本文件始终指向最新一轮。
-
-## 8. 详细材料
+## 9. 详细材料
 
 | 内容 | 文件 |
 |---|---|
-| 本批实现报告（候选 A 回测） | [docs/phase3c-delivery.md](docs/phase3c-delivery.md) |
-| 回测报告（自动生成，含逐笔交易） | [docs/phase3c-backtest.md](docs/phase3c-backtest.md) |
-| 机器可读回测结果 | [data/backtest/candidate-a.json](data/backtest/candidate-a.json) |
-| 序列清单（含官方日频系列） | [data/series/manifest.json](data/series/manifest.json) |
-| 批二：事后诊断与数据可行性 | [docs/phase3b-delivery.md](docs/phase3b-delivery.md)、[docs/phase3b-diagnostics.md](docs/phase3b-diagnostics.md)、[docs/phase3b-feasibility.md](docs/phase3b-feasibility.md) |
-| 阶段三首轮交付（已签收） | [docs/phase3-delivery.md](docs/phase3-delivery.md)、[docs/index-profile-spec.md](docs/index-profile-spec.md)、[docs/phase3-samples.md](docs/phase3-samples.md) |
-| 个股研究估值（阶段二） | [docs/phase2-delivery.md](docs/phase2-delivery.md)、[docs/equity-model-spec.md](docs/equity-model-spec.md)、[docs/assumptions-and-sensitivity.md](docs/assumptions-and-sensitivity.md) |
-| 验收清单（阶段一/二/三） | [docs/acceptance-checklist.md](docs/acceptance-checklist.md) |
+| 本批实现与验收报告（A + B、L1–L8、发现的问题） | [docs/phase4a-delivery.md](docs/phase4a-delivery.md) |
+| 个股政策试运行报告（自动生成，逐只结果与敏感性） | [docs/phase4a-equity-policy-trial.md](docs/phase4a-equity-policy-trial.md) |
+| 政策文件（版本化、每参数带依据） | [data/policies/equity-policy-v1-draft.json](data/policies/equity-policy-v1-draft.json) |
+| 试运行机器可读结果 | [data/policy-trial/trial-report.json](data/policy-trial/trial-report.json) |
+| 试运行数据来源汇总 | [data/policy-trial/build-summary.json](data/policy-trial/build-summary.json) |
+| 信号账本与规则 | [data/ledger/candidate-a-signals.jsonl](data/ledger/candidate-a-signals.jsonl)、[data/ledger/README.md](data/ledger/README.md) |
+| 指数画像规格（含候选 A 研究信号与账本） | [docs/index-profile-spec.md](docs/index-profile-spec.md) |
+| 候选 A 回测记录 | [docs/phase3c-backtest.md](docs/phase3c-backtest.md)、[data/backtest/candidate-a.json](data/backtest/candidate-a.json) |
+| 验收清单（阶段一/二/三 + 第四阶段 L1–L8） | [docs/acceptance-checklist.md](docs/acceptance-checklist.md) |
+| 个股研究估值（阶段二） | [docs/phase2-delivery.md](docs/phase2-delivery.md)、[docs/equity-model-spec.md](docs/equity-model-spec.md) |
 | 示例请求与输出 | [examples/](examples/) |
