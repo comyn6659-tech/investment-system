@@ -118,5 +118,5 @@ PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
 
 | 提交 | 内容 |
 |---|---|
-| 待回填 | 本批实现 |
-| 待回填 | 交付入口（记录实现提交） |
+| `15f7aea` | 本批实现 |
+| 本文件所在提交 | 交付入口（记录实现提交 `15f7aea`） |

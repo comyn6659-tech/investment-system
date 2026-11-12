@@ -5,132 +5,132 @@
 | 项目 | 内容 |
 |---|---|
 | 项目 | `/Users/comyn/Documents/deepseek-harness/投资/investment-system/` |
-| 本轮阶段 | 第四阶段第二批：**启用个股正式结论**（决策②批准 v1.1） |
+| 本轮阶段 | 第四阶段第三批：**指数线加入创业板指（399006）** |
 | 代码版本 | `phase4-1.0.0` |
-| 政策版本 | 个股 `equity-policy-v1.1`（`pol-6d1a5387780fe6a2`，`approved=true`，批准日 2026-11-12，复核日 2027-05-31）；v1.1 草案与 v1 保留 |
-| 模型版本 | 个股政策结果 `validated-1.0.0`（FCFF / 股息折现）；其余路径 `research-0.4.0` |
-| 模型状态 | 只有 `equity_dcf_fcff`、`equity_dividend_discount` 为 `validated`；银行股息、指数画像、候选 A、ETF 保持原状态 |
-| 本轮实现提交 | `71d1beb` |
+| 政策版本 | 个股 `equity-policy-v1.1`（`pol-6d1a5387780fe6a2`，未改） |
+| 模型版本 | 个股政策 `validated-1.0.0`；指数/ETF 仍 `research-0.4.0` / `unapproved-phase2` |
+| 本轮实现提交 | `15f7aea` |
 | 工作区 | 干净（`git status --short` 为空） |
-| 上一轮 | `28f3fb6`（4a-R 入口，实现 `7ccf8f6`） |
+| 上一轮 | `efbacfa`（第四阶段第二批入口，实现 `71d1beb`） |
 
-## 1. 决策②与批准落地（P1、P2）
+## 1. 结论：官方历史估值不可得，按“短历史”交付
+
+| 数据 | 是否官方 | 是否取得 | 处理 |
+|---|---|---|---|
+| 399006 日收盘 | 是（国证指数） | 是，2010-06-01～2026-11-11，3,993 条 | 接入序列库、指数快照 |
+| 399606 全收益日收盘 | 是（国证指数） | 是，同区间、3,993 条 | 接入序列库（收益口径） |
+| 399006 日度/月度 PE 历史 | 是（国证指数/深交所） | **否**；只有最新交易日 PE/PB 快照 | 只作“官方短历史”单日并列事实；**不计算分位** |
+| 159915 产品资料 | 否（天天基金/东财） | 是 | 纳入既有 ETF 产品资料检查 |
+
+官方当前快照（2026-11-11）：PE 滚动 **25.1325**、PE 静态 31.6183、PB **4.07**。
+
+- 没有用 CEIC 的创业板板块 PE（约 35.39）、深交所行业加权 PE、第三方指数 PE 或任何拼接序列补历史；
+- 因此 **没有做** 5 年月度估值画像、候选 A 周度研究信号、研究回测、399006 的候选 A 账本记录；
+- 逐项探针、URL、字段、起止与“为什么不用板块 PE”见
+  [docs/phase4c-chinext-feasibility.md](docs/phase4c-chinext-feasibility.md)。
+
+## 2. 已接入（Q1、Q2、Q3）
 
 | 项 | 内容 |
 |---|---|
-| 决定 | A：按现状批准 `equity-policy-v1.1-draft`，安全边际 A 25% / B 40% 不变 |
-| 批准文件 | `data/policies/equity-policy-v1.1.json`：`status=approved`、`approved=true`；参数与草案逐项相同（测试比对） |
-| 批准记录 | `approval.approved_by=股东`、`approved_at=2026-11-12`、`decision=决策②`、`review_date=2027-05-31`、依据与已知缺口/局限 |
-| 复核安排 | 无风险利率与 ERP 每半年更新（下一次 2027-05）；结论账本首次复盘 2027-05；规则每年复核；规则修改须重新批准 |
-| 模型状态 | 只把政策实际使用的 FCFF / 股息折现改为 `validated`，并在模型中记录批准依据；测试断言 validated 集合恰好为这两个 |
-| 不做 | 未改任何政策参数、未扩股票池、未改指数/ETF/回测、未做对话入口、未翻译条件名 |
+| 399006 收盘序列 | `cnindex.official_history` / `official_close`，3,993 条，内容哈希与序列库 manifest |
+| 399606 全收益序列 | 同源，`total_return_close`，3,993 条 |
+| 官方当前 PE/PB | `official_pe_ratio_1`、`official_pb_ratio_1`，各 1 条（2026-11-11），`daily_short` |
+| 指数快照 | `INDEX:399006.SZ`，`as_of=2026-11-11`；仅官方来源；`valuation_history.available=false` |
+| 指数画像 | `insufficient_data`，`metrics={}`；PE/PB 只进入 `official_short_history`，明确“仅作并列事实” |
+| CLI | `undetermined` / `insufficient_data` / 无 `model_status` / 无 `policy_conclusion` |
 
-`POLICY_VERSION = "equity-policy-v1.1"`；个股政策结果 `model_version="validated-1.0.0"`，
-指数/ETF/研究路径仍报 `unapproved-phase2` / `research-0.4.0`，避免混淆。
+- 接口原始 3,994 行含基日 2010-05-31 的 1000 点基点行；按发布日 2010-06-01 截断，丢弃 1 行。
+- `official_only=True` 与候选 A 的 `cnindex./csindex.` 白名单双重校验：第三方估值即使被放进序列库，也不能进入分位。
+- 没有 `official_pe_rolling` 序列；这是“不做信号/回测”的直接原因（Q4 不适用）。
 
-## 2. 30 只正式结论（P3、P4）
+## 3. 名称识别（Q6）
 
-| 结论 | 数量 | 标的 |
-|---|---|---|
-| 候选买点 | 0 | — |
-| 等待 | 3 | 贵州茅台（B）、美的集团（A）、宁德时代（B） |
-| 回避 | 4 | 海天味业（A）、双汇发展（A）、恒瑞医药（B）、中国移动（B） |
-| 无法判断 | 23 | C 级、partial、路线不支持、资料不足 |
+| 输入 | 结果 |
+|---|---|
+| `创业板指`、`创业板指数`、`399006` | `INDEX:399006.SZ` |
+| `创业板` | `needs_clarification`：“创业板”是交易板块，不是指数；询问是否指创业板指 |
+| `创业板50`、`创业板综`、`创业板R` 等 | `out_of_scope`，`OUT_OF_SCOPE_INDEX_VARIANT` |
 
-- **与试运行 v1.1 预演结论 30/30 一致，0 差异**；CLI 与试运行共用
-  `engine.policy.trial.evaluate_company`（测试用 monkeypatch 证明）。
-- 7 只正式结论的候选门槛：茅台 686.80、海天 13.06、双汇 11.21、美的 57.74、
-  宁德 145.23、恒瑞 11.67、中国移动 46.09（元/股）。
-- 格力电器等级 A 但状态 partial（勾稽 −30.2%），按 `undetermined`，不写账本。
-- 逐只三档价值、现价、距门槛与原因见 [docs/phase4b-equity-conclusions.md](docs/phase4b-equity-conclusions.md)。
+注册表新增 `INDEX:399006.SZ`，带国证指数、深交所两方身份证据，并标记 `official_valuation_only=true`。
 
-CLI 文本/JSON 均包含：结论、等级及含义（数据完整度与模型稳定性，不是公司质量）、
-三档价值及用途、起约束条件、距候选门槛百分比、主要未满足条件、政策版本与快照 ID、
-“不构成投资建议”。C / partial / 不支持 / 资料不足一律 `undetermined` 并给原因码。
+## 4. ETF 159915（Q7 的一部分）
 
-## 3. 数据新鲜度护栏（P5）
+- 注册表新增 `ETF:159915.SZ`（创业板ETF易方达），跟踪 `INDEX:399006.SZ`；
+- 产品快照：价格、单位净值、成交额/成交量、费率、跟踪标的；沿用既有 ETF 产品资料检查，不做执行检查；
+- 价格/成交在东方财富 push2 限流时改用新浪财经等价日线（`sina.etf_hist`），快照内如实标注；
+  净值仍来自东方财富；没有把新浪价格伪装成东财数据。
 
-| 检查 | 规则 | 结果 |
-|---|---|---|
-| 价格 | 价格日期距分析日 > 3 个交易日 | 30 只 `as_of=2026-11-11`、分析日 2026-11-12，全部通过 |
-| 年报 | 分析日 ≥ 4 月 30 日应包含上一年年报 | 30 只最新年报均为 2025，全部通过 |
-| 字段 | 政策所需价格/股本/年报字段 | 4 只金融类缺 2025 年报字段，但它们本来就不支持/资料不足，不出正式结论 |
+## 5. 未做及原因（Q4、Q5）
 
-三种情形各有测试；价格过期端到端测试结果为 `partial` / `undetermined` + `STALE_PRICE`。
-规则写在批准文件的 `runtime_parameters.freshness`，**不属于投资参数**，不参与 P1 的逐参数比较。
+| 未做 | 原因 |
+|---|---|
+| 5 年月度估值画像 | 没有官方日度/月度历史估值序列；不能用第三方或板块 PE 代替 |
+| 候选 A 周度研究信号 | 规则需要官方 PE 日频历史；只有 1 个交易日，无法形成 5 年周度池 |
+| 候选 A 研究回测 | 同上；回测文件未新增 399006 条目 |
+| 399006 候选 A 账本记录 | 没有信号可写；账本仍 3 条既有记录 |
 
-## 4. 结论账本（P6）
-
-文件：`data/ledger/equity-conclusions.jsonl`（`equity-conclusion-ledger/1`）。
-
-- **首次写入 7 条** = 30 只中给出正式结论的数量；重复运行新增 0、跳过 7。
-- 每条含：分析日期、代码、政策版本/哈希、快照 ID、价格及日期、三档价值、等级、
-  安全边际、结论、起约束条件、内容哈希 `concl-…`。
-- 同一标的 + 同一分析日 + 同一快照：内容一致跳过；内容不同报冲突；`undetermined` 不写。
-- `.venv/bin/python -m engine.cli --check-conclusions` 可发现改写/重复，返回 0/1。
-
-## 5. 未变化项（P7）
+## 6. 未变化项（Q7）
 
 | 检查项 | 结果 |
 |---|---|
-| 指数信号 | 三只指数 2026-W45 仍为退出条件成立；沪深300 分位 67.72%；`decision=undetermined`、`model_status=research` |
-| 指数账本 | `data/ledger/candidate-a-signals.jsonl` 仍 3 条，`--check` 0 问题 |
-| ETF | 产品检查逻辑未改，既有测试全过 |
-| 回测数据 | `data/backtest/candidate-a.json` 未改 |
+| 沪深300 / 中证500 / 中证1000 | 仍 `complete`；2026-W45 均为 `exit`；阈值未改 |
+| 候选 A 账本 | 仍 3 条，`--check` 0 问题；无 399006 记录 |
+| 个股政策 / 结论账本 | `equity-policy-v1.1` 未改；结论账本仍 7 条 |
+| 回测 | `data/backtest/candidate-a.json` 未改，无 399006 条目 |
+| ETF 既有结果 | `510300` / `510500` / `512100` 快照与产品检查未重建 |
 | 旧项目 | `/Users/comyn/Documents/deepseek-harness/投资/valuation/` 未修改、未删除 |
 
-## 6. 测试
+## 7. 测试（Q7）
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
-# 480 passed
+# 497 passed
 ```
 
 | 文件 | 项数 | 内容 |
 |---|---|---|
-| `tests/test_equity_conclusion.py` | 21 | P1–P7：批准一致性、模型状态、30/30、CLI 字段、新鲜度三情形与端到端、账本追加/跳过/冲突/篡改、指数与回测不变 |
-| `tests/test_equity_policy.py` | 55 | 4a-R 政策与试运行回归 |
-| `tests/test_index_signal.py` | 17 | 指数信号与账本 |
-| 既有回归 | 387 | 阶段一/二/三 |
+| `tests/test_chinext.py` | 17 | Q1–Q8：可行性、官方序列与哈希、非官方来源拒绝、共用代码、无回测/账本记录、名称三情形、CLI、快照、ETF、既有指数不变 |
+| 既有测试 | 480 | 阶段一/二/三/四批一/四批二回归 |
 
-## 7. 可复现命令
+## 8. 可复现命令
 
 ```bash
 cd /Users/comyn/Documents/deepseek-harness/投资/investment-system
-.venv/bin/python tools/run_equity_conclusions.py --date 2026-11-12   # 30 只结论 + 首次写账本
-.venv/bin/python -m engine.cli '贵州茅台' --analysis-date 2026-11-12  # 单只 CLI（正式结论）
-.venv/bin/python -m engine.cli --check-conclusions                    # 结论账本校验
-.venv/bin/python tools/update_signal_ledger.py --check                # 指数信号账本校验
+.venv/bin/python tools/build_chinext_data.py --probe-only   # 只核查，写可行性 JSON
+.venv/bin/python tools/build_chinext_data.py                # 核查 + 写序列/快照/ETF 快照
+.venv/bin/python -m engine.cli 创业板指                     # 指数：insufficient_data / undetermined
+.venv/bin/python -m engine.cli 创业板                       # 应要求澄清
+.venv/bin/python -m engine.cli 创业板50                     # 应为范围外
+.venv/bin/python -m engine.cli 159915                       # ETF 产品资料检查
+.venv/bin/python -m engine.cli --check-conclusions          # 个股结论账本：7 条，0 问题
+.venv/bin/python tools/update_signal_ledger.py --check      # 候选 A 账本：3 条，0 问题
 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
 ```
-
-## 8. 与复核、复盘的关系
-
-决策②已批准 v1.1；本轮只负责把批准落地为可运行的正式结论。按批准记录：
-2027-05 首次复盘结论账本并更新无风险利率/ERP；规则每年复核；任何规则修改须重新批准；
-不因单只股票结果改规则。已知缺口（v1.1 未经 Fable 定向复核）以结论账本 + 6 个月复盘补救。
 
 ## 9. 提交记录
 
 | 提交 | 内容 |
 |---|---|
-| `71d1beb` | **本轮实现**：批准落地 + 模型 validated + CLI 正式结论 + 新鲜度 + 结论账本 + 30 只 |
-| `28f3fb6` | 4a-R 交付入口（实现 `7ccf8f6`） |
-| `3ad76cd` | 4a 收尾入口（实现 `3a910c0`） |
-| `b7ef983` / `9bc31ac` | 第四阶段第一批（政策 v1 试运行 + 候选 A 信号与账本） |
+| `15f7aea` | **本轮实现**：可行性核查、399006/399606 序列、官方当前 PE/PB、指数快照、名称识别、ETF 159915 |
+| 本文件所在提交 | 交付入口（记录实现提交 `15f7aea`） |
+| `efbacfa` / `71d1beb` | 第四阶段第二批（批准 v1.1、正式结论、新鲜度、结论账本） |
+| `28f3fb6` / `7ccf8f6` | 第四阶段 4a-R |
+| `3ad76cd` / `3a910c0` | 第四阶段第一批收尾 |
+| `b7ef983` / `9bc31ac` | 第四阶段第一批 |
 | `1866e2b` / `106a9b8` | 第三阶段收尾（已签收） |
 
 ## 10. 详细材料
 
 | 内容 | 文件 |
 |---|---|
-| 本轮实现与 P1–P8 验收报告 | [docs/phase4b-delivery.md](docs/phase4b-delivery.md) |
-| 30 只正式结论表（自动生成） | [docs/phase4b-equity-conclusions.md](docs/phase4b-equity-conclusions.md) |
-| 已批准政策文件 | [data/policies/equity-policy-v1.1.json](data/policies/equity-policy-v1.1.json) |
-| v1.1 草案（保留） | [data/policies/equity-policy-v1.1-draft.json](data/policies/equity-policy-v1.1-draft.json) |
-| 政策目录说明 | [data/policies/README.md](data/policies/README.md) |
-| 结论账本 | [data/ledger/equity-conclusions.jsonl](data/ledger/equity-conclusions.jsonl)、[data/ledger/README.md](data/ledger/README.md) |
-| 30 只运行结果（机器可读） | [data/policy-trial/conclusion-run.json](data/policy-trial/conclusion-run.json) |
-| 个股政策试运行报告（v1.1） | [docs/phase4a-equity-policy-trial.md](docs/phase4a-equity-policy-trial.md) |
-| 验收清单（阶段一/二/三 + L1–L8 + M1–M5 + N1–N9 + P1–P8） | [docs/acceptance-checklist.md](docs/acceptance-checklist.md) |
-| 上一轮交付（4a-R） | [docs/phase4a-r-delivery.md](docs/phase4a-r-delivery.md) |
+| 本批实现与 Q1–Q8 验收 | [docs/phase4c-delivery.md](docs/phase4c-delivery.md) |
+| 创业板指数据可行性报告 | [docs/phase4c-chinext-feasibility.md](docs/phase4c-chinext-feasibility.md) |
+| 机器可读可行性记录 | [data/coverage/chinext-feasibility.json](data/coverage/chinext-feasibility.json) |
+| 数据构建脚本 | [tools/build_chinext_data.py](tools/build_chinext_data.py) |
+| 创业板指验收测试 | [tests/test_chinext.py](tests/test_chinext.py) |
+| 验收清单（Q1–Q8） | [docs/acceptance-checklist.md](docs/acceptance-checklist.md) |
+| 个股正式结论（上一批） | [docs/phase4b-delivery.md](docs/phase4b-delivery.md) |
+| 结论账本 | [data/ledger/equity-conclusions.jsonl](data/ledger/equity-conclusions.jsonl) |
+| 候选 A 信号账本 | [data/ledger/candidate-a-signals.jsonl](data/ledger/candidate-a-signals.jsonl) |
+| 旧项目（只读） | `/Users/comyn/Documents/deepseek-harness/投资/valuation/`（未改） |
