@@ -1,12 +1,12 @@
 {
   "meta": {
     "as_of": "2026-11-12",
-    "policy_id": "bank-pool-v1-draft",
-    "policy_digest": "94e1037cf581a83d938fdd376ae59835b89a002d17dfdcebd3c384bb74356735",
-    "policy_status": "draft_unapproved",
-    "approved": false,
+    "policy_id": "bank-pool-v1",
+    "policy_digest": "d6e3adbe214f03d67fe8b87038210cbe09e3dee2a57b25cf0d97595da21d603b",
+    "policy_status": "approved",
+    "approved": true,
     "snapshot_id": "qps-dc9c12160476db8b",
-    "generated_at": "2026-11-13T03:38:53+08:00",
+    "generated_at": "2026-11-13T04:24:01+08:00",
     "window": {
       "start_fy": 2016,
       "end_fy": 2025,

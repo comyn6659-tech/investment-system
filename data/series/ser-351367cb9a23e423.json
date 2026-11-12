@@ -1,0 +1,30 @@
+{
+  "schema_version": "index-series/1",
+  "instrument_id": "INDEX:HSTECH.HKEX",
+  "metric": "official_pe_ratio_1",
+  "field": "市盈率（官方指数单张，月度）",
+  "frequency": "daily_short",
+  "source": {
+    "source_id": "hsi.factsheet",
+    "publisher": "恒生指数有限公司（Hang Seng Indexes Company Limited）",
+    "interface": "恒生指数官方指数单张（月度）",
+    "url": "https://www.hsi.com.hk/api/wsit-hsi-ddoc-ea-public-website-proxy/v1/content/gcs/download",
+    "retrieved_at": "2026-11-13T04:25:45+08:00",
+    "definition_note": "官方指数单张的市盈率；月度快照，不是日频历史。"
+  },
+  "observations": [
+    {
+      "date": "2026-10-30",
+      "value": 25.43
+    }
+  ],
+  "unit": "ratio",
+  "transform": "官方指数单张『市价/盈利率』原值",
+  "aggregation_method": "unknown",
+  "denominator_basis": "unknown",
+  "loss_sample_handling": "unknown",
+  "revision_availability": "unknown",
+  "notes": "只有最新一个月度快照；不能用于分位、信号或回测。",
+  "series_id": "ser-351367cb9a23e423",
+  "observation_count": 1
+}

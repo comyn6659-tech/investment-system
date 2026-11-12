@@ -375,3 +375,17 @@
 | N5 | 我抽查的银行指标可由快照与原始来源核对 | `data/bank-pool/snapshot-.../bank-indicators.csv.gz`、`--show` | 600036 2025 ROE 13.44、不良 0.94%、拨备 391.79%、核心一级 14.16% 与源逐项一致（测试断言） | ✅ |
 | N6 | 既有池、账本、个股结论、指数结果不变；新账本只追加；全部测试通过 | 既有模块未改口径 | 好公司池 138、收息池 142、个股 7/候选 A 3/官方估值 4/池 3/收息 1 条 0 问题；银行账本 1 条 0 问题；**579 passed** | ✅ |
 | N7 | DELIVERY.md 一页以内，含复现命令、测试结果、提交 ID | `DELIVERY.md`、`docs/phase4h-delivery.md` | 入口 §1–§7 | ✅ |
+
+---
+
+# 第四阶段第九批验收清单（批准落地 + 恒生科技，Q1–Q7）
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| Q1 | 三个 approved 文件参数与草案逐项相同；批准记录与复核日在文件中 | `data/policies/{quality-pool-v1.2,income-pool-v1,bank-pool-v1}.json` | `test_approved_policy_matches_draft_and_has_approval_record`（parameters/groups/sensitivity/scope 逐项相等；approval.next_review_date=2027-11-13） | ✅ |
+| Q2 | 三池以 approved 规则重跑，名单与草案运行逐家相同；账本只追加 | `tools/run_{quality,income,bank}_pool.py`、三本 `*-pool.jsonl` | `test_approved_pool_run_matches_draft_list_and_appends`；质量 138 / 收息 142 / 银行 11，名单逐家相同，各追加 1 条 | ✅ |
+| Q3 | 银行估值未启用（CLI 与正式结论账本无银行结论） | `data/policy-inputs/bank-check-v1-draft.json` | `test_bank_valuation_not_enabled`：approved=false、decision3 不启用；CLI 600036 `insufficient_data`、valuation null；个股账本 7 条无银行 | ✅ |
+| Q4 | HSTECH 可行性报告逐项给出来源与判定；只用官方数据 | `tools/build_hstech_data.py`、`docs/phase4i-hstech-feasibility.md`、`data/coverage/hstech-feasibility.json` | `test_hstech_feasibility_uses_official_data_only`；全部 probes publisher=恒生指数公司、URL=hsi.com.hk；PE/DY/PB 历史 probes status=missing；第三方明列未采用 | ✅ |
+| Q5 | HSTECH 已接入部分与其他指数共用代码；名称识别三种情形有测试 | `engine/series/profile.py`、`engine/pipeline.py`、`data/registry/instruments.json` | `test_hstech_name_resolution_and_other_hang_seng_out_of_scope`（三种名称 resolved；恒生指数/恒生国企/恒生科技ETF 范围外）；`test_hstech_uses_shared_profile_and_signal` | ✅ |
+| Q6 | 既有指数、个股、ETF 结果与账本不变；全部测试通过 | 既有模块未改口径 | `test_existing_indices_and_ledgers_unchanged`：三大指数信号 complete/exit；候选 A 账本 3 条、官方估值账本 4 条、个股账本 7 条；**600 passed** | ✅ |
+| Q7 | DELIVERY.md 一页以内 | `DELIVERY.md` | 入口 §1–§7 | ✅ |

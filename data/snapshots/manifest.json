@@ -107,6 +107,15 @@
       "available_at": "2026-11-11T15:00:00+08:00",
       "fetched_at": "2026-11-12T19:50:33+08:00",
       "file": "snap-6a6ddb1b59abf532.json"
+    },
+    {
+      "snapshot_id": "snap-e2810b5ea15dc211",
+      "instrument_id": "INDEX:HSTECH.HKEX",
+      "asset_class": "index",
+      "as_of": "2026-11-12",
+      "available_at": "2026-11-12T16:08:00+08:00",
+      "fetched_at": "2026-11-13T04:25:45+08:00",
+      "file": "snap-e2810b5ea15dc211.json"
     }
   ]
 }

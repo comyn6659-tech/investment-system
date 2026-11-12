@@ -5,6 +5,9 @@
 | `equity-policy-v1.1.json` | `equity-policy-v1.1` | `approved` | **当前正式政策**：股东决策②于 2026-11-12 批准；参数与 v1.1 草案逐项相同 |
 | `equity-policy-v1.1-draft.json` | `equity-policy-v1.1-draft` | `draft_unapproved` | 个股政策 v1.1 草案：按审查 F1–F14 的 R1–R14 修订；保留作对照 |
 | `equity-policy-v1-draft.json` | `equity-policy-v1-draft` | `draft_unapproved` | v1 草案，保留作对照，不删除；v1.1 的 `supersedes` 指向它 |
+| `quality-pool-v1.2.json` | `quality-pool-v1.2` | `approved` | **当前好公司池正式规则**：股东决策③于 2026-11-13 批准；参数与 v1.2 草案逐项相同；下次复核 2027-11-13 |
+| `income-pool-v1.json` | `income-pool-v1` | `approved` | **当前稳定收息池正式规则**：股东决策③于 2026-11-13 批准；参数与草案逐项相同；下次复核 2027-11-13 |
+| `bank-pool-v1.json` | `bank-pool-v1` | `approved` | **当前银行池正式规则**：股东决策③于 2026-11-13 批准；参数与草案逐项相同；下次复核 2027-11-13 |
 | `quality-pool-v1-draft.json` | `quality-pool-v1-draft` | `draft_unapproved` | 好公司池规则 v1 草案：4 组 11 条条件；第四批快照使用，保留不改 |
 | `quality-pool-v1.1-draft.json` | `quality-pool-v1.1-draft` | `draft_unapproved` | 好公司池规则 v1.1 草案：同阈值，补审计意见/处罚/控股股东质押三项治理检验 |
 
@@ -55,3 +58,13 @@ v1 对照结果：`data/policy-trial/trial-report-v1.json`。
   `audit_nonstandard_years_max=0`、`penalty_count_max=0`（都是原规则的等价表述，没有放宽或收紧）；
 - 治理数据只对 252 家候选逐家查；取不到的公司记待定，不用推断或替代口径；
 - 第四批快照仍用 v1 政策复核；第五批新快照用 v1.1。
+
+
+## 三套池规则批准（2026-11-13，决策③）
+
+- 批准文件：`quality-pool-v1.2.json`、`income-pool-v1.json`、`bank-pool-v1.json`；`status=approved`、`approved=true`。
+- 参数与各自草案逐项相同（测试 `test_approved_policy_matches_draft_and_has_approval_record` 比对 `parameters`/`groups`/`sensitivity`/`scope`）。
+- 批准记录在文件 `approval` 块：决策③、2026-11-13、依据、已知缺口（未经独立审查）、补救（每年复盘）、下次复核 2027-11-13。
+- 草案文件保留，不删除；用 approved 规则重跑三池并各追加一条账本，名单与草案运行逐家相同。
+- 年度重跑：`.venv/bin/python tools/run_annual_pools.py`（先 `--dry-run` 查看步骤）。
+- 银行估值：决策③-4 不启用；`bank-check-v1-draft` 保持 draft，文件中注明“不启用”。

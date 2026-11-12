@@ -351,7 +351,7 @@ def test_bank_snapshot_and_report():
     if not BANK_REPORT.exists():
         pytest.skip("银行报告尚未生成")
     report = json.loads((BANK_DIR / "report.json").read_text(encoding="utf-8"))
-    assert report["meta"]["policy_id"] == "bank-pool-v1-draft"
+    assert report["meta"]["policy_id"] == "bank-pool-v1"
     assert report["meta"]["snapshot_id"] == manifest["snapshot_id"]
     assert report["counts"]["in_pool"] == 11
     assert report["counts"]["pending"] == 0
@@ -397,10 +397,11 @@ def test_bank_ledger_and_other_ledgers_unchanged():
         for line in (ROOT / "data" / "ledger" / "bank-pool.jsonl").read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
-    assert len(rows) == 1
+    assert len(rows) == 2
     assert rows[0]["policy_id"] == "bank-pool-v1-draft"
-    assert rows[0]["counts"]["in_pool"] == 11
-    assert rows[0]["pool_hash"] == "bph-13b62d2bcfb016c0"
+    assert rows[1]["policy_id"] == "bank-pool-v1"
+    assert rows[1]["counts"]["in_pool"] == 11
+    assert rows[1]["pool_hash"] == "bph-13b62d2bcfb016c0"
 
     quality = json.loads((ROOT / "data" / "quality-pool" / "report.json").read_text(encoding="utf-8"))
     assert quality["counts"]["in_pool"] == 138

@@ -1,6 +1,8 @@
 # 银行池固定快照与预演
 
-本目录保存银行规则 `bank-pool-v1-draft` 的固定快照、机器可读报告与估值预演。
+本目录保存银行规则 `bank-pool-v1` 的固定快照、机器可读报告与估值预演。
+2026-11-13 决策③批准 `bank-pool-v1`（参数与草案逐项相同）；银行估值仍为 research，
+`bank-check-v1-draft` 保持 draft 且明确“不启用”，预演不进入正式结论。
 快照 `qps-dc9c12160476db8b`：71 张表、约 10.31 MB；原始下载缓存位于
 `data/cache/bank-pool/` 与 `data/cache/governance/`，不提交 git。
 

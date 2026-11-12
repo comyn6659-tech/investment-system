@@ -1,12 +1,12 @@
 {
   "meta": {
     "as_of": "2026-11-12",
-    "policy_id": "quality-pool-v1.2-draft",
-    "policy_digest": "d584af0e9825e8e4a987d4d5ac5bff6efcb2991d6a07bae16620d8b9cbd79201",
-    "policy_status": "draft_unapproved",
-    "approved": false,
+    "policy_id": "quality-pool-v1.2",
+    "policy_digest": "315f849fb82dc0007dca64a306e814c625d48da9fb2081be4ae051b6730c7e7a",
+    "policy_status": "approved",
+    "approved": true,
     "snapshot_id": "qps-3ebbd24be612bf7e",
-    "generated_at": "2026-11-13T02:16:31+08:00",
+    "generated_at": "2026-11-13T04:23:54+08:00",
     "window": {
       "start_fy": 2016,
       "end_fy": 2025,

@@ -27,7 +27,7 @@ from engine.quality.policy import load_policy  # noqa: E402
 from engine.quality.snapshot import load_snapshot_dir  # noqa: E402
 
 TZ = ZoneInfo("Asia/Singapore")
-POLICY_PATH = ROOT / "data" / "policies" / "bank-pool-v1-draft.json"
+POLICY_PATH = ROOT / "data" / "policies" / "bank-pool-v1.json"
 BANK_DIR = ROOT / "data" / "bank-pool"
 MANIFEST_PATH = BANK_DIR / "manifest.json"
 REPORT_JSON = BANK_DIR / "report.json"
@@ -308,13 +308,14 @@ def main() -> int:
     parser.add_argument("--no-ledger", action="store_true")
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--show")
+    parser.add_argument("--policy", default=str(POLICY_PATH))
     args = parser.parse_args()
     if args.check:
         return check_ledger()
 
     manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
     snapshot, companies, _stats = load_snapshot_dir(BANK_DIR / manifest["current"])
-    policy = load_policy(POLICY_PATH)
+    policy = load_policy(Path(args.policy))
     if args.show:
         code = str(args.show).zfill(6)
         company = next((item for item in companies if item.code == code), None)

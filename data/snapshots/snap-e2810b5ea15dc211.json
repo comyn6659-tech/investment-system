@@ -1,0 +1,125 @@
+{
+  "schema_version": "snapshot/1",
+  "instrument_id": "INDEX:HSTECH.HKEX",
+  "asset_class": "index",
+  "as_of": "2026-11-12",
+  "available_at": "2026-11-12T16:08:00+08:00",
+  "fetched_at": "2026-11-13T04:25:45+08:00",
+  "facts": [
+    {
+      "fact_id": "index.level",
+      "metric": "index_close_level",
+      "status": "known",
+      "value": 3931.93,
+      "unit": "index_point",
+      "currency": null,
+      "period": "2026-11-12",
+      "available_at": "2026-11-12T16:08:00+08:00",
+      "fetched_at": "2026-11-13T04:25:45+08:00",
+      "source": {
+        "source_id": "hsi.official_history",
+        "publisher": "恒生指数有限公司（Hang Seng Indexes Company Limited）",
+        "interface": "恒生指数官方指数数据接口 valueHistoryPub",
+        "url": "https://www.hsi.com.hk/api/wsit-hsi-ddoc-ea-public-website-proxy/v1/product-data/pub/indexes/metadata/v2",
+        "retrieved_at": "2026-11-13T04:25:45+08:00",
+        "notes": "官方价格指数日收盘；HKD 计价"
+      },
+      "transform": "官方接口最后一行收盘",
+      "restated": false,
+      "notes": "港股交易日收盘；港元计价",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "index.pe_ttm",
+      "metric": "pe_ttm",
+      "status": "known",
+      "value": 25.43,
+      "unit": "ratio",
+      "currency": null,
+      "period": "2026-10-30",
+      "available_at": null,
+      "fetched_at": "2026-11-13T04:25:45+08:00",
+      "source": {
+        "source_id": "hsi.factsheet",
+        "publisher": "恒生指数有限公司（Hang Seng Indexes Company Limited）",
+        "interface": "恒生指数官方指数单张（月度）",
+        "url": "https://www.hsi.com.hk/api/wsit-hsi-ddoc-ea-public-website-proxy/v1/content/gcs/download",
+        "retrieved_at": "2026-11-13T04:25:45+08:00",
+        "notes": "官方指数单张的 PE/股息率；月度快照，不提供 PB，不构成日频估值历史"
+      },
+      "transform": "官方指数单张『市价/盈利率』",
+      "restated": false,
+      "notes": "月度快照，不是日频历史；不能用于分位或回测",
+      "conflict_values": []
+    }
+  ],
+  "coverage": {
+    "build": {
+      "mode": "official_history_close",
+      "market_date": "2026-11-12",
+      "bar_status": "closed",
+      "built_at": "2026-11-13T04:25:45+08:00",
+      "date_source": "官方指数数据接口最后一行"
+    },
+    "market": "HK",
+    "currency": "HKD",
+    "price_history": {
+      "source_id": "hsi.official_history",
+      "start": "2021-11-11",
+      "end": "2026-11-12",
+      "observations": 1230,
+      "frequency": "daily",
+      "note": "官方接口只返回近 5 年；未覆盖 2020-07-27 至 2021-11-10 的已发布历史。"
+    },
+    "total_return_history": {
+      "source_id": "hsi.official_history",
+      "code": "12083.00",
+      "start": "2021-11-11",
+      "end": "2026-11-12",
+      "observations": 1230,
+      "frequency": "daily",
+      "note": "全收益（Gross Total Return）指数；分红再投资。"
+    },
+    "valuation_source_official": {
+      "source_id": "hsi.factsheet",
+      "publisher": "恒生指数有限公司（Hang Seng Indexes Company Limited）",
+      "start": "2026-10-30",
+      "end": "2026-10-30",
+      "observations": 1,
+      "frequency": "monthly",
+      "pe": 25.43,
+      "dividend_yield_pct": 1.23,
+      "pb": null,
+      "note": "官方指数单张月度快照；PB 不提供；HSTECH 没有公开的 PE/DY 历史文件。"
+    },
+    "valuation_history": {
+      "available": false,
+      "note": "未取得 HSTECH 官方 PE/股息率/市净率历史；官方历史估值文件只覆盖 HSI/HSCEI。"
+    },
+    "aggregation_method": "unknown",
+    "aggregation_note": "官方未说明指数 PE 的加权方式与亏损样本处理",
+    "supports_weekly_5y_history": false,
+    "supports_5y_window": false,
+    "index_identity_verified": true,
+    "index_launch_date": "2020-07-27",
+    "index_base_date": "2014-12-31",
+    "index_base_value": 3000,
+    "index_constituents": 30,
+    "point_in_time_safe": false,
+    "point_in_time_granularity": "mixed",
+    "availability_precision_counts": {
+      "second": 1,
+      "date": 0,
+      "unknown": 1
+    },
+    "availability_unknown": [
+      "index.pe_ttm"
+    ],
+    "availability_note": "只有全部事实都带秒级可获得时间，才标记 point_in_time_safe=true；仅日期精度按「当日结束时才可知」处理，不用于盘中历史判断。"
+  },
+  "producers": [
+    "tools/build_hstech_data.py"
+  ],
+  "notes": "恒生科技指数：港股、港元计价；官方收盘与全收益已接入；官方历史估值未取得，仅保留月度当前快照；不构成估值结论",
+  "snapshot_id": "snap-e2810b5ea15dc211"
+}

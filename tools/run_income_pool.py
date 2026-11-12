@@ -28,7 +28,7 @@ from engine.quality.snapshot import load_snapshot_dir  # noqa: E402
 from engine.quality.tables import read_table  # noqa: E402
 
 TZ = ZoneInfo("Asia/Singapore")
-POLICY_PATH = ROOT / "data" / "policies" / "income-pool-v1-draft.json"
+POLICY_PATH = ROOT / "data" / "policies" / "income-pool-v1.json"
 INCOME_DIR = ROOT / "data" / "income-pool"
 MANIFEST_PATH = INCOME_DIR / "manifest.json"
 CANDIDATES_PATH = INCOME_DIR / "candidates.json"
@@ -298,6 +298,7 @@ def main() -> int:
     parser.add_argument("--no-ledger", action="store_true")
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--show", help="从固定快照独立复算并打印一只股票的成绩单")
+    parser.add_argument("--policy", default=str(POLICY_PATH))
     args = parser.parse_args()
     if args.check:
         return check_ledger()
@@ -305,7 +306,7 @@ def main() -> int:
     manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
     snapshot_path = INCOME_DIR / manifest["current"]
     snapshot, companies, _stats = load_snapshot_dir(snapshot_path)
-    policy = load_policy(POLICY_PATH)
+    policy = load_policy(Path(args.policy))
     if args.show:
         code = str(args.show).zfill(6)
         company = next((item for item in companies if item.code == code), None)

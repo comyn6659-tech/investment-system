@@ -299,6 +299,42 @@
       "end_date": "2026-11-11",
       "observation_count": 3993,
       "file": "ser-d50212f068f47cd2.json"
+    },
+    {
+      "series_id": "ser-4fe1fbd5d865aa2f",
+      "instrument_id": "INDEX:HSTECH.HKEX",
+      "metric": "official_close",
+      "frequency": "daily",
+      "source_id": "hsi.official_history",
+      "retrieved_at": "2026-11-13T04:25:45+08:00",
+      "start_date": "2021-11-11",
+      "end_date": "2026-11-12",
+      "observation_count": 1230,
+      "file": "ser-4fe1fbd5d865aa2f.json"
+    },
+    {
+      "series_id": "ser-351367cb9a23e423",
+      "instrument_id": "INDEX:HSTECH.HKEX",
+      "metric": "official_pe_ratio_1",
+      "frequency": "daily_short",
+      "source_id": "hsi.factsheet",
+      "retrieved_at": "2026-11-13T04:25:45+08:00",
+      "start_date": "2026-10-30",
+      "end_date": "2026-10-30",
+      "observation_count": 1,
+      "file": "ser-351367cb9a23e423.json"
+    },
+    {
+      "series_id": "ser-cee2acf87305022d",
+      "instrument_id": "INDEX:HSTECH.HKEX",
+      "metric": "total_return_close",
+      "frequency": "daily",
+      "source_id": "hsi.official_history",
+      "retrieved_at": "2026-11-13T04:25:45+08:00",
+      "start_date": "2021-11-11",
+      "end_date": "2026-11-12",
+      "observation_count": 1230,
+      "file": "ser-cee2acf87305022d.json"
     }
   ]
 }

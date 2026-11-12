@@ -1,0 +1,217 @@
+{
+  "schema_version": "hstech-feasibility/1",
+  "generated_at": "2026-11-13T04:25:45+08:00",
+  "scope": "恒生科技指数（HSTECH）",
+  "decision": "short_history_only",
+  "decision_detail": "官方价格指数与全收益指数的日收盘可得（接口返回近 5 年）；官方估值只有月度指数单张的 PE/股息率当前快照，没有 HSTECH 的 PE/DY/PB 历史文件，因此不做 5 年估值分位、候选 A 周度信号、研究回测、候选 A 账本。已接入官方收盘、全收益、月度当前估值快照与指数快照。",
+  "official_history_available": true,
+  "official_pe_history_available": false,
+  "official_dividend_yield_history_available": false,
+  "official_pb_history_available": false,
+  "current_official_valuation": {
+    "date": "2026-10-30",
+    "pe_ratio": 25.43,
+    "dividend_yield_pct": 1.23,
+    "pb": null,
+    "pb_note": "官方指数单张不提供市净率；公开历史估值文件也没有 HSTECH。",
+    "frequency": "monthly",
+    "source": "hsi.factsheet"
+  },
+  "probes": [
+    {
+      "probe_id": "h1_hsi_daily_close",
+      "requirement": "官方日收盘",
+      "purpose": "恒生科技指数价格指数日收盘",
+      "publisher": "恒生指数有限公司",
+      "interface": "官方指数数据接口 valueHistoryPub（02083.00）",
+      "url": "https://www.hsi.com.hk/api/wsit-hsi-ddoc-ea-public-website-proxy/v1/product-data/pub/indexes/metadata/v2",
+      "status": "ok",
+      "rows": 1230,
+      "fields": [
+        "date",
+        "close"
+      ],
+      "date_range": [
+        "2021-11-11",
+        "2026-11-12"
+      ],
+      "frequency": "daily",
+      "official": true,
+      "adopted": true,
+      "note": "接口只返回近 5 年；未覆盖 2020-07-27 至 2021-11-10 的已发布历史。"
+    },
+    {
+      "probe_id": "h1_hsi_total_return",
+      "requirement": "官方全收益",
+      "purpose": "恒生科技指数全收益（12083.00 / 22083.00）",
+      "publisher": "恒生指数有限公司",
+      "interface": "官方指数数据接口 valueHistoryPub（Gross/Net Total Return）",
+      "url": "https://www.hsi.com.hk/api/wsit-hsi-ddoc-ea-public-website-proxy/v1/product-data/pub/indexes/metadata/v2",
+      "status": "ok",
+      "rows": 1230,
+      "fields": [
+        "date",
+        "close"
+      ],
+      "date_range": [
+        "2021-11-11",
+        "2026-11-12"
+      ],
+      "frequency": "daily",
+      "official": true,
+      "adopted": true,
+      "note": "采用 Gross Total Return（12083.00）；Net Total Return（22083.00）1230 条，仅登记不混用。"
+    },
+    {
+      "probe_id": "h2_hsi_pe_history",
+      "requirement": "官方估值历史",
+      "purpose": "HSTECH 官方 PE 历史（日度或月度）",
+      "publisher": "恒生指数有限公司",
+      "interface": "官方历史估值文件 historical_pe",
+      "url": "https://www.hsi.com.hk/content/dam/wpb/hsil/index_operation/historical_pe/en_hk/hstech/hstech.xlsx",
+      "status": "missing",
+      "rows": 0,
+      "fields": [
+        "PE"
+      ],
+      "date_range": [],
+      "frequency": "",
+      "official": true,
+      "adopted": false,
+      "note": "同一路径下 HSI/HSCEI 返回 Excel；HSTECH 返回 AEM 404 HTML，content-type='text/html;charset=utf-8'。"
+    },
+    {
+      "probe_id": "h2_hsi_dy_history",
+      "requirement": "官方估值历史",
+      "purpose": "HSTECH 官方股息率历史（日度或月度）",
+      "publisher": "恒生指数有限公司",
+      "interface": "官方历史估值文件 historical_dy",
+      "url": "https://www.hsi.com.hk/content/dam/wpb/hsil/index_operation/historical_dy/en_hk/hstech/hstech.xlsx",
+      "status": "missing",
+      "rows": 0,
+      "fields": [
+        "股息率"
+      ],
+      "date_range": [],
+      "frequency": "",
+      "official": true,
+      "adopted": false,
+      "note": "同一路径下 HSI/HSCEI 返回 Excel；HSTECH 返回 AEM 404 HTML，content-type='text/html;charset=utf-8'。"
+    },
+    {
+      "probe_id": "h2_hsi_pb_history",
+      "requirement": "官方估值历史",
+      "purpose": "HSTECH 官方市净率历史（日度或月度）",
+      "publisher": "恒生指数有限公司",
+      "interface": "官方指数单张/历史估值文件",
+      "url": "https://www.hsi.com.hk/api/wsit-hsi-ddoc-ea-public-website-proxy/v1/content/gcs/download",
+      "status": "missing",
+      "rows": 0,
+      "fields": [
+        "PB"
+      ],
+      "date_range": [],
+      "frequency": "",
+      "official": true,
+      "adopted": false,
+      "note": "官方指数单张只提供股息率与 PE；公开历史估值文件没有 HSTECH；PB 不可得。"
+    },
+    {
+      "probe_id": "h2_hsi_current_factsheet",
+      "requirement": "官方当前估值",
+      "purpose": "HSTECH 官方月度 PE/股息率当前快照",
+      "publisher": "恒生指数有限公司",
+      "interface": "官方指数单张（月度 PDF）",
+      "url": "https://www.hsi.com.hk/api/wsit-hsi-ddoc-ea-public-website-proxy/v1/content/gcs/download",
+      "status": "ok",
+      "rows": 1,
+      "fields": [
+        "股息率",
+        "市价/盈利率",
+        "数据截止日"
+      ],
+      "date_range": [
+        "2026-10-30",
+        "2026-10-30"
+      ],
+      "frequency": "monthly",
+      "official": true,
+      "adopted": true,
+      "note": "PE 25.43、股息率 1.23%；数据截至 2026-10-30；PB 不提供。"
+    },
+    {
+      "probe_id": "h3_hsi_identity",
+      "requirement": "指数身份",
+      "purpose": "HSTECH 名称、代码、发布日、基日",
+      "publisher": "恒生指数有限公司",
+      "interface": "官方指数数据接口 details + 官方指数单张",
+      "url": "https://www.hsi.com.hk/api/wsit-hsi-ddoc-ea-public-website-proxy/v1/product-data/pub/series/metadata/v2",
+      "status": "ok",
+      "rows": 1,
+      "fields": [
+        "indexSeriesName",
+        "推出日期",
+        "基日",
+        "基值",
+        "成份股数目",
+        "货币"
+      ],
+      "date_range": [],
+      "frequency": "",
+      "official": true,
+      "adopted": true,
+      "note": "Hang Seng TECH Index；推出 2020-07-27，基日 2014-12-31，基值 3000，成份股 30，货币 HKD。"
+    }
+  ],
+  "implemented": [
+    "HSTECH 官方价格指数日收盘序列（hsi.official_history）",
+    "HSTECH 官方全收益（Gross Total Return，12083.00）日收盘序列",
+    "HSTECH 官方月度 PE 当前快照（指数单张，2026-10-30）",
+    "HSTECH 指数快照（官方收盘 + 官方月度 PE；港股/港元）",
+    "名称识别：恒生科技 / 恒生科技指数 / HSTECH"
+  ],
+  "not_implemented": [
+    "5 年月度估值画像（无官方历史估值序列）",
+    "候选 A 周度研究信号（无官方 PE 日频历史）",
+    "候选 A 研究回测（无官方 PE 日频历史）",
+    "候选 A 信号账本 HSTECH 记录（无信号可写）",
+    "官方估值前向记录账本（无官方当日 PE/股息率值）"
+  ],
+  "third_party_not_adopted": [
+    "Wind/东方财富/同花顺等第三方 HSTECH PE：非官方，未采用。",
+    "恒生科技 ETF 或 QDII 产品资料：本批不接入任何港股 ETF/QDII。"
+  ],
+  "notes": [
+    "只使用恒生指数有限公司官方接口、官方指数单张与官方历史估值文件路径；",
+    "没有为了让分位或信号通过而使用第三方估值、ETF 估值或拼接序列；",
+    "指数 2020-07-27 发布，之前为回溯计算（如适用）；官方接口只返回近 5 年日收盘。",
+    "港股、港元计价；成分集中于互联网与科技龙头；部分成分股亏损或利润波动大，PE 作为估值指标的可靠性有限。"
+  ],
+  "series": [
+    {
+      "series_id": "ser-4fe1fbd5d865aa2f",
+      "metric": "official_close",
+      "frequency": "daily",
+      "observations": 1230,
+      "start": "2021-11-11",
+      "end": "2026-11-12"
+    },
+    {
+      "series_id": "ser-cee2acf87305022d",
+      "metric": "total_return_close",
+      "frequency": "daily",
+      "observations": 1230,
+      "start": "2021-11-11",
+      "end": "2026-11-12"
+    },
+    {
+      "series_id": "ser-351367cb9a23e423",
+      "metric": "official_pe_ratio_1",
+      "frequency": "daily_short",
+      "observations": 1,
+      "start": "2026-10-30",
+      "end": "2026-10-30"
+    }
+  ],
+  "snapshot_id": "snap-e2810b5ea15dc211"
+}

@@ -898,6 +898,70 @@
           "note": "基金全称：银华中证2000增强策略交易型开放式指数证券投资基金（增强策略）"
         }
       ]
+    },
+    {
+      "instrument_id": "INDEX:HSTECH.HKEX",
+      "display_name": "恒生科技指数",
+      "aliases": [
+        "恒生科技",
+        "HSTECH",
+        "Hang Seng TECH Index",
+        "Hang Seng TECH"
+      ],
+      "asset_class": "index",
+      "code": "HSTECH",
+      "market": "HK",
+      "venue": "HKEX",
+      "venue_type": "index_publisher",
+      "currency": "HKD",
+      "index_class": "industry_theme",
+      "region": "cross_border",
+      "in_first_batch": false,
+      "data_coverage_verified": true,
+      "official_valuation_only": true,
+      "valid_from": "2020-07-27",
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "BROAD_INDEX_NOT_IN_FIRST_BATCH",
+        "detail": "第四阶段第九批研究样本：恒生科技指数（HSTECH）；官方收盘/全收益与月度当前估值已接入，官方历史估值未取得，不做信号与回测"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-hsi-hstech-index",
+          "kind": "index_publisher",
+          "publisher": "恒生指数有限公司（Hang Seng Indexes Company Limited）",
+          "url": "https://www.hsi.com.hk/en-hk/indexes/all-indexes/index-details/?seriesCode=hstech",
+          "retrieved_at": "2026-11-13T04:30:00+08:00",
+          "fields_cited": [
+            "指数名称",
+            "指数代码",
+            "推出日期",
+            "基日",
+            "基值",
+            "成份股数目",
+            "货币"
+          ],
+          "note": "官方指数详情页与官方指数数据接口 details/values；HSTECH 价格指数代码 02083.00。"
+        },
+        {
+          "evidence_id": "ev-hsi-hstech-factsheet",
+          "kind": "index_factsheet",
+          "publisher": "恒生指数有限公司（Hang Seng Indexes Company Limited）",
+          "url": "https://www.hsi.com.hk/public-website/webapp/factsheets/en-hk/hstech.pdf",
+          "retrieved_at": "2026-11-13T04:30:00+08:00",
+          "fields_cited": [
+            "市盈率",
+            "股息率",
+            "数据截止日",
+            "推出日期",
+            "基日",
+            "基值",
+            "成份股数目",
+            "货币"
+          ],
+          "note": "官方指数单张（月度，数据截至 2026-10-30）：PE 25.43、股息率 1.23%；不提供 PB。"
+        }
+      ]
     }
   ]
 }

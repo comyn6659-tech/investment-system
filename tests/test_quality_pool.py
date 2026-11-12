@@ -645,7 +645,7 @@ def test_condition_reason_wording_is_not_misleading(policy_v11):
 REPORT_4E = ROOT / "docs" / "phase4e-quality-pool-report.md"
 REPORT_JSON_4E = ROOT / "data" / "quality-pool" / "report-4e.json"
 REPORT_4F = ROOT / "docs" / "phase4f-quality-pool-report.md"
-REPORT_JSON_4F = ROOT / "data" / "quality-pool" / "report.json"
+REPORT_JSON_4F = ROOT / "data" / "quality-pool" / "report-v1.2-draft.json"
 
 
 def test_4e_report_has_governance_sections_and_no_misleading_wording():
@@ -825,21 +825,25 @@ def test_4e_snapshot_and_report_are_preserved():
     assert report["counts"]["pending"] == 18
 
 
-def test_4f_pool_ledger_has_three_records_and_only_appends():
+def test_pool_ledger_has_three_drafts_plus_approved_and_only_appends():
     rows = [
         json.loads(line)
         for line in (ROOT / "data" / "ledger" / "quality-pool.jsonl").read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
-    assert len(rows) == 3
+    assert len(rows) == 4
     assert [row["policy_id"] for row in rows] == [
         "quality-pool-v1-draft",
         "quality-pool-v1.1-draft",
         "quality-pool-v1.2-draft",
+        "quality-pool-v1.2",
     ]
     assert rows[2]["snapshot_id"] == "qps-3ebbd24be612bf7e"
     assert rows[2]["counts"]["in_pool"] == 138
     assert rows[2]["pool_hash"] == "qph-fc548bf288b854fe"
+    assert rows[3]["snapshot_id"] == "qps-3ebbd24be612bf7e"
+    assert rows[3]["counts"]["in_pool"] == 138
+    assert rows[3]["pool_hash"] == "qph-fc548bf288b854fe"
 
 
 def test_pledge_row_parser_handles_q3_formats():

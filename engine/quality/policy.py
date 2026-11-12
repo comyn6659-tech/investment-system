@@ -26,8 +26,13 @@ SUPPORTED_POLICY_IDS = (
     "quality-pool-v1.2-draft",
     "income-pool-v1-draft",
     "bank-pool-v1-draft",
+    "quality-pool-v1.2",
+    "income-pool-v1",
+    "bank-pool-v1",
 )
 POLICY_STATUS_DRAFT = "draft_unapproved"
+POLICY_STATUS_APPROVED = "approved"
+POLICY_STATUSES = (POLICY_STATUS_DRAFT, POLICY_STATUS_APPROVED)
 SUPPORTED_OPERATORS = (">=", ">", "<=", "<", "==")
 
 _VALUE_LABELS = {
@@ -158,8 +163,31 @@ def _require(condition: bool, message: str) -> None:
 def validate_policy(raw: Mapping[str, Any]) -> None:
     _require(raw.get("schema_version") in SUPPORTED_SCHEMA_VERSIONS, "政策 schema_version 不受支持")
     _require(raw.get("policy_id") in SUPPORTED_POLICY_IDS, f"政策 policy_id 必须是 {SUPPORTED_POLICY_IDS} 之一")
-    _require(raw.get("status") == POLICY_STATUS_DRAFT, "好公司池政策本版只能是 draft_unapproved")
-    _require(raw.get("approved") is False, "草案不得自我批准（approved 必须为 false）")
+    status = raw.get("status")
+    _require(status in POLICY_STATUSES, f"政策 status 必须是 {POLICY_STATUSES} 之一")
+    if status == POLICY_STATUS_DRAFT:
+        _require(raw.get("approved") is False, "草案不得自我批准（approved 必须为 false）")
+    else:
+        _require(raw.get("approved") is True, "已批准政策的 approved 必须为 true")
+        approval = raw.get("approval") or {}
+        for key in (
+            "approved_by",
+            "approved_at",
+            "decision",
+            "basis",
+            "known_gaps",
+            "remedy",
+            "next_review_date",
+        ):
+            _require(isinstance(approval.get(key), str) and approval[key].strip(), f"已批准政策缺少 approval.{key}")
+        _require(
+            isinstance(raw.get("next_review_date"), str) and raw["next_review_date"].strip(),
+            "已批准政策缺少顶层 next_review_date",
+        )
+        _require(
+            approval["next_review_date"] == raw["next_review_date"],
+            "approval.next_review_date 与顶层 next_review_date 不一致",
+        )
     _require(isinstance(raw.get("parameters"), dict) and raw["parameters"], "政策缺少 parameters")
     _require(isinstance(raw.get("groups"), list) and raw["groups"], "政策缺少 groups")
 

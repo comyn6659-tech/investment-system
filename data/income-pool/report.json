@@ -1,12 +1,12 @@
 {
   "meta": {
     "as_of": "2026-11-12",
-    "policy_id": "income-pool-v1-draft",
-    "policy_digest": "ca8286bded456f99c97e0e7ded468bb6df596789049b426659e9b12403ef25b5",
-    "policy_status": "draft_unapproved",
-    "approved": false,
+    "policy_id": "income-pool-v1",
+    "policy_digest": "1dc2ee11a372d3f0587af6955f74cf237373888cd5dfce4f3a5fa93781be84c4",
+    "policy_status": "approved",
+    "approved": true,
     "snapshot_id": "qps-d8fb7e3718675b93",
-    "generated_at": "2026-11-13T03:11:31+08:00",
+    "generated_at": "2026-11-13T04:23:58+08:00",
     "window": {
       "start_fy": 2016,
       "end_fy": 2025,
@@ -16849,18 +16849,18 @@
   ],
   "ownership_distribution": {
     "quality": {
-      "民企": 93,
       "地方国企": 22,
+      "民企": 93,
       "央企": 10,
       "外资": 6,
       "其他": 7
     },
     "income": {
       "民企": 76,
-      "其他": 7,
-      "央企": 18,
       "地方国企": 38,
-      "外资": 3
+      "央企": 18,
+      "外资": 3,
+      "其他": 7
     },
     "quality_total": 138,
     "income_total": 142,

@@ -368,7 +368,7 @@ def test_income_snapshot_and_report_and_ledger():
     if not INCOME_REPORT_MD.exists():
         pytest.skip("收息型报告尚未生成")
     report = json.loads((INCOME_DIR / "report.json").read_text(encoding="utf-8"))
-    assert report["meta"]["policy_id"] == "income-pool-v1-draft"
+    assert report["meta"]["policy_id"] == "income-pool-v1"
     assert report["meta"]["snapshot_id"] == manifest["snapshot_id"]
     assert report["dividend_coverage"]["periods_available"] == 10
     assert {row["year"] for row in report["dividend_coverage"]["years"]} == set(range(2016, 2021))
@@ -381,25 +381,28 @@ def test_income_snapshot_and_report_and_ledger():
 
     ledger = ROOT / "data" / "ledger" / "income-pool.jsonl"
     rows = [json.loads(line) for line in ledger.read_text(encoding="utf-8").splitlines() if line.strip()]
-    assert len(rows) == 1
+    assert len(rows) == 2
     assert rows[0]["policy_id"] == "income-pool-v1-draft"
-    assert rows[0]["snapshot_id"] == manifest["snapshot_id"]
-    assert rows[0]["counts"]["in_pool"] == report["counts"]["in_pool"]
-    assert rows[0]["pool_hash"].startswith("iph-")
+    assert rows[1]["policy_id"] == "income-pool-v1"
+    assert rows[1]["snapshot_id"] == manifest["snapshot_id"]
+    assert rows[1]["counts"]["in_pool"] == report["counts"]["in_pool"]
+    assert rows[1]["pool_hash"] == rows[0]["pool_hash"]
+    assert rows[1]["pool_hash"].startswith("iph-")
 
 
 def test_quality_pool_unchanged():
     manifest = json.loads((ROOT / "data" / "quality-pool" / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["snapshot_id"] == "qps-3ebbd24be612bf7e"
     report = json.loads((ROOT / "data" / "quality-pool" / "report.json").read_text(encoding="utf-8"))
-    assert report["meta"]["policy_id"] == "quality-pool-v1.2-draft"
+    assert report["meta"]["policy_id"] == "quality-pool-v1.2"
     assert report["counts"]["in_pool"] == 138
     ledger = [
         json.loads(line)
         for line in (ROOT / "data" / "ledger" / "quality-pool.jsonl").read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
-    assert len(ledger) == 3
+    assert len(ledger) == 4
+    assert ledger[-1]["policy_id"] == "quality-pool-v1.2"
     assert ledger[-1]["pool_hash"] == "qph-fc548bf288b854fe"
 
 

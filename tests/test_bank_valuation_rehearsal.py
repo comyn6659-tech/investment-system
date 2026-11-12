@@ -125,8 +125,12 @@ def test_only_policy_and_bank_check_are_read(policy, rehearsal):
     assert "rwa_density" not in json.dumps(rehearsal["meta"], ensure_ascii=False)
 
 
-def test_old_rehearsal_params_are_not_read(monkeypatch):
+def test_old_rehearsal_params_are_not_read(monkeypatch, tmp_path):
     import builtins
+    import tools.run_bank_valuation_rehearsal as rehearsal_tool
+
+    monkeypatch.setattr(rehearsal_tool, "OUTPUT_JSON", tmp_path / "valuation-rehearsal.json")
+    monkeypatch.setattr(rehearsal_tool, "OUTPUT_MD", tmp_path / "valuation-rehearsal.md")
 
     real_open = builtins.open
 

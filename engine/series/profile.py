@@ -26,7 +26,7 @@ from engine.series.window import MIN_VALID_MONTHS, WINDOW_MONTHS, build_window
 PROFILE_PAYLOAD_VERSION = "index-profile/1"
 
 # 官方来源前缀：候选 A 的固定序列与「只允许官方估值」的标的都按此校验。
-OFFICIAL_SOURCE_PREFIXES = ("csindex.", "cnindex.")
+OFFICIAL_SOURCE_PREFIXES = ("csindex.", "cnindex.", "hsi.")
 
 # 需要计入参考池的指标（顺序决定报告顺序）
 POOL_METRICS = (METRIC_PE_ROLLING, METRIC_PB)

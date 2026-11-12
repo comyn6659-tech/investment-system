@@ -26,7 +26,7 @@ from engine.quality.report import build_report, render_markdown  # noqa: E402
 from engine.quality.snapshot import load_snapshot_dir  # noqa: E402
 
 TZ = ZoneInfo("Asia/Singapore")
-POLICY_PATH = ROOT / "data" / "policies" / "quality-pool-v1.2-draft.json"
+POLICY_PATH = ROOT / "data" / "policies" / "quality-pool-v1.2.json"
 BASELINE_POLICY_PATH = ROOT / "data" / "policies" / "quality-pool-v1.1-draft.json"
 POOL_DIR = ROOT / "data" / "quality-pool"
 BASELINE_REPORT_4D = POOL_DIR / "report-4d.json"

@@ -100,7 +100,8 @@
 
 2026-11-12 第四批首次写入 1 条（`quality-pool-v1-draft`，入池 144）；
 第五批追加 1 条（`quality-pool-v1.1-draft`，入池 120）；
-第六批追加 1 条（`quality-pool-v1.2-draft`，入池 138），旧记录不变。
+第六批追加 1 条（`quality-pool-v1.2-draft`，入池 138）；
+2026-11-13 决策③批准后追加 1 条（`quality-pool-v1.2`，入池 138，`pool_hash=qph-fc548bf288b854fe`），旧记录不变。
 
 ---
 
@@ -148,7 +149,8 @@
 命令：`.venv/bin/python tools/run_income_pool.py --check`。
 
 2026-11-13 首次写入 1 条（`income-pool-v1-draft`，快照 `qps-d8fb7e3718675b93`，
-入池 142，`pool_hash=iph-3a3ca849f50a9f58`）。
+入池 142，`pool_hash=iph-3a3ca849f50a9f58`）；同日决策③批准后追加 1 条
+（`income-pool-v1`，入池 142，`pool_hash` 相同），旧记录不变。
 
 ---
 
@@ -165,4 +167,5 @@
 命令：`.venv/bin/python tools/run_bank_pool.py --check`。
 
 2026-11-13 首次写入 1 条（`bank-pool-v1-draft`，快照 `qps-dc9c12160476db8b`，
-入池 11，`pool_hash=bph-13b62d2bcfb016c0`）。
+入池 11，`pool_hash=bph-13b62d2bcfb016c0`）；同日决策③批准后追加 1 条
+（`bank-pool-v1`，入池 11，`pool_hash` 相同），旧记录不变。
