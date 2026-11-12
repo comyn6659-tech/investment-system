@@ -1,0 +1,23 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "universe",
+  "file": "universe.csv.gz",
+  "rows": 5225,
+  "columns": [
+    "code",
+    "name",
+    "exchange",
+    "board",
+    "listing_date",
+    "industry_csrc"
+  ],
+  "content_hash": "39038a03c770d87cec84e78852f85a31e4b78dc8499be20918cfa104d485b1b1",
+  "size_bytes": 66494,
+  "kind": "universe",
+  "source_id": "sse.szse.listing",
+  "publisher": "上海证券交易所 / 深圳证券交易所",
+  "interface": "股票列表",
+  "url": "https://query.sse.com.cn/；https://www.szse.cn/",
+  "fetched_at": "2026-11-12T20:33:36+08:00",
+  "definition_note": "当前沪深 A 股；上市日期、板块、简称；ST 按简称识别。"
+}

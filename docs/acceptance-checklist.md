@@ -289,3 +289,22 @@
 | Q6 | 名称识别三种情形各有测试（创业板指 / 创业板歧义 / 创业板50 范围外） | `engine/identity/resolver.py`、`data/registry/instruments.json` | `test_name_resolution_three_cases`、`test_cli_bare_board_needs_clarification` | ✅ |
 | Q7 | 前三只指数、个股结论、结论账本、ETF 既有结果不变；全部测试通过 | 既有模块未改口径 | `test_existing_three_indices_unchanged`；个股 7 条账本不变；**497 passed** | ✅ |
 | Q8 | DELIVERY.md 汇总、复现命令、测试结果、提交 ID | `DELIVERY.md` | 入口文件 §1–§9 | ✅ |
+
+---
+
+# 第四阶段第四批验收清单（好公司池，G1–G9）
+
+对应文件：`batch4d-quality-pool-instructions.md` 冻结验收条件。范围：数据可行性优先、财务覆盖率 95% 门槛、
+规则版本化、缺数据不默认通过、固定快照可重放、报告 7 项、两本新账本、不改既有结论。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| G1 | 可行性报告逐项给出来源、覆盖率、起止；按 95% 门槛执行停或继续 | `docs/phase4d-quality-pool-feasibility.md`、`data/coverage/quality-pool-feasibility.json`、`tools/build_quality_pool_data.py --probe-only` | 财务 99.45%（3,234/3,252），gate_passed=true；审计/处罚/质押不可得逐项列探针 | ✅ |
+| G2 | 规则在版本化文件中，每个参数带依据；代码无散落数字；每条条件有边界测试 | `data/policies/quality-pool-v1-draft.json`、`engine/quality/{policy,evaluator,metrics}.py` | `test_roe_average_exact_threshold_passes`、`test_roe_average_just_below_threshold_fails`、`test_roe_consistency_boundary`、`test_roe_recent_boundary`、`test_cash_conversion_boundary`、`test_free_cash_flow_must_be_strictly_positive`、`test_loss_year_fails`、`test_net_debt_to_ebitda_strict_boundary`、`test_dividend_payout_boundary` | ✅ |
+| G3 | 缺数据规则按第一部分执行，有测试证明缺数据不会默认通过 | `engine/quality/metrics.py`、`evaluator.py`、政策 `missing_data` | `test_missing_year_does_not_default_pass`、`test_missing_field_does_not_default_pass`、`test_financial_condition_is_untested_not_passed`；缺年报 fail、缺字段 pending、未检验单列 | ✅ |
+| G4 | 全市场快照可重放：同快照重跑结果逐家相同 | `engine/quality/{snapshot,build}.py`、`data/quality-pool/snapshot-qps-e6fd0031c30f1e01/` | `test_same_snapshot_replays_identically`、`test_snapshot_directory_round_trip_and_tamper_detection`；表级哈希校验 | ✅ |
+| G5 | 报告含第二部分 C 的 7 项 | `docs/phase4d-quality-pool-report.md`、`data/quality-pool/report.json` | §1 首页、§2 入池 144、§3 只差一条 108、§4 漏斗、§5 敏感性、§6 30 只、§7 行业 | ✅ |
+| G6 | 我抽查的公司成绩单可由快照独立复算 | `tools/run_quality_pool.py --show <code>` | 从 `*.csv.gz` 原始表重算逐年 ROE/现金流/分红；示例 600519 | ✅ |
+| G7 | 入池账本与官方估值记录只追加、重复跳过、篡改可检出 | `tools/run_quality_pool.py`、`tools/update_official_valuation_ledger.py`、`data/ledger/*.jsonl` | `test_pool_ledger_append_skip_conflict_and_tamper`、`test_official_valuation_ledger_hash_and_tamper`；`--check` 各 0 问题 | ✅ |
+| G8 | 个股结论、两本既有账本、指数与 ETF 结果不变；全部测试通过 | 既有模块未改口径 | 个股 7 条、候选 A 3 条 0 问题；快照/序列/回测未改；**524 passed** | ✅ |
+| G9 | DELIVERY.md 汇总、复现命令、测试结果、提交 ID | `DELIVERY.md`、`docs/phase4d-delivery.md` | 入口 §1–§9；实现提交见 DELIVERY | ✅ |

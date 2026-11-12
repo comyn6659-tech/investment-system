@@ -1,0 +1,25 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "pledge",
+  "file": "pledge.csv.gz",
+  "rows": 2246,
+  "columns": [
+    "code",
+    "name",
+    "trade_date",
+    "pledge_ratio",
+    "pledge_shares",
+    "pledge_deals",
+    "industry"
+  ],
+  "content_hash": "eadc30714b5569c63fdd309dafefcf559581a6d52e143ac8a5acf08268579305",
+  "size_bytes": 44939,
+  "kind": "pledge",
+  "trade_date": "2026-11-06",
+  "source_id": "eastmoney.pledge.company_level",
+  "publisher": "东方财富（转中国结算）",
+  "interface": "RPT_CSDC_LIST 上市公司质押比例",
+  "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+  "fetched_at": "2026-11-12T21:20:54+08:00",
+  "definition_note": "公司整体质押比例（质押股数/总股本）；不是控股股东质押比例，不参与规则。"
+}

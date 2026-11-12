@@ -5,7 +5,7 @@ A 股个股 / 境内 A 股宽基指数 / 境内普通被动 ETF 的分析引擎�
 建设方式：独立新项目，从零搭建，不读取、不导入、不依赖旧项目
 `../valuation/` 的代码、缓存或投资政策。旧目录仅作可选的只读查证资料。
 
-**当前阶段：第四阶段第三批（创业板指 399006 接入；官方历史估值不可得，只做收盘/全收益/当前快照/ETF）。**
+**当前阶段：第四阶段第四批（好公司池：数据可行性 + 规则草案试运行；入池 144 家，规则未批准）。**
 
 - 阶段一：身份、结果契约、固定快照与数据可用性调查（已签收 `5c4c1c9`）。
 - 阶段二：三条个股研究路线（FCFF / 股息折现 / 银行专用），全部 `research`
@@ -14,9 +14,10 @@ A 股个股 / 境内 A 股宽基指数 / 境内普通被动 ETF 的分析引擎�
   见 [docs/phase3-delivery.md](docs/phase3-delivery.md)、
   [docs/index-profile-spec.md](docs/index-profile-spec.md)、
   [docs/phase3-samples.md](docs/phase3-samples.md)。
-- 阶段四：个股政策 v1.1 正式结论（第二批）；创业板指接入（第三批，官方历史估值不可得）。
-  见 [docs/phase4b-delivery.md](docs/phase4b-delivery.md)、
-  [docs/phase4c-delivery.md](docs/phase4c-delivery.md)。
+- 阶段四：个股政策 v1.1 正式结论（第二批）；创业板指接入（第三批，官方历史估值不可得）；
+  好公司池草案试运行（第四批）。见 [docs/phase4b-delivery.md](docs/phase4b-delivery.md)、
+  [docs/phase4c-delivery.md](docs/phase4c-delivery.md)、
+  [docs/phase4d-delivery.md](docs/phase4d-delivery.md)。
 
 **交付入口：[DELIVERY.md](DELIVERY.md)。**
 

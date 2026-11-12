@@ -1,0 +1,32 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "balance-2015",
+  "file": "balance-2015.csv.gz",
+  "rows": 4311,
+  "columns": [
+    "SECUCODE",
+    "SECURITY_CODE",
+    "SECURITY_NAME_ABBR",
+    "NOTICE_DATE",
+    "REPORT_DATE",
+    "TOTAL_PARENT_EQUITY",
+    "TOTAL_EQUITY",
+    "MONETARYFUNDS",
+    "SHORT_LOAN",
+    "NONCURRENT_LIAB_1YEAR",
+    "LONG_LOAN",
+    "BOND_PAYABLE",
+    "LEASE_LIAB",
+    "TOTAL_ASSETS"
+  ],
+  "content_hash": "f9b2640f7e084fcbdb23946d37bb383c3e36972ba8a22cdd2b27d5f968accf29",
+  "size_bytes": 231420,
+  "kind": "balance",
+  "report_date": "2015-12-31",
+  "source_id": "eastmoney.f10.balance",
+  "publisher": "东方财富",
+  "interface": "RPT_F10_FINANCE_GBALANCE",
+  "url": "https://datacenter.eastmoney.com/securities/api/data/v1/get",
+  "fetched_at": "2026-11-12T20:35:18+08:00",
+  "definition_note": "合并报表；金额单位元；按报告期一次取全市场。"
+}

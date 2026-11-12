@@ -69,3 +69,57 @@
 | `recorded_at` | 追加时刻（不参与哈希） |
 
 2026-11-12 首次运行写入 7 条（海天、双汇、美的、茅台、宁德、恒瑞、中国移动）。
+
+---
+
+# 好公司池账本（只追加）
+
+文件：`quality-pool.jsonl`（JSON Lines，一行一条记录）。
+
+## 规则
+
+- 只追加：已有记录不得修改或删除；`record_id` 是记录内容（不含 `recorded_at`）的哈希，
+  `pool_hash` 是入池名单（按代码排序后逗号连接）的哈希；任一被改写都会被 `--check` 检出。
+- 同一 `as_of` + 同一 `policy_id` + 同一 `snapshot_id` 只允许一条：
+  内容一致 → 跳过；内容不同 → 冲突并退出。
+- 入池名单是规则试运行结果，不代表买入建议；规则仍为未批准草案。
+
+## 字段
+
+| 字段 | 含义 |
+|---|---|
+| `as_of` | 快照截止日 |
+| `policy_id` / `policy_digest` | 规则版本与内容哈希 |
+| `snapshot_id` | 所用固定快照 |
+| `counts` | 入池/未入池/待定/范围外数量 |
+| `pool_codes` / `pool_hash` | 入池名单与名单哈希 |
+| `record_id` | 记录内容哈希（不含 `recorded_at`） |
+| `recorded_at` | 追加时刻（不参与哈希） |
+
+命令：`.venv/bin/python tools/run_quality_pool.py --check`。
+
+---
+
+# 官方指数当日估值账本（只追加，不参与计算）
+
+文件：`official-valuation-daily.jsonl`（JSON Lines，一行一条“日期 × 指数”）。
+
+## 规则
+
+- 只追加；同一 `date` + `index_code` 只允许一条，内容一致跳过，不同则冲突。
+- 记录官方 PE（滚动，能确认时）与 PB（有则记）；取不到 PB 时写 `null` 并注明来源原因。
+- 不参与任何估值、分位、信号或结论计算；用途是给创业板指将来做分位积累同源历史。
+
+## 字段
+
+| 字段 | 含义 |
+|---|---|
+| `date` / `index_code` / `index_name` | 估值所属交易日与指数 |
+| `pe` / `pe_field` / `pe_definition` | 官方 PE 值、原字段名与口径说明 |
+| `pe_static` | 国证指数静态 PE（仅创业板指有） |
+| `pb` / `pb_note` | 官方 PB（有则记）与缺失原因 |
+| `source_id` / `source_url` | 官方来源 |
+| `record_id` | 内容哈希（不含 `recorded_at`） |
+| `recorded_at` | 追加时刻（不参与哈希） |
+
+命令：`.venv/bin/python tools/update_official_valuation_ledger.py --check`。

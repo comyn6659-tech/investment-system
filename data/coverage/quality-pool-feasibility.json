@@ -1,0 +1,352 @@
+{
+  "schema_version": "quality-pool-feasibility/1",
+  "as_of": "2026-11-12",
+  "fetched_at": "2026-11-12T21:09:07+08:00",
+  "window": {
+    "start_fy": 2016,
+    "end_fy": 2025,
+    "min_years": 7,
+    "window_years": 10
+  },
+  "universe": {
+    "total": 5225,
+    "by_exchange": {
+      "SZ": 2906,
+      "SH": 2319
+    },
+    "st": 193,
+    "financial": 123,
+    "short_history": 1658,
+    "evaluated": 3252
+  },
+  "financial": {
+    "interface": "东方财富 datacenter F10 合并报表按报告期批量接口（RPT_F10_FINANCE_GBALANCE / GINCOME / GCASHFLOW）",
+    "years": {
+      "balance": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "income": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "cashflow": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ]
+    },
+    "statement_rows": {
+      "balance_2015": 4311,
+      "balance_2016": 4585,
+      "balance_2017": 4914,
+      "balance_2018": 5207,
+      "balance_2019": 5357,
+      "balance_2020": 5380,
+      "balance_2021": 5372,
+      "balance_2022": 5416,
+      "balance_2023": 5392,
+      "balance_2024": 5369,
+      "balance_2025": 5346,
+      "income_2016": 4686,
+      "income_2017": 5014,
+      "income_2018": 5308,
+      "income_2019": 5458,
+      "income_2020": 5481,
+      "income_2021": 5473,
+      "income_2022": 5517,
+      "income_2023": 5492,
+      "income_2024": 5467,
+      "income_2025": 5445,
+      "cashflow_2016": 4584,
+      "cashflow_2017": 4912,
+      "cashflow_2018": 5206,
+      "cashflow_2019": 5356,
+      "cashflow_2020": 5380,
+      "cashflow_2021": 5372,
+      "cashflow_2022": 5416,
+      "cashflow_2023": 5391,
+      "cashflow_2024": 5368,
+      "cashflow_2025": 5346
+    },
+    "core_fields": {
+      "balance": [
+        "TOTAL_PARENT_EQUITY",
+        "MONETARYFUNDS"
+      ],
+      "income": [
+        "PARENT_NETPROFIT"
+      ],
+      "cashflow": [
+        "NETCASH_OPERATE",
+        "CONSTRUCT_LONG_ASSET"
+      ]
+    },
+    "complete_companies": 3234,
+    "coverage": 0.9944649446494465,
+    "threshold": 0.95,
+    "gate_passed": true,
+    "by_year": {
+      "2016": {
+        "expected": 2562,
+        "complete": 2561,
+        "coverage": 0.9996096799375488
+      },
+      "2017": {
+        "expected": 2977,
+        "complete": 2975,
+        "coverage": 0.9993281827342962
+      },
+      "2018": {
+        "expected": 3069,
+        "complete": 3064,
+        "coverage": 0.9983708048224177
+      },
+      "2019": {
+        "expected": 3252,
+        "complete": 3248,
+        "coverage": 0.998769987699877
+      },
+      "2020": {
+        "expected": 3636,
+        "complete": 3633,
+        "coverage": 0.9991749174917491
+      },
+      "2021": {
+        "expected": 4107,
+        "complete": 4106,
+        "coverage": 0.9997565132700268
+      },
+      "2022": {
+        "expected": 4442,
+        "complete": 4441,
+        "coverage": 0.9997748761819001
+      },
+      "2023": {
+        "expected": 4677,
+        "complete": 4677,
+        "coverage": 1.0
+      },
+      "2024": {
+        "expected": 4754,
+        "complete": 4753,
+        "coverage": 0.9997896508203618
+      },
+      "2025": {
+        "expected": 4844,
+        "complete": 4842,
+        "coverage": 0.999587118084228
+      }
+    },
+    "incomplete_examples": [
+      {
+        "code": "000670",
+        "name": "盈方微",
+        "years": [
+          2019
+        ]
+      },
+      {
+        "code": "000691",
+        "name": "亚太实业",
+        "years": [
+          2018
+        ]
+      },
+      {
+        "code": "000802",
+        "name": "北京文化",
+        "years": [
+          2021,
+          2024
+        ]
+      },
+      {
+        "code": "000820",
+        "name": "神雾节能",
+        "years": [
+          2020
+        ]
+      },
+      {
+        "code": "000953",
+        "name": "中哲精化",
+        "years": [
+          2019
+        ]
+      },
+      {
+        "code": "002072",
+        "name": "凯瑞德",
+        "years": [
+          2019,
+          2020
+        ]
+      },
+      {
+        "code": "002731",
+        "name": "萃华退",
+        "years": [
+          2025
+        ]
+      },
+      {
+        "code": "300270",
+        "name": "中威电子",
+        "years": [
+          2020
+        ]
+      },
+      {
+        "code": "600106",
+        "name": "重庆路桥",
+        "years": [
+          2018
+        ]
+      },
+      {
+        "code": "600137",
+        "name": "浪莎股份",
+        "years": [
+          2016
+        ]
+      },
+      {
+        "code": "600191",
+        "name": "华资实业",
+        "years": [
+          2018
+        ]
+      },
+      {
+        "code": "600301",
+        "name": "华锡有色",
+        "years": [
+          2019
+        ]
+      },
+      {
+        "code": "600610",
+        "name": "中毅达",
+        "years": [
+          2018
+        ]
+      },
+      {
+        "code": "600725",
+        "name": "云维股份",
+        "years": [
+          2017
+        ]
+      },
+      {
+        "code": "600817",
+        "name": "宇通重工",
+        "years": [
+          2018
+        ]
+      },
+      {
+        "code": "601005",
+        "name": "重庆钢铁",
+        "years": [
+          2017
+        ]
+      },
+      {
+        "code": "603466",
+        "name": "风语筑",
+        "years": [
+          2025
+        ]
+      },
+      {
+        "code": "603991",
+        "name": "领先股份",
+        "years": [
+          2022
+        ]
+      }
+    ]
+  },
+  "governance": {
+    "audit_opinion": {
+      "available": false,
+      "probes": [
+        "akshare 1.20.35 无审计意见函数",
+        "东方财富 RPT_AUDIT_OPINION / RPT_AUDIT_OPINION_DETAIL / RPT_F10_FINANCE_AUDIT → 报表配置不存在",
+        "巨潮资讯公告接口只有公告标题，不含逐家公司逐年审计意见类型"
+      ],
+      "reason": "没有覆盖全市场、可批量重放的审计意见接口；不从报表字段推断。",
+      "condition_status": "本版未检验"
+    },
+    "penalties": {
+      "available": false,
+      "probes": [
+        "东方财富 RPT_VIOLATION / RPT_PUNISHMENT / RPT_INVESTIGATION 等 → 报表配置不存在",
+        "证监会行政处罚 JSON feed 只覆盖近期且不含交易所公开谴责，无法覆盖最近 5 年全市场",
+        "不采用第三方违规处理数据库拼接"
+      ],
+      "reason": "证监会/交易所处罚、立案、公开谴责没有全市场批量接口；不拼接新闻或第三方数据库。",
+      "condition_status": "本版未检验"
+    },
+    "controlling_shareholder_pledge": {
+      "available": false,
+      "probes": [
+        "东方财富 RPT_CSDC_LIST → 公司整体质押比例（质押股数/总股本）",
+        "东方财富 RPTA_APP_ACCUMDETAILS → 单笔质押明细，不是控股股东最新余额",
+        "没有全市场「控股股东质押股份 ÷ 其所持股份」的批量字段"
+      ],
+      "reason": "公开批量接口只有公司整体质押比例，没有控股股东质押比例；口径不同，不替代。",
+      "company_level_pledge_rows": 2246,
+      "condition_status": "本版未检验"
+    },
+    "dividends": {
+      "available": true,
+      "periods": [
+        "2021-06-30 / 2021-12-31",
+        "2022-06-30 / 2022-12-31",
+        "2023-06-30 / 2023-12-31",
+        "2024-06-30 / 2024-12-31",
+        "2025-06-30 / 2025-12-31"
+      ],
+      "rows": 19014,
+      "codes": 4417,
+      "years": [
+        "2021",
+        "2022",
+        "2023",
+        "2024",
+        "2025"
+      ],
+      "note": "按财年归集中期与年度现金分红；没有分红方案的公司记 0，不记缺失。"
+    },
+    "industry_rows": 5260
+  },
+  "decision": "continue",
+  "decision_note": "财务覆盖率 ≥ 95%，按施工单继续构建全市场快照与规则试运行。"
+}

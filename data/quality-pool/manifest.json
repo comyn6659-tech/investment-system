@@ -1,0 +1,10 @@
+{
+  "current": "snapshot-qps-e6fd0031c30f1e01",
+  "snapshot_id": "qps-e6fd0031c30f1e01",
+  "content_hash": "e6fd0031c30f1e012dd3127bf08e3a510347b98b1042e823a32da245c444969b",
+  "as_of": "2026-11-12",
+  "companies": 5225,
+  "tables": 44,
+  "total_bytes": 9748403,
+  "written_at": "2026-11-12T21:25:49+08:00"
+}

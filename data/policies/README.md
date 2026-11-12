@@ -5,6 +5,7 @@
 | `equity-policy-v1.1.json` | `equity-policy-v1.1` | `approved` | **当前正式政策**：股东决策②于 2026-11-12 批准；参数与 v1.1 草案逐项相同 |
 | `equity-policy-v1.1-draft.json` | `equity-policy-v1.1-draft` | `draft_unapproved` | 个股政策 v1.1 草案：按审查 F1–F14 的 R1–R14 修订；保留作对照 |
 | `equity-policy-v1-draft.json` | `equity-policy-v1-draft` | `draft_unapproved` | v1 草案，保留作对照，不删除；v1.1 的 `supersedes` 指向它 |
+| `quality-pool-v1-draft.json` | `quality-pool-v1-draft` | `draft_unapproved` | 好公司池规则 v1 草案：4 组 11 条条件；只试运行，未批准 |
 
 ## v1.1 相对 v1 的修订（R1–R14）
 
@@ -37,3 +38,11 @@ v1 对照结果：`data/policy-trial/trial-report-v1.json`。
 
 正式结论：`docs/phase4b-equity-conclusions.md`；结论账本：`data/ledger/equity-conclusions.jsonl`。
 批准日期 2026-11-12，首次复核 2027-05-31；任何规则修改须重新批准。
+
+
+## 好公司池政策（`quality-pool-v1-draft`）
+
+- 只用于 `tools/run_quality_pool.py` 的试运行报告与入池账本，不进入个股 CLI；
+- 每个参数带 `basis` / `source`；`approved` 必须为 `false`，测试拒绝自我批准；
+- 缺数据规则：全市场不可得 → 未检验；个别公司缺字段 → 待定；缺年报 → 不通过；
+- 修改任何阈值须经股东批准（决策③），本版不因入池数量调整阈值。
