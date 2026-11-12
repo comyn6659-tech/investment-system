@@ -178,6 +178,7 @@ class Company:
     ownership_holder: str | None = None
     ownership_basis: str | None = None
     ownership_source: str | None = None
+    bank_reports: tuple[Mapping[str, Any], ...] = ()
 
     @property
     def window_years(self) -> tuple[int, ...]:
@@ -220,6 +221,7 @@ class Company:
             "ownership_holder": self.ownership_holder,
             "ownership_basis": self.ownership_basis,
             "ownership_source": self.ownership_source,
+            "bank_reports": [dict(item) for item in self.bank_reports],
         }
 
     @classmethod
@@ -272,6 +274,7 @@ class Company:
             ownership_holder=payload.get("ownership_holder"),
             ownership_basis=payload.get("ownership_basis"),
             ownership_source=payload.get("ownership_source"),
+            bank_reports=tuple(payload.get("bank_reports") or ()),
         )
 
 

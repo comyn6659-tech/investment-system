@@ -1,0 +1,23 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "bank-profile",
+  "file": "bank-profile.csv.gz",
+  "rows": 42,
+  "columns": [
+    "code",
+    "name",
+    "total_shares",
+    "total_assets_2025",
+    "source_id",
+    "source_url",
+    "fetched_at"
+  ],
+  "content_hash": "cc0e11d6a96569f8381fce2f03786ebd36c232e4af209e3666a0f7b71ab02557",
+  "size_bytes": 1059,
+  "kind": "bank_profile",
+  "source_id": "eastmoney.f10.capital_structure",
+  "publisher": "东方财富",
+  "interface": "CapitalStockStructure TOTAL_SHARES + 2025 资产负债表 TOTAL_ASSETS",
+  "url": "https://emweb.securities.eastmoney.com/PC_HSF10/CapitalStockStructure/PageAjax",
+  "definition_note": "总股本用于预演估值换算每股；总资产只用于预演中风险加权资产的研究假设。"
+}

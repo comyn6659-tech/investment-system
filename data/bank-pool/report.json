@@ -1,0 +1,1565 @@
+{
+  "meta": {
+    "as_of": "2026-11-12",
+    "policy_id": "bank-pool-v1-draft",
+    "policy_digest": "94e1037cf581a83d938fdd376ae59835b89a002d17dfdcebd3c384bb74356735",
+    "policy_status": "draft_unapproved",
+    "approved": false,
+    "snapshot_id": "qps-dc9c12160476db8b",
+    "generated_at": "2026-11-13T03:38:53+08:00",
+    "window": {
+      "start_fy": 2016,
+      "end_fy": 2025,
+      "min_years": 7,
+      "window_years": 10
+    },
+    "warning": "规则为未批准草案；入池只说明历史公开数据符合规则，不说明现在便宜，也不构成买入建议。"
+  },
+  "counts": {
+    "total": 5225,
+    "in_pool": 11,
+    "not_in_pool": 25,
+    "pending": 0,
+    "out_of_scope": 5189,
+    "out_of_scope_breakdown": {
+      "NON_BANK": 4990,
+      "ST": 193,
+      "SHORT_HISTORY": 6
+    }
+  },
+  "untested_conditions": [],
+  "in_pool": [
+    {
+      "code": "002839",
+      "name": "张家港行",
+      "board": "主板",
+      "industry": "银行Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 9,
+      "available_years": 9,
+      "roe_average": 10.393333333333334,
+      "roe_recent_average": 11.020000000000001,
+      "loss_years": 0,
+      "npl_ratio": 0.93,
+      "npl_change_5y": -0.009999999999999898,
+      "provision_coverage": 307.01,
+      "core_tier1_ratio": 11.05,
+      "net_interest_margin": 1.36,
+      "dividend_missing_years": 0,
+      "dividend_payout": 0.2530334859804209,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "ownership": "民企",
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "condition_status": {
+        "loss_years": "pass",
+        "roe_average": "pass",
+        "roe_recent": "pass",
+        "npl_ratio": "pass",
+        "npl_change": "pass",
+        "provision_coverage": "pass",
+        "core_tier1": "pass",
+        "dividend_every_year": "pass",
+        "dividend_payout": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass"
+      }
+    },
+    {
+      "code": "002966",
+      "name": "苏州银行",
+      "board": "主板",
+      "industry": "银行Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 7,
+      "available_years": 7,
+      "roe_average": 10.661428571428571,
+      "roe_recent_average": 11.446666666666667,
+      "loss_years": 0,
+      "npl_ratio": 0.81,
+      "npl_change_5y": -0.3599999999999999,
+      "provision_coverage": 370.73,
+      "core_tier1_ratio": 9.39,
+      "net_interest_margin": 1.4,
+      "dividend_missing_years": 0,
+      "dividend_payout": 0.27569606469627683,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "ownership": "地方国企",
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "condition_status": {
+        "loss_years": "pass",
+        "roe_average": "pass",
+        "roe_recent": "pass",
+        "npl_ratio": "pass",
+        "npl_change": "pass",
+        "provision_coverage": "pass",
+        "core_tier1": "pass",
+        "dividend_every_year": "pass",
+        "dividend_payout": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass"
+      }
+    },
+    {
+      "code": "600036",
+      "name": "招商银行",
+      "board": "主板",
+      "industry": "银行Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 16.012,
+      "roe_recent_average": 14.716666666666667,
+      "loss_years": 0,
+      "npl_ratio": 0.94,
+      "npl_change_5y": 0.009999999999999898,
+      "provision_coverage": 389.39,
+      "core_tier1_ratio": 14.39,
+      "net_interest_margin": 1.82,
+      "dividend_missing_years": 0,
+      "dividend_payout": 0.33171736364548265,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "ownership": "央企",
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "condition_status": {
+        "loss_years": "pass",
+        "roe_average": "pass",
+        "roe_recent": "pass",
+        "npl_ratio": "pass",
+        "npl_change": "pass",
+        "provision_coverage": "pass",
+        "core_tier1": "pass",
+        "dividend_every_year": "pass",
+        "dividend_payout": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass"
+      }
+    },
+    {
+      "code": "601009",
+      "name": "南京银行",
+      "board": "主板",
+      "industry": "银行Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 14.911000000000001,
+      "roe_recent_average": 12.713333333333333,
+      "loss_years": 0,
+      "npl_ratio": 0.83,
+      "npl_change_5y": -0.08000000000000007,
+      "provision_coverage": 321.15,
+      "core_tier1_ratio": 9.49,
+      "net_interest_margin": 1.79,
+      "dividend_missing_years": 0,
+      "dividend_payout": 0.3000293729633973,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "ownership": "地方国企",
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "condition_status": {
+        "loss_years": "pass",
+        "roe_average": "pass",
+        "roe_recent": "pass",
+        "npl_ratio": "pass",
+        "npl_change": "pass",
+        "provision_coverage": "pass",
+        "core_tier1": "pass",
+        "dividend_every_year": "pass",
+        "dividend_payout": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass"
+      }
+    },
+    {
+      "code": "601166",
+      "name": "兴业银行",
+      "board": "主板",
+      "industry": "银行Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 13.100999999999999,
+      "roe_recent_average": 9.893333333333333,
+      "loss_years": 0,
+      "npl_ratio": 1.08,
+      "npl_change_5y": -0.040000000000000036,
+      "provision_coverage": 222.68,
+      "core_tier1_ratio": 9.52,
+      "net_interest_margin": 1.6,
+      "dividend_missing_years": 0,
+      "dividend_payout": 0.27788454508407606,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "ownership": "地方国企",
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "condition_status": {
+        "loss_years": "pass",
+        "roe_average": "pass",
+        "roe_recent": "pass",
+        "npl_ratio": "pass",
+        "npl_change": "pass",
+        "provision_coverage": "pass",
+        "core_tier1": "pass",
+        "dividend_every_year": "pass",
+        "dividend_payout": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass"
+      }
+    },
+    {
+      "code": "601288",
+      "name": "农业银行",
+      "board": "主板",
+      "industry": "银行Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 12.154,
+      "roe_recent_average": 10.51,
+      "loss_years": 0,
+      "npl_ratio": 1.23,
+      "npl_change_5y": -0.25,
+      "provision_coverage": 289.13,
+      "core_tier1_ratio": 10.9,
+      "net_interest_margin": 1.28,
+      "dividend_missing_years": 0,
+      "dividend_payout": 0.30004986756074364,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "ownership": "央企",
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "condition_status": {
+        "loss_years": "pass",
+        "roe_average": "pass",
+        "roe_recent": "pass",
+        "npl_ratio": "pass",
+        "npl_change": "pass",
+        "provision_coverage": "pass",
+        "core_tier1": "pass",
+        "dividend_every_year": "pass",
+        "dividend_payout": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass"
+      }
+    },
+    {
+      "code": "601328",
+      "name": "交通银行",
+      "board": "主板",
+      "industry": "银行Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 10.477,
+      "roe_recent_average": 9.046666666666667,
+      "loss_years": 0,
+      "npl_ratio": 1.29,
+      "npl_change_5y": -0.31000000000000005,
+      "provision_coverage": 200.11,
+      "core_tier1_ratio": 11.35,
+      "net_interest_margin": 1.24,
+      "dividend_missing_years": 0,
+      "dividend_payout": 0.30057056062488346,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "ownership": "央企",
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "condition_status": {
+        "loss_years": "pass",
+        "roe_average": "pass",
+        "roe_recent": "pass",
+        "npl_ratio": "pass",
+        "npl_change": "pass",
+        "provision_coverage": "pass",
+        "core_tier1": "pass",
+        "dividend_every_year": "pass",
+        "dividend_payout": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass"
+      }
+    },
+    {
+      "code": "601398",
+      "name": "工商银行",
+      "board": "主板",
+      "industry": "银行Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 12.197,
+      "roe_recent_average": 9.996666666666668,
+      "loss_years": 0,
+      "npl_ratio": 1.29,
+      "npl_change_5y": -0.22999999999999998,
+      "provision_coverage": 211.64,
+      "core_tier1_ratio": 13.07,
+      "net_interest_margin": 1.29,
+      "dividend_missing_years": 0,
+      "dividend_payout": 0.2999478508408228,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "ownership": "央企",
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "condition_status": {
+        "loss_years": "pass",
+        "roe_average": "pass",
+        "roe_recent": "pass",
+        "npl_ratio": "pass",
+        "npl_change": "pass",
+        "provision_coverage": "pass",
+        "core_tier1": "pass",
+        "dividend_every_year": "pass",
+        "dividend_payout": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass"
+      }
+    },
+    {
+      "code": "601658",
+      "name": "邮储银行",
+      "board": "主板",
+      "industry": "银行Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 7,
+      "available_years": 7,
+      "roe_average": 11.15,
+      "roe_recent_average": 9.786666666666667,
+      "loss_years": 0,
+      "npl_ratio": 0.99,
+      "npl_change_5y": 0.17000000000000004,
+      "provision_coverage": 204.74,
+      "core_tier1_ratio": 10.21,
+      "net_interest_margin": 1.6,
+      "dividend_missing_years": 0,
+      "dividend_payout": 0.3000086908706256,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "ownership": "央企",
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "condition_status": {
+        "loss_years": "pass",
+        "roe_average": "pass",
+        "roe_recent": "pass",
+        "npl_ratio": "pass",
+        "npl_change": "pass",
+        "provision_coverage": "pass",
+        "core_tier1": "pass",
+        "dividend_every_year": "pass",
+        "dividend_payout": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass"
+      }
+    },
+    {
+      "code": "601939",
+      "name": "建设银行",
+      "board": "主板",
+      "industry": "银行Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 12.672,
+      "roe_recent_average": 10.763333333333334,
+      "loss_years": 0,
+      "npl_ratio": 1.29,
+      "npl_change_5y": -0.21999999999999997,
+      "provision_coverage": 233.21,
+      "core_tier1_ratio": 14.39,
+      "net_interest_margin": 1.36,
+      "dividend_missing_years": 0,
+      "dividend_payout": 0.3002376131571495,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "ownership": "央企",
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "condition_status": {
+        "loss_years": "pass",
+        "roe_average": "pass",
+        "roe_recent": "pass",
+        "npl_ratio": "pass",
+        "npl_change": "pass",
+        "provision_coverage": "pass",
+        "core_tier1": "pass",
+        "dividend_every_year": "pass",
+        "dividend_payout": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass"
+      }
+    },
+    {
+      "code": "601998",
+      "name": "中信银行",
+      "board": "主板",
+      "industry": "银行Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "window_years": 10,
+      "available_years": 10,
+      "roe_average": 10.833,
+      "roe_recent_average": 9.993333333333334,
+      "loss_years": 0,
+      "npl_ratio": 1.15,
+      "npl_change_5y": -0.33000000000000007,
+      "provision_coverage": 201.94,
+      "core_tier1_ratio": 9.43,
+      "net_interest_margin": 1.6,
+      "dividend_missing_years": 0,
+      "dividend_payout": 0.2746574799378665,
+      "audit_nonstandard_years": 0,
+      "penalty_count": 0,
+      "pledge_ratio": 0.0,
+      "ownership": "央企",
+      "failing_conditions": [],
+      "pending_conditions": [],
+      "condition_status": {
+        "loss_years": "pass",
+        "roe_average": "pass",
+        "roe_recent": "pass",
+        "npl_ratio": "pass",
+        "npl_change": "pass",
+        "provision_coverage": "pass",
+        "core_tier1": "pass",
+        "dividend_every_year": "pass",
+        "dividend_payout": "pass",
+        "audit_opinion": "pass",
+        "no_penalty": "pass",
+        "pledge_ratio": "pass"
+      }
+    }
+  ],
+  "near_misses": [
+    {
+      "code": "601077",
+      "name": "渝农商行",
+      "industry": "银行Ⅱ",
+      "condition_id": "roe_average",
+      "label": "窗口内 ROE 平均值",
+      "value": 9.967142857142857,
+      "threshold": 10.0,
+      "distance_abs": -0.03285714285714292,
+      "distance_rel": -0.003285714285714292,
+      "unit": "percent",
+      "reason": "观测值 9.97%，要求 ≥ 10.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "601988",
+      "name": "中国银行",
+      "industry": "银行Ⅱ",
+      "condition_id": "provision_coverage",
+      "label": "最新拨备覆盖率",
+      "value": 198.3,
+      "threshold": 200.0,
+      "distance_abs": -1.6999999999999886,
+      "distance_rel": -0.008499999999999943,
+      "unit": "percent",
+      "reason": "观测值 198.30%，要求 ≥ 200.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "601838",
+      "name": "成都银行",
+      "industry": "银行Ⅱ",
+      "condition_id": "core_tier1",
+      "label": "最新核心一级资本充足率",
+      "value": 8.85,
+      "threshold": 9.0,
+      "distance_abs": -0.15000000000000036,
+      "distance_rel": -0.016666666666666705,
+      "unit": "percent",
+      "reason": "观测值 8.85%，要求 ≥ 9.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "002948",
+      "name": "青岛银行",
+      "industry": "银行Ⅱ",
+      "condition_id": "core_tier1",
+      "label": "最新核心一级资本充足率",
+      "value": 8.76,
+      "threshold": 9.0,
+      "distance_abs": -0.2400000000000002,
+      "distance_rel": -0.02666666666666669,
+      "unit": "percent",
+      "reason": "观测值 8.76%，要求 ≥ 9.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "600919",
+      "name": "江苏银行",
+      "industry": "银行Ⅱ",
+      "condition_id": "core_tier1",
+      "label": "最新核心一级资本充足率",
+      "value": 8.67,
+      "threshold": 9.0,
+      "distance_abs": -0.33000000000000007,
+      "distance_rel": -0.036666666666666674,
+      "unit": "percent",
+      "reason": "观测值 8.67%，要求 ≥ 9.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "600926",
+      "name": "杭州银行",
+      "industry": "银行Ⅱ",
+      "condition_id": "dividend_payout",
+      "label": "最近 5 年现金分红率",
+      "value": 0.2322152644657615,
+      "threshold": 0.25,
+      "distance_abs": -0.01778473553423851,
+      "distance_rel": -0.07113894213695404,
+      "unit": "ratio",
+      "reason": "观测值 23.22%，要求 ≥ 25.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "002807",
+      "name": "江阴银行",
+      "industry": "银行Ⅱ",
+      "condition_id": "dividend_payout",
+      "label": "最近 5 年现金分红率",
+      "value": 0.22983052491255462,
+      "threshold": 0.25,
+      "distance_abs": -0.020169475087445377,
+      "distance_rel": -0.0806779003497815,
+      "unit": "ratio",
+      "reason": "观测值 22.98%，要求 ≥ 25.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "601169",
+      "name": "北京银行",
+      "industry": "银行Ⅱ",
+      "condition_id": "roe_recent",
+      "label": "最近 3 个财年 ROE 平均值",
+      "value": 8.026666666666667,
+      "threshold": 9.0,
+      "distance_abs": -0.9733333333333327,
+      "distance_rel": -0.10814814814814808,
+      "unit": "percent",
+      "reason": "观测值 8.03%，要求 ≥ 9.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "601128",
+      "name": "常熟银行",
+      "industry": "银行Ⅱ",
+      "condition_id": "dividend_payout",
+      "label": "最近 5 年现金分红率",
+      "value": 0.21961307989707457,
+      "threshold": 0.25,
+      "distance_abs": -0.03038692010292543,
+      "distance_rel": -0.12154768041170172,
+      "unit": "ratio",
+      "reason": "观测值 21.96%，要求 ≥ 25.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "000001",
+      "name": "平安银行",
+      "industry": "银行Ⅱ",
+      "condition_id": "dividend_payout",
+      "label": "最近 5 年现金分红率",
+      "value": 0.21941636371805728,
+      "threshold": 0.25,
+      "distance_abs": -0.030583636281942717,
+      "distance_rel": -0.12233454512777087,
+      "unit": "ratio",
+      "reason": "观测值 21.94%，要求 ≥ 25.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "600908",
+      "name": "无锡银行",
+      "industry": "银行Ⅱ",
+      "condition_id": "dividend_payout",
+      "label": "最近 5 年现金分红率",
+      "value": 0.2140415092426,
+      "threshold": 0.25,
+      "distance_abs": -0.03595849075740001,
+      "distance_rel": -0.14383396302960005,
+      "unit": "ratio",
+      "reason": "观测值 21.40%，要求 ≥ 25.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "601577",
+      "name": "长沙银行",
+      "industry": "银行Ⅱ",
+      "condition_id": "dividend_payout",
+      "label": "最近 5 年现金分红率",
+      "value": 0.21257243763078318,
+      "threshold": 0.25,
+      "distance_abs": -0.03742756236921682,
+      "distance_rel": -0.14971024947686729,
+      "unit": "ratio",
+      "reason": "观测值 21.26%，要求 ≥ 25.00%，未通过",
+      "untested_count": 0
+    },
+    {
+      "code": "002142",
+      "name": "宁波银行",
+      "industry": "银行Ⅱ",
+      "condition_id": "dividend_payout",
+      "label": "最近 5 年现金分红率",
+      "value": 0.19606861021377672,
+      "threshold": 0.25,
+      "distance_abs": -0.05393138978622328,
+      "distance_rel": -0.2157255591448931,
+      "unit": "ratio",
+      "reason": "观测值 19.61%，要求 ≥ 25.00%，未通过",
+      "untested_count": 0
+    }
+  ],
+  "funnel": [
+    {
+      "condition_id": "loss_years",
+      "group_id": "profitability",
+      "label": "窗口内亏损年数",
+      "untested": false,
+      "independent_fail_count": 0,
+      "sequential_eliminated": 0,
+      "sequential_pending": 0,
+      "remaining_after": 36
+    },
+    {
+      "condition_id": "roe_average",
+      "group_id": "profitability",
+      "label": "窗口内 ROE 平均值",
+      "untested": false,
+      "independent_fail_count": 8,
+      "sequential_eliminated": 8,
+      "sequential_pending": 0,
+      "remaining_after": 28
+    },
+    {
+      "condition_id": "roe_recent",
+      "group_id": "profitability",
+      "label": "最近 3 个财年 ROE 平均值",
+      "untested": false,
+      "independent_fail_count": 11,
+      "sequential_eliminated": 5,
+      "sequential_pending": 0,
+      "remaining_after": 23
+    },
+    {
+      "condition_id": "npl_ratio",
+      "group_id": "asset_quality",
+      "label": "最新不良贷款率",
+      "untested": false,
+      "independent_fail_count": 6,
+      "sequential_eliminated": 1,
+      "sequential_pending": 0,
+      "remaining_after": 22
+    },
+    {
+      "condition_id": "npl_change",
+      "group_id": "asset_quality",
+      "label": "不良贷款率 5 年变化",
+      "untested": false,
+      "independent_fail_count": 2,
+      "sequential_eliminated": 0,
+      "sequential_pending": 0,
+      "remaining_after": 22
+    },
+    {
+      "condition_id": "provision_coverage",
+      "group_id": "asset_quality",
+      "label": "最新拨备覆盖率",
+      "untested": false,
+      "independent_fail_count": 9,
+      "sequential_eliminated": 1,
+      "sequential_pending": 0,
+      "remaining_after": 21
+    },
+    {
+      "condition_id": "core_tier1",
+      "group_id": "capital",
+      "label": "最新核心一级资本充足率",
+      "untested": false,
+      "independent_fail_count": 6,
+      "sequential_eliminated": 3,
+      "sequential_pending": 0,
+      "remaining_after": 18
+    },
+    {
+      "condition_id": "dividend_every_year",
+      "group_id": "dividend",
+      "label": "窗口内每个财年都有现金分红",
+      "untested": false,
+      "independent_fail_count": 3,
+      "sequential_eliminated": 0,
+      "sequential_pending": 0,
+      "remaining_after": 18
+    },
+    {
+      "condition_id": "dividend_payout",
+      "group_id": "dividend",
+      "label": "最近 5 年现金分红率",
+      "untested": false,
+      "independent_fail_count": 16,
+      "sequential_eliminated": 7,
+      "sequential_pending": 0,
+      "remaining_after": 11
+    },
+    {
+      "condition_id": "audit_opinion",
+      "group_id": "governance",
+      "label": "最近 5 年审计意见均为标准无保留",
+      "untested": false,
+      "independent_fail_count": 0,
+      "sequential_eliminated": 0,
+      "sequential_pending": 0,
+      "remaining_after": 11
+    },
+    {
+      "condition_id": "no_penalty",
+      "group_id": "governance",
+      "label": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责",
+      "untested": false,
+      "independent_fail_count": 0,
+      "sequential_eliminated": 0,
+      "sequential_pending": 0,
+      "remaining_after": 11
+    },
+    {
+      "condition_id": "pledge_ratio",
+      "group_id": "governance",
+      "label": "控股股东最新质押比例",
+      "untested": false,
+      "independent_fail_count": 1,
+      "sequential_eliminated": 0,
+      "sequential_pending": 0,
+      "remaining_after": 11
+    }
+  ],
+  "sensitivity": {
+    "npl_ratio_max": {
+      "applicable": true,
+      "values": [
+        {
+          "value": 1.3,
+          "in_pool": 11,
+          "not_in_pool": 25,
+          "pending": 0
+        },
+        {
+          "value": 1.5,
+          "in_pool": 11,
+          "not_in_pool": 25,
+          "pending": 0
+        },
+        {
+          "value": 1.8,
+          "in_pool": 11,
+          "not_in_pool": 25,
+          "pending": 0
+        }
+      ],
+      "note": null
+    },
+    "provision_coverage_min": {
+      "applicable": true,
+      "values": [
+        {
+          "value": 150,
+          "in_pool": 12,
+          "not_in_pool": 24,
+          "pending": 0
+        },
+        {
+          "value": 200,
+          "in_pool": 11,
+          "not_in_pool": 25,
+          "pending": 0
+        },
+        {
+          "value": 250,
+          "in_pool": 5,
+          "not_in_pool": 31,
+          "pending": 0
+        }
+      ],
+      "note": null
+    },
+    "core_tier1_min": {
+      "applicable": true,
+      "values": [
+        {
+          "value": 8.5,
+          "in_pool": 14,
+          "not_in_pool": 22,
+          "pending": 0
+        },
+        {
+          "value": 9.0,
+          "in_pool": 11,
+          "not_in_pool": 25,
+          "pending": 0
+        },
+        {
+          "value": 10.0,
+          "in_pool": 7,
+          "not_in_pool": 29,
+          "pending": 0
+        }
+      ],
+      "note": null
+    }
+  },
+  "test_set": [
+    {
+      "code": "600036",
+      "name": "招商银行",
+      "board": "主板",
+      "industry": "银行Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "conditions": [
+        {
+          "condition_id": "loss_years",
+          "group_id": "profitability",
+          "label": "窗口内亏损年数",
+          "status": "pass",
+          "value": 0.0,
+          "threshold": 0.0,
+          "distance_abs": 0.0,
+          "distance_rel": null,
+          "reason": "观测值 0 年，要求 = 0 年，通过",
+          "missing": [],
+          "unit": "years"
+        },
+        {
+          "condition_id": "roe_average",
+          "group_id": "profitability",
+          "label": "窗口内 ROE 平均值",
+          "status": "pass",
+          "value": 16.012,
+          "threshold": 10.0,
+          "distance_abs": 6.0120000000000005,
+          "distance_rel": 0.6012000000000001,
+          "reason": "观测值 16.01%，要求 ≥ 10.00%，通过",
+          "missing": [],
+          "unit": "percent"
+        },
+        {
+          "condition_id": "roe_recent",
+          "group_id": "profitability",
+          "label": "最近 3 个财年 ROE 平均值",
+          "status": "pass",
+          "value": 14.716666666666667,
+          "threshold": 9.0,
+          "distance_abs": 5.716666666666667,
+          "distance_rel": 0.6351851851851852,
+          "reason": "观测值 14.72%，要求 ≥ 9.00%，通过",
+          "missing": [],
+          "unit": "percent"
+        },
+        {
+          "condition_id": "npl_ratio",
+          "group_id": "asset_quality",
+          "label": "最新不良贷款率",
+          "status": "pass",
+          "value": 0.94,
+          "threshold": 1.5,
+          "distance_abs": 0.56,
+          "distance_rel": 0.37333333333333335,
+          "reason": "观测值 0.94%，要求 ≤ 1.50%，通过",
+          "missing": [],
+          "unit": "percent"
+        },
+        {
+          "condition_id": "npl_change",
+          "group_id": "asset_quality",
+          "label": "不良贷款率 5 年变化",
+          "status": "pass",
+          "value": 0.009999999999999898,
+          "threshold": 0.3,
+          "distance_abs": 0.2900000000000001,
+          "distance_rel": 0.966666666666667,
+          "reason": "观测值 0.01 个百分点，要求 ≤ 0.30 个百分点，通过",
+          "missing": [],
+          "unit": "pp"
+        },
+        {
+          "condition_id": "provision_coverage",
+          "group_id": "asset_quality",
+          "label": "最新拨备覆盖率",
+          "status": "pass",
+          "value": 389.39,
+          "threshold": 200.0,
+          "distance_abs": 189.39,
+          "distance_rel": 0.94695,
+          "reason": "观测值 389.39%，要求 ≥ 200.00%，通过",
+          "missing": [],
+          "unit": "percent"
+        },
+        {
+          "condition_id": "core_tier1",
+          "group_id": "capital",
+          "label": "最新核心一级资本充足率",
+          "status": "pass",
+          "value": 14.39,
+          "threshold": 9.0,
+          "distance_abs": 5.390000000000001,
+          "distance_rel": 0.5988888888888889,
+          "reason": "观测值 14.39%，要求 ≥ 9.00%，通过",
+          "missing": [],
+          "unit": "percent"
+        },
+        {
+          "condition_id": "dividend_every_year",
+          "group_id": "dividend",
+          "label": "窗口内每个财年都有现金分红",
+          "status": "pass",
+          "value": 0.0,
+          "threshold": 0.0,
+          "distance_abs": 0.0,
+          "distance_rel": null,
+          "reason": "观测值 0 年，要求 = 0 年，通过",
+          "missing": [],
+          "unit": "years"
+        },
+        {
+          "condition_id": "dividend_payout",
+          "group_id": "dividend",
+          "label": "最近 5 年现金分红率",
+          "status": "pass",
+          "value": 0.33171736364548265,
+          "threshold": 0.25,
+          "distance_abs": 0.08171736364548265,
+          "distance_rel": 0.3268694545819306,
+          "reason": "观测值 33.17%，要求 ≥ 25.00%，通过",
+          "missing": [],
+          "unit": "ratio"
+        },
+        {
+          "condition_id": "audit_opinion",
+          "group_id": "governance",
+          "label": "最近 5 年审计意见均为标准无保留",
+          "status": "pass",
+          "value": 0.0,
+          "threshold": 0.0,
+          "distance_abs": 0.0,
+          "distance_rel": null,
+          "reason": "观测值 0 年，要求 = 0 年，通过",
+          "missing": [],
+          "unit": "years"
+        },
+        {
+          "condition_id": "no_penalty",
+          "group_id": "governance",
+          "label": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责",
+          "status": "pass",
+          "value": 0.0,
+          "threshold": 0.0,
+          "distance_abs": 0.0,
+          "distance_rel": null,
+          "reason": "观测值 0 件，要求 = 0 件，通过",
+          "missing": [],
+          "unit": "count"
+        },
+        {
+          "condition_id": "pledge_ratio",
+          "group_id": "governance",
+          "label": "控股股东最新质押比例",
+          "status": "pass",
+          "value": 0.0,
+          "threshold": 0.5,
+          "distance_abs": 0.5,
+          "distance_rel": 1.0,
+          "reason": "观测值 0.00%，要求 ≤ 50.00%，通过",
+          "missing": [],
+          "unit": "ratio"
+        }
+      ],
+      "metrics": {
+        "roe_average": {
+          "value": 16.012,
+          "missing": [],
+          "note": "10/10 个财年可计算（加权 ROE）"
+        },
+        "roe_recent_average": {
+          "value": 14.716666666666667,
+          "missing": [],
+          "note": "最近 3 个财年"
+        },
+        "loss_years": {
+          "value": 0,
+          "missing": [],
+          "note": null
+        },
+        "npl_ratio": {
+          "value": 0.94,
+          "missing": [],
+          "note": "2026-09-30 三季报"
+        },
+        "npl_change_5y": {
+          "value": 0.009999999999999898,
+          "missing": [],
+          "note": "2026-09-30 − 2021-09-30"
+        },
+        "provision_coverage": {
+          "value": 389.39,
+          "missing": [],
+          "note": "2026-09-30"
+        },
+        "core_tier1_ratio": {
+          "value": 14.39,
+          "missing": [],
+          "note": "2026-09-30"
+        },
+        "dividend_missing_years": {
+          "value": 0,
+          "missing": [],
+          "note": null
+        },
+        "dividend_payout": {
+          "value": 0.33171736364548265,
+          "missing": [],
+          "note": "现金分红合计 ÷ 归母净利润合计"
+        },
+        "audit_nonstandard_years": {
+          "value": 0,
+          "missing": [],
+          "note": "非标准年份：无"
+        },
+        "penalty_count": {
+          "value": 0,
+          "missing": [],
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
+        },
+        "pledge_ratio": {
+          "value": 0.0,
+          "missing": [],
+          "note": "2026-09-30"
+        },
+        "roe_rows": [
+          {
+            "fiscal_year": 2016,
+            "roe": 16.27
+          },
+          {
+            "fiscal_year": 2017,
+            "roe": 16.54
+          },
+          {
+            "fiscal_year": 2018,
+            "roe": 16.57
+          },
+          {
+            "fiscal_year": 2019,
+            "roe": 16.84
+          },
+          {
+            "fiscal_year": 2020,
+            "roe": 15.73
+          },
+          {
+            "fiscal_year": 2021,
+            "roe": 16.96
+          },
+          {
+            "fiscal_year": 2022,
+            "roe": 17.06
+          },
+          {
+            "fiscal_year": 2023,
+            "roe": 16.22
+          },
+          {
+            "fiscal_year": 2024,
+            "roe": 14.49
+          },
+          {
+            "fiscal_year": 2025,
+            "roe": 13.44
+          }
+        ],
+        "net_interest_margin": 1.82,
+        "dividend_total": 233233132118.048,
+        "dividend_profit_total": 703108000000.0,
+        "ownership": "央企"
+      }
+    },
+    {
+      "code": "601398",
+      "name": "工商银行",
+      "board": "主板",
+      "industry": "银行Ⅱ",
+      "status": "in_pool",
+      "reason": null,
+      "conditions": [
+        {
+          "condition_id": "loss_years",
+          "group_id": "profitability",
+          "label": "窗口内亏损年数",
+          "status": "pass",
+          "value": 0.0,
+          "threshold": 0.0,
+          "distance_abs": 0.0,
+          "distance_rel": null,
+          "reason": "观测值 0 年，要求 = 0 年，通过",
+          "missing": [],
+          "unit": "years"
+        },
+        {
+          "condition_id": "roe_average",
+          "group_id": "profitability",
+          "label": "窗口内 ROE 平均值",
+          "status": "pass",
+          "value": 12.197,
+          "threshold": 10.0,
+          "distance_abs": 2.196999999999999,
+          "distance_rel": 0.21969999999999992,
+          "reason": "观测值 12.20%，要求 ≥ 10.00%，通过",
+          "missing": [],
+          "unit": "percent"
+        },
+        {
+          "condition_id": "roe_recent",
+          "group_id": "profitability",
+          "label": "最近 3 个财年 ROE 平均值",
+          "status": "pass",
+          "value": 9.996666666666668,
+          "threshold": 9.0,
+          "distance_abs": 0.9966666666666679,
+          "distance_rel": 0.11074074074074088,
+          "reason": "观测值 10.00%，要求 ≥ 9.00%，通过",
+          "missing": [],
+          "unit": "percent"
+        },
+        {
+          "condition_id": "npl_ratio",
+          "group_id": "asset_quality",
+          "label": "最新不良贷款率",
+          "status": "pass",
+          "value": 1.29,
+          "threshold": 1.5,
+          "distance_abs": 0.20999999999999996,
+          "distance_rel": 0.13999999999999999,
+          "reason": "观测值 1.29%，要求 ≤ 1.50%，通过",
+          "missing": [],
+          "unit": "percent"
+        },
+        {
+          "condition_id": "npl_change",
+          "group_id": "asset_quality",
+          "label": "不良贷款率 5 年变化",
+          "status": "pass",
+          "value": -0.22999999999999998,
+          "threshold": 0.3,
+          "distance_abs": 0.53,
+          "distance_rel": 1.7666666666666668,
+          "reason": "观测值 -0.23 个百分点，要求 ≤ 0.30 个百分点，通过",
+          "missing": [],
+          "unit": "pp"
+        },
+        {
+          "condition_id": "provision_coverage",
+          "group_id": "asset_quality",
+          "label": "最新拨备覆盖率",
+          "status": "pass",
+          "value": 211.64,
+          "threshold": 200.0,
+          "distance_abs": 11.639999999999986,
+          "distance_rel": 0.05819999999999993,
+          "reason": "观测值 211.64%，要求 ≥ 200.00%，通过",
+          "missing": [],
+          "unit": "percent"
+        },
+        {
+          "condition_id": "core_tier1",
+          "group_id": "capital",
+          "label": "最新核心一级资本充足率",
+          "status": "pass",
+          "value": 13.07,
+          "threshold": 9.0,
+          "distance_abs": 4.07,
+          "distance_rel": 0.45222222222222225,
+          "reason": "观测值 13.07%，要求 ≥ 9.00%，通过",
+          "missing": [],
+          "unit": "percent"
+        },
+        {
+          "condition_id": "dividend_every_year",
+          "group_id": "dividend",
+          "label": "窗口内每个财年都有现金分红",
+          "status": "pass",
+          "value": 0.0,
+          "threshold": 0.0,
+          "distance_abs": 0.0,
+          "distance_rel": null,
+          "reason": "观测值 0 年，要求 = 0 年，通过",
+          "missing": [],
+          "unit": "years"
+        },
+        {
+          "condition_id": "dividend_payout",
+          "group_id": "dividend",
+          "label": "最近 5 年现金分红率",
+          "status": "pass",
+          "value": 0.2999478508408228,
+          "threshold": 0.25,
+          "distance_abs": 0.049947850840822816,
+          "distance_rel": 0.19979140336329126,
+          "reason": "观测值 29.99%，要求 ≥ 25.00%，通过",
+          "missing": [],
+          "unit": "ratio"
+        },
+        {
+          "condition_id": "audit_opinion",
+          "group_id": "governance",
+          "label": "最近 5 年审计意见均为标准无保留",
+          "status": "pass",
+          "value": 0.0,
+          "threshold": 0.0,
+          "distance_abs": 0.0,
+          "distance_rel": null,
+          "reason": "观测值 0 年，要求 = 0 年，通过",
+          "missing": [],
+          "unit": "years"
+        },
+        {
+          "condition_id": "no_penalty",
+          "group_id": "governance",
+          "label": "最近 5 年无立案调查、信息披露类行政处罚或公开谴责",
+          "status": "pass",
+          "value": 0.0,
+          "threshold": 0.0,
+          "distance_abs": 0.0,
+          "distance_rel": null,
+          "reason": "观测值 0 件，要求 = 0 件，通过",
+          "missing": [],
+          "unit": "count"
+        },
+        {
+          "condition_id": "pledge_ratio",
+          "group_id": "governance",
+          "label": "控股股东最新质押比例",
+          "status": "pass",
+          "value": 0.0,
+          "threshold": 0.5,
+          "distance_abs": 0.5,
+          "distance_rel": 1.0,
+          "reason": "观测值 0.00%，要求 ≤ 50.00%，通过",
+          "missing": [],
+          "unit": "ratio"
+        }
+      ],
+      "metrics": {
+        "roe_average": {
+          "value": 12.197,
+          "missing": [],
+          "note": "10/10 个财年可计算（加权 ROE）"
+        },
+        "roe_recent_average": {
+          "value": 9.996666666666668,
+          "missing": [],
+          "note": "最近 3 个财年"
+        },
+        "loss_years": {
+          "value": 0,
+          "missing": [],
+          "note": null
+        },
+        "npl_ratio": {
+          "value": 1.29,
+          "missing": [],
+          "note": "2026-09-30 三季报"
+        },
+        "npl_change_5y": {
+          "value": -0.22999999999999998,
+          "missing": [],
+          "note": "2026-09-30 − 2021-09-30"
+        },
+        "provision_coverage": {
+          "value": 211.64,
+          "missing": [],
+          "note": "2026-09-30"
+        },
+        "core_tier1_ratio": {
+          "value": 13.07,
+          "missing": [],
+          "note": "2026-09-30"
+        },
+        "dividend_missing_years": {
+          "value": 0,
+          "missing": [],
+          "note": null
+        },
+        "dividend_payout": {
+          "value": 0.2999478508408228,
+          "missing": [],
+          "note": "现金分红合计 ÷ 归母净利润合计"
+        },
+        "audit_nonstandard_years": {
+          "value": 0,
+          "missing": [],
+          "note": "非标准年份：无"
+        },
+        "penalty_count": {
+          "value": 0,
+          "missing": [],
+          "note": "无计入的立案/处罚/公开谴责（其他主体只记录）"
+        },
+        "pledge_ratio": {
+          "value": 0.0,
+          "missing": [],
+          "note": "2026-09-30"
+        },
+        "roe_rows": [
+          {
+            "fiscal_year": 2016,
+            "roe": 15.24
+          },
+          {
+            "fiscal_year": 2017,
+            "roe": 14.35
+          },
+          {
+            "fiscal_year": 2018,
+            "roe": 13.79
+          },
+          {
+            "fiscal_year": 2019,
+            "roe": 13.05
+          },
+          {
+            "fiscal_year": 2020,
+            "roe": 11.95
+          },
+          {
+            "fiscal_year": 2021,
+            "roe": 12.15
+          },
+          {
+            "fiscal_year": 2022,
+            "roe": 11.45
+          },
+          {
+            "fiscal_year": 2023,
+            "roe": 10.66
+          },
+          {
+            "fiscal_year": 2024,
+            "roe": 9.88
+          },
+          {
+            "fiscal_year": 2025,
+            "roe": 9.45
+          }
+        ],
+        "net_interest_margin": 1.29,
+        "dividend_total": 542272120160.91345,
+        "dividend_profit_total": 1807888000000.0,
+        "ownership": "央企"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "eastmoney.f10.financials",
+      "publisher": "东方财富",
+      "interface": "datacenter F10 合并报表按报告期批量接口",
+      "url": "https://datacenter.eastmoney.com/securities/api/data/v1/get",
+      "note": "资产负债表 2015–2025、利润表/现金流量表 2016–2025；合并口径，金额单位元。"
+    },
+    {
+      "id": "eastmoney.dividend",
+      "publisher": "东方财富",
+      "interface": "RPT_SHAREBONUS_DET 分红送配",
+      "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+      "note": "2021–2025 年中期与年度方案；每 10 股派现 × 总股本 ÷ 10，按财年归集。"
+    },
+    {
+      "id": "eastmoney.pledge.company_level",
+      "publisher": "东方财富（转中国结算）",
+      "interface": "RPT_CSDC_LIST 上市公司质押比例",
+      "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+      "note": "公司整体质押比例，仅作旁证，不参与规则；不是控股股东质押比例。"
+    },
+    {
+      "id": "eastmoney.industry",
+      "publisher": "东方财富",
+      "interface": "RPT_LICO_FN_CPD 最新年报行业",
+      "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+      "note": "用于识别银行、保险、证券、多元金融；行业缺失时用深交所列表的证监会门类。"
+    },
+    {
+      "id": "sse.szse.listing",
+      "publisher": "上海证券交易所 / 深圳证券交易所",
+      "interface": "股票列表（上市日期、板块、简称）",
+      "url": "https://query.sse.com.cn/；https://www.szse.cn/",
+      "note": "当前沪深 A 股；ST/*ST 按简称识别，上市年份用于确定评价窗口。"
+    },
+    {
+      "id": "eastmoney.f10.audit_opinion",
+      "publisher": "东方财富",
+      "interface": "F10 个股资产负债表 OPINION_TYPE",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/zcfzbAjaxNew",
+      "note": "2021–2025 年报审计意见；逐家取。"
+    },
+    {
+      "id": "eastmoney.announcement",
+      "publisher": "东方财富",
+      "interface": "公告检索（立案/行政处罚/公开谴责/纪律处分）+ 正文核对",
+      "url": "https://np-anotice-stock.eastmoney.com/api/security/ann",
+      "note": "最近 5 年；逐条判定主体身份与信息披露类事项。"
+    },
+    {
+      "id": "gw.f10.controller",
+      "publisher": "国网 F10",
+      "interface": "个股控股股东",
+      "url": "http://webf10.gw.com.cn/",
+      "note": "只用于控股股东名称；名称过期时按年报/第一大股东口径补正。"
+    },
+    {
+      "id": "eastmoney.pledge.detail",
+      "publisher": "东方财富",
+      "interface": "重要股东股权质押明细",
+      "url": "https://data.eastmoney.com/gpzy/pledgeDetail.aspx",
+      "note": "定期报告股东表取不到时补足；累计质押比例 × 总股本 ÷ 持股数。"
+    },
+    {
+      "id": "eastmoney.f10.bank_indicators",
+      "publisher": "东方财富",
+      "interface": "RPT_F10_FINANCE_MAINFINADATA 银行主要指标",
+      "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+      "note": "2016 年起季度与年报；ROE、不良率、拨备覆盖率、核心一级资本充足率、净息差。"
+    },
+    {
+      "id": "eastmoney.f10.capital_structure",
+      "publisher": "东方财富",
+      "interface": "CapitalStockStructure TOTAL_SHARES",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/CapitalStockStructure/PageAjax",
+      "note": "总股本用于预演估值换算每股。"
+    },
+    {
+      "id": "eastmoney.f10.ownership",
+      "publisher": "东方财富 F10",
+      "interface": "RPT_F10_BASIC_ORGINFO ACTUAL_HOLDER；无实际控制人时用第一大股东",
+      "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+      "note": "所有制只标记，不参与判定。"
+    }
+  ],
+  "snapshot_untested_conditions": [],
+  "data_coverage": {
+    "roe": {
+      "total": 36,
+      "available": 36,
+      "ratio": 1.0,
+      "note": "ROEJQ 加权 ROE，2016–2025 年报"
+    },
+    "npl": {
+      "total": 36,
+      "available": 36,
+      "ratio": 1.0,
+      "note": "NONPERLOAN；最新报告期"
+    },
+    "npl_change": {
+      "total": 36,
+      "available": 36,
+      "ratio": 1.0,
+      "note": "最新报告期 − 5 年前同一报告期"
+    },
+    "provision": {
+      "total": 36,
+      "available": 36,
+      "ratio": 1.0,
+      "note": "BLDKBBL；最新报告期"
+    },
+    "core_tier1": {
+      "total": 36,
+      "available": 36,
+      "ratio": 1.0,
+      "note": "HXYJBCZL；最新报告期"
+    },
+    "nim": {
+      "total": 36,
+      "available": 36,
+      "ratio": 1.0,
+      "note": "NET_INTEREST_MARGIN；只展示"
+    },
+    "dividend": {
+      "total": 36,
+      "available": 36,
+      "ratio": 1.0,
+      "note": "RPT_SHAREBONUS_DET 2016–2025"
+    },
+    "audit": {
+      "total": 36,
+      "available": 36,
+      "ratio": 1.0,
+      "note": "OPINION_TYPE，companyType=3（银行报表）"
+    },
+    "penalty": {
+      "total": 36,
+      "available": 36,
+      "ratio": 1.0,
+      "note": "公告检索 + 主体判定；同 v1.2"
+    },
+    "pledge": {
+      "total": 36,
+      "available": 36,
+      "ratio": 1.0,
+      "note": "定期报告股东表；同 v1.2"
+    }
+  },
+  "ownership_distribution": {
+    "total": 11,
+    "marked": 11,
+    "央企": 7,
+    "地方国企": 3,
+    "民企": 1
+  },
+  "valuation_rehearsal_summary": {
+    "total": 36,
+    "grade_b": 31,
+    "grade_c": 5,
+    "insufficient": 0
+  }
+}

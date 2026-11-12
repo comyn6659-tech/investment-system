@@ -25,6 +25,7 @@ SUPPORTED_POLICY_IDS = (
     "quality-pool-v1.1-draft",
     "quality-pool-v1.2-draft",
     "income-pool-v1-draft",
+    "bank-pool-v1-draft",
 )
 POLICY_STATUS_DRAFT = "draft_unapproved"
 SUPPORTED_OPERATORS = (">=", ">", "<=", "<", "==")
@@ -45,6 +46,10 @@ _VALUE_LABELS = {
     "profit_decline_years": "窗口内归母净利润同比下降超过 30% 的年数",
     "dividend_missing_years": "窗口内未现金分红的年数",
     "fcf_to_dividend": "最近 5 年自由现金流合计 ÷ 现金分红合计",
+    "npl_ratio": "最新不良贷款率",
+    "npl_change_5y": "不良贷款率 5 年变化",
+    "provision_coverage": "最新拨备覆盖率",
+    "core_tier1_ratio": "最新核心一级资本充足率",
 }
 
 

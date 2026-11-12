@@ -358,3 +358,20 @@
 | M6 | 抽查公司可由快照独立复算 | `tools/run_income_pool.py --show`、`engine.quality.snapshot` | `test_income_snapshot_and_report_and_ledger` 同快照重放逐家状态一致；600519 逐年复算 | ✅ |
 | M7 | 好公司池快照、报告、账本不变；其他账本不变；新账本只追加；全部测试通过 | `data/quality-pool/*`、`data/ledger/*` | 好公司池快照/报告/账本 3 条未改；个股 7、候选 A 3、官方估值 4 条 0 问题；新账本 1 条 0 问题；**563 passed** | ✅ |
 | M8 | DELIVERY.md 一页以内，含复现命令、测试结果、提交 ID | `DELIVERY.md`、`docs/phase4g-delivery.md` | 入口 §1–§7 | ✅ |
+
+---
+
+# 第四阶段第八批验收清单（银行标准 + 估值预演，N1–N7）
+
+对应文件：`batch4h-bank-instructions.md` 冻结验收条件。范围：新增 `bank-pool-v1-draft`、
+银行专项数据、银行池试运行、所有制标记、银行估值预演与新账本；不做券商/保险，不改既有池与结论。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| N1 | 规则版本化、每个参数带依据；每条条件有边界测试 | `data/policies/bank-pool-v1-draft.json`、`engine/bank/{metrics,evaluator}.py` | `test_policy_versioned_and_all_parameters_have_basis`、`test_roe_boundaries`、`test_roe_recent_boundary`、`test_loss_npl_provision_core_boundaries`、`test_dividend_boundaries_and_missing`、`test_audit_penalty_pledge_conditions` | ✅ |
+| N2 | 各项银行指标来源与覆盖率逐项报告；缺失不默认通过 | `tools/build_bank_pool_data.py`、报告 §1b | 1,773 行银行指标；36 家评价银行 ROE/不良/5 年变化/拨备/核心一级/分红/审计/处罚/质押均 36/36；缺银行指标→待定测试 `test_missing_bank_metric_and_annual_report` | ✅ |
+| N3 | 报告含 B 节全部内容 | `docs/phase4h-bank-pool-report.md` | 首页、名单 11、只差一条 13、漏斗、敏感性、两家测试银行、所有制、预演摘要 | ✅ |
+| N4 | 估值预演每家有路线/状态/等级/价值/预演结论；正式账本与 CLI 不变（测试） | `tools/run_bank_valuation_rehearsal.py`、`docs/phase4h-bank-valuation-rehearsal.md` | 36 家：B 31、C 5、资料不足 0；`test_bank_valuation_rehearsal_report`、`test_bank_ledger_and_other_ledgers_unchanged`、`test_cli_bank_conclusion_unchanged` | ✅ |
+| N5 | 我抽查的银行指标可由快照与原始来源核对 | `data/bank-pool/snapshot-.../bank-indicators.csv.gz`、`--show` | 600036 2025 ROE 13.44、不良 0.94%、拨备 391.79%、核心一级 14.16% 与源逐项一致（测试断言） | ✅ |
+| N6 | 既有池、账本、个股结论、指数结果不变；新账本只追加；全部测试通过 | 既有模块未改口径 | 好公司池 138、收息池 142、个股 7/候选 A 3/官方估值 4/池 3/收息 1 条 0 问题；银行账本 1 条 0 问题；**579 passed** | ✅ |
+| N7 | DELIVERY.md 一页以内，含复现命令、测试结果、提交 ID | `DELIVERY.md`、`docs/phase4h-delivery.md` | 入口 §1–§7 | ✅ |

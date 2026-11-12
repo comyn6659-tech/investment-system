@@ -1,0 +1,29 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "income-2018",
+  "file": "income-2018.csv.gz",
+  "rows": 5308,
+  "columns": [
+    "SECUCODE",
+    "SECURITY_CODE",
+    "SECURITY_NAME_ABBR",
+    "NOTICE_DATE",
+    "REPORT_DATE",
+    "PARENT_NETPROFIT",
+    "TOTAL_PROFIT",
+    "FE_INTEREST_EXPENSE",
+    "FINANCE_EXPENSE",
+    "OPERATE_PROFIT",
+    "TOTAL_OPERATE_INCOME"
+  ],
+  "content_hash": "0bf80107cd39c3944dc87dbb03b22b939ddcc86dce046566f429a00954a7f920",
+  "size_bytes": 292950,
+  "kind": "income",
+  "report_date": "2018-12-31",
+  "source_id": "eastmoney.f10.income",
+  "publisher": "东方财富",
+  "interface": "RPT_F10_FINANCE_GINCOME",
+  "url": "https://datacenter.eastmoney.com/securities/api/data/v1/get",
+  "fetched_at": "2026-11-12T20:57:20+08:00",
+  "definition_note": "合并报表；金额单位元；按报告期一次取全市场。"
+}

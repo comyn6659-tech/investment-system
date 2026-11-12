@@ -149,3 +149,20 @@
 
 2026-11-13 首次写入 1 条（`income-pool-v1-draft`，快照 `qps-d8fb7e3718675b93`，
 入池 142，`pool_hash=iph-3a3ca849f50a9f58`）。
+
+---
+
+# 银行池账本（只追加）
+
+文件：`bank-pool.jsonl`（JSON Lines，一行一条记录）。
+
+## 规则
+
+- 与好公司池、稳定收息型账本相同：只追加；`record_id` 为记录内容（不含 `recorded_at`）哈希，
+  `pool_hash` 为入池名单哈希；同一 `as_of` + `policy_id` + `snapshot_id` 只允许一条。
+- 入池名单是规则试运行结果，不代表买入建议；规则仍为未批准草案。
+
+命令：`.venv/bin/python tools/run_bank_pool.py --check`。
+
+2026-11-13 首次写入 1 条（`bank-pool-v1-draft`，快照 `qps-dc9c12160476db8b`，
+入池 11，`pool_hash=bph-13b62d2bcfb016c0`）。

@@ -1,0 +1,28 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "dividends-2023-06-30",
+  "file": "dividends-2023-06-30.csv.gz",
+  "rows": 173,
+  "columns": [
+    "SECUCODE",
+    "SECURITY_CODE",
+    "SECURITY_NAME_ABBR",
+    "REPORT_DATE",
+    "PRETAX_BONUS_RMB",
+    "TOTAL_SHARES",
+    "ASSIGN_PROGRESS",
+    "IMPL_PLAN_PROFILE",
+    "NOTICE_DATE",
+    "PLAN_NOTICE_DATE"
+  ],
+  "content_hash": "06a840fe237d3d6a0cf131e9fc10bf6b8390b31d298ddae6a087536126eb08ec",
+  "size_bytes": 5865,
+  "kind": "dividends",
+  "report_date": "2023-06-30",
+  "source_id": "eastmoney.dividend",
+  "publisher": "东方财富",
+  "interface": "RPT_SHAREBONUS_DET",
+  "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+  "fetched_at": "2026-11-12T20:49:35+08:00",
+  "definition_note": "每 10 股派现（含税）与总股本；按报告期取方案。"
+}

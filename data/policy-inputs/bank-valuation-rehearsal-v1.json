@@ -1,0 +1,42 @@
+{
+  "version": "bank-valuation-rehearsal-v1",
+  "approved": false,
+  "reviewed_at": "2026-11-13",
+  "source": "batch4h 第二部分 C；个股政策 v1.1 grades.banks 银行条款",
+  "required_cet1_ratio": 0.085,
+  "required_cet1_basis": "监管底线核心一级 7.5% + 1.0 个百分点安全垫；研究假设，未获批准",
+  "required_provision_coverage": 1.5,
+  "required_provision_basis": "监管拨备覆盖率 120–150% 的上沿；研究假设，未获批准",
+  "rwa_density": 0.65,
+  "rwa_density_basis": "风险加权资产 ≈ 总资产 × 65%；研究假设，用于资本一致性检查",
+  "rwa_growth": 0.03,
+  "horizon_years": 5,
+  "scenarios": {
+    "bear": {
+      "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
+      "net_profit_growth": [0.0, 0.0, 0.0, 0.0, 0.0],
+      "payout_adjust": 0.0,
+      "cost_of_equity": 0.095,
+      "terminal_growth": 0.015
+    },
+    "base": {
+      "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
+      "net_profit_growth": [0.02, 0.03, 0.03, 0.03, 0.03],
+      "payout_adjust": 0.0,
+      "cost_of_equity": 0.09,
+      "terminal_growth": 0.02
+    },
+    "bull": {
+      "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
+      "net_profit_growth": [0.04, 0.04, 0.04, 0.04, 0.04],
+      "payout_adjust": 0.02,
+      "cost_of_equity": 0.085,
+      "terminal_growth": 0.025
+    }
+  },
+  "notes": [
+    "本文件只是预演假设，approved=false；银行估值模型仍为 research，是否启用由股东在决策③决定。",
+    "派息率以最近 5 个财年实际分红合计 ÷ 归母净利润合计为基准，情景中只做小幅调整，不超过 90%。",
+    "预演不写入正式结论账本，不改变 CLI 结论。"
+  ]
+}

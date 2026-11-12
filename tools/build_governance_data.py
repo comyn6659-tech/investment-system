@@ -127,17 +127,21 @@ def candidates() -> list[dict]:
 
 
 def audit_opinions(code: str) -> dict:
-    response = _get(
-        "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/zcfzbAjaxNew",
-        params={
-            "companyType": "4",
-            "reportDateType": "0",
-            "reportType": "1",
-            "dates": AUDIT_DATES,
-            "code": _symbol(code),
-        },
-    )
-    rows = response.json().get("data") or []
+    rows = []
+    for company_type in ("4", "3"):
+        response = _get(
+            "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/zcfzbAjaxNew",
+            params={
+                "companyType": company_type,
+                "reportDateType": "0",
+                "reportType": "1",
+                "dates": AUDIT_DATES,
+                "code": _symbol(code),
+            },
+        )
+        rows = response.json().get("data") or []
+        if rows:
+            break
     opinions = {}
     for row in rows:
         year = str(row.get("REPORT_DATE") or "")[:4]
@@ -438,6 +442,7 @@ REPORT_KINDS = (
     ("第三季度报告", 2025, "2025 年三季报"),
 )
 REPORT_EXCLUDE = (
+    "H股公告",
     "摘要",
     "英文",
     "取消",
@@ -485,11 +490,38 @@ def _pdf_text(art_code: str) -> tuple[str, str]:
 
 def _top10_region(text: str) -> str | None:
     flat = re.sub(r"[ \t]+", " ", text)
-    start = re.search(r"前\s*10\s*名股东持股情况", flat)
-    if not start:
-        return None
-    end = re.search(r"前\s*10\s*名无限售条件股东持股情况", flat[start.end() :])
-    return flat[start.start() : start.end() + (end.start() if end else 3000)]
+    prefix = r"前\s*(?:10|十)\s*名"
+    common = r"普\s*通\s*股"
+    holder = r"股\s*东"
+    pattern = (
+        rf"{prefix}\s*(?:{common})?\s*{holder}"
+        rf"(?:\s*及\s*{prefix}\s*(?:无限售条件)?\s*{common}\s*{holder})?"
+        rf"\s*持股情况"
+    )
+    end_pattern = prefix
+    for match in re.finditer(pattern, flat):
+        tail = flat[match.end() : match.end() + 4000]
+        end_match = re.search(end_pattern, tail)
+        segment = tail[: end_match.start()] if end_match else tail
+        head = segment[:400]
+        if "优先股" in head:
+            continue
+        if "股东名称" not in segment[:800]:
+            continue
+        return flat[match.start() : match.end()] + segment
+    anchor = re.search(
+        rf"{prefix}\s*(?:无限售条件)?\s*(?:{common}|流\s*通\s*股)\s*{holder}", flat
+    )
+    if anchor:
+        table = re.search(r"股东名称", flat[anchor.end() :])
+        if table:
+            start = anchor.end() + table.start()
+            tail = flat[start : start + 5000]
+            end_match = re.search(end_pattern, tail)
+            segment = tail[: end_match.start()] if end_match else tail
+            if "优先股" not in segment[:300]:
+                return segment
+    return None
 
 
 def _parse_pledge_row(region: str | None, holdings: float | int | None) -> dict:
@@ -525,6 +557,9 @@ def _parse_pledge_by_name(region: str | None, name: str, holder_names: list[str]
     """按股东姓名定位行：适配 PDF 把持股数拆成“2,742,578, 825”的情况。"""
     if not region or not name:
         return {"status": "missing", "error": "no_region_or_name"}
+    dash_map = str.maketrans("－—–", "---")
+    region = region.translate(dash_map)
+    name = name.translate(dash_map)
     pattern = r"\s*".join(re.escape(char) for char in name)
     match = re.search(pattern, region)
     if not match:
