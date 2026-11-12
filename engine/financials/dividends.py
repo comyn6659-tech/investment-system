@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
-from typing import Iterable
+from typing import Any, Iterable
 
 from engine.valuation import errors as e
 from engine.valuation.errors import ValuationError
@@ -150,6 +150,42 @@ class DividendBook:
             "ltm_window": list(self.ltm_window) if self.ltm_window else None,
             "notes": list(self.notes),
         }
+
+
+def par_value(history: Any, base_year: int) -> float | None:
+    """由基准年「股本（元）÷（归母净利润 ÷ 基本每股收益）」推出每股面值。
+
+    送转改变股本金额，但面值不变；用最近一年推面值，再用各年期末股本 ÷
+    面值还原该年股数，避免送转后用当前股本计算历史派息率（R10）。
+    """
+    annual = history.year(base_year)
+    if annual is None:
+        return None
+    capital = annual.number("share_capital")
+    profit = annual.number("net_profit_parent")
+    eps = annual.number("eps_basic")
+    if capital is None or capital <= 0 or profit is None or profit <= 0:
+        return None
+    if eps is None or eps <= 0:
+        return None
+    implied = profit / eps
+    if implied <= 0:
+        return None
+    return capital / implied
+
+
+def year_shares(annual: Any, par: float | None) -> float | None:
+    """某财年期末股数：期末股本 ÷ 面值；缺股本时退回归母净利润 ÷ 基本每股收益。"""
+    if annual is None:
+        return None
+    capital = annual.number("share_capital")
+    if capital is not None and capital > 0 and par is not None and par > 0:
+        return capital / par
+    profit = annual.number("net_profit_parent")
+    eps = annual.number("eps_basic")
+    if profit is not None and profit > 0 and eps is not None and eps > 0:
+        return profit / eps
+    return None
 
 
 def _fiscal_year_from_label(label: str | None) -> int | None:

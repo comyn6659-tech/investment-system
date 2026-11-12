@@ -1,4 +1,4 @@
-"""个股政策 v1 草案（`equity-policy-v1-draft`）的加载、校验与参数访问。
+"""个股政策草案（`equity-policy-v1.1-draft`，保留 v1 可读）的加载、校验与参数访问。
 
 设计约束（施工单 A.1、验收 L1）：
 - 所有阈值、比例、来源与理由集中在版本化政策 JSON 中；
@@ -16,8 +16,10 @@ from typing import Any, Iterator, Mapping
 
 from engine.data.snapshot import stable_digest
 
-POLICY_SCHEMA_VERSION = "equity-policy/1"
-POLICY_ID = "equity-policy-v1-draft"
+POLICY_SCHEMA_VERSION = "equity-policy/1.1"
+SUPPORTED_SCHEMA_VERSIONS = ("equity-policy/1", "equity-policy/1.1")
+POLICY_ID = "equity-policy-v1.1-draft"
+SUPPORTED_POLICY_IDS = ("equity-policy-v1-draft", "equity-policy-v1.1-draft")
 POLICY_STATUS_DRAFT = "draft_unapproved"
 
 # 参数节点的取值形式：单值 / 规则 / 列表 / 网格 / 结构化字段组
@@ -115,12 +117,15 @@ class EquityPolicy:
     # --- 校验 -----------------------------------------------------------
     def validate(self) -> list[str]:
         problems: list[str] = []
-        if self.data.get("schema_version") != POLICY_SCHEMA_VERSION:
+        if self.data.get("schema_version") not in SUPPORTED_SCHEMA_VERSIONS:
             problems.append(
-                f"schema_version={self.data.get('schema_version')!r}，期望 {POLICY_SCHEMA_VERSION!r}"
+                f"schema_version={self.data.get('schema_version')!r}，"
+                f"期望 {SUPPORTED_SCHEMA_VERSIONS!r}"
             )
-        if self.data.get("policy_id") != POLICY_ID:
-            problems.append(f"policy_id={self.data.get('policy_id')!r}，期望 {POLICY_ID!r}")
+        if self.data.get("policy_id") not in SUPPORTED_POLICY_IDS:
+            problems.append(
+                f"policy_id={self.data.get('policy_id')!r}，期望 {SUPPORTED_POLICY_IDS!r}"
+            )
         if self.data.get("status") != POLICY_STATUS_DRAFT:
             problems.append(
                 f"status={self.data.get('status')!r}：本版只允许 {POLICY_STATUS_DRAFT!r}"
@@ -135,7 +140,6 @@ class EquityPolicy:
             "discount_rate.cost_of_equity",
             "discount_rate.cost_of_debt",
             "forecast.horizon_years",
-            "forecast.year_2_to_5_growth_cap",
             "forecast.payout_path",
             "terminal.growth_base",
             "terminal.growth_cap",
@@ -158,6 +162,15 @@ class EquityPolicy:
             "sensitivity.discount_rate_delta",
             "sensitivity.terminal_growth_delta",
         )
+        if self.data.get("policy_id") == "equity-policy-v1.1-draft":
+            required = required + (
+                "forecast.growth_cap",
+                "forecast.steady_growth",
+                "forecast.interpolation",
+                "terminal.continuity_guardrail",
+                "grade.dividend_coverage",
+                "grade.missing_data",
+            )
         for path in required:
             try:
                 self.node(path)
@@ -179,8 +192,8 @@ class EquityPolicy:
                     problems.append(f"grade.{grade}.margin_of_safety={margin} 不在 (0,1) 内")
             if self.value("forecast.horizon_years") != int(self.value("forecast.horizon_years")):
                 problems.append("forecast.horizon_years 必须是整数")
-            if not 0.0 < self.value("forecast.year_2_to_5_growth_cap") < 1.0:
-                problems.append("forecast.year_2_to_5_growth_cap 不在 (0,1) 内")
+            if self.data.get("policy_id") == "equity-policy-v1.1-draft" and not 0.0 < self.value("forecast.growth_cap") < 1.0:
+                problems.append("forecast.growth_cap 不在 (0,1) 内")
             if not 0.0 <= self.value("terminal.growth_base") < 1.0:
                 problems.append("terminal.growth_base 不在 [0,1) 内")
             if self.value("terminal.growth_cap") < self.value("terminal.growth_base"):
@@ -226,6 +239,8 @@ __all__ = [
     "POLICY_ID",
     "POLICY_SCHEMA_VERSION",
     "POLICY_STATUS_DRAFT",
+    "SUPPORTED_POLICY_IDS",
+    "SUPPORTED_SCHEMA_VERSIONS",
     "PolicyError",
     "load_policy",
 ]

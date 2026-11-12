@@ -138,7 +138,11 @@ class ResearchValuation:
 def _payout_stats(
     book: DividendBook, history: FinancialHistory, shares: float | None
 ) -> tuple[float | None, float | None, int, float | None]:
-    """最近若干财年的派息率、稳定性与样本年数。"""
+    """最近若干财年的派息率、稳定性与样本年数（R10 总额口径）。"""
+    from engine.financials.dividends import par_value, year_shares
+
+    base_year = history.latest.fiscal_year if history.latest is not None else None
+    par = par_value(history, base_year) if base_year is not None else None
     pays: list[float] = []
     for entry in book.years:
         if not entry.has_annual_final or entry.ordinary_per_share <= 0:
@@ -149,12 +153,10 @@ def _payout_stats(
         profit = annual.number("net_profit_parent")
         if profit is None or profit <= 0:
             continue
-        if shares is None or shares <= 0:
+        count = year_shares(annual, par)
+        if count is None or count <= 0:
             continue
-        eps = profit / shares
-        if eps <= 0:
-            continue
-        pays.append(entry.ordinary_per_share / eps)
+        pays.append(entry.ordinary_per_share * count / profit)
     if not pays:
         return None, None, 0, None
     latest = pays[0]

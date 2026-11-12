@@ -234,3 +234,22 @@
 | M3-2 | 试运行报告新增「基期异常变动清单」，阈值版本化，不改结论 | `engine/policy/trial.py`、`tools/run_equity_policy_trial.py`、政策 `reporting.base_year_anomaly` | 报告 §4.2 列出 000858（−54.6% / −71.9%）；`test_trial_base_year_anomaly_list`、`test_policy_carries_designer_decisions_and_guardrail` | ✅ |
 | M4-1 | 杠杆护栏 50% 版本化；超过时 partial / C / 无法判断，价值仅研究参考，新增原因码 | 政策 `quality.leverage_guardrail`、`engine/policy/valuation.py::leverage_guardrail`、`engine/contracts/reason_codes.py` | 601668 83.3% 触发；刚好 50% 不触发、50.01% 触发；`test_leverage_guardrail_boundary`、`test_trial_leverage_guardrail_forces_c` | ✅ |
 | M5-1 | 30 只预演结论不变；账本 3 条哈希不变；CLI 仍 research/undetermined；全部测试通过 | `data/policy-trial/trial-report.json`、`data/ledger/` | 结论逐只比对 0 差异；`update_signal_ledger.py --check` 0 问题；全套测试通过 | ✅ |
+
+---
+
+# 第四阶段 4a-R 验收清单（个股政策 v1.1，R1–R14 / N1–N9）
+
+对应文件：`fable-review-judgement-and-batch4a-r.md` 第四节。范围只做 R1–R14、重跑 30 只；
+不改 ERP、无风险利率规则、安全边际 25%/40%，不增加银行数据，不动指数与 ETF，不升级 validated。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| N1 | R1–R14 每项在政策文件中有参数与依据，代码无散落数字；每项至少一个测试（含边界） | `data/policies/equity-policy-v1.1-draft.json`、`engine/policy/*` | `test_policy_module_has_no_hardcoded_policy_numbers`；17 项 R 系列测试（`test_r1_*` … `test_r14_*`） | ✅ |
+| N2 | 万华化学状态 partial、无法判断，原因码说明 R2 哪一条触发 | `engine/policy/trial.py::continuity_guardrail_reasons` | 600309：`TERMINAL_GUARDRAIL_BY_DEFAULT`、`..._EXPLICIT_CASH`、`..._TERMINAL_SHARE` 三项；`test_r2_wanhua_*` | ✅ |
+| N3 | 茅台现金取 `END_CCE`、受限代理为 0；报告列出新等级与新价值 | `engine/policy/valuation.py::extract_inputs`、快照重建 | 1,264.3 亿元；非现金等价物 0；等级 B、基准 1,144.66 元；`test_r3_maotai_*` | ✅ |
+| N4 | R1 后 FCFF 基准价值对终值增长 ±0.5pp 变化 < 1%（手算 + 报告） | `engine/policy/valuation.py::terminal_spec` | `test_r1_fcff_terminal_roi_is_wacc_and_growth_cancels`；报告 §3.5 最大 0.88% | ✅ |
+| N5 | 比亚迪派息率总额口径，新旧并列；路线按新值重判 | `engine/financials/dividends.py::par_value`、`runner._payout_stats` | 64.7% → 22.9%；路线 股息折现 → FCFF；`test_r10_payout_total_basis_fixes_byd_split` | ✅ |
+| N6 | 报告满足 R12 全部条目 | `tools/run_equity_policy_trial.py` | 报告 §1.1、§3.1/3.2 分表、§3.3 终值占比、§5 起约束、§6 倍数表、读法；`test_r12_report_presentation`、`test_r12_threshold_distance_alert_boundary` | ✅ |
+| N7 | 试运行 30 只全部有结果；新旧逐只对照表含状态、等级、三档价值、结论、变化原因 | `data/policy-trial/trial-report.json`、`docs/phase4a-equity-policy-trial.md` §7 | 30 行对照；`test_trial_covers_all_thirty_codes` | ✅ |
+| N8 | 指数、账本、CLI、回测不变；全部测试通过 | `engine/signals/*`、`engine/pipeline.py`（未改） | 账本 3 条 0 问题；CLI `research`/`undetermined`；**459 passed** | ✅ |
+| N9 | DELIVERY.md 汇总、复现命令、提交 ID | `DELIVERY.md` | 入口文件 §1–§10 | ✅ |

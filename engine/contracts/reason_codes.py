@@ -213,6 +213,31 @@ LEVERAGE_GUARDRAIL_EXCEEDED = _register(
     "model",
     "账面有息负债占比超过政策护栏，研究价值仅供参考，不给正式结论",
 )
+TERMINAL_GUARDRAIL_BY_DEFAULT = _register(
+    "TERMINAL_GUARDRAIL_BY_DEFAULT",
+    "model",
+    "主模型按机制默认落入（*_by_default），不是适用性规则选中：研究价值不用于结论",
+)
+TERMINAL_GUARDRAIL_EXPLICIT_CASH = _register(
+    "TERMINAL_GUARDRAIL_EXPLICIT_CASH",
+    "model",
+    "基准情景显式期 FCFF 合计非正，终值与显式期脱节：研究价值不用于结论",
+)
+TERMINAL_GUARDRAIL_TERMINAL_SHARE = _register(
+    "TERMINAL_GUARDRAIL_TERMINAL_SHARE",
+    "model",
+    "基准情景终值占比达到政策上限：研究价值不用于结论",
+)
+PESSIMISTIC_VALUE_NONPOSITIVE = _register(
+    "PESSIMISTIC_VALUE_NONPOSITIVE",
+    "model",
+    "悲观情景每股价值非正，负价值不可解释：状态 partial、无法判断",
+)
+BASE_YEAR_ANOMALY = _register(
+    "BASE_YEAR_ANOMALY",
+    "data",
+    "基期营业收入或归母净利润同比超过政策阈值，口径可能断裂：状态 partial、无法判断",
+)
 TERMINAL_DISTRIBUTION_UNFUNDED = _register(
     "TERMINAL_DISTRIBUTION_UNFUNDED",
     "model",

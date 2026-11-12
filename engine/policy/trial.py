@@ -54,92 +54,92 @@ def _approximations(
     base_value: float | None,
     bridge: Any | None,
 ) -> dict[str, Any]:
-    """逐项量化近似影响；无法量化的项单独列出（并因此不能给 A/B）。"""
+    """逐项量化近似影响，并按 R4 分方向：
+
+    - counted：可能让价值变低（少数股东隐含值高于账面、金融子公司、负少数股东权益），
+      计入等级；
+    - disclose_only：只可能让价值变高（非现金等价物货币资金），只披露、不计入等级；
+    - 无法量化的 counted 项会使 A/B 条件不通过；无法量化的 disclose_only 项只记录。
+    """
     items: list[dict[str, Any]] = []
-    unquantified: list[str] = []
+    unquantified_counted: list[str] = []
+    unquantified_disclosed: list[str] = []
     shares = inputs.shares
 
-    # 1) 受限资金未披露：用「货币资金 − 期末现金等价物」估算
-    if model_id != "equity_dcf_fcff":
+    # 1) 非现金等价物货币资金（多为定期存款）：R4 只披露，不计入等级
+    if inputs.non_cash_equivalents is None:
+        unquantified_disclosed.append("non_cash_equivalents")
         items.append(
             {
-                "name": "restricted_cash",
-                "label": "受限资金未披露",
-                "quantified": True,
-                "impact_per_share": 0.0,
-                "note": "股息路线不使用可抵扣现金，该近似项对每股价值无影响（影响按 0 计）",
-            }
-        )
-    elif inputs.restricted_cash_estimate is None:
-        unquantified.append("restricted_cash")
-        items.append(
-            {
-                "name": "restricted_cash",
-                "label": "受限资金未披露",
+                "name": "non_cash_equivalents",
+                "label": "非现金等价物货币资金（多为定期存款）",
+                "direction": "disclose_only",
                 "quantified": False,
                 "impact_per_share": None,
-                "note": "缺货币资金或期末现金等价物，无法估算受限资金",
+                "note": "缺货币资金或期末现金及现金等价物，无法估算；只披露，不计入等级",
             }
         )
     else:
-        impact = inputs.restricted_cash_estimate / shares
         items.append(
             {
-                "name": "restricted_cash",
-                "label": "受限资金未披露",
+                "name": "non_cash_equivalents",
+                "label": "非现金等价物货币资金（多为定期存款）",
+                "direction": "disclose_only",
                 "quantified": True,
-                "estimated_amount": inputs.restricted_cash_estimate,
-                "impact_per_share": impact,
+                "estimated_amount": inputs.non_cash_equivalents,
+                "impact_per_share": inputs.non_cash_equivalents / shares,
                 "note": (
-                    "估算 = 货币资金 − 现金流量表期末现金及现金等价物余额；"
-                    "已从可抵扣现金中扣除，影响按该金额/股本计"
+                    "估算 = 货币资金 − 期末现金及现金等价物余额（END_CCE）；"
+                    "已从可抵扣现金中扣除（保守），但该项只会让价值变高，故只披露、不计入等级"
                 ),
             }
         )
 
-    # 2) 少数股东损益占比过高：按与母公司相同市盈率定价 vs 账面值
-    minority_node = policy.node("quality.minority_interest")
-    threshold = float(minority_node["approximation_if_profit_share_above"])
-    minority_profit = inputs.minority_profit
-    profit = inputs.net_profit
-    share = (
-        minority_profit / profit
-        if minority_profit is not None and profit not in (None, 0) and profit > 0
-        else None
-    )
-    if model_id == "equity_dcf_fcff" and share is not None and share > threshold:
+    # 2) 少数股东权益：R5 取消触发线，隐含值高于账面时计入
+    if inputs.minority_equity != 0 or (inputs.minority_profit or 0) != 0:
+        minority_profit = inputs.minority_profit
         if base_value is None or inputs.net_profit_parent in (None, 0) or inputs.net_profit_parent <= 0:
-            unquantified.append("minority_interest")
+            unquantified_counted.append("minority_interest")
             items.append(
                 {
                     "name": "minority_interest",
-                    "label": "少数股东权益（损益占比过高）",
+                    "label": "少数股东权益（同市盈率定价）",
+                    "direction": "counted",
                     "quantified": False,
                     "impact_per_share": None,
-                    "note": f"少数股东损益占合并净利润 {share:.1%}，但缺少正归母净利润，无法量化",
+                    "note": "缺少正归母净利润或基准价值，无法计算同市盈率隐含值；计入等级前必须量化",
                 }
             )
         else:
             equity_before_minority = base_value * shares + inputs.minority_equity
             multiple = equity_before_minority / inputs.net_profit_parent
             implied = (minority_profit or 0.0) * multiple
-            impact = abs(implied - inputs.minority_equity) / shares
+            diff = implied - inputs.minority_equity
+            counted = diff > 0
             items.append(
                 {
                     "name": "minority_interest",
-                    "label": "少数股东权益（损益占比过高）",
+                    "label": "少数股东权益（同市盈率定价）",
+                    "direction": "counted" if counted else "disclose_only",
                     "quantified": True,
-                    "minority_profit_share": share,
+                    "minority_profit_share": (
+                        minority_profit / inputs.net_profit
+                        if minority_profit is not None and inputs.net_profit not in (None, 0)
+                        else None
+                    ),
                     "book_value": inputs.minority_equity,
                     "implied_value": implied,
-                    "impact_per_share": impact,
+                    "difference": diff,
+                    "impact_per_share": abs(diff) / shares,
                     "note": (
-                        "影响 = |少数股东损益 × 母公司隐含市盈率 − 账面少数股东权益| / 股本"
+                        "隐含值高于账面：差额计入近似项（使价值变低）"
+                        if counted
+                        else "隐含值不高于账面：只披露，不计入等级"
                     ),
                 }
             )
 
-    # 3) 金融子公司：吸收存款/发放贷款合计超过总资产阈值
+    # 3) 金融子公司：两条路线都计为近似项（可能让价值变低）
     subsidiary_node = policy.node("quality.financial_subsidiary")
     subsidiary_threshold = float(subsidiary_node["approximation_if_above"])
     loans = inputs.loan_advance
@@ -150,15 +150,16 @@ def _approximations(
         if loans is not None and deposits is not None and assets not in (None, 0) and assets > 0
         else None
     )
-    if model_id == "equity_dcf_fcff" and ratio is not None and ratio > subsidiary_threshold:
+    if ratio is not None and ratio > subsidiary_threshold:
         gap = bridge.reconciliation_gap if bridge is not None else None
         fcff = bridge.fcff if bridge is not None else None
         if gap is None or fcff in (None, 0) or fcff <= 0 or base_value is None:
-            unquantified.append("financial_subsidiary")
+            unquantified_counted.append("financial_subsidiary")
             items.append(
                 {
                     "name": "financial_subsidiary",
                     "label": "金融子公司（现金流口径近似）",
+                    "direction": "counted",
                     "quantified": False,
                     "impact_per_share": None,
                     "note": (
@@ -174,6 +175,7 @@ def _approximations(
                 {
                     "name": "financial_subsidiary",
                     "label": "金融子公司（现金流口径近似）",
+                    "direction": "counted",
                     "quantified": True,
                     "asset_share": ratio,
                     "bridge_gap": gap,
@@ -186,29 +188,36 @@ def _approximations(
                 }
             )
 
-    # 4) 少数股东权益为负：桥接按 0 处理，差额单列为近似项
+    # 4) 少数股东权益为负：桥接按 0 处理，差额计入（使价值变低）
     if inputs.minority_equity < 0:
         items.append(
             {
                 "name": "negative_minority_equity",
                 "label": "少数股东权益为负",
+                "direction": "counted",
                 "quantified": True,
                 "reported_value": inputs.minority_equity,
                 "impact_per_share": abs(inputs.minority_equity) / shares,
-                "note": "子公司累计亏损超过少数股东投入；桥接按 0 处理，差额计为近似影响",
+                "note": "子公司累计亏损超过少数股东投入；桥接按 0 处理，差额计入近似影响",
             }
         )
 
-    quantified = [item for item in items if item["quantified"]]
-    total = sum(item["impact_per_share"] for item in quantified) if quantified else 0.0
+    counted = [item for item in items if item["direction"] == "counted" and item["quantified"]]
+    disclosed = [item for item in items if item["direction"] == "disclose_only" and item["quantified"]]
+    counted_total = sum(item["impact_per_share"] for item in counted) if counted else 0.0
+    disclosed_total = sum(item["impact_per_share"] for item in disclosed) if disclosed else 0.0
     return {
         "items": items,
-        "quantified_count": len(quantified),
-        "unquantified": unquantified,
-        "total_impact_per_share": total if not unquantified else None,
+        "counted_count": len(counted),
+        "disclosed_count": len(disclosed),
+        "counted_total_per_share": counted_total,
+        "disclosed_total_per_share": disclosed_total,
+        "total_impact_per_share": counted_total if not unquantified_counted else None,
+        "unquantified": unquantified_counted,
+        "unquantified_disclosed": unquantified_disclosed,
         "note": (
-            "合计取各项绝对影响之和（保守口径）；存在无法量化项时合计不成立，"
-            "按政策不能给 A/B 级"
+            "计入等级的合计只取「可能让价值变低」各项的绝对影响之和；"
+            "「非现金等价物货币资金」只披露、不计入。存在无法量化的计入项时按政策不能给 A/B 级"
         ),
     }
 
@@ -306,6 +315,59 @@ def _sensitivity(
                 }
             )
     return rows
+
+
+def continuity_guardrail_reasons(
+    policy: EquityPolicy,
+    *,
+    route_conclusions: list[str],
+    model_id: str,
+    explicit_cash_sum: float | None,
+    terminal_share: float | None,
+) -> list[dict[str, str]]:
+    """R2 的三项连续性护栏，返回 [{"code","reason"}]；空列表表示未触发。
+
+    边界按政策：显式期合计 ≤ 0 触发；终值占比 ≥ 上限触发；默认路线按
+    `*_by_default` 字样识别。
+    """
+    node = policy.node("terminal.continuity_guardrail")
+    hits: list[dict[str, str]] = []
+    if any(str(item).endswith("_by_default") for item in route_conclusions if item):
+        hits.append(
+            {
+                "code": rc.TERMINAL_GUARDRAIL_BY_DEFAULT,
+                "reason": "主模型按机制默认落入（*_by_default），不是适用性规则选中",
+            }
+        )
+    if model_id == "equity_dcf_fcff" and explicit_cash_sum is not None and explicit_cash_sum <= 0:
+        hits.append(
+            {
+                "code": rc.TERMINAL_GUARDRAIL_EXPLICIT_CASH,
+                "reason": f"基准情景显式期 FCFF 合计 {explicit_cash_sum / 1e8:,.1f} 亿元 ≤ 0",
+            }
+        )
+    limit = float(node["terminal_share_max"])
+    if terminal_share is not None and terminal_share >= limit:
+        hits.append(
+            {
+                "code": rc.TERMINAL_GUARDRAIL_TERMINAL_SHARE,
+                "reason": f"基准情景终值占比 {terminal_share:.1%} ≥ {limit:.0%}",
+            }
+        )
+    return hits
+
+
+def base_year_anomaly(
+    policy: EquityPolicy, *, revenue_yoy: float | None, profit_yoy: float | None
+) -> list[str]:
+    """R11：基期异常触发项说明；空列表表示未触发。"""
+    node = policy.node("reporting.base_year_anomaly")
+    parts: list[str] = []
+    if revenue_yoy is not None and abs(revenue_yoy) > float(node["revenue_yoy_abs"]["value"]):
+        parts.append(f"营业收入同比 {revenue_yoy:.1%}")
+    if profit_yoy is not None and abs(profit_yoy) > float(node["profit_yoy_abs"]["value"]):
+        parts.append(f"归母净利润同比 {profit_yoy:.1%}")
+    return parts
 
 
 def _base_record(
@@ -557,11 +619,14 @@ def evaluate_company(
         "da_pct": inputs.da_pct,
         "capex_pct": inputs.capex_pct,
         "nwc_intensity": inputs.nwc_intensity,
+        "nwc_missing": inputs.nwc_missing,
         "payout": inputs.payout,
         "payout_years": list(inputs.payout_years),
+        "payout_missing_years": list(inputs.payout_missing_years),
         "roe_latest": inputs.roe_latest,
         "roe_5y": inputs.roe_5y,
         "revenue_cagr5": inputs.revenue_cagr5,
+        "revenue_cagr3": inputs.revenue_cagr3,
         "year1_growth": inputs.year1_growth,
         "year1_basis": inputs.year1_basis,
         "debt": inputs.debt,
@@ -569,9 +634,11 @@ def evaluate_company(
         "missing_debt_components": list(inputs.missing_debt_components),
         "average_debt": inputs.average_debt,
         "interest_expense": inputs.interest_expense,
+        "interest_missing": inputs.interest_missing,
         "monetary_funds": inputs.monetary_funds,
         "cash_equivalents_end": inputs.cash_equivalents_end,
-        "restricted_cash_estimate": inputs.restricted_cash_estimate,
+        "cash_equivalents_component": inputs.cash_equivalents_component,
+        "non_cash_equivalents": inputs.non_cash_equivalents,
         "operating_cash_need": inputs.operating_cash_need,
         "available_cash": inputs.available_cash,
         "minority_equity": inputs.minority_equity,
@@ -585,16 +652,32 @@ def evaluate_company(
         "profit_5y": inputs.profit_5y,
         "loss_years": inputs.loss_years,
         "loss_years_7": inputs.loss_years_7,
+        "loss_missing_10": list(inputs.loss_missing_10),
+        "loss_missing_7": list(inputs.loss_missing_7),
+        "ocf_missing_years": list(inputs.ocf_missing_years),
+        "dividend_3y_total": inputs.dividend_3y_total,
+        "ocf_capex_3y_total": inputs.ocf_capex_3y_total,
+        "dividend_missing_years": list(inputs.dividend_missing_years),
         "available_years": inputs.available_years,
         "ebitda": inputs.ebitda,
+        "ebit_margin_min_5y": inputs.ebit_margin_min_5y,
+        "net_margin_base": inputs.net_margin_base,
+        "net_margin_min_5y": inputs.net_margin_min_5y,
         "notes": list(inputs.notes),
     }
 
     discount = valuation.build_discount(policy, inputs, risk_free=rf["normalized"])
     record["discount"] = discount.to_dict()
     leverage = valuation.leverage_guardrail(
-        policy, valuation.leverage_ratio(discount.debt, discount.market_cap)
+        policy, valuation.leverage_ratio(discount.net_debt, discount.market_cap)
     )
+    thresholds = [
+        float(x) for x in policy.node("quality.leverage_guardrail")["sensitivity_thresholds"]["values"]
+    ]
+    leverage["sensitivity"] = [
+        {"threshold": threshold, "exceeded": leverage["ratio"] > threshold}
+        for threshold in thresholds
+    ]
     record["leverage_guardrail"] = leverage
 
     try:
@@ -625,8 +708,10 @@ def evaluate_company(
         "path_pessimistic": paths["pessimistic"],
         "path_base": paths["base"],
         "path_optimistic": paths["optimistic"],
-        "steady_growth": paths["base"][1] if len(paths["base"]) > 1 else None,
+        "steady_growth": valuation.steady_growth(policy, inputs),
         "revenue_cagr5": inputs.revenue_cagr5,
+        "revenue_cagr3": inputs.revenue_cagr3,
+        "revenue_cagr3": inputs.revenue_cagr3,
         "year1_growth": inputs.year1_growth,
         "year1_basis": inputs.year1_basis,
     }
@@ -637,28 +722,30 @@ def evaluate_company(
         name: scenario.terminal_share for name, scenario in scenarios.items()
     }
 
-    # 现金流勾稽（P8）
+    # 现金流勾稽（P8）：R6 两条路线都执行（公司报表层面检查）
     bridge = None
     status = "complete"
     status_reason = "政策模型完整执行"
-    if model_id == "equity_dcf_fcff":
-        try:
-            bridge = build_fcff_bridge(
-                history,
-                base_year,
-                tolerance=policy.value("quality.bridge_tolerance"),
-            )
-            record["bridge"] = bridge.to_dict()
-            if bridge.reconciled is False:
-                status = "partial"
-                status_reason = (
-                    f"FCFF 与经营现金流勾稽差额占经营现金流 {bridge.reconciliation_relative:.1%}，"
-                    f"超过政策容差 {policy.value('quality.bridge_tolerance'):.0%}：结果按 partial 输出"
-                )
-        except Exception as exc:  # noqa: BLE001 - 勾稽不可完成也不能假装完整
+    reason_codes: list[str] = []
+    try:
+        bridge = build_fcff_bridge(
+            history,
+            base_year,
+            tolerance=policy.value("quality.bridge_tolerance"),
+        )
+        record["bridge"] = bridge.to_dict()
+        if bridge.reconciled is False:
             status = "partial"
-            status_reason = f"现金流勾稽无法完成：{type(exc).__name__}: {exc}"
-            record["bridge"] = {"error": str(exc)}
+            status_reason = (
+                f"FCFF 与经营现金流勾稽差额占经营现金流 {bridge.reconciliation_relative:.1%}，"
+                f"超过政策容差 {policy.value('quality.bridge_tolerance'):.0%}：结果按 partial 输出"
+            )
+            reason_codes.append(rc.BRIDGE_RECONCILIATION_GAP)
+    except Exception as exc:  # noqa: BLE001 - 勾稽不可完成也不能假装完整
+        status = "partial"
+        status_reason = f"现金流勾稽无法完成：{type(exc).__name__}: {exc}"
+        record["bridge"] = {"error": str(exc)}
+        reason_codes.append(rc.BRIDGE_RECONCILIATION_GAP)
 
     # 交叉检查
     alt_model = _ALT_MODEL.get(model_id)
@@ -709,23 +796,74 @@ def evaluate_company(
         approximation_unquantified=tuple(approximations["unquantified"]),
         family=applicability.family,
         bank_evidence_ok=_bank_evidence_ok(snapshot),
+        model_id=model_id,
     )
+
+    guardrail_notes: list[str] = []
     if leverage["exceeded"]:
         grade = grading.force_grade_c(
             grade,
             "leverage_guardrail",
             note=(
-                f"账面有息负债占比 {leverage['ratio']:.1%} 超过杠杆护栏 "
+                f"净有息负债占比 {leverage['ratio']:.1%} 超过杠杆护栏 "
                 f"{leverage['limit']:.0%}：研究价值仅供研究参考，不用于结论"
             ),
         )
+        guardrail_notes.append(
+            f"净有息负债占比 {leverage['ratio']:.1%} 超过杠杆护栏 {leverage['limit']:.0%}"
+        )
+        reason_codes.append(rc.LEVERAGE_GUARDRAIL_EXCEEDED)
+
+    # R2：显式期与终值连续性护栏
+    base_detail = scenarios["base"].detail
+    hits = continuity_guardrail_reasons(
+        policy,
+        route_conclusions=[r.get("conclusion") for r in (record["route"].get("reasons") or [])],
+        model_id=model_id,
+        explicit_cash_sum=base_detail.get("explicit_fcff_sum"),
+        terminal_share=record["terminal_share"].get("base"),
+    )
+    for hit in hits:
+        reason_codes.append(hit["code"])
+        guardrail_notes.append(hit["reason"])
+    if hits:
+        grade = grading.force_grade_c(
+            grade,
+            "terminal_continuity_guardrail",
+            note="；".join(hit["reason"] for hit in hits)
+            + "：研究价值仅供研究参考，不用于结论",
+        )
+
+    # R8 直接后果：悲观价值非正时负价值不可解释，不给结论
+    if values["pessimistic"] <= 0:
+        guardrail_notes.append(
+            f"悲观情景每股价值 {values['pessimistic']:,.2f} 元 ≤ 0（利润率下行假设下自由现金流为负）"
+        )
+        reason_codes.append(rc.PESSIMISTIC_VALUE_NONPOSITIVE)
+        grade = grading.force_grade_c(
+            grade,
+            "pessimistic_value_nonpositive",
+            note="悲观情景价值非正：研究价值仅供研究参考，不用于结论",
+        )
+
+    # R11：基期异常变动触发 partial / 无法判断
+    anomaly_parts = base_year_anomaly(
+        policy, revenue_yoy=revenue_yoy, profit_yoy=profit_yoy
+    )
+    if anomaly_parts:
+        guardrail_notes.append("基期异常变动（" + "、".join(anomaly_parts) + "）")
+        reason_codes.append(rc.BASE_YEAR_ANOMALY)
+        grade = grading.force_grade_c(
+            grade,
+            "base_year_anomaly",
+            note="基期口径可能断裂：按 R11 状态 partial、无法判断",
+        )
+
+    if guardrail_notes:
         if status == "complete":
             status = "partial"
-        status_reason = (
-            f"账面有息负债占比 {leverage['ratio']:.1%} 超过杠杆护栏 "
-            f"{leverage['limit']:.0%}（M4）：研究价值仅供研究参考，不给正式结论"
-        )
-        record["reason_codes"] = [rc.LEVERAGE_GUARDRAIL_EXCEEDED]
+        status_reason = "；".join(guardrail_notes) + "。研究价值仅供研究参考，不用于结论"
+    record["reason_codes"] = reason_codes
     record["grade"] = grade.to_dict()
 
     conclusion = grading.conclude(
@@ -878,6 +1016,11 @@ def run_trial(
         records.append(record)
 
     rf = valuation.normalized_risk_free(policy, macro)
+    cost_of_equity = (
+        rf["normalized"]
+        + policy.value("discount_rate.equity_risk_premium")
+        + policy.value("discount_rate.company_specific_premium")
+    )
     summary = {
         "generated_at": generated_at,
         "policy": {
@@ -887,8 +1030,18 @@ def run_trial(
             "approved": policy.approved,
             "version_date": policy.version_date,
             "path": policy.path,
+            "supersedes": policy.data.get("supersedes"),
+            "revision_note": policy.data.get("revision_note"),
         },
         "risk_free": rf,
+        "cost_of_equity": cost_of_equity,
+        "risk_free_drift": valuation.risk_free_drift(policy, macro),
+        "candidate_multiple_table": valuation.candidate_multiple_table(
+            policy, cost_of_equity=cost_of_equity
+        ),
+        "candidate_multiple_ranges": valuation.candidate_multiple_ranges(
+            policy, cost_of_equity=cost_of_equity
+        ),
         "risk_free_series": {
             "series_id": macro.get("series_id"),
             "source": macro.get("source"),
@@ -898,6 +1051,20 @@ def run_trial(
             "months": len(macro.get("month_end_observations") or []),
         },
         "test_set_size": len(codes),
+        "reporting": {
+            "terminal_share_max": float(
+                policy.node("terminal.continuity_guardrail")["terminal_share_max"]
+            ),
+            "grade_distance_alert": float(
+                policy.node("grade.threshold_distance")["alert_below"]
+            ),
+            "candidate_payout_grid": list(
+                policy.node("reporting.candidate_buy_point_conditions")["payout_grid"]
+            ),
+            "candidate_growth_grid": list(
+                policy.node("reporting.candidate_buy_point_conditions")["growth_grid"]
+            ),
+        },
         "reporting_thresholds": {
             "base_year_revenue_yoy_abs": policy.value(
                 "reporting.base_year_anomaly.revenue_yoy_abs"

@@ -341,9 +341,10 @@ _CASH_FIELDS = (
     ("OPERATE_RECE_REDUCE", "operating_receivables_decrease", "operating_receivables_decrease", "经营性应收项目的减少（减：增加）"),
     ("OPERATE_PAYABLE_ADD", "operating_payables_add", "operating_payables_add", "经营性应付项目的增加（减：减少）"),
     ("DEFER_TAX", "deferred_tax", "deferred_tax", "递延所得税资产/负债变动"),
-    # 期末现金及现金等价物余额：用于估算「受限资金 + 非现金等价物」
-    ("END_CASH_EQUIVALENTS", "cash_equivalents_end", "cash_and_equivalents_end", "期末现金及现金等价物余额"),
-    ("END_CCE", "cash_flow_end_cce", "cash_flow_end_cash_equivalents", "现金流量表期末现金及现金等价物余额（另一口径）"),
+    # R3：期末现金余额只用 END_CCE。东方财富 END_CASH_EQUIVALENTS 是「现金等价物」
+    # 分项（茅台 2021–2025 为 0/0/30.0/56.7/84.7 亿元），不能当作余额。
+    ("END_CASH_EQUIVALENTS", "cash_equivalents_component", "cash_and_equivalents_component", "现金等价物（分项，不是期末余额）"),
+    ("END_CCE", "cash_equivalents_end", "cash_and_equivalents_end", "现金流量表期末现金及现金等价物余额（估值只用此口径）"),
 )
 
 _BALANCE_FIELDS = (
