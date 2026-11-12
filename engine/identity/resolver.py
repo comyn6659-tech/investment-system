@@ -26,6 +26,18 @@ _CROSS_BORDER_MARKERS = (
 _COMMODITY_MARKERS = ("黄金", "白银", "原油", "豆粕", "有色金属期货", "商品")
 _BOND_MARKERS = ("国债", "政金债", "信用债", "可转债", "短融", "城投债")
 
+# 「创业板」是交易板块，不是指数；必须澄清，不能按名称包含关系猜成创业板指。
+_CHINEXT_BOARD = "创业板"
+# 其他创业板指数（含创业板50、创业板综、创业板R 等）仍在本批范围外。
+_CHINEXT_INDEX_VARIANTS = (
+    "创业板50",
+    "创业板100",
+    "创业板200",
+    "创业板300",
+    "创业板综",
+    "创业板R",
+)
+
 
 def resolve(text: str | None, catalog: IdentityCatalog) -> Resolution:
     n = normalize(text)
@@ -129,6 +141,32 @@ def _venue_matches(instrument: InstrumentRef, wanted: str) -> bool:
 
 # --- 名称输入 ---------------------------------------------------------------
 def _resolve_name(n: NormalizedInput, catalog: IdentityCatalog) -> Resolution:
+    # 1) 单独说「创业板」：先问是不是创业板指，不按板块名称猜指数。
+    if n.canonical == _CHINEXT_BOARD:
+        candidates = tuple(
+            sorted(catalog.by_code("399006"), key=lambda c: c.instrument_id)
+        )
+        return Resolution(
+            status=ResolutionStatus.AMBIGUOUS.value,
+            raw_input=n.raw,
+            candidates=candidates,
+            reason_codes=(rc.IDENTITY_AMBIGUOUS,),
+            clarification_question=(
+                "「创业板」是一个交易板块，不是指数。你是指创业板指"
+                "（399006，INDEX:399006.SZ），还是想查询创业板板块的其他标的？"
+                "请给出指数全称或 6 位代码。"
+            ),
+        )
+
+    # 2) 创业板50、创业板综、创业板R 等其他创业板指数：明确范围外。
+    if any(marker in n.canonical for marker in _CHINEXT_INDEX_VARIANTS):
+        return Resolution(
+            status=ResolutionStatus.OUT_OF_SCOPE.value,
+            raw_input=n.raw,
+            reason_codes=(rc.OUT_OF_SCOPE_INDEX_VARIANT,),
+            clarification_question=None,
+        )
+
     exact = catalog.by_name(n.canonical)
     if len(exact) == 1:
         return _resolved(exact[0], n, matched_by="exact_name")

@@ -26,6 +26,8 @@ FREQ_DAILY = "daily"
 METRIC_PE_ROLLING = "pe_rolling"
 METRIC_PB = "pb"
 METRIC_OFFICIAL_PE_1 = "official_pe_ratio_1"
+# 官方当前 PB 快照（与 PE 一样只作并列事实，不进入长历史排名）
+METRIC_OFFICIAL_PB_1 = "official_pb_ratio_1"
 # 价格指数收盘（不含分红），只用于事后价格收益诊断
 METRIC_PRICE_INDEX_CLOSE = "price_index_close"
 # 中证官方历史行情文件：指数日频收盘与日频滚动市盈率（候选 A 回测的输入）
@@ -280,6 +282,7 @@ def metric_label(metric: str) -> str:
         METRIC_PE_ROLLING: "滚动市盈率",
         METRIC_PB: "市净率",
         METRIC_OFFICIAL_PE_1: "官方市盈率1",
+        METRIC_OFFICIAL_PB_1: "官方市净率1",
         METRIC_PRICE_INDEX_CLOSE: "价格指数收盘",
         METRIC_OFFICIAL_CLOSE: "官方指数收盘",
         METRIC_OFFICIAL_PE_ROLLING: "官方滚动市盈率",
@@ -293,6 +296,7 @@ __all__ = [
     "FREQ_MONTHLY_REFERENCE",
     "IndexSeries",
     "METRIC_OFFICIAL_PE_1",
+    "METRIC_OFFICIAL_PB_1",
     "METRIC_PB",
     "METRIC_PE_ROLLING",
     "METRIC_OFFICIAL_CLOSE",

@@ -43,7 +43,14 @@ MARKET_CLOSE = (15, 0)  # 收盘时间，按交易所收盘口径
 
 INDEX_CODES = {"000300": "沪深300", "000905": "中证500", "000852": "中证1000"}
 ETF_CODES = ["510300", "510500", "512100"]
-_ETF_VENUE_SUFFIX = {"510300": "SH", "510500": "SH", "512100": "SH", "159845": "SZ", "159919": "SZ"}
+_ETF_VENUE_SUFFIX = {
+    "510300": "SH",
+    "510500": "SH",
+    "512100": "SH",
+    "159845": "SZ",
+    "159919": "SZ",
+    "159915": "SZ",
+}
 STOCK_CODE = "601398"
 
 
@@ -541,14 +548,30 @@ def fetch_fund_profile(code: str, *, now: datetime) -> dict:
     }
 
 
-def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: datetime | None = None) -> Snapshot:
+def build_etf_snapshot(
+    code: str,
+    *,
+    expected_as_of: str | None = None,
+    now: datetime | None = None,
+    hist_frame: pd.DataFrame | None = None,
+    price_source: SourceRef | None = None,
+) -> Snapshot:
+    """构建 ETF 快照。
+
+    `hist_frame`/`price_source` 只用于行情接口不可用时的等价替代源：
+    调用方必须显式传入源信息，快照里会如实写成该源，不能伪装成东财数据。
+    """
     now = now or datetime.now(TZ)
     src = _make_sources(code)
+    price_src = price_source or src["etf_hist"]
     facts: list[Fact] = []
 
-    hist = ak.fund_etf_hist_em(
-        symbol=code, period="daily", start_date="20240101", end_date="20301231", adjust=""
-    )
+    if hist_frame is None:
+        hist = ak.fund_etf_hist_em(
+            symbol=code, period="daily", start_date="20240101", end_date="20301231", adjust=""
+        )
+    else:
+        hist = hist_frame.copy()
     if hist.empty:
         raise BuildError(f"{code} 行情为空，无法确定市场日期")
     hist.to_csv(CACHE_DIR / f"etf_hist_{code}.csv", index=False)
@@ -569,7 +592,7 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
                 f"{market_date_str}T15:00:00+08:00" if status == "closed" else None
             ),
             fetched_at=now.isoformat(timespec="seconds"),
-            source=src["etf_hist"],
+            source=price_src,
             transform=f"ETF 日线最后一行收盘价（bar_status={status}）",
             notes=(
                 "已收盘交易日的收盘价"
@@ -593,7 +616,7 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
                     metric=metric,
                     period=market_date_str,
                     fetched_at=stamp,
-                    source=src["etf_hist"],
+                    source=price_src,
                     notes=f"行情接口未返回『{column}』",
                 )
             )
@@ -610,7 +633,7 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
                         f"{market_date_str}T15:00:00+08:00" if status == "closed" else None
                     ),
                     fetched_at=stamp,
-                    source=src["etf_hist"],
+                    source=price_src,
                     transform=f"不复权日线『{column}』（bar_status={status}）",
                     notes="已收盘交易日的日成交数据" if status == "closed" else "当日未收盘，成交数据不完整",
                 )
@@ -627,7 +650,7 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
                     metric="turnover_avg_20d",
                     period=market_date_str,
                     fetched_at=stamp,
-                    source=src["etf_hist"],
+                    source=price_src,
                     notes="没有可用的成交额观测",
                 )
             )
@@ -644,7 +667,7 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
                         f"{market_date_str}T15:00:00+08:00" if status == "closed" else None
                     ),
                     fetched_at=stamp,
-                    source=src["etf_hist"],
+                    source=price_src,
                     transform=f"末尾 {days_used} 个交易日成交额算术平均（最多取 20 个）",
                     notes=f"实际使用 {days_used} 个交易日；不足 20 天时不称『20 日均值』",
                 )
@@ -657,7 +680,7 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
                     unit="count",
                     period=market_date_str,
                     fetched_at=stamp,
-                    source=src["etf_hist"],
+                    source=price_src,
                     transform="参与平均的实际交易日数",
                 )
             )
@@ -668,7 +691,7 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
             metric="bid_ask_spread",
             period=market_date_str,
             fetched_at=stamp,
-            source=src["etf_hist"],
+            source=price_src,
             notes="日线行情不含买卖盘口，未取得价差；不因有收盘价就断言可交易",
         )
     )
@@ -676,6 +699,14 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
     nav_df = ak.fund_etf_fund_info_em(fund=code, start_date="20260101", end_date="20261231")
     nav_df.to_csv(CACHE_DIR / f"etf_nav_{code}.csv", index=False)
     if not nav_df.empty:
+        # 快照 as_of 可能早于最新净值日（例如按前一交易日重建）：只用不晚于
+        # 快照日期的净值，避免把未来净值塞进「截至某日」的快照。
+        nav_df = nav_df.copy()
+        nav_df["_nav_date"] = [_as_date(value) for value in nav_df["净值日期"]]
+        visible = nav_df[nav_df["_nav_date"] <= market_date]
+        if not visible.empty:
+            nav_df = visible
+        nav_df = nav_df.sort_values("_nav_date").drop(columns=["_nav_date"])
         nav_latest = nav_df.iloc[-1]
         nav_date = _as_date(nav_latest["净值日期"])
         facts.append(
@@ -801,7 +832,7 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
             metric="trading_status",
             period=market_date_str,
             fetched_at=now.isoformat(timespec="seconds"),
-            source=src["etf_hist"],
+            source=price_src,
             notes="未取得交易所停复牌状态字段；仅能确认当日有行情",
         )
     )
@@ -875,7 +906,7 @@ def build_etf_snapshot(code: str, *, expected_as_of: str | None = None, now: dat
             "date_source": "按日期选行" if expected_as_of else "ETF 日线最后一行",
             "rows_after_market_date_dropped": dropped,
         },
-        "price_history": {"source_id": src["etf_hist"].source_id, "frequency": "daily"},
+        "price_history": {"source_id": price_src.source_id, "frequency": "daily"},
         "nav_history": {
             "source_id": src["etf_nav"].source_id,
             "observations_2026": int(len(nav_df)),

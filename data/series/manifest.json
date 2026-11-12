@@ -251,6 +251,54 @@
       "end_date": "2026-11-11",
       "observation_count": 4818,
       "file": "ser-5ab1aa6a153cf8bf.json"
+    },
+    {
+      "series_id": "ser-7ac07cf786e292e2",
+      "instrument_id": "INDEX:399006.SZ",
+      "metric": "official_close",
+      "frequency": "daily",
+      "source_id": "cnindex.official_history",
+      "retrieved_at": "2026-11-12T19:50:33+08:00",
+      "start_date": "2010-06-01",
+      "end_date": "2026-11-11",
+      "observation_count": 3993,
+      "file": "ser-7ac07cf786e292e2.json"
+    },
+    {
+      "series_id": "ser-6081301e8f8db931",
+      "instrument_id": "INDEX:399006.SZ",
+      "metric": "official_pb_ratio_1",
+      "frequency": "daily_short",
+      "source_id": "cnindex.index_list",
+      "retrieved_at": "2026-11-12T19:50:33+08:00",
+      "start_date": "2026-11-11",
+      "end_date": "2026-11-11",
+      "observation_count": 1,
+      "file": "ser-6081301e8f8db931.json"
+    },
+    {
+      "series_id": "ser-26370efe035d2f02",
+      "instrument_id": "INDEX:399006.SZ",
+      "metric": "official_pe_ratio_1",
+      "frequency": "daily_short",
+      "source_id": "cnindex.index_list",
+      "retrieved_at": "2026-11-12T19:50:33+08:00",
+      "start_date": "2026-11-11",
+      "end_date": "2026-11-11",
+      "observation_count": 1,
+      "file": "ser-26370efe035d2f02.json"
+    },
+    {
+      "series_id": "ser-d50212f068f47cd2",
+      "instrument_id": "INDEX:399006.SZ",
+      "metric": "total_return_close",
+      "frequency": "daily",
+      "source_id": "cnindex.official_history",
+      "retrieved_at": "2026-11-12T19:50:33+08:00",
+      "start_date": "2010-06-01",
+      "end_date": "2026-11-11",
+      "observation_count": 3993,
+      "file": "ser-d50212f068f47cd2.json"
     }
   ]
 }

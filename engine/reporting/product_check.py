@@ -85,7 +85,10 @@ def build_product_check(
             "missing": [
                 {"item": "快照", "fact_id": None, "status": "missing", "note": "没有可用快照"}
             ],
-            "usage_note": "",
+            "usage_note": (
+                "没有可用快照，无法检查产品资料；"
+                "「资料齐备」不等于「满足买入条件」，本块不构成买卖建议。"
+            ),
         }
 
     price = _num(snapshot, "etf.price")

@@ -40,6 +40,7 @@ from engine.series.models import (
     FREQ_DAILY_SHORT,
     FREQ_MONTHLY_REFERENCE,
     METRIC_OFFICIAL_CLOSE,
+    METRIC_OFFICIAL_PB_1,
     METRIC_OFFICIAL_PE_1,
     METRIC_OFFICIAL_PE_ROLLING,
     METRIC_TOTAL_RETURN_CLOSE,
@@ -454,16 +455,18 @@ class Analyzer:
             if item is not None:
                 series[metric] = item
         short = {}
-        official = self.series.find(
-            instrument.instrument_id, METRIC_OFFICIAL_PE_1, frequency=FREQ_DAILY_SHORT
-        )
-        if official is not None:
-            short[METRIC_OFFICIAL_PE_1] = official
+        for metric in (METRIC_OFFICIAL_PE_1, METRIC_OFFICIAL_PB_1):
+            official = self.series.find(
+                instrument.instrument_id, metric, frequency=FREQ_DAILY_SHORT
+            )
+            if official is not None:
+                short[metric] = official
         return build_index_profile(
             instrument_id=instrument.instrument_id,
             as_of=as_of,
             series=series,
             short_series=short,
+            official_only=instrument.official_valuation_only,
         )
 
     def _index_result(
@@ -634,9 +637,11 @@ class Analyzer:
         elif profile.get("missing"):
             codes.append(rc.INDEX_PROFILE_COVERAGE_INSUFFICIENT)
         codes.extend([rc.INDEX_PROFILE_DESCRIPTIVE_ONLY, rc.INDEX_STRATEGY_NOT_IMPLEMENTED])
-        if product.get("trading", {}).get("secondary_market_status", {}).get("status") != "known":
+        trading_block = product.get("trading") or {}
+        if (trading_block.get("secondary_market_status") or {}).get("status") != "known":
             codes.append(rc.ETF_TRADING_STATUS_UNKNOWN)
-        if not product.get("nav", {}).get("disclosure_time_known"):
+        nav_block = product.get("nav") or {}
+        if not nav_block.get("disclosure_time_known"):
             codes.append(rc.ETF_NAV_DISCLOSURE_TIME_UNKNOWN)
         premium = product.get("premium_discount_same_day") or {}
         if premium.get("value") is None:

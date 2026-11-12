@@ -1,0 +1,313 @@
+{
+  "schema_version": "chinext-feasibility/1",
+  "generated_at": "2026-11-12T19:50:33+08:00",
+  "scope": "创业板指（399006）与跟踪 ETF 159915",
+  "decision": "short_history_only",
+  "decision_detail": "官方日收盘与全收益可得且自发布日起完整；官方估值只有最新一个交易日的 PE/PB 快照，没有日度或月度历史，因此不做 5 年分位、不做周度候选 A 信号、不做研究回测、不写候选 A 账本。已接入收盘、全收益、当前估值快照、指数快照与 ETF 产品资料。",
+  "official_history_available": true,
+  "official_pe_history_available": false,
+  "current_official_valuation": {
+    "date": "2026-11-11",
+    "pe_dynamic": 25.1325,
+    "pe_static": 31.6183,
+    "pb": 4.07,
+    "source": "cnindex.index_list"
+  },
+  "implemented": [
+    "399006 官方日收盘序列（含内容哈希与序列库 manifest）",
+    "399606 官方全收益日收盘序列",
+    "399006 官方当前 PE/PB 快照（单日，进入指数画像的『官方短历史』并列事实）",
+    "399006 指数快照（官方收盘 + 官方当前 PE/PB）",
+    "159915 产品资料快照（价格、净值、费率、跟踪标的）",
+    "名称识别：创业板指/创业板指数/399006 可识别；单独『创业板』澄清；创业板50 等范围外"
+  ],
+  "not_implemented": [
+    "5 年月度估值画像（无官方历史估值序列）",
+    "候选 A 周度研究信号（无官方 PE 日频历史）",
+    "候选 A 研究回测（无官方 PE 日频历史）",
+    "候选 A 信号账本 399006 记录（无信号可写）"
+  ],
+  "third_party_not_adopted": [
+    "CEIC 转载的创业板板块日度 PE/PB：对象是板块，不是 399006；第三方，未采用。",
+    "乐咕乐股等第三方指数 PE 历史：不支持创业板指或口径未说明，未采用。"
+  ],
+  "probes": [
+    {
+      "probe_id": "c1_cni_daily_close_399006",
+      "requirement": "官方日收盘",
+      "purpose": "创业板指官方日频收盘",
+      "publisher": "深圳证券信息有限公司（国证指数）",
+      "interface": "国证指数官方历史行情接口",
+      "url": "http://hq.cnindex.com.cn/market/market/getIndexDailyDataWithDataFormat",
+      "status": "ok",
+      "rows": 3993,
+      "fields": [
+        "日期",
+        "收盘"
+      ],
+      "date_range": [
+        "2010-06-01",
+        "2026-11-11"
+      ],
+      "frequency": "daily",
+      "official": true,
+      "adopted": true,
+      "note": "原始返回 3994 行，含基日 2010-05-31 基点行；按发布日截断后 3993 行。"
+    },
+    {
+      "probe_id": "c1_cni_total_return_399606",
+      "requirement": "官方全收益",
+      "purpose": "创业板指全收益（399606，创业板R）日频收盘",
+      "publisher": "深圳证券信息有限公司（国证指数）",
+      "interface": "国证指数官方历史行情接口",
+      "url": "http://hq.cnindex.com.cn/market/market/getIndexDailyDataWithDataFormat",
+      "status": "ok",
+      "rows": 3993,
+      "fields": [
+        "日期",
+        "收盘"
+      ],
+      "date_range": [
+        "2010-06-01",
+        "2026-11-11"
+      ],
+      "frequency": "daily",
+      "official": true,
+      "adopted": true,
+      "note": "分红再投资口径；与价格指数分属不同序列，不混用。"
+    },
+    {
+      "probe_id": "c2_cni_current_valuation",
+      "requirement": "官方估值",
+      "purpose": "创业板指官方 PE/PB 当前快照",
+      "publisher": "深圳证券信息有限公司（国证指数）",
+      "interface": "国证指数官网指数列表接口",
+      "url": "https://www.cnindex.com.cn/index/indexList",
+      "status": "ok",
+      "rows": 1,
+      "fields": [
+        "peStatic",
+        "peDynamic",
+        "pb",
+        "closeingPoint"
+      ],
+      "date_range": [
+        "2026-11-11",
+        "2026-11-11"
+      ],
+      "frequency": "snapshot",
+      "official": true,
+      "adopted": true,
+      "note": "PE 滚动 25.1325、PE 静态 31.6183、PB 4.07；官网只给最新交易日，无历史。"
+    },
+    {
+      "probe_id": "c2_cni_pe_history",
+      "requirement": "官方估值",
+      "purpose": "创业板指官方滚动市盈率日度/月度历史",
+      "publisher": "深圳证券信息有限公司（国证指数）",
+      "interface": "官网指数详情/指数列表/历史行情",
+      "url": "http://hq.cnindex.com.cn/market/market/getIndexDailyDataWithDataFormat",
+      "status": "missing",
+      "rows": 0,
+      "fields": [
+        "peDynamic",
+        "pb"
+      ],
+      "date_range": [],
+      "frequency": "",
+      "official": true,
+      "adopted": false,
+      "note": "历史行情接口只有 OHLC/成交，无 PE；指数列表只有最新值，date/tradeDate/searchDate 等日期参数实测均被忽略；官网无指数估值历史下载。未找到可复核的官方日度或月度历史。"
+    },
+    {
+      "probe_id": "c2_szse_index_quote",
+      "requirement": "官方估值",
+      "purpose": "深交所指数行情是否含 PE",
+      "publisher": "深圳证券交易所",
+      "interface": "深交所指数行情报表（1826_snapshot）",
+      "url": "http://www.szse.cn/api/report/ShowReport/data",
+      "status": "ok",
+      "rows": 3,
+      "fields": [
+        "交易日期",
+        "指数代码",
+        "指数简称",
+        "前收",
+        "开盘",
+        "最高",
+        "最低",
+        "今收",
+        "涨跌幅<br>(%)",
+        "成交金额<br>(亿元)"
+      ],
+      "date_range": [
+        "2026-11-07",
+        "2026-11-11"
+      ],
+      "frequency": "daily",
+      "official": true,
+      "adopted": false,
+      "note": "深交所指数行情报表字段只有 OHLC/成交，没有市盈率。"
+    },
+    {
+      "probe_id": "c2_szse_industry_pe",
+      "requirement": "官方估值",
+      "purpose": "深交所行业加权平均市盈率是否可用于创业板指",
+      "publisher": "深圳证券交易所",
+      "interface": "深交所股票行业统计（1804_gptj_merge_after）",
+      "url": "http://www.szse.cn/api/report/ShowReport/data",
+      "status": "ok",
+      "rows": 19,
+      "fields": [
+        "行业名称",
+        "股票数<br>(只)",
+        "上市公司家数<br>(家)",
+        "成交金额<br>(亿元)",
+        "成交量<br>(亿)",
+        "总股本<br>(亿)",
+        "总市值<br>(亿元)",
+        "流通股本<br>(亿)",
+        "流通市值<br>(亿元)",
+        "加权平均市盈率"
+      ],
+      "date_range": [],
+      "frequency": "daily",
+      "official": true,
+      "adopted": false,
+      "note": "深交所『创业板』板块的行业加权平均市盈率（19 个行业），对象是板块/行业，不是创业板指 100 只样本；指数 PE 的样本与加权方式不同，不能替代。"
+    },
+    {
+      "probe_id": "c2_ceic_chinext_board_pe",
+      "requirement": "官方估值",
+      "purpose": "第三方转载的创业板板块 PE（存在但未采用）",
+      "publisher": "CEIC（数据标注来源：深圳证券交易所）",
+      "interface": "CEIC 数据库页面",
+      "url": "https://www.ceicdata.com.cn/zh-hans/china/shenzhen-stock-exchange-chinext-pe-and-pb-ratio-daily",
+      "status": "ok",
+      "rows": null,
+      "fields": [
+        "市盈率",
+        "市净率"
+      ],
+      "date_range": [
+        "2009-10-30",
+        "2026-11-02"
+      ],
+      "frequency": "daily",
+      "official": false,
+      "adopted": false,
+      "note": "页面标注为『深交所 : 创业板 : 市盈率和市净率 : 日度』，最新约 35.39 倍；这是创业板**板块**口径，与创业板指 100 只样本的 25.1325 倍不是同一对象；且为第三方转载，未采用。"
+    },
+    {
+      "probe_id": "c3_cni_index_identity",
+      "requirement": "指数身份",
+      "purpose": "创业板指名称、代码、基日",
+      "publisher": "深圳证券信息有限公司（国证指数）",
+      "interface": "国证指数官网指数详情接口",
+      "url": "https://www.cnindex.com.cn/index/selectIndexByCode",
+      "status": "ok",
+      "rows": 1,
+      "fields": [
+        "indexcode",
+        "indexname",
+        "indexfullcname",
+        "jr"
+      ],
+      "date_range": [],
+      "frequency": "",
+      "official": true,
+      "adopted": true,
+      "note": "创业板指（创业板指数），代码 399006，基日 2010-05-31。"
+    },
+    {
+      "probe_id": "c3_szse_index_list",
+      "requirement": "指数身份",
+      "purpose": "深交所指数列表交叉核对",
+      "publisher": "深圳证券交易所",
+      "interface": "深交所指数列表（1812_zs）",
+      "url": "http://www.szse.cn/api/report/ShowReport/data",
+      "status": "ok",
+      "rows": 1,
+      "fields": [
+        "指数代码",
+        "指数名称",
+        "基日",
+        "基日指数",
+        "起始计算日"
+      ],
+      "date_range": [],
+      "frequency": "",
+      "official": true,
+      "adopted": true,
+      "note": "399006 创业板指数，基日 2010-05-31，基日指数 1000，起始计算日 2010-06-01。"
+    },
+    {
+      "probe_id": "c4_etf_159915",
+      "requirement": "跟踪 ETF",
+      "purpose": "159915 产品资料与日线/净值可用性",
+      "publisher": "天天基金/东方财富",
+      "interface": "基金概况页 + fund_etf_hist_em + fund_etf_fund_info_em",
+      "url": "http://fundf10.eastmoney.com/jbgk_159915.html",
+      "status": "ok",
+      "rows": 207,
+      "fields": [
+        "跟踪标的",
+        "管理费率",
+        "托管费率",
+        "日线收盘",
+        "单位净值"
+      ],
+      "date_range": [
+        "2011-12-09",
+        "2026-11-11"
+      ],
+      "frequency": "daily",
+      "official": false,
+      "adopted": true,
+      "note": "跟踪 创业板指数；管理费 0.15%/年、托管费 0.05%/年；与既有 ETF 产品资料检查同口径。 价格源：sina.etf_hist。 说明：Push2RateLimitError: 东方财富限流，已改用新浪日线"
+    }
+  ],
+  "notes": [
+    "本结论只针对已测官方接口与参数，不代表所有官方渠道都没有历史估值；",
+    "没有为了让分位通过而用第三方估值、板块 PE 或拼接序列；",
+    "官方当前 PE/PB 只作单日并列事实，不计算分位，也不构成买点。"
+  ],
+  "series": [
+    {
+      "series_id": "ser-7ac07cf786e292e2",
+      "metric": "official_close",
+      "frequency": "daily",
+      "observations": 3993,
+      "start": "2010-06-01",
+      "end": "2026-11-11"
+    },
+    {
+      "series_id": "ser-d50212f068f47cd2",
+      "metric": "total_return_close",
+      "frequency": "daily",
+      "observations": 3993,
+      "start": "2010-06-01",
+      "end": "2026-11-11"
+    },
+    {
+      "series_id": "ser-26370efe035d2f02",
+      "metric": "official_pe_ratio_1",
+      "frequency": "daily_short",
+      "observations": 1,
+      "start": "2026-11-11",
+      "end": "2026-11-11"
+    },
+    {
+      "series_id": "ser-6081301e8f8db931",
+      "metric": "official_pb_ratio_1",
+      "frequency": "daily_short",
+      "observations": 1,
+      "start": "2026-11-11",
+      "end": "2026-11-11"
+    }
+  ],
+  "snapshot_id": "snap-6a6ddb1b59abf532",
+  "etf_price_source_fallback": "sina.etf_hist",
+  "etf_snapshot_id": "snap-e459e6eb00b87bd6",
+  "etf_snapshot_note": "价格源为 sina.etf_hist（东财 push2 限流时的等价日线源），净值仍来自东方财富"
+}

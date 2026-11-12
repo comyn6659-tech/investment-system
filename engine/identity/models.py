@@ -74,6 +74,9 @@ class InstrumentRef:
     scope: ScopeDecision | None = None
     in_first_batch: bool = False
     data_coverage_verified: bool = False
+    # True 时该指数的估值/信号/回测只允许中证或国证官方来源进入分位；
+    # 用于「官方历史估值是否可得」尚未达到完整口径的指数。
+    official_valuation_only: bool = False
     evidence: tuple[EvidenceRef, ...] = ()
     valid_from: str | None = None
     valid_to: str | None = None
@@ -106,6 +109,7 @@ class InstrumentRef:
             "scope": self.scope.to_dict() if self.scope else None,
             "in_first_batch": self.in_first_batch,
             "data_coverage_verified": self.data_coverage_verified,
+            "official_valuation_only": self.official_valuation_only,
             "evidence": [e.to_dict() for e in self.evidence],
             "valid_from": self.valid_from,
             "valid_to": self.valid_to,
@@ -140,6 +144,7 @@ class InstrumentRef:
             else None,
             in_first_batch=bool(data.get("in_first_batch", False)),
             data_coverage_verified=bool(data.get("data_coverage_verified", False)),
+            official_valuation_only=bool(data.get("official_valuation_only", False)),
             evidence=tuple(EvidenceRef(**e) for e in data.get("evidence", ())),
             valid_from=data.get("valid_from"),
             valid_to=data.get("valid_to"),

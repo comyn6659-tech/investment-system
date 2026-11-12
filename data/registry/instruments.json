@@ -257,6 +257,76 @@
       ]
     },
     {
+      "instrument_id": "INDEX:399006.SZ",
+      "display_name": "创业板指",
+      "aliases": [
+        "创业板指数",
+        "ChiNext",
+        "ChiNext Index",
+        "399006"
+      ],
+      "asset_class": "index",
+      "code": "399006",
+      "market": "CN",
+      "venue": "SZSE",
+      "venue_type": "index_publisher",
+      "currency": null,
+      "index_class": "broad_based",
+      "region": "domestic",
+      "in_first_batch": false,
+      "data_coverage_verified": true,
+      "official_valuation_only": true,
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "BROAD_INDEX_NOT_IN_FIRST_BATCH",
+        "detail": "第四批研究样本：创业板指；官方收盘与全收益已接入，官方历史估值未取得，只保留当前快照"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-cnindex-399006",
+          "kind": "index_publisher",
+          "publisher": "深圳证券信息有限公司（国证指数）",
+          "url": "https://www.cnindex.com.cn/module/index-detail.html?act_menu=1&indexCode=399006",
+          "retrieved_at": "2026-11-12T19:40:00+08:00",
+          "fields_cited": [
+            "indexcode",
+            "indexname",
+            "indexfullcname",
+            "jr"
+          ],
+          "note": "国证指数官网：创业板指（创业板指数），代码 399006，基日 2010-05-31"
+        },
+        {
+          "evidence_id": "ev-szse-1812-399006",
+          "kind": "exchange_list",
+          "publisher": "深圳证券交易所",
+          "url": "http://www.szse.cn/api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1812_zs&TABKEY=tab1&txtQueryDate=399006",
+          "retrieved_at": "2026-11-12T19:40:00+08:00",
+          "fields_cited": [
+            "指数代码",
+            "指数名称",
+            "基日",
+            "基日指数",
+            "起始计算日"
+          ],
+          "note": "深交所指数列表：399006 创业板指数，基日 2010-05-31，基日指数 1000，起始计算日 2010-06-01"
+        },
+        {
+          "evidence_id": "ev-cnindex-399006-valuation",
+          "kind": "index_publisher",
+          "publisher": "深圳证券信息有限公司（国证指数）",
+          "url": "https://www.cnindex.com.cn/index/indexList",
+          "retrieved_at": "2026-11-12T19:40:00+08:00",
+          "fields_cited": [
+            "peStatic",
+            "peDynamic",
+            "pb"
+          ],
+          "note": "官网指数列表只提供最新交易日估值快照：PE 滚动 25.1325、PE 静态 31.6183、PB 4.07（2026-11-11）；无历史序列"
+        }
+      ]
+    },
+    {
       "instrument_id": "INDEX:000015.SH",
       "display_name": "上证红利",
       "aliases": [
@@ -498,6 +568,62 @@
             "成立日期"
           ],
           "note": "跟踪标的：沪深300指数；管理费率 0.15%/年；托管费率 0.05%/年；成立 2012-05-07。深交所 ETF 份额接口当前不可用，交易所归属依据代码段 159 与行情清单"
+        }
+      ]
+    },
+    {
+      "instrument_id": "ETF:159915.SZ",
+      "display_name": "创业板ETF易方达",
+      "aliases": [
+        "易方达创业板ETF",
+        "创业板ETF",
+        "159915"
+      ],
+      "asset_class": "etf",
+      "code": "159915",
+      "market": "CN",
+      "venue": "SZSE",
+      "venue_type": "exchange",
+      "currency": "CNY",
+      "etf_strategy": "passive_plain",
+      "region": "domestic",
+      "underlying_index_id": "INDEX:399006.SZ",
+      "in_first_batch": false,
+      "data_coverage_verified": true,
+      "scope": {
+        "status": "in_scope",
+        "reason_code": "PASSIVE_BROAD_ETF",
+        "detail": "普通被动 ETF，跟踪第四批创业板指"
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev-fundf10-159915",
+          "kind": "fund_profile",
+          "publisher": "天天基金（基金概况页）",
+          "url": "http://fundf10.eastmoney.com/jbgk_159915.html",
+          "retrieved_at": "2026-11-12T19:40:00+08:00",
+          "fields_cited": [
+            "基金全称",
+            "基金简称",
+            "跟踪标的",
+            "业绩比较基准",
+            "管理费率",
+            "托管费率",
+            "成立日期"
+          ],
+          "note": "易方达创业板交易型开放式指数证券投资基金；跟踪创业板指数（价格）；管理费率 0.15%/年、托管费率 0.05%/年；成立 2011-09-20"
+        },
+        {
+          "evidence_id": "ev-cnindex-399006-etf-link",
+          "kind": "index_publisher",
+          "publisher": "深圳证券信息有限公司（国证指数）",
+          "url": "https://www.cnindex.com.cn/module/index-detail.html?act_menu=1&indexCode=399006",
+          "retrieved_at": "2026-11-12T19:40:00+08:00",
+          "fields_cited": [
+            "indexcode",
+            "indexname"
+          ],
+          "note": "产品资料页跟踪标的为「创业板指数（价格）」；对应指数条目 399006 创业板指"
         }
       ]
     },

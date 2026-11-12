@@ -37,6 +37,15 @@
       "file": "snap-e701028693917737.json"
     },
     {
+      "snapshot_id": "snap-e459e6eb00b87bd6",
+      "instrument_id": "ETF:159915.SZ",
+      "asset_class": "etf",
+      "as_of": "2026-11-11",
+      "available_at": "2026-11-11T15:00:00+08:00",
+      "fetched_at": "2026-11-12T19:53:25+08:00",
+      "file": "snap-e459e6eb00b87bd6.json"
+    },
+    {
       "snapshot_id": "snap-d6570cf8645d49e4",
       "instrument_id": "ETF:510300.SH",
       "asset_class": "etf",
@@ -89,6 +98,15 @@
       "available_at": "2026-11-10T15:00:00+08:00",
       "fetched_at": "2026-11-11T13:36:56+08:00",
       "file": "snap-1a5ed1b1f7206c14.json"
+    },
+    {
+      "snapshot_id": "snap-6a6ddb1b59abf532",
+      "instrument_id": "INDEX:399006.SZ",
+      "asset_class": "index",
+      "as_of": "2026-11-11",
+      "available_at": "2026-11-11T15:00:00+08:00",
+      "fetched_at": "2026-11-12T19:50:33+08:00",
+      "file": "snap-6a6ddb1b59abf532.json"
     }
   ]
 }

@@ -1,0 +1,138 @@
+{
+  "schema_version": "snapshot/1",
+  "instrument_id": "INDEX:399006.SZ",
+  "asset_class": "index",
+  "as_of": "2026-11-11",
+  "available_at": "2026-11-11T15:00:00+08:00",
+  "fetched_at": "2026-11-12T19:50:33+08:00",
+  "facts": [
+    {
+      "fact_id": "index.level",
+      "metric": "index_close_level",
+      "status": "known",
+      "value": 2572.0672,
+      "unit": "index_point",
+      "currency": null,
+      "period": "2026-11-11",
+      "available_at": "2026-11-11T15:00:00+08:00",
+      "fetched_at": "2026-11-12T19:50:33+08:00",
+      "source": {
+        "source_id": "cnindex.official_history",
+        "publisher": "深圳证券信息有限公司（国证指数）",
+        "interface": "国证指数官方历史行情接口",
+        "url": "http://hq.cnindex.com.cn/market/market/getIndexDailyDataWithDataFormat",
+        "retrieved_at": "2026-11-12T19:50:33+08:00",
+        "notes": "官方指数历史行情；收盘点位"
+      },
+      "transform": "官方历史行情最后一行收盘",
+      "restated": false,
+      "notes": "已收盘交易日的收盘点位；价格指数，不含分红",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "index.pb",
+      "metric": "pb",
+      "status": "known",
+      "value": 4.07,
+      "unit": "ratio",
+      "currency": null,
+      "period": "2026-11-11",
+      "available_at": null,
+      "fetched_at": "2026-11-12T19:50:33+08:00",
+      "source": {
+        "source_id": "cnindex.index_list",
+        "publisher": "深圳证券信息有限公司（国证指数）",
+        "interface": "国证指数官网指数列表接口（当前交易日快照）",
+        "url": "https://www.cnindex.com.cn/index/indexList",
+        "retrieved_at": "2026-11-12T19:50:33+08:00",
+        "notes": "官网只提供最新交易日的 PE/PB，无历史"
+      },
+      "transform": "官网指数列表『PB』",
+      "restated": false,
+      "notes": "官方当前快照，只有 1 个交易日；不能用于分位",
+      "conflict_values": []
+    },
+    {
+      "fact_id": "index.pe_ttm",
+      "metric": "pe_ttm",
+      "status": "known",
+      "value": 25.1325,
+      "unit": "ratio",
+      "currency": null,
+      "period": "2026-11-11",
+      "available_at": null,
+      "fetched_at": "2026-11-12T19:50:33+08:00",
+      "source": {
+        "source_id": "cnindex.index_list",
+        "publisher": "深圳证券信息有限公司（国证指数）",
+        "interface": "国证指数官网指数列表接口（当前交易日快照）",
+        "url": "https://www.cnindex.com.cn/index/indexList",
+        "retrieved_at": "2026-11-12T19:50:33+08:00",
+        "notes": "官网只提供最新交易日的 PE/PB，无历史"
+      },
+      "transform": "官网指数列表『PE滚动』",
+      "restated": false,
+      "notes": "官方当前快照，只有 1 个交易日；不能用于分位或回测",
+      "conflict_values": []
+    }
+  ],
+  "coverage": {
+    "build": {
+      "mode": "official_history_close",
+      "market_date": "2026-11-11",
+      "bar_status": "closed",
+      "built_at": "2026-11-12T19:50:33+08:00",
+      "date_source": "官方历史行情最后一行"
+    },
+    "price_history": {
+      "source_id": "cnindex.official_history",
+      "start": "2010-06-01",
+      "end": "2026-11-11",
+      "observations": 3993,
+      "frequency": "daily"
+    },
+    "total_return_history": {
+      "source_id": "cnindex.official_history",
+      "code": "399606",
+      "start": "2010-06-01",
+      "end": "2026-11-11",
+      "observations": 3993,
+      "frequency": "daily"
+    },
+    "valuation_source_official": {
+      "source_id": "cnindex.index_list",
+      "publisher": "深圳证券信息有限公司（国证指数）",
+      "start": "2026-11-11",
+      "end": "2026-11-11",
+      "observations": 1,
+      "frequency": "snapshot",
+      "note": "官网只提供最新交易日 PE/PB，没有日度或月度历史，不能计算 5 年分位"
+    },
+    "valuation_history": {
+      "available": false,
+      "note": "未取得创业板指的官方历史估值序列；第三方板块 PE 与指数 PE 不是同一对象，未采用"
+    },
+    "aggregation_method": "unknown",
+    "aggregation_note": "官网未说明指数 PE/PB 的加权方式与亏损样本处理",
+    "supports_weekly_5y_history": false,
+    "supports_5y_window": false,
+    "index_identity_verified": true,
+    "point_in_time_safe": false,
+    "point_in_time_granularity": "mixed",
+    "availability_precision_counts": {
+      "second": 1,
+      "date": 0,
+      "unknown": 2
+    },
+    "availability_unknown": [
+      "index.pb",
+      "index.pe_ttm"
+    ],
+    "availability_note": "只有全部事实都带秒级可获得时间，才标记 point_in_time_safe=true；仅日期精度按「当日结束时才可知」处理，不用于盘中历史判断。"
+  },
+  "producers": [
+    "tools/build_chinext_data.py"
+  ],
+  "notes": "创业板指：官方收盘与全收益已接入；官方历史估值不可得，仅保留当前快照，不构成估值结论",
+  "snapshot_id": "snap-6a6ddb1b59abf532"
+}

@@ -32,6 +32,7 @@ from engine.series.models import (
     METRIC_TOTAL_RETURN_CLOSE,
     SeriesStore,
 )
+from engine.series.profile import is_official_source
 from engine.signals.ledger import RULE_VERSION
 
 BACKTEST_JSON = "data/backtest/candidate-a.json"
@@ -119,6 +120,20 @@ def build_candidate_a_signal(
     pe = store.find(instrument_id, METRIC_OFFICIAL_PE_ROLLING, frequency=FREQ_DAILY)
     tr = store.find(instrument_id, METRIC_TOTAL_RETURN_CLOSE, frequency=FREQ_DAILY)
 
+    # 候选 A 只允许官方指数机构（中证/国证）的同源序列进入分位；
+    # 第三方估值即使被误放进序列库，也不能参与计算。
+    rejected = [
+        item.metric
+        for item in (close, pe, tr)
+        if item is not None and not is_official_source(item.source)
+    ]
+    if close is not None and not is_official_source(close.source):
+        close = None
+    if pe is not None and not is_official_source(pe.source):
+        pe = None
+    if tr is not None and not is_official_source(tr.source):
+        tr = None
+
     rule = {
         "entry_percentile": ENTRY_PERCENTILE,
         "exit_percentile": EXIT_PERCENTILE,
@@ -142,15 +157,24 @@ def build_candidate_a_signal(
             "pe": pe.series_id if pe else None,
             "total_return": tr.series_id if tr else None,
         },
+        "source_policy": "only_csindex_or_cnindex",
+        "rejected_non_official_metrics": rejected,
         "backtest": load_backtest_summary(backtest_path, instrument_id),
     }
 
     if close is None or pe is None:
+        if rejected:
+            reason = (
+                "序列来源不是中证/国证官方机构，按候选 A 的官方同源要求拒绝进入分位："
+                + "、".join(rejected)
+            )
+        else:
+            reason = "缺少官方指数收盘或官方滚动市盈率日频序列，无法计算周度分位"
         base.update(
             {
                 "status": "insufficient_data",
                 "signal": "not_evaluable",
-                "reason": "缺少官方指数收盘或官方滚动市盈率日频序列，无法计算周度分位",
+                "reason": reason,
                 "latest": None,
             }
         )

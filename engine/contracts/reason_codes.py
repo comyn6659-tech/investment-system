@@ -53,10 +53,13 @@ OUT_OF_SCOPE_ACTIVE_ETF = _register("OUT_OF_SCOPE_ACTIVE_ETF", "scope", "主动 
 OUT_OF_SCOPE_CROSS_BORDER = _register("OUT_OF_SCOPE_CROSS_BORDER", "scope", "跨境/QDII 产品不在第一版范围")
 OUT_OF_SCOPE_BOND_COMMODITY = _register("OUT_OF_SCOPE_BOND_COMMODITY", "scope", "债券/商品类产品不在第一版范围")
 OUT_OF_SCOPE_INDUSTRY_INDEX = _register("OUT_OF_SCOPE_INDUSTRY_INDEX", "scope", "行业指数不在第一版范围")
+OUT_OF_SCOPE_INDEX_VARIANT = _register(
+    "OUT_OF_SCOPE_INDEX_VARIANT", "scope", "该指数属于本批未纳入的指数变体"
+)
 OUT_OF_SCOPE_MARKET = _register("OUT_OF_SCOPE_MARKET", "scope", "港美股等境外市场个股不在第一版范围")
 OUT_OF_SCOPE_OTHER = _register("OUT_OF_SCOPE_OTHER", "scope", "标的不在第一版模型范围")
 INDEX_NOT_IN_FIRST_BATCH = _register(
-    "INDEX_NOT_IN_FIRST_BATCH", "scope", "宽基指数已识别，但不在首批研究样本内，数据覆盖未核实"
+    "INDEX_NOT_IN_FIRST_BATCH", "scope", "宽基指数已识别，但不在首批研究样本内"
 )
 
 # --- 模型 -------------------------------------------------------------------

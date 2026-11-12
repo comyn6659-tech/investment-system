@@ -271,3 +271,21 @@
 | P6 | 账本追加、重复跳过、冲突、篡改检测各有测试；首次写入条数 = 30 只中正式结论数量 | `engine/policy/conclusion_ledger.py`、`engine/cli.py` | `test_p6_ledger_append_skip_conflict_and_check`、`test_p6_ledger_detects_tampering`、`test_p6_cli_check_detects_tampering`、`test_p6_first_write_has_seven_formal_conclusions` | ✅ |
 | P7 | 指数信号、指数账本、ETF、回测不变；全部既有测试通过 | `engine/signals/*`、`engine/pipeline.py` | `test_p7_index_and_signal_ledger_unchanged`、`test_p7_backtest_file_is_read_only`；**480 passed** | ✅ |
 | P8 | DELIVERY.md 汇总、复现命令、测试结果、提交 ID | `DELIVERY.md` | 入口文件 §1–§10 | ✅ |
+
+---
+
+# 第四阶段第三批验收清单（创业板指 399006，Q1–Q8）
+
+对应文件：`batch4c-chinext-instructions.md` 第四节。范围：先做官方数据可行性，再按结果接入；
+不用第三方估值、板块 PE 或拼接序列；不调候选 A 阈值，不给指数正式买点，不做 ETF 执行检查。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| Q1 | 可行性报告逐项给出来源、字段、起止、频率、是否官方，以及做了哪些、没做哪些及原因 | `docs/phase4c-chinext-feasibility.md`、`data/coverage/chinext-feasibility.json`、`tools/build_chinext_data.py` | `test_feasibility_record_is_explicit`；报告 §2–§3 六类探针 | ✅ |
+| Q2 | 估值、信号、回测只用官方同源数据；有测试证明非官方来源不能进入分位 | `engine/series/profile.py::build_index_profile(official_only=…)`、`engine/signals/candidate_a.py` | `test_non_official_profile_series_is_rejected`、`test_non_official_signal_series_is_rejected`；`cnindex.*` / `csindex.*` 白名单 | ✅ |
+| Q3 | 已做部分与前三只指数共用代码；399006 结果可由独立重算复现 | `engine/pipeline.py::_index_profile`、`build_candidate_a_signal`、`SeriesStore` | `test_shared_profile_and_signal_functions`、`test_series_hash_can_be_recomputed`、`test_official_short_history_is_used_by_profile` | ✅ |
+| Q4 | 若做回测：字段与第三阶段第三批一致，含分段与逐笔明细 | 未做 | 官方 PE 历史不可得，回测不启动；`test_no_chinext_backtest_entry` 证明回测文件未新增 399006 | ✅（不适用） |
+| Q5 | 账本既有 3 条哈希不变；399006 新记录符合只追加、重复跳过 | `data/ledger/candidate-a-signals.jsonl` 未改 | `test_ledger_has_no_chinext_record_and_existing_three_unchanged`；`SignalLedger.check()` 0 问题；无信号可写，未新增记录 | ✅（不适用新增） |
+| Q6 | 名称识别三种情形各有测试（创业板指 / 创业板歧义 / 创业板50 范围外） | `engine/identity/resolver.py`、`data/registry/instruments.json` | `test_name_resolution_three_cases`、`test_cli_bare_board_needs_clarification` | ✅ |
+| Q7 | 前三只指数、个股结论、结论账本、ETF 既有结果不变；全部测试通过 | 既有模块未改口径 | `test_existing_three_indices_unchanged`；个股 7 条账本不变；**497 passed** | ✅ |
+| Q8 | DELIVERY.md 汇总、复现命令、测试结果、提交 ID | `DELIVERY.md` | 入口文件 §1–§9 | ✅ |

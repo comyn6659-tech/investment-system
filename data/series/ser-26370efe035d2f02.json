@@ -1,0 +1,30 @@
+{
+  "schema_version": "index-series/1",
+  "instrument_id": "INDEX:399006.SZ",
+  "metric": "official_pe_ratio_1",
+  "field": "滚动市盈率（官方当前快照）",
+  "frequency": "daily_short",
+  "source": {
+    "source_id": "cnindex.index_list",
+    "publisher": "深圳证券信息有限公司（国证指数）",
+    "interface": "国证指数官网指数列表接口（当前交易日快照）",
+    "url": "https://www.cnindex.com.cn/index/indexList",
+    "retrieved_at": "2026-11-12T19:50:33+08:00",
+    "definition_note": "官网指数列表只提供最新交易日的 PE（静态/滚动）与 PB；不提供历史下载，未说明加权方式与亏损样本处理。"
+  },
+  "observations": [
+    {
+      "date": "2026-11-11",
+      "value": 25.1325
+    }
+  ],
+  "unit": "ratio",
+  "transform": "官网指数列表『PE滚动』原值，未做换算",
+  "aggregation_method": "unknown",
+  "denominator_basis": "unknown",
+  "loss_sample_handling": "unknown",
+  "revision_availability": "unknown",
+  "notes": "只有最新一个交易日，作为并列事实；样本不足，不参与分位、不生成信号、不回测。；只保留发布日 2010-06-01 及之后的记录，基日 2010-06-01 之前的基点行已丢弃",
+  "series_id": "ser-26370efe035d2f02",
+  "observation_count": 1
+}

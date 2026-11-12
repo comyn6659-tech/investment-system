@@ -164,6 +164,7 @@ def _parse_instrument(entry: dict[str, Any]) -> InstrumentRef:
         scope=scope,
         in_first_batch=bool(entry.get("in_first_batch", False)),
         data_coverage_verified=bool(entry.get("data_coverage_verified", False)),
+        official_valuation_only=bool(entry.get("official_valuation_only", False)),
         evidence=evidence,
         valid_from=entry.get("valid_from"),
         valid_to=entry.get("valid_to"),
