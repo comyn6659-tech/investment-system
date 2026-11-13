@@ -422,5 +422,22 @@
 | S5 | `ask` 覆盖第二节全部意图，每类 ≥3 种说法有测试 | `engine/ask/*`、`data/ask/questions.json`、`tests/test_dialog.py` | 46 条问题覆盖 10 类（单股 6、银行 4、指数 4、ETF 4、池名单 4、是否在池 5、排行 4、历史 5、状态 4、范围外/歧义 6）；`test_question_set_has_at_least_40_and_covers_every_intent`、`test_every_question_matches_expected` | ✅ |
 | S6 | 卡片结构符合第二节第 4 条；默认 ≤25 行 | `engine/ask/service.py`、`docs/phase4k-samples.md` | 第一行结论；现价/门槛/距门槛/三档价值及用途；起约束与中文未满足条件；池/所有制/周期属性/等级含义；局限；来源日期与政策版本；末行免责声明；全部问题集 8–10 行；`test_card_structure`、`test_detail_expands_and_keeps_disclaimer` | ✅ |
 | S7 | 端到端问题集 ≥40 条全部通过；禁用词扫描、日期来源检查通过 | `tools/run_ask_acceptance.py`、`docs/phase4k-acceptance.md` | 46/46 问题、30/30 测试股、4/4 指数（含 HSTECH）、2/2 银行、3/3 ETF；禁用词 0；日期/来源/免责声明齐全；研究模型无正式结论；`test_forbidden_words_absent`、`test_every_question_matches_expected` | ✅ |
-| S8 | 全部既有测试通过；所有账本只追加 | 既有模块；`data/ledger/*` | **648 passed**；`equity-conclusions.jsonl` 96 条 `--check` 0 问题；候选 A 3、官方估值 4、恒生科技月度 1、三池/银行账本 0 问题；`test_pool_valuation.py::test_policy_and_valuation_code_unchanged` 已更新为「仅允许结论标签变化」；账本 `check` 全部通过 | ✅ |
+| S8 | 全部既有测试通过；所有账本只追加 | 既有模块；`data/ledger/*` | 本地 **660 passed**；`equity-conclusions.jsonl` 98 条 `--check` 0 问题；候选 A 3、官方估值 4、恒生科技月度 1、三池/银行账本 0 问题；`test_pool_valuation.py::test_policy_and_valuation_code_unchanged` 已更新为「仅允许结论标签与账本改判能力变化」；账本 `check` 全部通过 | ✅ |
 | S9 | DELIVERY.md 一页以内，附 5 个真实问答样例 | `DELIVERY.md`、`docs/phase4k-samples.md` | 入口 §1–§8；5 个真实样例（茅台、招商银行、沪深300、好公司池、比亚迪） | ✅ |
+
+
+---
+
+# 第四阶段第十一批收尾验收清单（T1–T3 / U1–U4）
+
+对应文件：`batch4k-r-closeout-instructions.md`。范围：只读已提交快照、账本改判记录、launchd 测试。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| T1 | `ask`、`update`、池成员估值及测试不读 `data/cache/` 或被忽略路径；所有制改读已提交快照；扫描测试 | `engine/ask/service.py`、`tools/run_pool_valuation.py`、`tools/run_income_pool.py`、`tests/test_clean_inputs.py` | 所有制/分红改读 `data/income-pool/snapshot-qps-d8fb7e3718675b93/`；`update` 状态改读 `data/ledger/update-log.jsonl`；运行时扫描 0 命中；`test_runtime_code_has_no_cache_directory_reference`、`test_ownership_comes_from_committed_snapshot` | ✅ |
+| T2 | 最新正式结论遇无法判断时追加改判记录；原因码/中文原因/政策/快照/分析日；旧记录不改；从未有正式结论不写 | `engine/policy/conclusion_ledger.py`、`engine/policy/conclusion.py`、`engine/cli.py`、`engine/ask/service.py`、`tools/run_cyclical_rerun.py` | 君正 601216、扬农 600486 各 1 条 reversal（`MODEL_FAMILY_NOT_IMPLEMENTED` + `CYCLICAL_INDUSTRY_LIST_MATCH`）；账本 98 条 0 问题；历史问答 2 条且最新为无法判断；`test_reversal.py` 7 项 | ✅ |
+| T3 | 非 macOS 跳过 launchd 测试并注明原因 | `tests/test_forward_update.py` | `@pytest.mark.skipif(sys.platform != "darwin", reason="定时任务只支持 macOS（launchd）")`；macOS 下 plist 校验通过 | ✅ |
+| U1 | 干净目录（`git archive`）中全部测试与 46 条问题集通过；代码扫描通过 | `scripts/verify-clean-archive.sh`、`tests/test_clean_inputs.py` | `git archive HEAD` 到临时目录（无 `.venv`/`data/cache`）：**659 passed + 1 skipped**（无 `.git` 的 diff 测试跳过）、问题集 **46/46**、30 股/4 指数/2 银行/3 ETF 全过 | ✅ |
+| U2 | 君正、扬农各一条改判；“君正集团以前的结论”显示两条，最新为无法判断及原因；旧记录不变 | `data/ledger/equity-conclusions.jsonl`、`engine/ask/service.py` | 601216/600486 各 2 条；最新 `record_type=reversal`、`conclusion=undetermined`、原因码/中文原因/分析日/快照/`reversal_of` 齐全；旧记录 record_id 未变；`test_real_ledger_has_two_reversals_for_junzheng_and_yangnong`、`test_history_question_shows_two_records_and_reason` | ✅ |
+| U3 | 其他账本、结论、池名单不变；全部测试通过 | 既有模块 | 候选 A 3、官方估值 4、三池/银行账本不变；池名单 138/142/11 不变；本地 660 passed | ✅ |
+| U4 | DELIVERY.md 一页以内 | `DELIVERY.md` | 81 行；含 U1–U4、复现命令、干净归档结果 | ✅ |
