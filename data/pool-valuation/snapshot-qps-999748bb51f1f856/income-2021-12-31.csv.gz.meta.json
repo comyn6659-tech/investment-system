@@ -1,0 +1,33 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "income-2021-12-31",
+  "file": "income-2021-12-31.csv.gz",
+  "rows": 5473,
+  "columns": [
+    "SECUCODE",
+    "SECURITY_CODE",
+    "SECURITY_NAME_ABBR",
+    "NOTICE_DATE",
+    "REPORT_DATE",
+    "TOTAL_OPERATE_INCOME",
+    "OPERATE_INCOME",
+    "OPERATE_PROFIT",
+    "TOTAL_PROFIT",
+    "INCOME_TAX",
+    "NETPROFIT",
+    "PARENT_NETPROFIT",
+    "FE_INTEREST_EXPENSE",
+    "FINANCE_EXPENSE",
+    "BASIC_EPS"
+  ],
+  "content_hash": "d6fc0d650ea471e3270eb18b4542c88c31b9777675850890871cd5c855301699",
+  "size_bytes": 397096,
+  "kind": "income_full",
+  "report_date": "2021-12-31",
+  "source_id": "eastmoney.f10.batch_financials",
+  "publisher": "东方财富",
+  "interface": "RPT_F10_FINANCE_GINCOME",
+  "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+  "retrieved_at": "2026-11-13T13:42:28+08:00",
+  "definition_note": "2021-12-31 全市场沪深 A 股合并报表估值所需字段；按报告期批量。"
+}

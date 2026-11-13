@@ -1,0 +1,21 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "shares",
+  "file": "shares.csv.gz",
+  "rows": 3553,
+  "columns": [
+    "code",
+    "name",
+    "end_date",
+    "total_shares"
+  ],
+  "content_hash": "4a5285ebaae6f2266513486c3fa03ac8e2128f2953e71aabdc6067669d81856e",
+  "size_bytes": 34047,
+  "kind": "shares",
+  "source_id": "eastmoney.f10.equity",
+  "publisher": "东方财富",
+  "interface": "RPT_F10_EH_EQUITY",
+  "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+  "retrieved_at": "2026-11-13T18:45:00+08:00",
+  "definition_note": "最近一期股本变动（END_DATE ≤ 分析日）的总股本；池内缺失代码逐只补齐。"
+}

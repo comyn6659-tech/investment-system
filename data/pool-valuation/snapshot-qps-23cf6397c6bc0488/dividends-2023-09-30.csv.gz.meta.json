@@ -1,0 +1,28 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "dividends-2023-09-30",
+  "file": "dividends-2023-09-30.csv.gz",
+  "rows": 55,
+  "columns": [
+    "SECUCODE",
+    "SECURITY_CODE",
+    "SECURITY_NAME_ABBR",
+    "REPORT_DATE",
+    "PRETAX_BONUS_RMB",
+    "TOTAL_SHARES",
+    "ASSIGN_PROGRESS",
+    "IMPL_PLAN_PROFILE",
+    "NOTICE_DATE",
+    "PLAN_NOTICE_DATE"
+  ],
+  "content_hash": "063dc5b2168c21fd3a9143a625d8e521ce28e49616a3b898481776147ea38e07",
+  "size_bytes": 2233,
+  "kind": "dividends_full",
+  "report_date": "2023-09-30",
+  "source_id": "eastmoney.f10.batch_financials",
+  "publisher": "东方财富",
+  "interface": "RPT_SHAREBONUS_DET",
+  "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+  "retrieved_at": "2026-11-13T14:04:29+08:00",
+  "definition_note": "2023-09-30 全市场沪深 A 股合并报表估值所需字段；按报告期批量。"
+}

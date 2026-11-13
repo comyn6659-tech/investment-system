@@ -389,3 +389,18 @@
 | Q5 | HSTECH 已接入部分与其他指数共用代码；名称识别三种情形有测试 | `engine/series/profile.py`、`engine/pipeline.py`、`data/registry/instruments.json` | `test_hstech_name_resolution_and_other_hang_seng_out_of_scope`（三种名称 resolved；恒生指数/恒生国企/恒生科技ETF 范围外）；`test_hstech_uses_shared_profile_and_signal` | ✅ |
 | Q6 | 既有指数、个股、ETF 结果与账本不变；全部测试通过 | 既有模块未改口径 | `test_existing_indices_and_ledgers_unchanged`：三大指数信号 complete/exit；候选 A 账本 3 条、官方估值账本 4 条、个股账本 7 条；**600 passed** | ✅ |
 | Q7 | DELIVERY.md 一页以内 | `DELIVERY.md` | 入口 §1–§7 | ✅ |
+
+---
+
+# 第四阶段第十批验收清单（池成员估值，R1–R8）
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| R1 | 字段映射表齐全；新增数据 ≤ 200 MB；快照可重放 | `data/pool-valuation/snapshot-qps-f140a9790e4015ea`、`docs/phase4j-field-mapping.md` | 50 张表、15.08 MB；`test_batch_snapshot_size_and_replay`、`test_field_mapping_document_covers_policy_fields` | ✅ |
+| R2 | 政策与估值代码未改（diff 证明）；适配层有测试 | `engine/pool_valuation/adapter.py`、`tools/build_pool_valuation_data.py` | `test_policy_and_valuation_code_unchanged`（`git diff e0da6d2 -- engine/policy engine/valuation` 为空）；`test_batch_snapshot_600519_recomputes_policy_inputs` | ✅ |
+| R3 | 30 只回归：状态、等级、结论 30/30 相同，基准价值差 ≤ 1% | `tools/run_pool_valuation_regression.py`、`docs/phase4j-regression-30.md` | 30/30 通过；最大基准价值相对差 **0.0000%**；`test_regression_30_matches_original_paths` | ✅ |
+| R4 | 池成员全部有结果；正式结论账本只追加，冲突规则有测试 | `tools/run_pool_valuation.py`、`data/ledger/equity-conclusions.jsonl` | 221 家全部有结果；首次写入 88 条，旧 7 条不变，账本 95 条；`test_p6_ledger_append_skip_conflict_and_check` 覆盖冲突 | ✅ |
+| R5 | 报告含第 5 条全部内容 | `docs/phase4j-pool-valuation-report.md` | 结论分布、原因分组、88 家按距门槛排序（现价/门槛/起约束/等级/池/所有制/周期）、账本口径 | ✅ |
+| R6 | 抽查公司可由快照独立复算 | `tools/run_pool_valuation.py --show 600519` | `test_show_recomputes_from_snapshot`；打印输入、三档价值、等级、结论 | ✅ |
+| R7 | 指数、ETF、三池名单与账本不变；全部测试通过 | 既有模块未改 | 三池/指数/ETF 测试全过；旧 7 条结论前缀不变；**608 passed** | ✅ |
+| R8 | DELIVERY.md 一页以内 | `DELIVERY.md` | 入口 §1–§7 | ✅ |

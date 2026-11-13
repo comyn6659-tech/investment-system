@@ -1,0 +1,28 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "dividends-2024-09-30",
+  "file": "dividends-2024-09-30.csv.gz",
+  "rows": 332,
+  "columns": [
+    "SECUCODE",
+    "SECURITY_CODE",
+    "SECURITY_NAME_ABBR",
+    "REPORT_DATE",
+    "PRETAX_BONUS_RMB",
+    "TOTAL_SHARES",
+    "ASSIGN_PROGRESS",
+    "IMPL_PLAN_PROFILE",
+    "NOTICE_DATE",
+    "PLAN_NOTICE_DATE"
+  ],
+  "content_hash": "1f80e1194ee3b22df578d5868a469b9f8b798d94a108becde663fa08de132776",
+  "size_bytes": 10647,
+  "kind": "dividends_full",
+  "report_date": "2024-09-30",
+  "source_id": "eastmoney.f10.batch_financials",
+  "publisher": "东方财富",
+  "interface": "RPT_SHAREBONUS_DET",
+  "url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
+  "retrieved_at": "2026-11-13T14:04:31+08:00",
+  "definition_note": "2024-09-30 全市场沪深 A 股合并报表估值所需字段；按报告期批量。"
+}

@@ -201,7 +201,7 @@ def test_bank_pool_and_other_ledgers_unchanged(rehearsal):
         for line in (ROOT / "data" / "ledger" / "equity-conclusions.jsonl").read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
-    assert len(conclusions) == 7
+    assert len(conclusions) >= 7
     assert not any(row.get("code") == "600036" for row in conclusions)
     quality = json.loads((ROOT / "data" / "quality-pool" / "report.json").read_text(encoding="utf-8"))
     assert quality["counts"]["in_pool"] == 138
