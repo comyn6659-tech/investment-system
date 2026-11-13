@@ -28,6 +28,7 @@ from engine.data.snapshot import SnapshotStore  # noqa: E402
 from engine.evidence.applicability import SELECTION_POLICY  # noqa: E402
 from engine.evidence.cyclical import list_summary, load_list  # noqa: E402
 from engine.evidence.models import BusinessEvidence  # noqa: E402
+from engine.reporting.labels import family_label  # noqa: E402
 from engine.policy.conclusion_ledger import (  # noqa: E402
     ConclusionConflict,
     ConclusionLedger,
@@ -344,9 +345,9 @@ def render(payload: dict) -> str:
         match = after.get("cyclical_list") or {}
         reason = (
             f"{CONCLUSION_LABELS.get(before['conclusion'], before['conclusion'])}"
-            f"（{before['family']}）→ "
+            f"（{family_label(before['family'])}）→ "
             f"{CONCLUSION_LABELS.get(after['conclusion'], after['conclusion'])}"
-            f"（{after['family']}）"
+            f"（{family_label(after['family'])}）"
         )
         lines.append(
             f"| {row['code']} | {row['name']} | {row['industry']} | {match.get('group', '—')} | "
@@ -365,8 +366,9 @@ def render(payload: dict) -> str:
         match = after.get("cyclical_list") or {}
         lines.append(
             f"- **{row['code']} {row['name']}**（{row['industry']}）："
-            f"命中 `{match.get('list_id', '—')}` 的「{match.get('group', '—')}」组"
-            f"（{match.get('matched_by', '—')}，{match.get('matched_name', '—')}）；"
+            f"命中周期行业清单 `{match.get('list_id', '—')}` 的「{match.get('group', '—')}」组"
+            f"（{'精确名称' if match.get('matched_by') == 'exact_name' else '旧关键词'}，"
+            f"{match.get('matched_name', '—')}）；"
             f"结论由「{CONCLUSION_LABELS.get(row['before']['conclusion'], row['before']['conclusion'])}」"
             f"改为「{CONCLUSION_LABELS.get(after['conclusion'], after['conclusion'])}」。"
             f"此前三档价值（悲观/基准/乐观）：{_fmt_values(row)} 元/股；"
@@ -385,7 +387,8 @@ def render(payload: dict) -> str:
         lines += [
             f"- 行业：`{junzheng['industry']}`，申万 2021 版「基础化工 / 化学原料」，"
             f"命中清单 `{match.get('list_id')}` 的「{match.get('group')}」组"
-            f"（{match.get('matched_by')}，{match.get('matched_name')}）。",
+            f"（{'精确名称' if match.get('matched_by') == 'exact_name' else '旧关键词'}，"
+            f"{match.get('matched_name')}）。",
             f"- 收入波动：{observed.get('revenue_growth_stdev', 0):.1%}（阈值 ≥8%）；"
             f"收入最大回撤：{observed.get('max_revenue_drawdown', 0):.1%}（阈值 ≥15%）。",
             "- 旧清单只有关键词「化工」，「化学原料」不含「化工」，因此旧版漏判；"
