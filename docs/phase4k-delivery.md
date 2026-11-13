@@ -39,8 +39,8 @@
 - validated 模型版本号去掉 `-research`：`equity_dcf_fcff`、`equity_dividend_discount`
   均为 `0.2.0`；三份假设文件同步。research 模型仍保留 `-research` 后缀。
 - 指数原因码 `INDEX_NOT_IN_FIRST_BATCH` 的描述改为
-  「宽基指数已识别，但不在已接入的研究样本内（已接入：沪深300、中证500、中证1000、恒生科技）」；
-  注册表 detail 同步为「不在已接入研究样本内」。
+  「宽基指数已识别，但不在首批三只样本内；恒生科技等已接入指数按各自数据能力单独处理」；
+  注册表 detail 同步改为「不在已接入研究样本内」。
 - 报告中内部英文条件名改中文：`engine/reporting/labels.py` 统一映射
   近似项影响、经营现金流/净利润、净有息负债/EBITDA、两条路线分歧、终值连续性护栏等；
   卡片默认不再出现 `approximation_impact`、`partial`、`cyclical` 等内部名。

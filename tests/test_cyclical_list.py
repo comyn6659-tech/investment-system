@@ -154,8 +154,9 @@ def test_validated_model_versions_have_no_research_suffix():
 
 def test_reason_code_description_is_current():
     text = rc.describe(rc.INDEX_NOT_IN_FIRST_BATCH)
-    assert "已接入" in text
-    assert "沪深300" in text
+    assert "首批" in text
+    assert "恒生科技" in text
+    assert "已接入指数" in text
 
 
 def test_live_policy_conclusion_label_is_formal():
