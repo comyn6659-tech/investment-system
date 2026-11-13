@@ -213,28 +213,20 @@ def test_chinext_signal_is_not_computed(store):
 
 
 # --- Q3 共用代码与独立重算 --------------------------------------------------
-def test_shared_profile_and_signal_functions(monkeypatch, chinext_analyzer):
+def test_removed_index_no_longer_enters_profile_or_signal(monkeypatch, chinext_analyzer):
+    """移出后：不再调用画像与候选 A 信号函数，直接返回范围外结果。"""
     import engine.pipeline as pipeline
 
-    calls = {}
-    original_profile = pipeline.build_index_profile
-    original_signal = pipeline.build_candidate_a_signal
+    def _unexpected(*args, **kwargs):  # pragma: no cover - 被调用即失败
+        raise AssertionError("创业板指已移出，不应再进入指数画像或候选 A 信号")
 
-    def profile_wrapper(*args, **kwargs):
-        calls["profile"] = kwargs
-        return original_profile(*args, **kwargs)
-
-    def signal_wrapper(*args, **kwargs):
-        calls["signal"] = (args, kwargs)
-        return original_signal(*args, **kwargs)
-
-    monkeypatch.setattr(pipeline, "build_index_profile", profile_wrapper)
-    monkeypatch.setattr(pipeline, "build_candidate_a_signal", signal_wrapper)
+    monkeypatch.setattr(pipeline, "build_index_profile", _unexpected)
+    monkeypatch.setattr(pipeline, "build_candidate_a_signal", _unexpected)
     result = chinext_analyzer.analyze("创业板指")
-    assert result.analysis_status == "insufficient_data"
-    assert calls["profile"]["instrument_id"] == CHINEXT
-    assert calls["profile"]["official_only"] is True
-    assert calls["signal"][1]["as_of"] == "2026-11-11"
+    assert result.analysis_status == "unsupported"
+    assert result.reason_codes == ["INDEX_REMOVED_OFFICIAL_HISTORY_UNAVAILABLE"]
+    assert result.decision == "undetermined"
+    assert result.payload.get("valuation_profile") is None
 
 
 def test_official_short_history_is_used_by_profile(chinext_series):
@@ -286,9 +278,11 @@ def test_ledger_has_no_chinext_record_and_existing_three_unchanged():
 def test_name_resolution_three_cases(catalog):
     for text in ("创业板指", "创业板指数", "399006"):
         resolution = resolve(text, catalog)
-        assert resolution.status == ResolutionStatus.RESOLVED.value
+        assert resolution.status == ResolutionStatus.OUT_OF_SCOPE.value
         assert resolution.instrument is not None
         assert resolution.instrument.instrument_id == CHINEXT
+        assert resolution.reason_codes == ("INDEX_REMOVED_OFFICIAL_HISTORY_UNAVAILABLE",)
+        assert "已移出" in resolution.instrument.scope.detail
 
     ambiguous = resolve("创业板", catalog)
     assert ambiguous.status == ResolutionStatus.AMBIGUOUS.value
@@ -308,25 +302,18 @@ def test_cli_bare_board_needs_clarification(chinext_analyzer):
 
 
 # --- CLI / 指数结果 ---------------------------------------------------------
-def test_cli_chinext_is_undetermined(chinext_analyzer):
+def test_cli_chinext_is_out_of_scope(chinext_analyzer):
     result = chinext_analyzer.analyze("创业板指")
-    assert result.analysis_status == "insufficient_data"
+    assert result.analysis_status == "unsupported"
     assert result.decision == "undetermined"
     assert result.model_status is None
-    assert result.valuation_state == "unknown"
-    assert "INDEX_PROFILE_SERIES_MISSING" in result.reason_codes
-    assert "INDEX_SIGNAL_RESEARCH_ONLY" not in result.reason_codes
+    assert result.valuation_state == "not_applicable"
+    assert result.reason_codes == ["INDEX_REMOVED_OFFICIAL_HISTORY_UNAVAILABLE"]
     assert result.payload.get("policy_conclusion") is None
-    profile = result.payload["valuation_profile"]
-    assert profile["status"] == "insufficient_data"
-    assert profile["metrics"] == {}
-    assert len(profile["official_short_history"]) == 2
-    library = result.payload["history_coverage"]["series_library"]
-    assert library["status"] == "available"
-    assert library["supports_weekly_5y_history"] is False
-    assert "official_close" in library["series"]
-    assert "total_return_close" in library["series"]
-    assert "official_pe_rolling" not in library["series"]
+    assert result.payload.get("valuation_profile") is None
+    library = (result.payload.get("history_coverage") or {}).get("series_library") or {}
+    assert library.get("status") == "missing"
+    assert result.warnings and "范围外" in result.warnings[0]
 
 
 def test_index_snapshot_is_official_only(snapshot_dir):
@@ -356,17 +343,14 @@ def test_etf_159915_registry_and_product_check(chinext_analyzer):
     assert etf.underlying_index_id == CHINEXT
     assert etf.display_name == "创业板ETF易方达"
 
+    assert etf.scope.status.value == "out_of_scope"
     result = chinext_analyzer.analyze("159915")
     assert result.instrument_id == "ETF:159915.SZ"
-    assert result.analysis_status == "insufficient_data"  # 指数估值历史不足
-    product = result.payload["product_check"]
-    assert product["identity"]["underlying_index"]["instrument_id"] == CHINEXT
-    assert "创业板指数" in (product["identity"]["tracking_note"]["value"] or "")
-    assert product["price"]["price"]["value"] == pytest.approx(2.590, abs=1e-6)
-    assert product["nav"]["value"]["value"] == pytest.approx(2.5894, abs=1e-6)
-    assert product["fees"]["management"]["value"] == pytest.approx(0.15)
-    assert product["fees"]["custody"]["value"] == pytest.approx(0.05)
-    assert product["trading"]["secondary_market_status"]["status"] in ("missing", "unknown")
+    assert result.analysis_status == "unsupported"
+    assert result.reason_codes == ["ETF_TRACKING_INDEX_REMOVED"]
+    # 移出 ETF 资料检查：不再生成产品资料载荷
+    assert result.payload.get("product_check") is None
+    assert "已移出" in (result.instrument.get("scope") or {}).get("detail", "")
 
 
 # --- Q7 既有结果不变 --------------------------------------------------------
@@ -390,3 +374,36 @@ def test_chinext_signal_has_no_weekly_observations_because_no_pe(chinext_series)
     assert weekly
     assert sum(1 for point in weekly if point.pe is not None) == 1
     assert all(not item.evaluable for item in weekly_percentiles(weekly))
+
+
+# --- batch4k：移出后其余指数/ETF 不变 ---------------------------------------
+def test_other_indices_and_etfs_still_available(chinext_analyzer):
+    for query, expected in (
+        ("沪深300", "complete"),
+        ("中证500", "complete"),
+        ("中证1000", "complete"),
+        ("恒生科技", "insufficient_data"),
+    ):
+        result = chinext_analyzer.analyze(query)
+        assert result.analysis_status == expected, query
+        if query != "恒生科技":
+            assert result.payload.get("valuation_profile", {}).get("metrics")
+    for query in ("510300", "510500", "512100"):
+        result = chinext_analyzer.analyze(query)
+        assert result.instrument_id.startswith("ETF:")
+        assert result.analysis_status in ("complete", "partial")
+        assert result.payload.get("product_check")
+
+
+def test_existing_official_valuation_ledger_records_unchanged():
+    import json
+
+    path = ROOT / "data" / "ledger" / "official-valuation-daily.jsonl"
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
+    assert len(rows) >= 4
+    chinext = [row for row in rows if row.get("index_code") == "399006"]
+    assert len(chinext) == 1
+    assert chinext[0]["date"] == "2026-11-11"
+    assert chinext[0]["pe"] == pytest.approx(25.1325)
+    # 移出后没有新增 399006 记录
+    assert all(row["index_code"] != "399006" for row in rows if row["date"] >= "2026-11-12")

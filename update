@@ -1,0 +1,5 @@
+#!/bin/sh
+# 前向记录更新：./update
+# 刷新全市场行情、候选 A 周度信号、官方当日估值、恒生科技月度估值；只追加、重复跳过。
+cd "$(dirname "$0")" || exit 1
+exec .venv/bin/python tools/update.py "$@"

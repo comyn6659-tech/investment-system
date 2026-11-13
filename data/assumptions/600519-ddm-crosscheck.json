@@ -2,7 +2,7 @@
   "schema_version": "assumption-set/1",
   "instrument_id": "EQUITY:600519.SH",
   "model_id": "equity_dividend_discount",
-  "model_version": "0.2.0-research",
+  "model_version": "0.2.0",
   "applicable_as_of": "2026-11-10",
   "base_fiscal_year": 2025,
   "horizon_years": 5,

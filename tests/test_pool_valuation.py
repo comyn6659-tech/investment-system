@@ -156,8 +156,23 @@ def test_existing_conclusion_records_unchanged():
 
 
 def test_policy_and_valuation_code_unchanged():
-    result = subprocess.run(
-        ["git", "diff", "--quiet", "e0da6d2", "--", "engine/policy", "engine/valuation"],
-        cwd=ROOT,
+    """第十批的 R2 证明；第十一批只允许改结论标签，不改政策规则与估值。"""
+    valuation = subprocess.run(
+        ["git", "diff", "--quiet", "e0da6d2", "--", "engine/valuation"], cwd=ROOT
     )
-    assert result.returncode == 0, "政策或估值代码被修改"
+    assert valuation.returncode == 0, "估值代码被修改"
+    policy = subprocess.run(
+        ["git", "diff", "e0da6d2", "--", "engine/policy"], cwd=ROOT, capture_output=True, text=True
+    )
+    changed = [
+        line
+        for line in policy.stdout.splitlines()
+        if line.startswith(("+", "-")) and not line.startswith(("+++", "---"))
+        and "is_trial_only" not in line
+        and "正式结论" not in line
+        and "预演结论" not in line
+        and "政策 v1.1 已于" not in line
+        and "不再标" not in line
+        and "只有指数候选 A" not in line
+    ]
+    assert not changed, "政策代码除结论标签外被修改：\n" + "\n".join(changed[:20])

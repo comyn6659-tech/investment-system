@@ -10,7 +10,12 @@
 data/pool-valuation/
 ├── manifest.json                 # 当前快照指针
 ├── regression-30.json            # 30 只测试股：批量路径 vs 原快照路径
-├── pool-member-valuation.json    # 221 家池成员估值结果
+├── pool-member-valuation.json    # 第十批 221 家池成员估值结果（历史）
+├── cyclical-rerun.json           # 第十一批：周期清单补全后的 221 + 30 重跑
+├── live/                         # 第十一批：全市场行情前向快照（只追加）
+│   ├── manifest.json             # 价格日期、行数、内容哈希
+│   ├── quotes-YYYY-MM-DD.json    # 每个价格日期一个不可变文件
+│   └── update-state.json         # 最近一次 update 的状态（非账本）
 └── snapshot-qps-f140a9790e4015ea/
     ├── manifest.json             # as_of、表级哈希、来源
     ├── balance-2015…2025.csv.gz  # 按报告期批量的合并资产负债表
@@ -36,9 +41,12 @@ data/pool-valuation/
 
 ## 回归与结果
 
-- 30 只测试股：状态、等级、预演结论 **30/30 相同**；基准价值最大相对差 **0.0000%**。
+- 30 只测试股：状态、等级、结论 **30/30 相同**；基准价值最大相对差 **0.0000%**。
 - 池成员：221 家（好公司池 138 + 收息池 142，去重后 221）；银行不估值。
-- 正式结论写入 `data/ledger/equity-conclusions.jsonl`（只追加）；已有 7 条不变。
+- 正式结论写入 `data/ledger/equity-conclusions.jsonl`（只追加）；已有记录不变。
+- 第十一批周期清单补全：池成员结论改变 2 家（君正集团、扬农化工，候选/回避 → 无法判断）；
+  30 只测试股 0 家改变；其余受影响但结论未变的公司见重跑报告。
+  报告：`docs/phase4k-cyclical-rerun.md`。
 
 ## 复现
 
@@ -48,4 +56,6 @@ data/pool-valuation/
 .venv/bin/python tools/run_pool_valuation.py --no-ledger   # 只出报告
 .venv/bin/python tools/run_pool_valuation.py               # 追加正式结论账本
 .venv/bin/python tools/run_pool_valuation.py --show 600519 # 抽查复算
+.venv/bin/python tools/run_cyclical_rerun.py              # 周期清单补全重跑
+.venv/bin/python tools/update.py                          # 刷新前向记录（只追加）
 ```

@@ -1,0 +1,61 @@
+{
+  "schema_version": "ask-question-set/1",
+  "description": "对话入口固定问题集：覆盖施工单第二节全部意图，每类至少 3 种中文说法。测试使用批量快照价格（use_live_quotes=false）以保证可重复；验收报告另跑一次实时行情。",
+  "policy": "equity-policy-v1.1",
+  "analysis_date": "2026-11-13",
+  "questions": [
+    {"id": "q01", "category": "单只个股", "question": "茅台怎么样", "expect": {"intent": "stock", "code": "600519", "conclusion": "wait", "label": "正式结论（政策 equity-policy-v1.1，已批准）"}},
+    {"id": "q02", "category": "单只个股", "question": "600519 贵不贵", "expect": {"intent": "stock", "code": "600519", "conclusion": "wait"}},
+    {"id": "q03", "category": "单只个股", "question": "美的能买吗", "expect": {"intent": "stock", "code": "000333", "conclusion": "wait"}},
+    {"id": "q04", "category": "单只个股", "question": "五粮液值得买吗", "expect": {"intent": "stock", "code": "000858", "conclusion": "undetermined", "contains": ["基期异常变动"]}},
+    {"id": "q05", "category": "单只个股", "question": "格力电器现在能买吗", "expect": {"intent": "stock", "code": "000651", "conclusion": "undetermined", "contains": ["勾稽"]}},
+    {"id": "q06", "category": "单只个股", "question": "京东方A怎么样", "expect": {"intent": "stock", "code": "000725", "conclusion": "undetermined", "contains": ["悲观情景价值非正"]}},
+
+    {"id": "q07", "category": "银行", "question": "招商银行怎么样", "expect": {"intent": "bank", "code": "600036", "conclusion": "undetermined", "contains": ["银行估值未启用", "市净率", "股息率", "ROE", "不良率", "拨备覆盖率", "核心一级"]}},
+    {"id": "q08", "category": "银行", "question": "工商银行贵不贵", "expect": {"intent": "bank", "code": "601398", "conclusion": "undetermined", "contains": ["银行估值未启用", "市净率"]}},
+    {"id": "q09", "category": "银行", "question": "招行股息率多少", "expect": {"intent": "bank", "code": "600036", "conclusion": "undetermined", "contains": ["股息率", "ROE"]}},
+    {"id": "q10", "category": "银行", "question": "平安银行怎么样", "expect": {"intent": "bank", "code": "000001", "conclusion": "undetermined", "contains": ["市净率", "不良率", "核心一级"]}},
+
+    {"id": "q11", "category": "指数", "question": "沪深300 现在什么位置", "expect": {"intent": "index", "code": "000300", "conclusion": "undetermined", "contains": ["PE（滚动）", "分位", "候选 A 研究信号", "研究"]}},
+    {"id": "q12", "category": "指数", "question": "中证500 贵不贵", "expect": {"intent": "index", "code": "000905", "conclusion": "undetermined", "contains": ["PE（滚动）", "分位"]}},
+    {"id": "q13", "category": "指数", "question": "中证1000 什么位置", "expect": {"intent": "index", "code": "000852", "conclusion": "undetermined", "contains": ["PE（滚动）", "分位"]}},
+    {"id": "q14", "category": "指数", "question": "恒生科技", "expect": {"intent": "index", "code": "HSTECH", "conclusion": "undetermined", "contains": ["官方月度 PE", "股息率"]}},
+
+    {"id": "q15", "category": "ETF", "question": "510300 能买吗", "expect": {"intent": "etf", "code": "510300", "conclusion": "undetermined", "contains": ["产品资料", "跟踪指数位置", "管理费"]}},
+    {"id": "q16", "category": "ETF", "question": "510500 怎么样", "expect": {"intent": "etf", "code": "510500", "conclusion": "undetermined", "contains": ["产品资料", "跟踪指数位置"]}},
+    {"id": "q17", "category": "ETF", "question": "512100 能买吗", "expect": {"intent": "etf", "code": "512100", "conclusion": "undetermined", "contains": ["产品资料"]}},
+    {"id": "q18", "category": "ETF", "question": "159915 能买吗", "expect": {"intent": "out_of_scope", "code": "159915", "contains": ["已移出"]}},
+
+    {"id": "q19", "category": "池名单", "question": "好公司池有哪些", "expect": {"intent": "pool_list", "contains": ["好公司池", "138 家"]}},
+    {"id": "q20", "category": "池名单", "question": "收息池里的国企", "expect": {"intent": "pool_list", "contains": ["稳定收息池", "所有制筛选：国企"]}},
+    {"id": "q21", "category": "池名单", "question": "银行池", "expect": {"intent": "pool_list", "contains": ["银行池", "11 家"]}},
+    {"id": "q22", "category": "池名单", "question": "稳定收息池有哪些", "expect": {"intent": "pool_list", "contains": ["稳定收息池", "142 家"]}},
+
+    {"id": "q23", "category": "是否在池", "question": "格力在不在好公司池", "expect": {"intent": "membership", "code": "000651", "contains": ["不在好公司池", "控股股东最新质押比例"]}},
+    {"id": "q24", "category": "是否在池", "question": "为什么比亚迪不在", "expect": {"intent": "membership", "code": "002594", "contains": ["不在好公司池", "未通过 2 条"]}},
+    {"id": "q25", "category": "是否在池", "question": "茅台在不在收息池", "expect": {"intent": "membership", "code": "600519", "contains": ["在稳定收息池"]}},
+    {"id": "q26", "category": "是否在池", "question": "招商银行在不在银行池", "expect": {"intent": "membership", "code": "600036", "contains": ["在银行池"]}},
+    {"id": "q27", "category": "是否在池", "question": "中国平安在不在好公司池", "expect": {"intent": "membership", "code": "601318", "contains": ["不在好公司池", "范围外"]}},
+
+    {"id": "q28", "category": "排行", "question": "好公司里谁离买点最近", "expect": {"intent": "ranking", "contains": ["距候选门槛最近", "好公司池"]}},
+    {"id": "q29", "category": "排行", "question": "现在有哪些候选买点", "expect": {"intent": "ranking", "contains": ["候选买点"]}},
+    {"id": "q30", "category": "排行", "question": "收息池里谁离买点最近", "expect": {"intent": "ranking", "contains": ["稳定收息池"]}},
+    {"id": "q31", "category": "排行", "question": "离买点最近的股票有哪些", "expect": {"intent": "ranking", "contains": ["距候选门槛最近"]}},
+
+    {"id": "q32", "category": "历史", "question": "茅台以前的结论", "expect": {"intent": "history", "code": "600519", "contains": ["历史结论", "账本"]}},
+    {"id": "q33", "category": "历史", "question": "600519 历史结论", "expect": {"intent": "history", "code": "600519", "contains": ["账本"]}},
+    {"id": "q34", "category": "历史", "question": "招行的结论记录", "expect": {"intent": "history", "code": "600036", "contains": ["历史结论", "0 条"]}},
+
+    {"id": "q35", "category": "状态", "question": "数据是哪天的", "expect": {"intent": "status", "contains": ["行情：", "财务："]}},
+    {"id": "q36", "category": "状态", "question": "规则什么时候复核", "expect": {"intent": "status", "contains": ["复核", "下次复核"]}},
+    {"id": "q37", "category": "状态", "question": "数据更新到哪天", "expect": {"intent": "status", "contains": ["行情：", "官方当日估值账本"]}},
+    {"id": "q38", "category": "状态", "question": "政策版本是什么", "expect": {"intent": "status", "contains": ["equity-policy-v1.1"]}},
+
+    {"id": "q39", "category": "范围外/歧义", "question": "创业板", "expect": {"intent": "ambiguous", "contains": ["创业板指", "已移出"]}},
+    {"id": "q40", "category": "范围外/歧义", "question": "创业板指", "expect": {"intent": "out_of_scope", "code": "399006", "contains": ["已移出", "官方历史估值不可得"]}},
+    {"id": "q41", "category": "范围外/歧义", "question": "中国平安", "expect": {"intent": "stock", "code": "601318", "conclusion": "undetermined", "contains": ["保险企业路线首版未实现"]}},
+    {"id": "q42", "category": "范围外/歧义", "question": "苹果公司", "expect": {"intent": "out_of_scope", "contains": ["境外"]}},
+    {"id": "q43", "category": "范围外/歧义", "question": "000001", "expect": {"intent": "ambiguous", "contains": ["平安银行", "上证指数"]}},
+    {"id": "q44", "category": "范围外/歧义", "question": "平安", "expect": {"intent": "ambiguous", "contains": ["平安银行", "中国平安"]}}
+  ]
+}

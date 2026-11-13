@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from engine.contracts import reason_codes as rc
+from engine.evidence.cyclical import match_industry
 from engine.evidence.models import BusinessEvidence
 
 POLICY_VERSION = "model-applicability/1"
@@ -26,6 +27,7 @@ SELECTION_POLICY: dict[str, Any] = {
     "status": "research_candidate_pending_approval",
     "revenue_volatility_cyclical": 0.08,
     "revenue_drawdown_cyclical": 0.15,
+    "cyclical_list_id": "cyclical-industries-v1",
     "cyclical_industries": [
         "煤炭",
         "钢铁",
@@ -47,6 +49,8 @@ SELECTION_POLICY: dict[str, Any] = {
     "notes": [
         "阈值是研究起点，不是已批准政策；提高或降低门槛会改变主模型但不改变已算出的价值。",
         "判定只读业务证据与经营指标，不读当前股价。",
+        "行业线索自 2026-11-13 起来自版本化清单 data/policies/cyclical-industries-v1.json"
+        "（依据申万行业分类 2021 版）；清单只补全线索，不改变阈值。",
     ],
 }
 
@@ -255,9 +259,8 @@ def classify_family(evidence: BusinessEvidence) -> tuple[str, list[dict[str, Any
 
     volatility = evidence.revenue_volatility()
     drawdown = evidence.revenue_drawdown()
-    cyclical_industry = any(
-        key in industry for key in SELECTION_POLICY["cyclical_industries"]
-    )
+    cyclical_match = match_industry(industry)
+    cyclical_industry = cyclical_match is not None
     if cyclical_industry and (
         (volatility is not None and volatility >= SELECTION_POLICY["revenue_volatility_cyclical"])
         or (drawdown is not None and drawdown >= SELECTION_POLICY["revenue_drawdown_cyclical"])
@@ -269,10 +272,11 @@ def classify_family(evidence: BusinessEvidence) -> tuple[str, list[dict[str, Any
                     "industry": industry,
                     "revenue_growth_stdev": volatility,
                     "max_revenue_drawdown": drawdown,
+                    "cyclical_list": cyclical_match,
                 },
                 "conclusion": "cyclical",
                 "note": (
-                    "行业属周期类且收入波动/回撤超过研究阈值；"
+                    "行业线索命中版本化周期行业清单，且收入波动/回撤超过研究阈值；"
                     "行业本身只是线索，需收入波动共同确认"
                 ),
             }
@@ -288,6 +292,7 @@ def classify_family(evidence: BusinessEvidence) -> tuple[str, list[dict[str, Any
                 "revenue_growth_stdev": volatility,
                 "max_revenue_drawdown": drawdown,
                 "cyclical_industry_clue": cyclical_industry,
+                "cyclical_list": cyclical_match,
             },
             "conclusion": "non_financial",
             "note": "未命中金融、控股、困境或明显周期规则",

@@ -1,0 +1,12 @@
+{
+  "schema_version": "live-quotes-manifest/1",
+  "snapshots": [
+    {
+      "file": "quotes-2026-11-13.json",
+      "price_date": "2026-11-13",
+      "rows": 5225,
+      "content_hash": "5ace1a670b2b09a0",
+      "fetched_at": "2026-11-13T19:12:05+08:00"
+    }
+  ]
+}

@@ -874,8 +874,10 @@ def evaluate_company(
         values=values,
         margin=grade.margin,
     )
-    conclusion["is_trial_only"] = True
-    conclusion["label"] = "预演结论（未批准政策，不构成正式结论）"
+    # 政策 v1.1 已于 2026-11-12 获股东决策②批准：这里的结论是正式结论，
+    # 不再标「预演」；只有指数候选 A、银行估值等 research 模型才使用研究/预演字样。
+    conclusion["is_trial_only"] = False
+    conclusion["label"] = f"正式结论（政策 {policy.policy_id}，已批准）"
     record["trial_conclusion"] = conclusion
 
     record["margin_sensitivity"] = grading.margin_sensitivity(

@@ -1,0 +1,5 @@
+#!/bin/sh
+# 对话入口：./ask "茅台怎么样"
+# 原样输出 Markdown 卡片；不调用任何大模型。
+cd "$(dirname "$0")" || exit 1
+exec .venv/bin/python -m engine.ask "$@"

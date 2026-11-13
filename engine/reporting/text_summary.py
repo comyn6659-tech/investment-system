@@ -598,7 +598,11 @@ def _render_policy_conclusion(block: dict[str, Any]) -> list[str]:
             f"（{_price((binding.get('price') or {}).get('value'))}）"
         )
     unmet = grade.get("unmet_conditions") or []
-    lines.append("  主要未满足条件：" + ("、".join(unmet) if unmet else "无"))
+    from engine.reporting.labels import condition_labels
+
+    lines.append(
+        "  主要未满足条件：" + ("、".join(condition_labels(unmet)) if unmet else "无")
+    )
     if not formal:
         lines.append("  该结果不形成正式结论；三档价值仅研究参考，不用于买卖判断。")
     lines.append(f"  快照：{block.get('snapshot_id')}（数据截至 {block.get('as_of')}）")

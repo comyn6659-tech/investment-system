@@ -21,3 +21,7 @@ reports/_runtime/
 
 # macOS
 .DS_Store
+
+# 前向记录的运行状态（账本与行情快照仍入版本控制）
+data/pool-valuation/live/update-state.json
+data/series/.last_series_attempt.json

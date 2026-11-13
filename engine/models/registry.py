@@ -40,7 +40,7 @@ class ModelDescriptor:
 MODELS: tuple[ModelDescriptor, ...] = (
     ModelDescriptor(
         model_id="equity_dcf_fcff",
-        version="0.2.0-research",
+        version="0.2.0",
         applies_to="equity",
         status="validated",
         implemented=True,
@@ -64,12 +64,12 @@ MODELS: tuple[ModelDescriptor, ...] = (
         notes=(
             "已按股东决策②于 2026-11-12 批准（equity-policy-v1.1，pol-6d1a5387780fe6a2）："
             "EBIT×(1−t)+折旧摊销−资本开支−营运资本增加；历史勾稽与 OCF 对照，差额超容差按 partial 输出。"
-            "版本号沿用 0.2.0-research 以保持已签收样例可重放，批准状态见 status。"
+            "已批准；版本号去掉 -research 后缀（政策批准后不再用研究版号）。"
         ),
     ),
     ModelDescriptor(
         model_id="equity_dividend_discount",
-        version="0.2.0-research",
+        version="0.2.0",
         applies_to="equity",
         status="validated",
         implemented=True,
@@ -86,7 +86,7 @@ MODELS: tuple[ModelDescriptor, ...] = (
         notes=(
             "已按股东决策②于 2026-11-12 批准（equity-policy-v1.1，pol-6d1a5387780fe6a2）："
             "DPS = EPS × 派息率，用股权成本折现；特别分红不进入可持续 DPS；终值增长不得超过 ROE×留存率。"
-            "版本号沿用 0.2.0-research 以保持已签收样例可重放，批准状态见 status。"
+            "已批准；版本号去掉 -research 后缀（政策批准后不再用研究版号）。"
         ),
     ),
     ModelDescriptor(

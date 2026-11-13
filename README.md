@@ -5,7 +5,7 @@ A 股个股 / 境内 A 股宽基指数 / 境内普通被动 ETF 的分析引擎�
 建设方式：独立新项目，从零搭建，不读取、不导入、不依赖旧项目
 `../valuation/` 的代码、缓存或投资政策。旧目录仅作可选的只读查证资料。
 
-**当前阶段：第四阶段第五批（好公司池补治理检验；252 家候选逐家查，入池 120 家，规则未批准）。**
+**当前阶段：第四阶段第十一批（对话入口 + 端到端验收；周期行业清单补全；前向记录 update）。**
 
 - 阶段一：身份、结果契约、固定快照与数据可用性调查（已签收 `5c4c1c9`）。
 - 阶段二：三条个股研究路线（FCFF / 股息折现 / 银行专用），全部 `research`
@@ -15,10 +15,10 @@ A 股个股 / 境内 A 股宽基指数 / 境内普通被动 ETF 的分析引擎�
   [docs/index-profile-spec.md](docs/index-profile-spec.md)、
   [docs/phase3-samples.md](docs/phase3-samples.md)。
 - 阶段四：个股政策 v1.1 正式结论（第二批）；创业板指接入（第三批，官方历史估值不可得）；
-  好公司池草案试运行（第四批）；补治理检验（第五批）。见 [docs/phase4b-delivery.md](docs/phase4b-delivery.md)、
-  [docs/phase4c-delivery.md](docs/phase4c-delivery.md)、
-  [docs/phase4d-delivery.md](docs/phase4d-delivery.md)、
-  [docs/phase4e-delivery.md](docs/phase4e-delivery.md)。
+  好公司池草案试运行（第四批）；补治理检验（第五批）；收息池（第七批）；银行池与预演（第八批）；
+  三池批准与恒生科技（第九批）；池成员批量估值（第十批）；对话入口与周期清单补全（第十一批）。
+  见 [docs/phase4b-delivery.md](docs/phase4b-delivery.md) 至
+  [docs/phase4k-delivery.md](docs/phase4k-delivery.md)。
 
 **交付入口：[DELIVERY.md](DELIVERY.md)。**
 
@@ -103,6 +103,15 @@ $PY -m engine.cli '600519' \
 $PY -m engine.cli '600900' --assumptions data/assumptions/600900-ddm-base.json
 $PY -m engine.cli '601398'             # 银行：资本/资产质量证据缺失 → insufficient_data
 $PY -m engine.cli '601318'             # 保险：首版未实现 → unsupported
+
+# 第十一批：对话入口（不调用大模型；卡片可供 Claude 原样呈现）
+./ask "茅台怎么样"
+./ask --detail "招商银行怎么样"
+./ask --no-update "数据是哪天的"
+
+# 第十一批：前向记录只追加刷新（行情/周信号/官方当日估值/恒生科技月度）
+./update
+./update --check
 
 # 阶段三：指数画像与 ETF 产品资料（无需额外参数）
 $PY -m engine.cli '沪深300'            # 5 年月度 PE/PB 分位

@@ -163,7 +163,7 @@
       "scope": {
         "status": "in_scope",
         "reason_code": "BROAD_INDEX_NOT_IN_FIRST_BATCH",
-        "detail": "境内A股宽基，但不在首批研究样本内；数据覆盖尚未核实，不套用已验证标签"
+        "detail": "境内A股宽基，但不在已接入研究样本内；数据覆盖尚未核实，不套用已验证标签"
       },
       "evidence": [
         {
@@ -200,7 +200,7 @@
       "scope": {
         "status": "in_scope",
         "reason_code": "BROAD_INDEX_NOT_IN_FIRST_BATCH",
-        "detail": "境内A股宽基，但不在首批研究样本内；数据覆盖尚未核实"
+        "detail": "境内A股宽基，但不在已接入研究样本内；数据覆盖尚未核实"
       },
       "evidence": [
         {
@@ -238,7 +238,7 @@
       "scope": {
         "status": "in_scope",
         "reason_code": "BROAD_INDEX_NOT_IN_FIRST_BATCH",
-        "detail": "境内A股宽基，但不在首批研究样本内；数据覆盖尚未核实"
+        "detail": "境内A股宽基，但不在已接入研究样本内；数据覆盖尚未核实"
       },
       "evidence": [
         {
@@ -277,9 +277,9 @@
       "data_coverage_verified": true,
       "official_valuation_only": true,
       "scope": {
-        "status": "in_scope",
-        "reason_code": "BROAD_INDEX_NOT_IN_FIRST_BATCH",
-        "detail": "第四批研究样本：创业板指；官方收盘与全收益已接入，官方历史估值未取得，只保留当前快照"
+        "status": "out_of_scope",
+        "reason_code": "INDEX_REMOVED_OFFICIAL_HISTORY_UNAVAILABLE",
+        "detail": "已移出：官方历史估值不可得（2026-11-13 股东决定）。名称仍可识别为创业板指，但不再进入指数画像、候选 A 信号与官方估值前向记录；已有序列、快照与账本记录不改，留到整理批处理。"
       },
       "evidence": [
         {
@@ -324,7 +324,22 @@
           ],
           "note": "官网指数列表只提供最新交易日估值快照：PE 滚动 25.1325、PE 静态 31.6183、PB 4.07（2026-11-11）；无历史序列"
         }
-      ]
+      ],
+      "removed": {
+        "date": "2026-11-13",
+        "decision": "股东决定",
+        "reason": "官方历史估值不可得，无法做分位与信号",
+        "stop": [
+          "名称识别改为范围外",
+          "官方估值前向记录",
+          "ETF 资料检查"
+        ],
+        "keep": [
+          "已有官方收盘/全收益序列",
+          "已有指数快照",
+          "已有官方估值账本记录"
+        ]
+      }
     },
     {
       "instrument_id": "INDEX:000015.SH",
@@ -591,9 +606,9 @@
       "in_first_batch": false,
       "data_coverage_verified": true,
       "scope": {
-        "status": "in_scope",
-        "reason_code": "PASSIVE_BROAD_ETF",
-        "detail": "普通被动 ETF，跟踪第四批创业板指"
+        "status": "out_of_scope",
+        "reason_code": "ETF_TRACKING_INDEX_REMOVED",
+        "detail": "已移出：跟踪的创业板指已移出研究范围（官方历史估值不可得）；停止 ETF 产品资料检查，资料与快照保留到整理批。"
       },
       "evidence": [
         {
@@ -625,7 +640,18 @@
           ],
           "note": "产品资料页跟踪标的为「创业板指数（价格）」；对应指数条目 399006 创业板指"
         }
-      ]
+      ],
+      "removed": {
+        "date": "2026-11-13",
+        "decision": "股东决定",
+        "reason": "跟踪指数创业板指已移出",
+        "stop": [
+          "ETF 产品资料检查"
+        ],
+        "keep": [
+          "已有产品资料快照"
+        ]
+      }
     },
     {
       "instrument_id": "ETF:510500.SH",

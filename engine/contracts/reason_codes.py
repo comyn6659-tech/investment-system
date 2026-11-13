@@ -59,7 +59,15 @@ OUT_OF_SCOPE_INDEX_VARIANT = _register(
 OUT_OF_SCOPE_MARKET = _register("OUT_OF_SCOPE_MARKET", "scope", "港美股等境外市场个股不在第一版范围")
 OUT_OF_SCOPE_OTHER = _register("OUT_OF_SCOPE_OTHER", "scope", "标的不在第一版模型范围")
 INDEX_NOT_IN_FIRST_BATCH = _register(
-    "INDEX_NOT_IN_FIRST_BATCH", "scope", "宽基指数已识别，但不在首批研究样本内"
+    "INDEX_NOT_IN_FIRST_BATCH", "scope", "宽基指数已识别，但不在已接入的研究样本内（已接入：沪深300、中证500、中证1000、恒生科技）"
+)
+INDEX_REMOVED_OFFICIAL_HISTORY_UNAVAILABLE = _register(
+    "INDEX_REMOVED_OFFICIAL_HISTORY_UNAVAILABLE",
+    "scope",
+    "指数已移出研究范围：官方历史估值不可得（2026-11-13 股东决定）",
+)
+ETF_TRACKING_INDEX_REMOVED = _register(
+    "ETF_TRACKING_INDEX_REMOVED", "scope", "ETF 跟踪的指数已移出研究范围，停止产品资料检查"
 )
 
 # --- 模型 -------------------------------------------------------------------
