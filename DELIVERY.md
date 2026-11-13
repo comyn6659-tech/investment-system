@@ -5,80 +5,84 @@
 | 项目 | 内容 |
 |---|---|
 | 项目 | `/Users/comyn/Documents/deepseek-harness/投资/investment-system/` |
-| 本轮阶段 | 第四阶段第十批：**好公司池 + 收息池成员的个股估值** |
-| 本轮实现提交 | `1948318` |
-| 上一轮 | `e0da6d2`（第四阶段第九批入口，实现 `4e8b3b1`） |
+| 本轮阶段 | 第四阶段第十一批：**对话入口 + 端到端验收（含遗留修正）** |
+| 本轮实现提交 | `301f4aa`（补充 `792f92b`、`e23f378`） |
+| 上一轮 | `78635cc`（第四阶段第十批入口，实现 `1948318`） |
 
 ## 1. 结果
 
 | 项 | 数值 |
 |---|---:|
-| 池成员（两池去重、非银行） | 221 |
-| 候选买点 / 等待 / 回避 / 无法判断 | 2 / 37 / 49 / 133 |
-| 状态 complete / partial / unsupported | 131 / 74 / 16 |
-| 等级 A / B / C | 54 / 45 / 122 |
-| 正式结论账本写入 | 88（原 7 条不变，共 95 条） |
-| 30 只回归 | **30 / 30**；基准价值最大相对差 **0.0000%** |
-| 批量快照 | `qps-f140a9790e4015ea`，50 张表、15.08 MB |
-| 测试 | **608 passed** |
+| 周期清单 | `cyclical-industries-v1`（申万 2021 版；9 组、精确名 + 旧线索） |
+| 池成员 221 家重跑：结论改变 | **2**（君正集团、扬农化工 → 无法判断）；其余 219 家不变 |
+| 30 只测试股重跑：结论改变 | **0** |
+| `ask` 固定问题集 | **44 / 44**，10 类意图，每类 ≥3 种说法 |
+| 端到端 30 股 / 4 指数 / 2 银行 / 3 ETF | **30/30、4/4、2/2、3/3** |
+| `update` 首次行情快照 | 5,225 行，价格日期 **2026-11-13**；恒生科技月度 **2026-10-30** |
+| 正式结论账本 / 测试 | **96 条**（0 问题，旧记录不变）/ **648 passed** |
 
-## 2. 批量输入与适配（R1、R2）
+## 2. 遗留修正（S1–S4）
 
-- 财务按报告期批量取东方财富三张合并报表（2015–2025 年报 + 2025/2026 三季报）；
-  分红用好公司池 2021–2025 中期/年度表并补 2023–2025 三季报；行情用全市场快照
-  （价格日期 2026-11-12）；总股本用最近一期股本变动。
-- 字段映射：`docs/phase4j-field-mapping.md`；适配层
-  `engine/pool_valuation/adapter.py` 只把批量表还原成同名 `fin.*`/`div.*`/
-  `profile.*`/`price.*` 事实，再交给原政策与估值代码。
-- `git diff e0da6d2 -- engine/policy engine/valuation` 为空（测试证明）；应付类字段
-  与原快照保持相同可用集合，不新增口径。
+- **周期清单**：`data/policies/cyclical-industries-v1.json`，依据申万行业分类 2021 版
+  （2021-07-30 推出；来源 `http://www.swsindex.com/idx0530.aspx`）。覆盖煤炭、石油石化、钢铁、
+  有色金属（工业金属/小金属/能源金属/贵金属）、基础化工（化学原料/化学纤维/农化制品/塑料/橡胶）、
+  建筑材料（水泥/玻璃玻纤）、航运、生猪及禽类养殖；旧关键词单列保留，避免反向改结论。
+  仍须收入波动 ≥8% 或回撤 ≥15% 确认；阈值、政策 JSON、估值代码未改。君正集团（化学原料，
+  旧关键词「化工」漏判，波动 18.3%）由候选买点改为无法判断；扬农化工由回避改为无法判断。
+  报告：`docs/phase4k-cyclical-rerun.md`。
+- **标签**：正式结论统一为 `正式结论（政策 equity-policy-v1.1，已批准）`，`is_trial_only=false`；
+  只有指数候选 A、银行估值等 research 模型保留研究/预演字样。validated 模型版本 `0.2.0`；
+  指数原因码描述改为「不在已接入的研究样本内」；卡片内部英文条件名改中文。
+- **创业板指 / 159915**：两者 scope 改为范围外（`INDEX_REMOVED_OFFICIAL_HISTORY_UNAVAILABLE` /
+  `ETF_TRACKING_INDEX_REMOVED`）；停止 399006 官方估值前向记录与 159915 ETF 资料检查；
+  已有序列、快照、官方估值账本 4 条不改。
+- **前向记录**：`./update` 刷新官方日频序列、候选 A 周度信号、全市场行情、官方当日估值、
+  恒生科技月度估值；只追加、重复跳过、冲突不覆盖；单步失败不阻断，运行日志只追加。
+  `ask` 每次提问前尝试一次轻量 update，失败不阻断并注明数据日期。定时任务
+  `scripts/install-daily-update.sh`（launchd 每日 18:30）**需股东手动执行一次**；
+  卸载 `scripts/uninstall-daily-update.sh`；运行时不会自动安装。
 
-## 3. 回归与池成员（R3–R5）
+## 3. 对话入口（S5–S7）
 
-30 只测试股状态、等级、预演结论 **30/30 相同**，基准价值最大差 **0.0000%**；批量路径
-使用原快照的现价/价格日期/总股本，只换财务与分红输入。221 家全部有结果；88 家 A/B 且
-complete 的公司按“距候选门槛”从近到远列出现价、门槛价、起约束条件、等级、所属池、
-所有制、周期标记。无法判断按原因分组：等级 C 48、终值护栏 44、现金流勾稽 25、
-路线不支持 16。报告：`docs/phase4j-pool-valuation-report.md`；回归：`docs/phase4j-regression-30.md`。
+`./ask "<中文问题>"`，规则化识别（不调用大模型），默认卡片 ≤25 行、`--detail` 展开、`--json` 结构化。
+支持：单只个股（全部 A 股，含不在池公司）、银行、指数、ETF、池名单、是否在池、排行、历史、状态、
+范围外/歧义。卡片固定结构：第一行结论与一句话原因；现价/日期、候选门槛、距门槛、三档价值及用途；
+起约束条件与中文未满足条件；所属池/所有制/周期属性/等级含义；局限；来源与日期、政策版本；
+末行「不构成投资建议」。正式结论按原规则写入只追加账本。Claude 使用说明：`SKILL.md`
+（原样呈现，不改写结论，不补充买卖意见，追问用 `--detail`）。
+问题集：`data/ask/questions.json`；验收：`docs/phase4k-acceptance.md`；样例：`docs/phase4k-samples.md`。
 
-## 4. 结论账本（R4）
+## 4. 五个真实问答样例
 
-首次写入 **88 条**（分析日 2026-11-13、批量快照 `qps-f140a9790e4015ea`）；原有 7 条
-内容不变，账本共 95 条，`--check` 0 问题。只追加；同一标的、同一分析日、同一快照内容
-不同 → 冲突不覆盖（既有测试覆盖）。银行不估值；银行池与银行账本未改；银行估值仍未启用。
+1. **问：茅台怎么样** → 等待；现价 1,435.26 元（2026-11-13），候选门槛 686.80 元；正式结论（政策 v1.1）。
+2. **问：招商银行怎么样** → 无法判断（银行估值未启用）；PB 0.97、股息率 4.7%、ROE 13.4%、不良 0.94%、拨备 389.39%、核心一级 14.39%。
+3. **问：沪深300 现在什么位置** → 无法判断（研究画像）；PE 12.65（分位 76%）、PB 1.32（分位 39%）、候选 A 2026-W45 exit（研究信号，规则未批准）。
+4. **问：好公司池有哪些** → 138 家（quality-pool-v1.2，快照 2026-11-12）。
+5. **问：为什么比亚迪不在** → 不在好公司池；未通过 ROE 平均 11.93% < 15%、ROE ≥10% 年份占比 50% < 80%。
 
-## 5. 未改变（R7）
-
-好公司池 138、收息池 142、银行池 11 的名单与各自账本不变；三池快照、指数/ETF、
-候选 A 账本、官方估值账本不变；既有 7 条正式结论记录不变；全部测试 **608 passed**。
-
-## 6. 验收自检（R1–R8）
+## 5. 验收自检（S1–S9）
 
 | 编号 | 结果 |
 |---|---|
-| R1 | 映射齐全；50 表 15.08 MB ≤ 200 MB；快照哈希重放测试通过 |
-| R2 | 政策/估值代码 diff 为空；适配层有测试 |
-| R3 | 30/30 状态/等级/结论相同，基准价值最大差 0.0000% |
-| R4 | 221 家全部有结果；账本 95 条（7+88），只追加；冲突规则有测试 |
-| R5 | 报告含分布、原因分组、88 家排序与全部列 |
-| R6 | `--show 600519` 可从快照独立复算 |
-| R7 | 指数/ETF/三池名单与账本不变；608 passed |
-| R8 | 本文件一页以内 |
+| S1 | 清单版本化、带申万依据；221+30 重跑；改变 2 家；君正专节说明 |
+| S2 | 正式/研究标签测试通过；validated 版本去掉 `-research`；研究模型无「正式结论」 |
+| S3 | 399006/159915 范围外；其余指数、ETF 结果不变；官方估值旧 4 条不改 |
+| S4 | update 只追加/重复跳过/冲突不覆盖；launchd 可安装可卸载，未自动安装 |
+| S5 | 44 条问题覆盖 10 类意图，每类 ≥3 种说法，全部自动测试 |
+| S6 | 卡片结构符合要求；默认 8–10 行，≤25 行；`--detail` 展开 |
+| S7 | 问题集 44/44；30 股/4 指数/2 银行/3 ETF 全过；禁用词 0；日期/来源齐全 |
+| S8 | **648 passed**；账本 96 条 0 问题；旧记录不变；所有账本只追加 |
+| S9 | 本文件一页以内；5 个真实问答样例见上，完整卡片见 `docs/phase4k-samples.md` |
 
-## 7. 复现
+## 6. 复现
 
 ```bash
-.venv/bin/python tools/build_pool_valuation_data.py
-.venv/bin/python tools/run_pool_valuation_regression.py
-.venv/bin/python tools/run_pool_valuation.py --no-ledger
-.venv/bin/python tools/run_pool_valuation.py
-.venv/bin/python tools/run_pool_valuation.py --show 600519
+.venv/bin/python tools/run_cyclical_rerun.py --write-ledger
+./update && ./update --check
+./ask "茅台怎么样" && ./ask --detail "招商银行怎么样"
+.venv/bin/python tools/run_ask_acceptance.py
 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
 ```
 
-- 批量快照说明：[data/pool-valuation/README.md](data/pool-valuation/README.md)
-- 字段映射：[docs/phase4j-field-mapping.md](docs/phase4j-field-mapping.md)
-- 回归：[docs/phase4j-regression-30.md](docs/phase4j-regression-30.md)
-- 池成员报告：[docs/phase4j-pool-valuation-report.md](docs/phase4j-pool-valuation-report.md)
-- 详细交付：[docs/phase4j-delivery.md](docs/phase4j-delivery.md)
-- 验收清单：[docs/acceptance-checklist.md](docs/acceptance-checklist.md) 第十批 R1–R8
+- 详细交付：[docs/phase4k-delivery.md](docs/phase4k-delivery.md)｜周期重跑：[docs/phase4k-cyclical-rerun.md](docs/phase4k-cyclical-rerun.md)｜端到端验收：[docs/phase4k-acceptance.md](docs/phase4k-acceptance.md)
+- 样例：[docs/phase4k-samples.md](docs/phase4k-samples.md)｜Claude 使用说明：[SKILL.md](SKILL.md)｜问题集：[data/ask/questions.json](data/ask/questions.json)｜验收清单：[docs/acceptance-checklist.md](docs/acceptance-checklist.md) 第十一批 S1–S9
