@@ -157,16 +157,39 @@ def test_existing_conclusion_records_unchanged():
 
 def test_policy_and_valuation_code_unchanged():
     """第十批的 R2 证明；第十一批只允许改结论标签，不改政策规则与估值。"""
+    if not (ROOT / ".git").exists():
+        pytest.skip("git archive 目录没有 .git 元数据；本项在干净归档中跳过")
     valuation = subprocess.run(
         ["git", "diff", "--quiet", "e0da6d2", "--", "engine/valuation"], cwd=ROOT
     )
     assert valuation.returncode == 0, "估值代码被修改"
-    policy = subprocess.run(
-        ["git", "diff", "e0da6d2", "--", "engine/policy"], cwd=ROOT, capture_output=True, text=True
+    # 第十一批收尾 T2 只改结论账本的改判能力（conclusion.py / conclusion_ledger.py），
+    # 以及 trial.py 的结论标签；不涉及政策规则或估值代码。
+    names = subprocess.run(
+        ["git", "diff", "--name-only", "e0da6d2", "--", "engine/policy"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    ).stdout.split()
+    assert set(names) <= {
+        "engine/policy/conclusion.py",
+        "engine/policy/conclusion_ledger.py",
+        "engine/policy/trial.py",
+    }, names
+    policy_json = subprocess.run(
+        ["git", "diff", "--quiet", "e0da6d2", "--", "data/policies/equity-policy-v1.1.json"],
+        cwd=ROOT,
+    )
+    assert policy_json.returncode == 0, "已批准政策 JSON 被修改"
+    trial = subprocess.run(
+        ["git", "diff", "e0da6d2", "--", "engine/policy/trial.py"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
     )
     changed = [
         line
-        for line in policy.stdout.splitlines()
+        for line in trial.stdout.splitlines()
         if line.startswith(("+", "-")) and not line.startswith(("+++", "---"))
         and "is_trial_only" not in line
         and "正式结论" not in line
@@ -175,4 +198,4 @@ def test_policy_and_valuation_code_unchanged():
         and "不再标" not in line
         and "只有指数候选 A" not in line
     ]
-    assert not changed, "政策代码除结论标签外被修改：\n" + "\n".join(changed[:20])
+    assert not changed, "trial.py 除结论标签外被修改：\n" + "\n".join(changed[:20])

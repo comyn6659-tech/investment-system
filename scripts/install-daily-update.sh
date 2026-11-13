@@ -21,9 +21,13 @@ if [ "${1:-}" = "--dry-run" ]; then
 fi
 
 if [ ! -x "$PYTHON" ]; then
-  echo "找不到可执行解释器：$PYTHON" >&2
-  echo "请先在项目根目录创建 .venv 并安装依赖。" >&2
-  exit 1
+  if [ "$DRY_RUN" = "1" ]; then
+    echo "dry-run：解释器尚不存在（安装前需在项目根目录创建 .venv）：$PYTHON"
+  else
+    echo "找不到可执行解释器：$PYTHON" >&2
+    echo "请先在项目根目录创建 .venv 并安装依赖。" >&2
+    exit 1
+  fi
 fi
 
 PLIST_CONTENT="$(cat <<PLIST

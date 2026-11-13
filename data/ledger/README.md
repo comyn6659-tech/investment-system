@@ -47,11 +47,15 @@
 
 ## 规则
 
-- 只有 `candidate` / `wait` / `avoid` 写入；`undetermined` 不写。
-- 同一标的、同一分析日、同一快照：内容一致 → 跳过；内容不同 → 报冲突，拒绝覆盖。
-- 每个 CLI 正式结论运行都会尝试写入；重复运行不会重复写。
+- 只有 `candidate` / `wait` / `avoid` 写入；`undetermined` 不写，**除非是改判记录**。
+- 改判：某标的账本中最新一条是正式结论，而新一次评估为无法判断时，追加一条
+  `record_type=reversal`、`conclusion=undetermined` 的记录，带原因码、中文原因、
+  政策版本、快照 ID、分析日与 `reversal_of`（被改判的正式记录 id）；旧记录不改。
+  从未有过正式结论的标的仍不写入无法判断。
+- 同一标的、同一分析日、同一快照的同类记录：内容一致 → 跳过；内容不同 → 报冲突，拒绝覆盖。
+- 每个 CLI / 对话入口的评估都会尝试写入；重复运行不会重复写。
 - `python -m engine.cli --check-conclusions`（或 `--conclusion-ledger` 指定文件）重新计算哈希，
-  发现历史被改写、重复记录或 `undetermined` 混入时返回 1。
+  发现历史被改写、重复记录、非改判的 `undetermined` 或改判目标非法时返回 1。
 
 ## 字段
 
@@ -64,15 +68,20 @@
 | `price` / `price_date` | 现价与价格日期 |
 | `values` | 悲观 / 基准 / 乐观三档每股价值 |
 | `grade` / `margin_of_safety` | 确定性等级与安全边际 |
-| `conclusion` | candidate / wait / avoid |
+| `conclusion` | candidate / wait / avoid；改判记录为 undetermined |
 | `binding_condition` | 起约束条件（安全边际或悲观价值） |
+| `record_type` | 正式结论省略；改判记录为 `reversal` |
+| `reason_codes` / `reason` | 改判记录的原因码与中文原因 |
+| `reversal_of` | 改判记录指向的旧正式记录 `record_id` |
 | `record_id` | 内容哈希（不含 `recorded_at`） |
 | `recorded_at` | 追加时刻（不参与哈希） |
 
 2026-11-12 首次运行写入 7 条（海天、双汇、美的、茅台、宁德、恒瑞、中国移动）。
 2026-11-13 第十批池成员估值写入 88 条（分析日 2026-11-13、批量快照 `qps-f140a9790e4015ea`），账本 95 条。
-2026-11-13 第十一批对话入口实测追加 1 条（茅台，实时行情 1,435.26 元，分析日 2026-11-13），
-账本共 **96 条**；旧记录内容不变，`--check-conclusions` 0 问题。
+2026-11-13 第十一批对话入口实测追加 1 条（茅台，实时行情 1,435.26 元，分析日 2026-11-13）。
+2026-11-13 第十一批收尾为君正集团（601216）、扬农化工（600486）各追加 1 条改判记录
+（明显周期、`MODEL_FAMILY_NOT_IMPLEMENTED` + `CYCLICAL_INDUSTRY_LIST_MATCH`），
+账本共 **98 条**；旧记录内容不变，`--check-conclusions` 0 问题。
 
 ---
 

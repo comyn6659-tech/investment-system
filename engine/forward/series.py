@@ -31,7 +31,6 @@ TZ = ZoneInfo("Asia/Singapore")
 ROOT = Path(__file__).resolve().parent.parent.parent
 SERIES_DIR = ROOT / "data" / "series"
 SIGNAL_LEDGER = ROOT / "data" / "ledger" / "candidate-a-signals.jsonl"
-ATTEMPT_STATE = ROOT / "data" / "series" / ".last_series_attempt.json"
 PERF_URL = "https://www.csindex.com.cn/csindex-home/perf/index-perf"
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
 INDICES = {
@@ -180,25 +179,6 @@ def _last_completed_week_end(now: datetime) -> date:
     return day - timedelta(days=weekday + 3)
 
 
-def _attempted_today(now: datetime) -> bool:
-    if not ATTEMPT_STATE.exists():
-        return False
-    try:
-        data = json.loads(ATTEMPT_STATE.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return False
-    return data.get("date") == now.date().isoformat()
-
-
-def _mark_attempt(now: datetime) -> None:
-    ATTEMPT_STATE.parent.mkdir(parents=True, exist_ok=True)
-    ATTEMPT_STATE.write_text(
-        json.dumps({"date": now.date().isoformat(), "attempted_at": now.isoformat(timespec="seconds")})
-        + "\n",
-        encoding="utf-8",
-    )
-
-
 def refresh_official_series(
     *,
     now: datetime | None = None,
@@ -221,14 +201,6 @@ def refresh_official_series(
             "expected_week_end": expected_week_end,
             "latest_dates": latest_dates,
         }
-    if not force and _attempted_today(clock):
-        return {
-            "status": "skipped",
-            "reason": "今日已尝试过官方序列刷新；不重复联网",
-            "expected_week_end": expected_week_end,
-            "latest_dates": latest_dates,
-        }
-    _mark_attempt(clock)
     summary = []
     changed = []
     for code in CODE_ORDER:
@@ -295,7 +267,6 @@ def refresh_signal_ledger(*, now: datetime | None = None, skip_network: bool = F
 
 
 __all__ = [
-    "ATTEMPT_STATE",
     "CODE_ORDER",
     "INDICES",
     "SERIES_DIR",

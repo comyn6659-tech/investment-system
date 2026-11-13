@@ -52,7 +52,7 @@ BANK_POLICY = ROOT / "data" / "policies" / "bank-pool-v1.json"
 QUALITY_SNAPSHOT = ROOT / "data" / "quality-pool" / "snapshot-qps-3ebbd24be612bf7e"
 INCOME_SNAPSHOT = ROOT / "data" / "income-pool" / "snapshot-qps-d8fb7e3718675b93"
 BANK_SNAPSHOT = ROOT / "data" / "bank-pool" / "snapshot-qps-dc9c12160476db8b"
-OWNERSHIP = ROOT / "data" / "cache" / "quality-pool" / "tables" / "ownership.csv.gz"
+OWNERSHIP = INCOME_SNAPSHOT / "ownership.csv.gz"
 BANK_INPUTS = ROOT / "data" / "bank-pool" / "valuation-inputs.csv.gz"
 OFFICIAL_LEDGER = ROOT / "data" / "ledger" / "official-valuation-daily.jsonl"
 HSTECH_LEDGER = ROOT / "data" / "ledger" / "hstech-monthly-valuation.jsonl"
@@ -295,7 +295,7 @@ class AskService:
                     "steps": {item["step"]: item["status"] for item in payload["steps"]},
                 }
             else:
-                state = update.read_state()
+                state = update.last_run()
                 note = {
                     "attempted": False,
                     "status": state.get("last_status"),
@@ -478,7 +478,7 @@ class AskService:
                 json.loads(line) for line in HSTECH_LEDGER.read_text(encoding="utf-8").splitlines() if line
             ]
         hstech_latest = hstech_rows[-1] if hstech_rows else None
-        state = update.read_state()
+        state = update.last_run()
         policy = self.policy
         approval = policy.data.get("approval") or {}
         q_policy = json.loads(QUALITY_POLICY.read_text(encoding="utf-8")).get("approval") or {}
@@ -500,7 +500,7 @@ class AskService:
             f"复核 {approval.get('review_date')}）",
             f"- 池规则：好公司池 quality-pool-v1.2 / 收息池 income-pool-v1 / 银行池 bank-pool-v1"
             f"（批准 {q_policy.get('approved_at')}；下次复核 {q_policy.get('next_review_date')}）",
-            f"- 前向更新：{state.get('last_run_at') or '尚未运行'}（{state.get('last_status') or '—'}）；"
+            f"- 前向更新：{state.get('run_at') or '尚未运行'}（{state.get('status') or '—'}）；"
             "每日定时任务需股东手动安装一次（scripts/install-daily-update.sh）",
         ]
         if detail:
@@ -510,7 +510,7 @@ class AskService:
                 f"- 官方估值账本记录：{len(official_rows)} 条；恒生科技月度记录：{len(hstech_rows)} 条",
                 f"- 行情快照行数：{len(quote_payload['rows']) if quote_payload else 0}",
                 f"- 政策文件：{POLICY.relative_to(ROOT)}",
-                f"- 更新状态文件：data/pool-valuation/live/update-state.json",
+                f"- 更新日志：data/ledger/update-log.jsonl",
             ]
         lines += ["", "不构成投资建议。"]
         return "\n".join(lines)
@@ -529,8 +529,8 @@ class AskService:
                     records.append(row)
         records.sort(key=lambda row: (str(row.get("analysis_date")), str(row.get("recorded_at"))))
         lines = [
-            f"**结论：{target.name}的历史结论** — 正式结论账本共 {len(records)} 条"
-            "（只记录候选买点/等待/回避；无法判断不入账本）。",
+            f"**结论：{target.name}的历史结论** — 账本记录共 {len(records)} 条"
+            "（正式结论只记录候选买点/等待/回避；无法判断仅在改判时追加）。",
             "",
         ]
         if not records:
@@ -541,22 +541,37 @@ class AskService:
         else:
             for row in records[-5:]:
                 values = row.get("values") or {}
+                label = _label(row.get("conclusion"))
+                extra = ""
+                if row.get("record_type") == "reversal":
+                    label = "无法判断（改判）"
+                    extra = f"｜改判原因：{row.get('reason') or '—'}"
                 lines.append(
-                    f"- {row.get('analysis_date')}：{_label(row.get('conclusion'))}"
-                    f"｜现价 {_money(row.get('price'))}（{row.get('price_date')}）"
+                    f"- {row.get('analysis_date')}：{label}"
+                    f"｜现价 {_money(row.get('price'))}（{row.get('price_date') or '—'}）"
                     f"｜基准价值 {_money(values.get('base'))}"
-                    f"｜等级 {row.get('grade')}"
+                    f"｜等级 {row.get('grade') or '—'}"
                     f"｜政策 {row.get('policy_version')}"
+                    f"{extra}"
                 )
             if detail:
                 lines += ["", "【详情】"]
                 for row in records:
                     values = row.get("values") or {}
+                    label = _label(row.get("conclusion"))
+                    if row.get("record_type") == "reversal":
+                        label = "无法判断（改判）"
                     lines.append(
                         f"- {row.get('analysis_date')}｜{row.get('instrument_id')}｜"
-                        f"快照 {row.get('snapshot_id')}｜{_label(row.get('conclusion'))}｜"
+                        f"快照 {row.get('snapshot_id')}｜{label}｜"
                         f"悲观/基准/乐观 {_money(values.get('pessimistic'))} / "
                         f"{_money(values.get('base'))} / {_money(values.get('optimistic'))}"
+                        + (
+                            f"｜原因码 {'、'.join(row.get('reason_codes') or [])}"
+                            f"｜{row.get('reason')}"
+                            if row.get("record_type") == "reversal"
+                            else ""
+                        )
                     )
         lines += [
             "",
@@ -626,50 +641,31 @@ class AskService:
             "name": self.batch.name_for(code),
             "ledger": None,
         }
-        if write_ledger and self.write_ledger and self._should_write(record):
+        if write_ledger and self.write_ledger:
             result["ledger"] = self._write_ledger(record, code)
         return result
 
-    @staticmethod
-    def _should_write(record: dict[str, Any]) -> bool:
-        return bool(
-            record.get("status") == "complete"
-            and (record.get("grade") or {}).get("grade") in ("A", "B")
-            and (record.get("trial_conclusion") or {}).get("conclusion")
-            in ("candidate_buy_point", "wait", "avoid")
-            and record.get("price") is not None
-            and record.get("values")
-        )
-
     def _write_ledger(self, record: dict[str, Any], code: str) -> dict[str, Any]:
-        values = record["values"]
-        item = ConclusionRecord(
-            instrument_id=record["instrument_id"],
-            code=code,
-            analysis_date=self.analysis_date.isoformat(),
-            policy_version=self.policy.policy_id,
-            policy_digest=self.policy.policy_digest,
-            snapshot_id=record["snapshot_id"],
-            price=float(record["price"]),
-            price_date=str(record.get("price_as_of") or ""),
-            values={key: float(values[key]) for key in ("pessimistic", "base", "optimistic")},
-            grade=str((record.get("grade") or {}).get("grade")),
-            margin_of_safety=(record.get("grade") or {}).get("margin_of_safety"),
-            conclusion=str((record.get("trial_conclusion") or {}).get("conclusion")),
-            binding_condition=str(
-                ((record.get("trial_conclusion") or {}).get("thresholds") or {}).get(
-                    "binding_condition_text"
-                )
-                or ""
-            ),
-            recorded_at=datetime.now(TZ).isoformat(timespec="seconds"),
-        )
+        from engine.policy.conclusion import append_evaluation
+
         try:
-            outcome = ConclusionLedger(self.ledger_path).append([item])
+            outcome = append_evaluation(
+                ConclusionLedger(self.ledger_path),
+                record,
+                policy=self.policy,
+                analysis_date=self.analysis_date.isoformat(),
+            )
         except ConclusionConflict as exc:
             return {"status": "conflict", "detail": str(exc)}
         except Exception as exc:  # noqa: BLE001
             return {"status": "error", "detail": f"{type(exc).__name__}: {exc}"}
+        if outcome.get("type") == "reversal":
+            return {
+                "status": "reversal",
+                "detail": "改判为无法判断（旧记录不改）",
+                "added": outcome.get("added") or [],
+                "reversal_of": outcome.get("reversal_of"),
+            }
         return {
             "status": "added" if outcome.get("added") else "skipped",
             "added": outcome.get("added") or [],
@@ -1393,7 +1389,9 @@ class AskService:
                 )
         ledger = result.get("ledger")
         if ledger:
-            lines.append(f"- 结论账本：{ledger.get('status')} {ledger.get('detail') or ''}".rstrip())
+            lines.append(
+                f"- 结论账本：{ledger.get('status')} {ledger.get('detail') or ''}".rstrip()
+            )
         return lines
 
     def _stock_data(self, result: dict[str, Any]) -> dict[str, Any]:

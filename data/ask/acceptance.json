@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-11-13T19:32:47+08:00",
+  "generated_at": "2026-11-13T19:51:15+08:00",
   "policy": "equity-policy-v1.1",
-  "question_count": 44,
-  "question_passed": 44,
+  "question_count": 46,
+  "question_passed": 46,
   "sections": {
     "stocks": [
       {
@@ -1033,6 +1033,32 @@
       "expected_conclusion": null,
       "actual_conclusion": null,
       "lines": 11,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q45",
+      "category": "历史",
+      "question": "君正集团以前的结论",
+      "expected_intent": "history",
+      "actual_intent": "history",
+      "code": "601216",
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 8,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q46",
+      "category": "历史",
+      "question": "扬农化工以前的结论",
+      "expected_intent": "history",
+      "actual_intent": "history",
+      "code": "600486",
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 8,
       "passed": true,
       "problems": []
     }

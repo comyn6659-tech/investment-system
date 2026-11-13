@@ -165,6 +165,11 @@ def describe(code: str) -> str:
 
 
 # --- 阶段二：个股研究估值 ---------------------------------------------------
+CYCLICAL_INDUSTRY_LIST_MATCH = _register(
+    "CYCLICAL_INDUSTRY_LIST_MATCH",
+    "model",
+    "行业线索命中版本化周期行业清单（cyclical-industries-v1），按强周期企业处理",
+)
 MODEL_FAMILY_NOT_IMPLEMENTED = _register(
     "MODEL_FAMILY_NOT_IMPLEMENTED",
     "model",

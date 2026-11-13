@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -159,7 +160,6 @@ def test_hstech_ledger_has_monthly_record():
 
 # --- 更新编排 ---------------------------------------------------------------
 def test_update_light_skips_heavy_series_and_logs(tmp_path, monkeypatch):
-    monkeypatch.setattr(update, "STATE", tmp_path / "state.json")
     monkeypatch.setattr(update, "LOG", tmp_path / "update-log.jsonl")
     monkeypatch.setattr(
         update.series, "refresh_official_series", lambda **kwargs: {"status": "ok", "indices": []}
@@ -182,13 +182,12 @@ def test_update_light_skips_heavy_series_and_logs(tmp_path, monkeypatch):
     assert "official_series" not in steps
     assert payload["status"] == "ok"
     assert (tmp_path / "update-log.jsonl").exists()
-    state = json.loads((tmp_path / "state.json").read_text(encoding="utf-8"))
-    assert state["last_status"] == "ok"
-    assert state["last_ok_at"].startswith("2026-11-13")
+    last = update.last_run()
+    assert last["status"] == "ok"
+    assert last["run_at"].startswith("2026-11-13")
 
 
 def test_update_failure_does_not_block_other_steps(tmp_path, monkeypatch):
-    monkeypatch.setattr(update, "STATE", tmp_path / "state.json")
     monkeypatch.setattr(update, "LOG", tmp_path / "update-log.jsonl")
     monkeypatch.setattr(
         update.series,
@@ -214,18 +213,22 @@ def test_update_failure_does_not_block_other_steps(tmp_path, monkeypatch):
 
 
 def test_should_attempt_once_per_day(tmp_path, monkeypatch):
-    monkeypatch.setattr(update, "STATE", tmp_path / "state.json")
-    update.write_state(
-        {
-            "last_status": "ok",
-            "last_ok_at": "2026-11-13T18:30:00+08:00",
-        }
+    log = tmp_path / "update-log.jsonl"
+    monkeypatch.setattr(update, "LOG", log)
+    log.write_text(
+        json.dumps(
+            {"run_at": "2026-11-13T18:30:00+08:00", "status": "ok", "steps": []},
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
     )
     assert update.should_attempt(datetime(2026, 11, 13, 19, 0, tzinfo=TZ)) is False
     assert update.should_attempt(datetime(2026, 11, 14, 9, 0, tzinfo=TZ)) is True
 
 
 # --- 定时脚本 ---------------------------------------------------------------
+@pytest.mark.skipif(sys.platform != "darwin", reason="定时任务只支持 macOS（launchd）")
 def test_launchd_scripts_are_manual_only(tmp_path):
     install = ROOT / "scripts" / "install-daily-update.sh"
     uninstall = ROOT / "scripts" / "uninstall-daily-update.sh"

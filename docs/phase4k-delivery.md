@@ -9,7 +9,7 @@
 1. 补遗留：周期行业清单版本化、结论标签修正、创业板指/159915 移出、小问题修正、
    前向记录 `update` 与定时脚本；
 2. 做对话入口：`./ask "<中文问题>"`，规则化意图 + 固定结构卡片，不调用任何大模型；
-3. 端到端验收：44 条固定问题集 + 30 只测试股 + 三只指数 + 恒生科技 + 两家银行 + 三只 ETF。
+3. 端到端验收：46 条固定问题集 + 30 只测试股 + 三只指数 + 恒生科技 + 两家银行 + 三只 ETF。
 
 不做：不改政策/池规则阈值；不启用银行估值；不加新标的类型。
 
@@ -63,7 +63,7 @@
 
 | 步骤 | 内容 | 只追加/重复跳过 |
 |---|---|---|
-| 官方日频序列 | 中证指数官网 `index-perf`，沪深300/中证500/中证1000 | 序列内容未变则不保存；今日已尝试过不重复联网 |
+| 官方日频序列 | 中证指数官网 `index-perf`，沪深300/中证500/中证1000 | 序列内容未变则不保存；最近已结束自然周已覆盖则跳过 |
 | 候选 A 周度信号 | 已结束自然周的观察点 | 同一标的同一周内容一致跳过，不同冲突 |
 | 全市场行情 | 腾讯财经 5,225 只 A 股，每个价格日期一个文件 | 同一价格日期内容一致跳过，不同冲突 |
 | 官方当日估值 | 沪深300/中证500/中证1000 | 同一日期×指数内容一致跳过，不同冲突 |
@@ -92,22 +92,34 @@
   三档价值及用途）→ 为什么（起约束、中文未满足条件）→ 它是什么（池、所有制、周期属性、等级含义）
   → 局限 → 来源与日期、政策版本 → 末行「不构成投资建议」。
 - 正式结论按现有规则写入 `data/ledger/equity-conclusions.jsonl`（只追加、冲突不覆盖）；
-  无法判断不写。
+  无法判断仅在「改判」时追加（见 §7.1）。
 - 使用说明：`SKILL.md`。
 
 ## 7. 端到端验收
 
-- 固定问题集：`data/ask/questions.json` 44 条，覆盖 10 类意图，每类 ≥3 种说法；
-  `tests/test_dialog.py` 全部自动测试；验收报告 `docs/phase4k-acceptance.md` 44/44。
+- 固定问题集：`data/ask/questions.json` 46 条，覆盖 10 类意图，每类 ≥3 种说法；
+  `tests/test_dialog.py` 全部自动测试；验收报告 `docs/phase4k-acceptance.md` 46/46。
 - 30 只测试股、3 只指数、恒生科技、2 家银行、3 只 ETF 各跑一次，结果在验收报告；
   全部通过，默认卡片行数 8–10 行。
 - 输出扫描：禁用词 0 命中；每张卡片有日期与来源；研究模型无「正式结论」；末行免责声明。
 - 真实问答样例：`docs/phase4k-samples.md`（5 个）。
-- 全部测试：**648 passed**（2026-11-13）。
+- 全部测试：**660 passed**（2026-11-13；干净归档中运行）。
+
+## 7.1 收尾（batch4k-r）
+
+- **T1 只读已提交快照**：`ask`、`update`、池成员估值与测试不读 `data/cache/` 或任何被 git
+  忽略的路径；所有制与收入池分红改读 `data/income-pool/snapshot-qps-d8fb7e3718675b93/`。
+  `update` 状态改读已提交的 `data/ledger/update-log.jsonl`，删除隐藏状态文件。
+  新增 `tests/test_clean_inputs.py` 扫描运行时引用；`scripts/verify-clean-archive.sh`
+  把 `git archive` 到无缓存目录后跑全部测试 + 46 条问题集。
+- **T2 改判记录**：账本最新为正式结论、新评估为无法判断时，追加 `record_type=reversal`、
+  `conclusion=undetermined` 记录（原因码、中文原因、政策版本、快照 ID、分析日、`reversal_of`）；
+  旧记录不改，从未有正式结论的标的不写。君正集团、扬农化工各 1 条；历史问答显示 2 条。
+- **T3 launchd 测试**：非 macOS 环境跳过并注明「定时任务只支持 macOS（launchd）」。
 
 ## 8. 账本与不变项
 
-- `data/ledger/equity-conclusions.jsonl`：96 条（第十批 95 条 + 对话入口实测 1 条茅台），
+- `data/ledger/equity-conclusions.jsonl`：98 条（96 条原有 + 2 条改判：君正集团、扬农化工），
   `--check-conclusions` 0 问题；旧记录内容不变。
 - 新增 `data/ledger/hstech-monthly-valuation.jsonl`（1 条）与 `data/ledger/update-log.jsonl`；
   两者均只追加。
@@ -117,6 +129,7 @@
 ## 9. 复现
 
 ```bash
+scripts/verify-clean-archive.sh                         # 干净归档：全部测试 + 46 条问题集
 .venv/bin/python tools/run_cyclical_rerun.py            # 周期清单重跑（报告 + 账本追加）
 .venv/bin/python tools/run_cyclical_rerun.py --write-ledger
 ./update                                                # 前向记录（需网络；只追加）

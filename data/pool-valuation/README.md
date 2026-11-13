@@ -14,8 +14,7 @@ data/pool-valuation/
 ├── cyclical-rerun.json           # 第十一批：周期清单补全后的 221 + 30 重跑
 ├── live/                         # 第十一批：全市场行情前向快照（只追加）
 │   ├── manifest.json             # 价格日期、行数、内容哈希
-│   ├── quotes-YYYY-MM-DD.json    # 每个价格日期一个不可变文件
-│   └── update-state.json         # 最近一次 update 的状态（非账本）
+│   └── quotes-YYYY-MM-DD.json    # 每个价格日期一个不可变文件
 └── snapshot-qps-f140a9790e4015ea/
     ├── manifest.json             # as_of、表级哈希、来源
     ├── balance-2015…2025.csv.gz  # 按报告期批量的合并资产负债表

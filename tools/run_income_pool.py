@@ -33,7 +33,8 @@ INCOME_DIR = ROOT / "data" / "income-pool"
 MANIFEST_PATH = INCOME_DIR / "manifest.json"
 CANDIDATES_PATH = INCOME_DIR / "candidates.json"
 QUALITY_REPORT = ROOT / "data" / "quality-pool" / "report.json"
-DIVIDEND_DIR = ROOT / "data" / "cache" / "quality-pool" / "tables" / "dividends"
+INCOME_SNAPSHOT = INCOME_DIR / json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))["current"]
+DIVIDEND_DIR = INCOME_SNAPSHOT
 REPORT_JSON = INCOME_DIR / "report.json"
 REPORT_MD = ROOT / "docs" / "phase4g-income-pool-report.md"
 LEDGER = ROOT / "data" / "ledger" / "income-pool.jsonl"

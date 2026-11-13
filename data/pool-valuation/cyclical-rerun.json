@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated_at": "2026-11-13T19:37:46+08:00",
+    "generated_at": "2026-11-13T19:49:25+08:00",
     "analysis_date": "2026-11-13",
     "policy": {
       "policy_id": "equity-policy-v1.1",
@@ -13402,6 +13402,18 @@
         "concl-12e3da599803d1cc",
         "concl-a1aa26f57af99aac",
         "concl-9e28f75ae813b61a"
+      ],
+      "reversals": [
+        {
+          "code": "600486",
+          "record_id": "concl-d741c33cb9e1ea39",
+          "reversal_of": "concl-8ba8876a7a333b21"
+        },
+        {
+          "code": "601216",
+          "record_id": "concl-fc3d567ed9314657",
+          "reversal_of": "concl-c664fdd998c97c46"
+        }
       ],
       "conflicts": []
     }

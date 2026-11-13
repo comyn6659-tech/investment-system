@@ -202,27 +202,65 @@ def main(argv: list[str] | None = None) -> int:
         Path(args.out).write_text(text + "\n", encoding="utf-8")
     print(text)
 
-    # 正式结论（candidate/wait/avoid）写入只追加账本；undetermined 不写
-    if result.decision in ("candidate", "wait", "avoid"):
-        from engine.policy.conclusion import record_from_result
-        from engine.policy.conclusion_ledger import ConclusionLedger, ConclusionLedgerError
+    # 正式结论写入只追加账本；无法判断仅在「改判」时追加（旧记录不改）
+    from engine.policy.conclusion import append_evaluation, record_from_result
+    from engine.policy.conclusion_ledger import ConclusionLedger, ConclusionLedgerError
+    from engine.policy.equity import load_policy
 
-        block = (result.payload or {}).get("policy_conclusion") or {}
-        if block and block.get("conclusion") != "undetermined":
-            try:
-                ledger = ConclusionLedger(config.conclusion_ledger_path)
-                record = record_from_result(
-                    result, recorded_at=datetime.now(TZ).isoformat(timespec="seconds")
-                )
-                outcome = ledger.append([record])
-                stream = sys.stderr if args.json else sys.stdout
-                if outcome["added"]:
-                    print(f"已写入结论账本：{outcome['added'][0]}", file=stream)
-                else:
-                    print(f"结论账本已有同内容记录，跳过：{outcome['skipped']}", file=stream)
-            except ConclusionLedgerError as exc:
-                print(f"结论账本写入失败：{exc}", file=sys.stderr)
-                return 3
+    block = (result.payload or {}).get("policy_conclusion") or {}
+    stream = sys.stderr if args.json else sys.stdout
+    if result.decision in ("candidate", "wait", "avoid") and block:
+        try:
+            ledger = ConclusionLedger(config.conclusion_ledger_path)
+            record = record_from_result(
+                result, recorded_at=datetime.now(TZ).isoformat(timespec="seconds")
+            )
+            outcome = ledger.append([record])
+            if outcome["added"]:
+                print(f"已写入结论账本：{outcome['added'][0]}", file=stream)
+            else:
+                print(f"结论账本已有同内容记录，跳过：{outcome['skipped']}", file=stream)
+        except ConclusionLedgerError as exc:
+            print(f"结论账本写入失败：{exc}", file=sys.stderr)
+            return 3
+    elif result.decision == "undetermined" and block:
+        record = {
+            "instrument_id": str(result.instrument_id),
+            "code": str(((result.instrument or {}).get("code")) or ""),
+            "status": block.get("status"),
+            "status_reason": block.get("status_reason"),
+            "snapshot_id": block.get("snapshot_id"),
+            "price": None,
+            "price_as_of": block.get("price_date"),
+            "values": {},
+            "grade": block.get("grade") or {},
+            "trial_conclusion": {"conclusion": "undetermined", "thresholds": None},
+            "route": {
+                "family": (result.model_plan or {}).get("family"),
+                "status": (
+                    "family_not_implemented"
+                    if result.analysis_status == "unsupported"
+                    else None
+                ),
+                "applicable_model_category": (result.model_plan or {}).get(
+                    "applicable_model_category"
+                ),
+            },
+            "reason_codes": list(result.reason_codes or []),
+        }
+        try:
+            policy = load_policy(config.policy_path)
+            outcome = append_evaluation(
+                ConclusionLedger(config.conclusion_ledger_path),
+                record,
+                policy=policy,
+                analysis_date=str(block.get("analysis_date")),
+            )
+            if outcome.get("type") == "reversal" and outcome.get("added"):
+                print(f"已写入改判记录：{outcome['record_id']}", file=stream)
+        except ConclusionLedgerError as exc:
+            print(f"结论账本改判写入失败：{exc}", file=sys.stderr)
+            return 3
 
     if result.analysis_status == "engine_error":
         return 3

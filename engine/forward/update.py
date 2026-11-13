@@ -19,7 +19,6 @@ from engine.forward import hstech, official, quotes, series
 
 TZ = ZoneInfo("Asia/Singapore")
 ROOT = Path(__file__).resolve().parent.parent.parent
-STATE = ROOT / "data" / "pool-valuation" / "live" / "update-state.json"
 LOG = ROOT / "data" / "ledger" / "update-log.jsonl"
 SCHEMA_VERSION = "forward-update/1"
 
@@ -41,26 +40,28 @@ def _step(name: str, func: Callable[[], dict[str, Any]]) -> dict[str, Any]:
         }
 
 
-def read_state() -> dict[str, Any]:
-    if not STATE.exists():
+def last_run() -> dict[str, Any]:
+    """最近一次 update 的运行记录（只读已提交的只追加日志）。"""
+    if not LOG.exists():
+        return {}
+    lines = [line for line in LOG.read_text(encoding="utf-8").splitlines() if line.strip()]
+    if not lines:
         return {}
     try:
-        return json.loads(STATE.read_text(encoding="utf-8"))
+        payload = json.loads(lines[-1])
     except json.JSONDecodeError:
         return {}
-
-
-def write_state(payload: dict[str, Any]) -> None:
-    STATE.parent.mkdir(parents=True, exist_ok=True)
-    STATE.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return payload if isinstance(payload, dict) else {}
 
 
 def should_attempt(now: datetime | None = None) -> bool:
     """当天已成功更新过就不再重复联网；失败或未更新过则尝试。"""
     clock = _now(now)
-    state = read_state()
-    last_ok = str(state.get("last_ok_at") or "")
-    return not (last_ok.startswith(clock.date().isoformat()) and state.get("last_status") == "ok")
+    last = last_run()
+    return not (
+        last.get("status") == "ok"
+        and str(last.get("run_at") or "").startswith(clock.date().isoformat())
+    )
 
 
 def run(
@@ -118,17 +119,6 @@ def run(
         with LOG.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
             handle.write("\n")
-        state = {
-            "last_run_at": payload["run_at"],
-            "last_status": status,
-            "last_ok_at": (read_state().get("last_ok_at") if status != "ok" else payload["run_at"]),
-            "last_steps": {item["step"]: item["status"] for item in steps},
-            "last_quote_date": next(
-                (item.get("price_date") for item in steps if item["step"] == "quotes" and item.get("price_date")),
-                None,
-            ),
-        }
-        write_state(state)
     return payload
 
 
@@ -156,4 +146,4 @@ def summary_text(payload: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-__all__ = ["LOG", "SCHEMA_VERSION", "STATE", "read_state", "run", "should_attempt", "summary_text", "write_state"]
+__all__ = ["LOG", "SCHEMA_VERSION", "last_run", "run", "should_attempt", "summary_text"]

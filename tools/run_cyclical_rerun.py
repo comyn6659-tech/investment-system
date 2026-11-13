@@ -29,10 +29,10 @@ from engine.evidence.applicability import SELECTION_POLICY  # noqa: E402
 from engine.evidence.cyclical import list_summary, load_list  # noqa: E402
 from engine.evidence.models import BusinessEvidence  # noqa: E402
 from engine.reporting.labels import family_label  # noqa: E402
+from engine.policy.conclusion import append_evaluation  # noqa: E402
 from engine.policy.conclusion_ledger import (  # noqa: E402
     ConclusionConflict,
     ConclusionLedger,
-    ConclusionRecord,
 )
 from engine.policy.equity import load_policy  # noqa: E402
 from engine.policy.trial import evaluate_company  # noqa: E402
@@ -118,7 +118,7 @@ def _pool_run(prior: dict, *, write_ledger: bool) -> dict:
     codes, pools = _codes()
     prior_by_code = {str(row["code"]).zfill(6): row for row in prior["results"]}
     ledger = ConclusionLedger(LEDGER) if write_ledger else None
-    added, skipped, conflicts = [], [], []
+    added, skipped, reversals, conflicts = [], [], [], []
     rows = []
     changes = []
     affected = []
@@ -169,33 +169,25 @@ def _pool_run(prior: dict, *, write_ledger: bool) -> dict:
             changes.append(row)
         elif old["family"] != now["family"] or old_match != new_match:
             affected.append(row)
-        if ledger is not None and row["ledger_eligible"]:
-            values = record["values"]
-            item = ConclusionRecord(
-                instrument_id=record["instrument_id"],
-                code=code,
-                analysis_date=ANALYSIS_DATE.isoformat(),
-                policy_version=policy.policy_id,
-                policy_digest=policy.policy_digest,
-                snapshot_id=snapshot.snapshot_id,
-                price=float(record["price"]),
-                price_date=str(record.get("price_as_of") or ""),
-                values={key: float(values[key]) for key in ("pessimistic", "base", "optimistic")},
-                grade=str((record.get("grade") or {}).get("grade")),
-                margin_of_safety=(record.get("grade") or {}).get("margin_of_safety"),
-                conclusion=str((record.get("trial_conclusion") or {}).get("conclusion")),
-                binding_condition=str(
-                    ((record.get("trial_conclusion") or {}).get("thresholds") or {}).get("binding_condition_text") or ""
-                ),
-                recorded_at=datetime.now(TZ).isoformat(timespec="seconds"),
-            )
+        if ledger is not None:
             try:
-                outcome = ledger.append([item])
+                outcome = append_evaluation(
+                    ledger, record, policy=policy, analysis_date=ANALYSIS_DATE.isoformat()
+                )
             except ConclusionConflict as exc:
                 conflicts.append({"code": code, "reason": str(exc)})
                 continue
-            added.extend(outcome.get("added") or [])
-            skipped.extend(outcome.get("skipped") or [])
+            if outcome.get("type") == "formal":
+                added.extend(outcome.get("added") or [])
+                skipped.extend(outcome.get("skipped") or [])
+            elif outcome.get("type") == "reversal" and outcome.get("added"):
+                reversals.append(
+                    {
+                        "code": code,
+                        "record_id": outcome.get("record_id"),
+                        "reversal_of": outcome.get("reversal_of"),
+                    }
+                )
     return {
         "total": len(rows),
         "conclusions_before": dict(Counter(row["before"]["conclusion"] for row in rows)),
@@ -208,6 +200,7 @@ def _pool_run(prior: dict, *, write_ledger: bool) -> dict:
             "eligible": sum(1 for row in rows if row["ledger_eligible"]),
             "added": added,
             "skipped": skipped,
+            "reversals": reversals,
             "conflicts": conflicts,
         },
     }
@@ -286,7 +279,7 @@ def run(*, write_ledger: bool) -> dict:
         f"池成员 {pool['total']}：结论改变 {pool['changed_count']}；"
         f"测试股 {test_set['total']}：结论改变 {test_set['changed_count']}；"
         f"账本新增 {len(pool['ledger']['added'])}、跳过 {len(pool['ledger']['skipped'])}、"
-        f"冲突 {len(pool['ledger']['conflicts'])}"
+        f"改判 {len(pool['ledger']['reversals'])}、冲突 {len(pool['ledger']['conflicts'])}"
     )
     return payload
 
@@ -448,9 +441,10 @@ def render(payload: dict) -> str:
         "## 4. 结论账本",
         "",
         f"- 本次可写入的正式结论 {pool['ledger']['eligible']} 条；"
-        f"新写入 {len(pool['ledger']['added'])} 条，已存在跳过 {len(pool['ledger']['skipped'])} 条，"
+        f"新写入 {len(pool['ledger']['added'])} 条，已存在跳过 {len(pool['ledger']['skipped'])} 条；"
+        f"改判为无法判断 {len(pool['ledger']['reversals'])} 条；"
         f"冲突 {len(pool['ledger']['conflicts'])} 条。",
-        "- 结论变为「无法判断」的公司按既有规则不写入正式结论账本；旧记录不改，账本只追加。",
+        "- 改判记录只追加、不覆盖旧正式结论；从未有过正式结论的标的仍不写入无法判断。",
         "",
         "## 5. 口径与限制",
         "",
