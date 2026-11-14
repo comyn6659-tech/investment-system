@@ -28,7 +28,7 @@ sys.path.insert(0, str(ROOT))
 
 TZ = ZoneInfo("Asia/Singapore")
 JSON_OUT = ROOT / "data" / "coverage" / "strategy-data-feasibility.json"
-MD_OUT = ROOT / "docs" / "phase3b-feasibility.md"
+MD_OUT = ROOT / "docs" / "archive" / "phase3b-feasibility.md"
 
 DATE_CANDIDATES = ("日期", "date", "净值日期", "报告日期", "时间")
 

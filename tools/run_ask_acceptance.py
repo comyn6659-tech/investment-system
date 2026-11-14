@@ -3,7 +3,7 @@
 
 输出：
 - `data/ask/acceptance.json`
-- `docs/phase4k-acceptance.md`
+- `docs/archive/phase4k-acceptance.md`
 
 只读运行，不写正式结论账本。
 """
@@ -23,7 +23,7 @@ from engine.ask.service import AskService  # noqa: E402
 QUESTION_SET = ROOT / "data" / "ask" / "questions.json"
 QUALITY_REPORT = ROOT / "data" / "quality-pool" / "report.json"
 OUT_JSON = ROOT / "data" / "ask" / "acceptance.json"
-OUT_MD = ROOT / "docs" / "phase4k-acceptance.md"
+OUT_MD = ROOT / "docs" / "archive" / "phase4k-acceptance.md"
 FORBIDDEN = ("建议买入", "建议卖出", "推荐买入", "推荐卖出", "强烈推荐", "建议加仓", "建议减仓")
 DATE_RE = re.compile(r"20\d\d-\d\d-\d\d")
 

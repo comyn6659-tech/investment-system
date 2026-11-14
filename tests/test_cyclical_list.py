@@ -21,7 +21,7 @@ from engine.pool_valuation.adapter import BatchStore, build_snapshot, load_evide
 ROOT = Path(__file__).resolve().parent.parent
 LIST = ROOT / "data" / "policies" / "cyclical-industries-v1.json"
 RERUN = ROOT / "data" / "pool-valuation" / "cyclical-rerun.json"
-REPORT = ROOT / "docs" / "phase4k-cyclical-rerun.md"
+REPORT = ROOT / "docs" / "archive" / "phase4k-cyclical-rerun.md"
 POLICY = ROOT / "data" / "policies" / "equity-policy-v1.1.json"
 MACRO = ROOT / "data" / "policy-trial" / "macro" / "cn-10y-yield.json"
 

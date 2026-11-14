@@ -4,7 +4,7 @@
 只更换「明显周期」的行业线索来源（版本化清单），不改任何阈值、政策或估值代码。
 输出：
 - `data/pool-valuation/cyclical-rerun.json`
-- `docs/phase4k-cyclical-rerun.md`
+- `docs/archive/phase4k-cyclical-rerun.md`
 
 用法：
     .venv/bin/python tools/run_cyclical_rerun.py
@@ -51,7 +51,7 @@ POLICY_EVIDENCE = ROOT / "data" / "policy-trial" / "evidence"
 MACRO = ROOT / "data" / "policy-trial" / "macro" / "cn-10y-yield.json"
 LEDGER = ROOT / "data" / "ledger" / "equity-conclusions.jsonl"
 OUT_JSON = ROOT / "data" / "pool-valuation" / "cyclical-rerun.json"
-OUT_MD = ROOT / "docs" / "phase4k-cyclical-rerun.md"
+OUT_MD = ROOT / "docs" / "archive" / "phase4k-cyclical-rerun.md"
 ANALYSIS_DATE = date(2026, 11, 13)
 LIST_PATH = ROOT / "data" / "policies" / "cyclical-industries-v1.json"
 

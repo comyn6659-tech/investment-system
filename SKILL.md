@@ -61,5 +61,5 @@ scripts/uninstall-daily-update.sh
 ## 参考
 
 - 交付入口：`DELIVERY.md`
-- 提问问题集与验收：`data/ask/questions.json`、`docs/phase4k-acceptance.md`
+- 提问问题集与验收：`data/ask/questions.json`、`docs/archive/phase4k-acceptance.md`
 - 政策：`data/policies/equity-policy-v1.1.json`（已批准）

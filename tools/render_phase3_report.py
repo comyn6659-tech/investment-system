@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""把第三阶段真实运行结果渲染成 Markdown 证据表（docs/phase3-samples.md）。
+"""把第三阶段真实运行结果渲染成 Markdown 证据表（docs/archive/phase3-samples.md）。
 
 所有数字来自真实运行：固定快照 + 版本化序列 → engine.cli。不手写任何数字。
 
@@ -21,7 +21,7 @@ sys.path.insert(0, str(ROOT))
 from engine.pipeline import Analyzer, AnalyzerConfig  # noqa: E402
 
 TZ = ZoneInfo("Asia/Singapore")
-TARGET = ROOT / "docs" / "phase3-samples.md"
+TARGET = ROOT / "docs" / "archive" / "phase3-samples.md"
 
 INDEX_CASES = (("沪深300", "000300"), ("中证500", "000905"), ("中证1000", "000852"))
 ETF_CASES = (("510300", "000300"), ("510500", "000905"), ("512100", "000852"))

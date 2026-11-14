@@ -17,7 +17,7 @@
 
 同一标的同一 `as_of` 只保留**抓取时间最新**的一版；被取代的中间版本由
 `tools/prune_snapshots.py` 清除（脚本会打印「谁被谁取代」）。
-作废样例已移出本目录（见 `docs/phase1-rework-f1f3.md` 的迁移说明），
+作废样例已移出本目录（见 `docs/archive/phase1-rework-f1f3.md` 的迁移说明），
 不再用备注文字控制数据准入。
 
 ## 规则
@@ -52,7 +52,7 @@
 - `etf.bid_ask_spread_cny` / `etf.trading_status`：未取得，记 `missing`。
 
 指数画像所需的长期序列不在快照里，而在 `data/series/`（`series_id` = 内容哈希），
-结果与 `docs/phase3-samples.md` 都引用这些 id。
+结果与 `docs/archive/phase3-samples.md` 都引用这些 id。
 
 ## 个股快照的口径
 

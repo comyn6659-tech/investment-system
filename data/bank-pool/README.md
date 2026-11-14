@@ -62,7 +62,7 @@ data/bank-pool/
   `draft_unapproved`，只做试运行。
 - 输入/历史数据：`valuation-v2/inputs.csv.gz`（36 家估值输入 + 42 家历史位置）、
   `valuation-v2/history.csv.gz`（月末 PB / 滚动 12 个月股息率）、`valuation-v2/manifest.json`。
-- 报告：`valuation-v2.json` 与 `docs/phase4l-bank-valuation-v2.md`；36 家中 25 家不在银行池，
+- 报告：`valuation-v2.json` 与 `docs/archive/phase4l-bank-valuation-v2.md`；36 家中 25 家不在银行池，
   只给价值数字与无法判断，不出现候选/等待/回避。
 - 历史位置：东方财富同源收盘价/市净率 + 分红（除权除息日），42 家中 41 家至少 5 年，
   兰州银行 58 个月不足 5 年，不计算分位；只描述，不给买点。
@@ -72,7 +72,7 @@ data/bank-pool/
 
 - 草案：`data/policies/bank-valuation-v2.1-draft.json`；基准 ROE 纳入最新财年，悲观 ROE 增加近 3 年
   下滑速度外推 3 年，乐观 ROE 改近 3 年平均；新增描述性隐含长期回报率。
-- 报告：`valuation-v2.1.json` 与 `docs/phase4l-bank-valuation-v2.1.md`；保留 v2 基线
+- 报告：`valuation-v2.1.json` 与 `docs/archive/phase4l-bank-valuation-v2.1.md`；保留 v2 基线
   `valuation-v2.json` 供逐家对照。
 - 银行卡片新增隐含长期回报率一行（仅描述，不参与结论）。
 - **2026-11-14 决策④批准 v2.1**：`data/policies/bank-valuation-v2.1.json`（status=approved，

@@ -36,7 +36,7 @@ QUALITY_REPORT = ROOT / "data" / "quality-pool" / "report.json"
 INCOME_SNAPSHOT = INCOME_DIR / json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))["current"]
 DIVIDEND_DIR = INCOME_SNAPSHOT
 REPORT_JSON = INCOME_DIR / "report.json"
-REPORT_MD = ROOT / "docs" / "phase4g-income-pool-report.md"
+REPORT_MD = ROOT / "docs" / "archive" / "phase4g-income-pool-report.md"
 LEDGER = ROOT / "data" / "ledger" / "income-pool.jsonl"
 
 STATUS_LABELS = {"in_pool": "入池", "pending": "待定", "out_of_scope": "范围外"}

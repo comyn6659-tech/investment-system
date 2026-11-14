@@ -642,9 +642,9 @@ def test_condition_reason_wording_is_not_misleading(policy_v11):
     assert not re.search(r"\d% ≥ [\d.]+%，未通过", reason)
 
 
-REPORT_4E = ROOT / "docs" / "phase4e-quality-pool-report.md"
+REPORT_4E = ROOT / "docs" / "archive" / "phase4e-quality-pool-report.md"
 REPORT_JSON_4E = ROOT / "data" / "quality-pool" / "report-4e.json"
-REPORT_4F = ROOT / "docs" / "phase4f-quality-pool-report.md"
+REPORT_4F = ROOT / "docs" / "archive" / "phase4f-quality-pool-report.md"
 REPORT_JSON_4F = ROOT / "data" / "quality-pool" / "report-v1.2-draft.json"
 
 

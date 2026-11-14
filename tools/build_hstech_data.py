@@ -45,7 +45,7 @@ SERIES_DIR = ROOT / "data" / "series"
 SNAPSHOT_DIR = ROOT / "data" / "snapshots"
 COVERAGE_DIR = ROOT / "data" / "coverage"
 FEASIBILITY_PATH = COVERAGE_DIR / "hstech-feasibility.json"
-DOC_PATH = ROOT / "docs" / "phase4i-hstech-feasibility.md"
+DOC_PATH = ROOT / "docs" / "archive" / "phase4i-hstech-feasibility.md"
 
 INSTRUMENT_ID = "INDEX:HSTECH.HKEX"
 INDEX_CODE = "HSTECH"

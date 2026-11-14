@@ -36,7 +36,7 @@ from engine.series.models import (  # noqa: E402
 
 TZ = ZoneInfo("Asia/Singapore")
 JSON_OUT = ROOT / "data" / "backtest" / "candidate-a.json"
-MD_OUT = ROOT / "docs" / "phase3c-backtest.md"
+MD_OUT = ROOT / "docs" / "archive" / "phase3c-backtest.md"
 
 INDICES = (
     ("000300", "沪深300", "2005-04-08"),

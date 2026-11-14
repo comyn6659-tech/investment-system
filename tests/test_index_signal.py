@@ -95,7 +95,7 @@ def test_signal_backtest_summary_matches_machine_readable_record(store):
     assert summary["cumulative_return"] == pytest.approx(full["cumulative_return"])
     assert summary["execution_lag"] == 1
     assert summary["cost_bp"] == 10.0
-    assert summary["report_path"] == "docs/phase3c-backtest.md"
+    assert summary["report_path"] == "docs/archive/phase3c-backtest.md"
 
 
 def test_signal_uses_only_data_up_to_as_of(store):

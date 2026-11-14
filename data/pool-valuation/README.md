@@ -31,7 +31,7 @@ data/pool-valuation/
 ## 口径
 
 - 财务：东方财富 `RPT_F10_FINANCE_GBALANCE/GINCOME/GCASHFLOW`，按报告期批量；
-  只保留政策实际使用的字段（见 `docs/phase4j-field-mapping.md`）。
+  只保留政策实际使用的字段（见 `docs/archive/phase4j-field-mapping.md`）。
 - 分红：好公司池快照的 2021–2025 中期/年度分红表，另补 2023–2025 三季报分红
   （政策派息率与 3 年分红覆盖窗口需要）。
 - 行情：腾讯财经全市场行情快照；收盘前取上一交易日收盘，逐行记录价格日期。
@@ -45,7 +45,7 @@ data/pool-valuation/
 - 正式结论写入 `data/ledger/equity-conclusions.jsonl`（只追加）；已有记录不变。
 - 第十一批周期清单补全：池成员结论改变 2 家（君正集团、扬农化工，候选/回避 → 无法判断）；
   30 只测试股 0 家改变；其余受影响但结论未变的公司见重跑报告。
-  报告：`docs/phase4k-cyclical-rerun.md`。
+  报告：`docs/archive/phase4k-cyclical-rerun.md`。
 
 ## 复现
 

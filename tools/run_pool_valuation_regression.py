@@ -23,7 +23,7 @@ OLD_SNAPSHOTS = ROOT / "data" / "policy-trial" / "snapshots"
 OLD_EVIDENCE = ROOT / "data" / "policy-trial" / "evidence"
 MACRO = ROOT / "data" / "policy-trial" / "macro" / "cn-10y-yield.json"
 OUT_JSON = ROOT / "data" / "pool-valuation" / "regression-30.json"
-OUT_MD = ROOT / "docs" / "phase4j-regression-30.md"
+OUT_MD = ROOT / "docs" / "archive" / "phase4j-regression-30.md"
 
 CODES = (
     "600519", "000858", "600887", "603288", "000895", "600436", "000333",

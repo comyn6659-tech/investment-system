@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""把真实研究结果渲染成 Markdown 证据表（docs/phase2-samples.md）。
+"""把真实研究结果渲染成 Markdown 证据表（docs/archive/phase2-samples.md）。
 
 内容全部来自真实运行：快照 + 业务证据 + 假设文件 → CLI 结果。
 不手写任何数字，避免「文档里的数字与代码跑出来的不一致」。
@@ -25,7 +25,7 @@ from engine.pipeline import Analyzer, AnalyzerConfig  # noqa: E402
 
 TZ = ZoneInfo("Asia/Singapore")
 ASSUMPTIONS = ROOT / "data" / "assumptions"
-TARGET = ROOT / "docs" / "phase2-samples.md"
+TARGET = ROOT / "docs" / "archive" / "phase2-samples.md"
 
 CASES = (
     {

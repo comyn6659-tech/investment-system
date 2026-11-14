@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""把 data/coverage/coverage-report.json 渲染成 docs/data-coverage.md。
+"""把 data/coverage/coverage-report.json 渲染成 docs/archive/data-coverage.md。
 
 只做格式转换，不产生新事实：报告里的每一行都来自实际接口调用记录。
 """
@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 REPORT = ROOT / "data" / "coverage" / "coverage-report.json"
-OUTPUT = ROOT / "docs" / "data-coverage.md"
+OUTPUT = ROOT / "docs" / "archive" / "data-coverage.md"
 
 STATUS_LABEL = {"ok": "可用", "partial": "部分可用", "failed": "不可用", "not_tested": "未测试"}
 

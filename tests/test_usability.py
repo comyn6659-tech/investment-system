@@ -188,7 +188,7 @@ def test_v5_cycle_label(service):
 
 
 def test_w1_claude_code_session_evidence_present():
-    doc = ROOT / "docs" / "phase4k-r2-claude-session.md"
+    doc = ROOT / "docs" / "archive" / "phase4k-r2-claude-session.md"
     assert doc.exists()
     text = doc.read_text(encoding="utf-8")
     assert "./ask" in text
@@ -406,7 +406,7 @@ def test_zr2_implicit_return_formula_and_card_line():
 
 def test_zr3_report_has_comparison_and_3x3_matrix():
     payload = json.loads((ROOT / "data" / "bank-pool" / "valuation-v2.1.json").read_text(encoding="utf-8"))
-    text = (ROOT / "docs" / "phase4l-bank-valuation-v2.1.md").read_text(encoding="utf-8")
+    text = (ROOT / "docs" / "archive" / "phase4l-bank-valuation-v2.1.md").read_text(encoding="utf-8")
     assert payload["meta"]["policy"] == "bank-valuation-v2.1-draft"
     assert len(payload["banks"]) == 36
     assert len(payload["comparison_v2"]) == 36

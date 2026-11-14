@@ -36,7 +36,7 @@ from engine.series.profile import is_official_source
 from engine.signals.ledger import RULE_VERSION
 
 BACKTEST_JSON = "data/backtest/candidate-a.json"
-BACKTEST_REPORT = "docs/phase3c-backtest.md"
+BACKTEST_REPORT = "docs/archive/phase3c-backtest.md"
 MODEL_ID = "index_strategy_a_valuation_reversion"
 MAIN_BASIS = "total_return"
 MAIN_LAG = 1

@@ -493,7 +493,7 @@
           "benchmark_total_return": 0.4139427375215332,
           "excess_vs_total_return": -0.22052435986715202,
           "generated_at": "2026-11-12T00:40:50+08:00",
-          "report_path": "docs/phase3c-backtest.md",
+          "report_path": "docs/archive/phase3c-backtest.md",
           "data_path": "data/backtest/candidate-a.json",
           "note": "回测记录摘要，只用于说明该规则的历史测算结果；样本交易次数少、理论指数不可直接投资，不能据此推断规则好坏"
         },
@@ -566,7 +566,7 @@
         "benchmark_total_return": 0.4139427375215332,
         "excess_vs_total_return": -0.22052435986715202,
         "generated_at": "2026-11-12T00:40:50+08:00",
-        "report_path": "docs/phase3c-backtest.md",
+        "report_path": "docs/archive/phase3c-backtest.md",
         "data_path": "data/backtest/candidate-a.json",
         "note": "回测记录摘要，只用于说明该规则的历史测算结果；样本交易次数少、理论指数不可直接投资，不能据此推断规则好坏"
       },

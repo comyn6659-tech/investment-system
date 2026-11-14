@@ -33,7 +33,7 @@ EQUITY_POLICY = ROOT / "data" / "policies" / "equity-policy-v1.1.json"
 BANK_CHECK = ROOT / "data" / "policy-inputs" / "bank-check-v1-draft.json"
 INPUTS = BANK_DIR / "valuation-inputs.csv.gz"
 OUTPUT_JSON = BANK_DIR / "valuation-rehearsal.json"
-OUTPUT_MD = ROOT / "docs" / "phase4h-bank-valuation-rehearsal.md"
+OUTPUT_MD = ROOT / "docs" / "archive" / "phase4h-bank-valuation-rehearsal.md"
 
 SCENARIOS = ("pessimistic", "base", "optimistic")
 SCENARIO_LABELS = {"pessimistic": "悲观", "base": "基准", "optimistic": "乐观"}

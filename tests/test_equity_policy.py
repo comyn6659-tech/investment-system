@@ -33,7 +33,7 @@ from engine.policy import grading
 ROOT = Path(__file__).resolve().parent.parent
 POLICY_PATH = ROOT / "data" / "policies" / "equity-policy-v1.1-draft.json"
 TRIAL_JSON = ROOT / "data" / "policy-trial" / "trial-report.json"
-TRIAL_MD = ROOT / "docs" / "phase4a-equity-policy-trial.md"
+TRIAL_MD = ROOT / "docs" / "archive" / "phase4a-equity-policy-trial.md"
 
 CODES = (
     "600519", "000858", "600887", "603288", "000895", "600436", "000333",
@@ -612,7 +612,7 @@ def test_trial_leverage_guardrail_forces_c(trial):
 
 def test_delivery_documents_independent_verification_of_000858():
     """M3(a)：交付文档必须写明独立来源核对结果。"""
-    text = (ROOT / "docs" / "phase4a-delivery.md").read_text(encoding="utf-8")
+    text = (ROOT / "docs" / "archive" / "phase4a-delivery.md").read_text(encoding="utf-8")
     assert "000858" in text and "已核对" in text
     assert "405.29" in text and "89.54" in text
     assert "同花顺" in text

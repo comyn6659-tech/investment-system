@@ -362,7 +362,7 @@ def test_diagnostics_latest_sample_matches_profile_json():
 
 
 def test_report_avoid_conclusory_wording():
-    text = (ROOT / "docs" / "phase3b-diagnostics.md").read_text(encoding="utf-8")
+    text = (ROOT / "docs" / "archive" / "phase3b-diagnostics.md").read_text(encoding="utf-8")
     for banned in ("胜率", "显著", "建议", "有效"):
         assert banned not in text, f"报告不应出现结论性措辞：{banned}"
     assert "不含分红" in text

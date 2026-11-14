@@ -86,7 +86,7 @@ def test_feasibility_record_is_explicit():
     assert probes["c2_ceic_chinext_board_pe"]["adopted"] is False
     assert probes["c2_ceic_chinext_board_pe"]["official"] is False
     assert "5 年月度估值画像" in " ".join(data["not_implemented"])
-    assert (ROOT / "docs" / "phase4c-chinext-feasibility.md").exists()
+    assert (ROOT / "docs" / "archive" / "phase4c-chinext-feasibility.md").exists()
 
 
 # --- 官方序列 ---------------------------------------------------------------

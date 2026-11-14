@@ -165,7 +165,7 @@ def test_hstech_feasibility_uses_official_data_only():
         assert "hsi.com.hk" in probe["url"]
     assert data["third_party_not_adopted"]
     assert "5 年月度估值画像" in " ".join(data["not_implemented"])
-    assert (ROOT / "docs" / "phase4i-hstech-feasibility.md").exists()
+    assert (ROOT / "docs" / "archive" / "phase4i-hstech-feasibility.md").exists()
 
 
 def test_hstech_series_and_snapshot_are_official_only():

@@ -35,7 +35,7 @@ ROOT = Path(__file__).resolve().parent.parent
 INCOME_POLICY = ROOT / "data" / "policies" / "income-pool-v1-draft.json"
 QUALITY_V12 = ROOT / "data" / "policies" / "quality-pool-v1.2-draft.json"
 INCOME_DIR = ROOT / "data" / "income-pool"
-INCOME_REPORT_MD = ROOT / "docs" / "phase4g-income-pool-report.md"
+INCOME_REPORT_MD = ROOT / "docs" / "archive" / "phase4g-income-pool-report.md"
 
 
 @pytest.fixture(scope="module")

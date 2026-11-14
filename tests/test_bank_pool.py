@@ -34,8 +34,8 @@ ROOT = Path(__file__).resolve().parent.parent
 BANK_POLICY = ROOT / "data" / "policies" / "bank-pool-v1-draft.json"
 QUALITY_V12 = ROOT / "data" / "policies" / "quality-pool-v1.2-draft.json"
 BANK_DIR = ROOT / "data" / "bank-pool"
-BANK_REPORT = ROOT / "docs" / "phase4h-bank-pool-report.md"
-REHEARSAL = ROOT / "docs" / "phase4h-bank-valuation-rehearsal.md"
+BANK_REPORT = ROOT / "docs" / "archive" / "phase4h-bank-pool-report.md"
+REHEARSAL = ROOT / "docs" / "archive" / "phase4h-bank-valuation-rehearsal.md"
 
 
 @pytest.fixture(scope="module")

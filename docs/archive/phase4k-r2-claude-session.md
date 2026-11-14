@@ -24,7 +24,7 @@ cd "/Users/comyn/Documents/deepseek-harness/投资/investment-system" && ./ask "
 不构成投资建议。
 ```
 
-截图：![Claude Code Q1](evidence/claude-code-q1.png)
+截图：![Claude Code Q1](../evidence/claude-code-q1.png)
 
 ## 问题 2：茅台怎么样
 
@@ -46,7 +46,7 @@ cd "/Users/comyn/Documents/deepseek-harness/投资/investment-system" && ./ask "
 不构成投资建议。
 ```
 
-截图：![Claude Code Q2](evidence/claude-code-q2.png)
+截图：![Claude Code Q2](../evidence/claude-code-q2.png)
 
 ## 说明
 

@@ -30,7 +30,7 @@ from engine.policy.conclusion_ledger import ConclusionLedger  # noqa: E402
 TZ = ZoneInfo("Asia/Singapore")
 TRIAL = ROOT / "data" / "policy-trial" / "trial-report.json"
 JSON_OUT = ROOT / "data" / "policy-trial" / "conclusion-run.json"
-MD_OUT = ROOT / "docs" / "phase4b-equity-conclusions.md"
+MD_OUT = ROOT / "docs" / "archive" / "phase4b-equity-conclusions.md"
 LEDGER = ROOT / "data" / "ledger" / "equity-conclusions.jsonl"
 
 _MAP = {

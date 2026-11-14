@@ -33,7 +33,7 @@ BASELINE_REPORT_4D = POOL_DIR / "report-4d.json"
 BASELINE_SNAPSHOT_4E = POOL_DIR / "snapshot-qps-1c1edb9a5fc01bc3"
 MANIFEST_PATH = POOL_DIR / "manifest.json"
 REPORT_JSON = POOL_DIR / "report.json"
-REPORT_MD = ROOT / "docs" / "phase4f-quality-pool-report.md"
+REPORT_MD = ROOT / "docs" / "archive" / "phase4f-quality-pool-report.md"
 LEDGER = ROOT / "data" / "ledger" / "quality-pool.jsonl"
 
 STATUS_LABELS = {"in_pool": "入池", "pending": "待定", "out_of_scope": "范围外"}

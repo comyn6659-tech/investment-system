@@ -31,7 +31,7 @@ POLICY_PATH = ROOT / "data" / "policies" / "bank-pool-v1.json"
 BANK_DIR = ROOT / "data" / "bank-pool"
 MANIFEST_PATH = BANK_DIR / "manifest.json"
 REPORT_JSON = BANK_DIR / "report.json"
-REPORT_MD = ROOT / "docs" / "phase4h-bank-pool-report.md"
+REPORT_MD = ROOT / "docs" / "archive" / "phase4h-bank-pool-report.md"
 REHEARSAL_JSON = BANK_DIR / "valuation-rehearsal.json"
 LEDGER = ROOT / "data" / "ledger" / "bank-pool.jsonl"
 

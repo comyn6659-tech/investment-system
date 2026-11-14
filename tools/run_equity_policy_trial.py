@@ -34,7 +34,7 @@ SNAPSHOT_DIR = ROOT / "data" / "policy-trial" / "snapshots"
 EVIDENCE_DIR = ROOT / "data" / "policy-trial" / "evidence"
 MACRO_PATH = ROOT / "data" / "policy-trial" / "macro" / "cn-10y-yield.json"
 JSON_OUT = ROOT / "data" / "policy-trial" / "trial-report.json"
-MD_OUT = ROOT / "docs" / "phase4a-equity-policy-trial.md"
+MD_OUT = ROOT / "docs" / "archive" / "phase4a-equity-policy-trial.md"
 
 CODES = (
     "600519", "000858", "600887", "603288", "000895", "600436", "000333",

@@ -215,11 +215,11 @@ def test_acceptance_report_present_and_all_passed():
     assert len(data["sections"]["indices"]) == 4
     assert len(data["sections"]["banks"]) == 2
     assert len(data["sections"]["etfs"]) == 3
-    assert (ROOT / "docs" / "phase4k-acceptance.md").exists()
+    assert (ROOT / "docs" / "archive" / "phase4k-acceptance.md").exists()
 
 
 def test_samples_document_has_five_real_cards():
-    text = (ROOT / "docs" / "phase4k-samples.md").read_text(encoding="utf-8")
+    text = (ROOT / "docs" / "archive" / "phase4k-samples.md").read_text(encoding="utf-8")
     assert text.count("## 样例") == 5
     assert "**结论：" in text
     assert text.count("不构成投资建议") >= 5

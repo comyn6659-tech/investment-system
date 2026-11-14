@@ -35,7 +35,7 @@ OWNERSHIP = ROOT / "data" / "income-pool" / "snapshot-qps-d8fb7e3718675b93" / "o
 MACRO = ROOT / "data" / "policy-trial" / "macro" / "cn-10y-yield.json"
 LEDGER = ROOT / "data" / "ledger" / "equity-conclusions.jsonl"
 OUT_JSON = ROOT / "data" / "pool-valuation" / "pool-member-valuation.json"
-OUT_MD = ROOT / "docs" / "phase4j-pool-valuation-report.md"
+OUT_MD = ROOT / "docs" / "archive" / "phase4j-pool-valuation-report.md"
 ANALYSIS_DATE = date(2026, 11, 13)
 
 CONCLUSION_LABELS = {
@@ -391,7 +391,7 @@ def render(payload: dict) -> str:
         "## 5. 口径",
         "",
         "- 财务输入来自按报告期批量的合并报表与分红表；现价来自全市场行情快照；总股本来自最近一期股本变动。",
-        "- 政策与估值代码未改；字段映射见 `docs/phase4j-field-mapping.md`。",
+        "- 政策与估值代码未改；字段映射见 `docs/archive/phase4j-field-mapping.md`。",
         "- 银行不估值；银行估值 `bank-check-v1-draft` 仍为 draft 且不启用。",
         "",
         "## 6. 抽查复算",

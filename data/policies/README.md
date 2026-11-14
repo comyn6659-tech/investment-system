@@ -37,10 +37,10 @@
 - `approved` 必须为 `false`：草案不得自我批准。批准权在股东（决策②）；
 - 本政策只用于试运行报告的「预演结论」字段，不进入 CLI 的正式结果路径。
 
-试运行报告：`docs/phase4a-equity-policy-trial.md`；机器可读结果：`data/policy-trial/trial-report.json`；
+试运行报告：`docs/archive/phase4a-equity-policy-trial.md`；机器可读结果：`data/policy-trial/trial-report.json`；
 v1 对照结果：`data/policy-trial/trial-report-v1.json`。
 
-正式结论：`docs/phase4b-equity-conclusions.md`；结论账本：`data/ledger/equity-conclusions.jsonl`。
+正式结论：`docs/archive/phase4b-equity-conclusions.md`；结论账本：`data/ledger/equity-conclusions.jsonl`。
 批准日期 2026-11-12，首次复核 2027-05-31；任何规则修改须重新批准。
 
 

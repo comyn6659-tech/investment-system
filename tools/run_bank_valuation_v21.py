@@ -3,7 +3,7 @@
 
 输出：
 - `data/bank-pool/valuation-v2.1.json`
-- `docs/phase4l-bank-valuation-v2.1.md`
+- `docs/archive/phase4l-bank-valuation-v2.1.md`
 """
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ BANK_REPORT = BANK_DIR / "report.json"
 EQUITY_POLICY = ROOT / "data" / "policies" / "equity-policy-v1.1.json"
 POLICY_FILE = ROOT / "data" / "policies" / "bank-valuation-v2.1-draft.json"
 OUT_JSON = BANK_DIR / "valuation-v2.1.json"
-OUT_MD = ROOT / "docs" / "phase4l-bank-valuation-v2.1.md"
+OUT_MD = ROOT / "docs" / "archive" / "phase4l-bank-valuation-v2.1.md"
 
 CONCLUSION = {
     "candidate_buy_point": "候选买点",

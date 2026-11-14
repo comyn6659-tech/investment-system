@@ -374,7 +374,7 @@ def test_backtest_result_shape_and_guardrails():
 
 
 def test_report_avoids_conclusory_wording_and_has_required_sections():
-    text = (ROOT / "docs" / "phase3c-backtest.md").read_text(encoding="utf-8")
+    text = (ROOT / "docs" / "archive" / "phase3c-backtest.md").read_text(encoding="utf-8")
     for banned in ("胜率", "显著", "建议", "有效"):
         assert banned not in text, f"报告不应出现结论性措辞：{banned}"
     for marker in (
