@@ -86,6 +86,18 @@ def test_required_runtime_data_files_are_committed():
             ignored = subprocess.run(["git", "check-ignore", "-q", str(path)], cwd=ROOT)
             assert ignored.returncode == 1, f"{path} 被 git 忽略"
 
+    # C1：账本引用的持久化快照必须存在且内容哈希通过（与 scripts/verify-ledger-snapshots.py 同一实现）。
+    import importlib.util
+
+    script = ROOT / "scripts" / "verify-ledger-snapshots.py"
+    spec = importlib.util.spec_from_file_location("verify_ledger_snapshots_script", script)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    result = module.verify()
+    assert result["problems"] == [], "\n".join(result["problems"])
+    assert result["qps"] >= 5, result
+    assert result["snap"] >= 7, result
+
 
 def test_clean_archive_script_is_documented():
     script = ROOT / "scripts" / "verify-clean-archive.sh"

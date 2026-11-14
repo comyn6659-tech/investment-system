@@ -73,7 +73,8 @@ def _snap_files() -> dict[str, Path]:
     return output
 
 
-def main() -> int:
+def verify() -> dict:
+    """返回校验结果；不打印，供命令行与测试共用。"""
     refs = _ledger_refs()
     qps_dirs = _qps_dirs()
     snap_files = _snap_files()
@@ -121,21 +122,34 @@ def main() -> int:
             else:
                 checked["policy"] += 1
 
+    return {
+        "ledgers": len(refs),
+        "qps": checked["qps"],
+        "snap": checked["snap"],
+        "policy": checked["policy"],
+        "derived": sorted(set(derived)),
+        "untraceable": sorted(set(untraceable)),
+        "problems": problems,
+    }
+
+
+def main() -> int:
+    result = verify()
     print(
-        f"账本 {len(refs)} 个；已校验池快照 {checked['qps']} 个、单标的快照 {checked['snap']} 个；"
-        f"政策派生 id {checked['policy']} 个（不是文件引用）"
+        f"账本 {result['ledgers']} 个；已校验池快照 {result['qps']} 个、单标的快照 {result['snap']} 个；"
+        f"政策派生 id {result['policy']} 个（不是文件引用）"
     )
     print(
-        f"批量路径逐公司派生 id {len(set(derived))} 个（逐公司 JSON 未落盘，属既有设计；"
-        f"其中 {len(set(derived)) - len(set(untraceable))} 个可在已保留的批量结果文件中追溯）"
+        f"批量路径逐公司派生 id {len(result['derived'])} 个（逐公司 JSON 未落盘，属既有设计；"
+        f"其中 {len(result['derived']) - len(result['untraceable'])} 个可在已保留的批量结果文件中追溯）"
     )
-    if untraceable:
+    if result["untraceable"]:
         print("以下派生 id 只能追溯到账本记录本身（不删除任何文件）：")
-        for item in sorted(set(untraceable)):
+        for item in result["untraceable"]:
             print(f"  - {item}")
-    if problems:
+    if result["problems"]:
         print("校验失败：", file=sys.stderr)
-        for item in problems:
+        for item in result["problems"]:
             print(f"  - {item}", file=sys.stderr)
         return 1
     print("所有持久化快照（池快照 + 单标的快照）存在且内容哈希校验通过。")
