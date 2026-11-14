@@ -1,0 +1,61 @@
+"""银行历史估值位置（描述性，不参与估值/结论）。"""
+
+from __future__ import annotations
+
+from functools import lru_cache
+from pathlib import Path
+from typing import Any
+
+from engine.quality.tables import read_table
+
+ROOT = Path(__file__).resolve().parent.parent.parent
+INPUTS = ROOT / "data" / "bank-pool" / "valuation-v2" / "inputs.csv.gz"
+
+
+@lru_cache(maxsize=1)
+def _rows() -> dict[str, dict[str, Any]]:
+    return {str(row["code"]).zfill(6): row for row in read_table(INPUTS)}
+
+
+def position(code: str) -> dict[str, Any]:
+    row = _rows().get(str(code).zfill(6)) or {}
+    if not row:
+        return {"status": "missing", "months": 0, "pb_percentile": None, "dy_percentile": None}
+    months = int(float(row["history_months"])) if row.get("history_months") not in (None, "") else 0
+    return {
+        "status": row.get("history_status") or "missing",
+        "months": months,
+        "start": row.get("history_start"),
+        "end": row.get("history_end"),
+        "pb_current": _num(row.get("pb_current")),
+        "pb_percentile": _num(row.get("pb_percentile")),
+        "dy_current": _num(row.get("dy_current")),
+        "dy_percentile": _num(row.get("dy_percentile")),
+    }
+
+
+def one_line(code: str) -> str:
+    item = position(code)
+    if item["status"] == "ok" and item["pb_percentile"] is not None and item["dy_percentile"] is not None:
+        return (
+            f"历史位置：市净率处于近 10 年 {item['pb_percentile']:.0f}% 分位，"
+            f"股息率处于 {item['dy_percentile']:.0f}% 分位"
+            f"（可用 {item['months']} 个月月末序列；同源同口径，描述性，不给买点）。"
+        )
+    if item["status"] == "insufficient":
+        return (
+            f"历史位置：可用月末序列 {item['months']} 个月，不足 5 年，未计算分位。"
+        )
+    return "历史位置：暂无可用历史估值序列。"
+
+
+def _num(value):
+    if value in (None, ""):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+__all__ = ["one_line", "position"]

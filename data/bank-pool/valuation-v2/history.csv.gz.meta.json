@@ -1,0 +1,20 @@
+{
+  "schema_version": "quality-pool-table/1",
+  "table_id": "history",
+  "file": "history.csv.gz",
+  "rows": 4098,
+  "columns": [
+    "code",
+    "month",
+    "date",
+    "close",
+    "pb",
+    "trailing_dps",
+    "dividend_yield"
+  ],
+  "content_hash": "ed9419683ba906ccfdd5352f780138cf35c4c77795ec3610706189e4bedb04ec",
+  "size_bytes": 66262,
+  "kind": "bank-valuation-history",
+  "generated_at": "2026-11-14T17:16:41+08:00",
+  "definition_note": "月末 PB 与滚动 12 个月股息率；同源东方财富收盘价、市净率与分红（除权除息日）。"
+}

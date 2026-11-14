@@ -479,3 +479,20 @@
 | X7/Y3 | 结论行位置概括；分档版本化配置 | `data/policies/index-position-bands-v1.json`、`engine/ask/index_bands.py`、`engine/ask/service.py` | 20/40/60/80 边界测试；`test_x7_index_position_bands`、`test_x7_index_conclusion_has_position_summary`、`test_x7_bands_config_is_versioned` | ✅ |
 | Y4 | 干净目录（`git archive`）全部测试与 61 条问题集通过；账本旧记录不变 | `scripts/verify-clean-archive.sh`、`data/ledger/equity-conclusions.jsonl` | 干净归档 **682 passed + 1 skipped**；问题集 61/61；账本 99 条 0 问题，前 98 条不变 | ✅ |
 | Y5 | DELIVERY.md 一页以内，附平安银行、沪深300、“收息池有哪些公司现在的价格很合适”三张卡片原文 | `DELIVERY.md` | 见入口文件 | ✅ |
+
+
+---
+
+# 第四阶段第十二批验收清单（银行专用估值 v2 试运行 / 历史位置 Z1–Z6）
+
+对应文件：`batch4l-bank-valuation-v2-instructions.md`。范围：银行专用估值草案、36 家试运行、
+报告与敏感性、42 家历史估值位置；**不启用正式银行结论，不改政策/池/账本旧记录**。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| Z1 | 草案版本化、每个参数带依据；招商银行、工商银行三档价值有手算测试 | `data/policies/bank-valuation-v2-draft.json`、`engine/bank/valuation_v2.py` | `test_z1_cmb_hand_calculation`、`test_z1_icbc_hand_calculation`、`test_z2_policy_has_basis_for_every_parameter` | ✅ |
+| Z2 | 报告含三档 ROE、扣减、k/g、每股净资产、三档价值、现价、合理 PB、门槛价、结论、起约束条件；全集分布；k 溢价与安全边际敏感性；与第八批逐家对照 | `tools/run_bank_valuation_v2.py`、`data/bank-pool/valuation-v2.json`、`docs/phase4l-bank-valuation-v2.md` | 36 家逐家表；36/36 v1-v2 对照；k 1/2/3pp 与 margin 20/30/40 各含数量+名单；`test_z2_report_has_required_sections_and_sensitivity` | ✅ |
+| Z3 | 非银行池银行只有价值数字与无法判断，不出现候选/等待/回避 | `engine/bank/valuation_v2.py`、报告 | 25 家非银行池全部 `undetermined` 且三档价值存在；`test_z3_non_bank_pool_banks_only_values_and_undetermined` | ✅ |
+| Z4 | 历史位置同源同口径、至少 5 年；银行卡片显示一行分位 | `tools/build_bank_valuation_v2_data.py`、`data/bank-pool/valuation-v2/`、`engine/bank/history.py`、`engine/ask/service.py` | 42 家中 41 家 ≥60 个月，兰州银行 58 个月不足 5 年；招商/平安卡片显示 PB/股息率分位行；`test_z4_history_position_same_source_and_card_line` | ✅ |
+| Z5 | 正式账本、CLI 银行结论、其他结果不变；干净目录全部测试通过 | 全项目 | 未写账本；CLI 银行仍“无法判断”；干净归档待最终实测；账本 99 条旧记录不变 | ✅ |
+| Z6 | DELIVERY.md 一页以内 | `DELIVERY.md` | 见入口文件 | ✅ |

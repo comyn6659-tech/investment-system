@@ -1,0 +1,95 @@
+{
+  "schema_version": "bank-valuation-policy/1",
+  "policy_id": "bank-valuation-v2-draft",
+  "label": "银行专用估值草案 v2（未批准，设计方起草）",
+  "status": "draft_unapproved",
+  "approved": false,
+  "version_date": "2026-11-14",
+  "basis": "施工单 batch4l：通用股息折现对银行不可信（终值占比 86%–98%），改用合理市净率法（剩余收益法稳态形式），只做试运行，是否启用由股东在决策④决定。",
+  "method": {
+    "name": "合理市净率法（剩余收益法的稳态形式）",
+    "formula": "每股价值 = 最新每股净资产 × (ROE − g) ÷ (k − g)",
+    "note": "ROE 为三档普通股 ROE；k 为银行股权成本；g 为长期增长；每股净资产只算普通股。"
+  },
+  "parameters": {
+    "roe_base": {
+      "rule": "min(近 3 年平均 ROE, 近 5 年平均 ROE)",
+      "basis": "不假设盈利能力回升；近 3 年与近 5 年孰低，避免用高盈利年份外推。"
+    },
+    "roe_pessimistic": {
+      "rule": "近 5 年最低 ROE − 1 个百分点",
+      "basis": "覆盖净息差继续下行、坏账暴露。",
+      "deduction": 0.01
+    },
+    "roe_optimistic": {
+      "rule": "近 5 年平均 ROE",
+      "basis": "乐观情景不假设超过近 5 年平均。"
+    },
+    "asset_quality_deduction": {
+      "trigger": "拨备覆盖率 < 200% 或不良率 5 年上升 > 0.3 个百分点",
+      "deduction": 0.01,
+      "basis": "报表不良率可能低估真实坏账；触发时三档 ROE 各再减 1 个百分点。",
+      "npl_change_years": 5,
+      "trigger_provision_coverage_pct": 200.0,
+      "trigger_npl_change_pp": 0.3
+    },
+    "growth": {
+      "base": 0.02,
+      "pessimistic": 0.015,
+      "optimistic": 0.025,
+      "cap": "g ≤ 规范化无风险利率",
+      "basis": "与个股政策一致；长期增长不得超过规范化无风险利率。"
+    },
+    "cost_of_equity": {
+      "rule": "个股政策股权成本 + 银行业溢价",
+      "bank_premium": 0.02,
+      "premium_sensitivity": [
+        0.01,
+        0.02,
+        0.03
+      ],
+      "basis": "银行杠杆十几倍、资产质量不透明；这是对整个行业的溢价，不是逐家主观加点。"
+    },
+    "book_value_per_share": {
+      "rule": "(最新报告期归母净资产 − 其他权益工具（优先股、永续债）) ÷ 总股本",
+      "basis": "只算普通股，避免把优先股/永续债持有人权益算给普通股股东。"
+    },
+    "margin_of_safety": {
+      "value": 0.3,
+      "sensitivity": [
+        0.2,
+        0.3,
+        0.4
+      ],
+      "basis": "银行池已过质量筛选；与个股 A 级 25%、B 级 40% 并列为政策选择。"
+    }
+  },
+  "eligibility": {
+    "bank_pool_required": true,
+    "bank_pool_policy": "bank-pool-v1",
+    "required_fields": [
+      "bvps",
+      "roe_3y_avg",
+      "roe_5y_avg",
+      "roe_5y_min",
+      "npl_ratio",
+      "provision_coverage",
+      "shares",
+      "price"
+    ],
+    "max_loss_years_7": 0,
+    "note": "全部满足才给候选/等待/回避；其余银行只给价值数字与无法判断及原因。"
+  },
+  "conclusion": {
+    "candidate_buy_point": "现价 ≤ 基准价值 × (1 − 安全边际) 且 ≤ 悲观价值",
+    "avoid": "现价 > 乐观价值",
+    "wait": "其余",
+    "undetermined": "不满足 eligibility、数据不足或价值不可解释",
+    "binding": "安全边际（基准价值 × (1 − M)）与悲观价值孰低"
+  },
+  "notes": [
+    "本文件是未批准草案，只用于试运行；不写正式账本、不改变 CLI 银行结论。",
+    "所有参数与阈值只从本文件读取，代码不另设业务数字。",
+    "历史估值位置是描述性统计，不参与本估值与结论。"
+  ]
+}

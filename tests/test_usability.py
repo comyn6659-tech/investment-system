@@ -15,6 +15,7 @@ from engine.ask.plain import BANNED_TERMS, REASON_PLAIN, reason_plain
 from engine.ask.service import AskService
 from engine.forward import update
 from engine.forward.calendar import is_trading_day
+from engine.quality.tables import read_table
 
 ROOT = Path(__file__).resolve().parent.parent
 QUESTIONS = ROOT / "data" / "ask" / "questions.json"
@@ -322,3 +323,128 @@ def test_x3_all_in_scope_banks_have_indicator_and_ownership():
             assert indicator.get(key) not in (None, ""), (code, key)
         assert service._bank_ownership(code), code
     assert checked == 36
+
+
+# --- batch4l：银行估值 v2 试运行 + 历史位置 --------------------------------
+def _bank_v2_fixture():
+    from engine.bank.valuation_v2 import BankValuationInputs, load_policy, value_bank
+    from engine.policy.equity import load_policy as load_equity_policy
+    from engine.policy.valuation import load_macro_series
+    from engine.quality.tables import read_table
+    from pathlib import Path
+
+    policy = load_policy()
+    equity_policy = load_equity_policy("data/policies/equity-policy-v1.1.json")
+    macro = load_macro_series(
+        Path(equity_policy.node("discount_rate.risk_free")["series_file"])
+    )
+    rows = {
+        row["code"]: row
+        for row in read_table(Path("data/bank-pool/valuation-v2/inputs.csv.gz"))
+    }
+    pool_codes = {"600036", "601398"}
+    inputs = {
+        code: BankValuationInputs.from_row(rows[code], in_bank_pool=code in pool_codes)
+        for code in ("600036", "601398")
+    }
+    return policy, equity_policy, macro, inputs, value_bank
+
+
+def test_z1_cmb_hand_calculation():
+    policy, equity_policy, macro, inputs, value_bank = _bank_v2_fixture()
+    out = value_bank(inputs["600036"], policy, equity_policy, macro)
+    bvps = 46.867733
+    roe_base = min(0.14716666666666667, 0.15633999999999998)
+    roe_pess = 0.1344 - 0.01
+    roe_opt = 0.15633999999999998
+    k = out["risk_free"] + out["equity_risk_premium"] + 0.02
+    expected = {
+        "pessimistic": bvps * (roe_pess - 0.015) / (k - 0.015),
+        "base": bvps * (roe_base - 0.02) / (k - 0.02),
+        "optimistic": bvps * (roe_opt - 0.025) / (k - 0.025),
+    }
+    for name, value in expected.items():
+        assert abs(out["values"][name] - value) < 0.02, name
+    assert abs(out["cost_of_equity"] - k) < 1e-12
+    assert out["asset_quality_deduction"] is False
+    assert out["conclusion"] == "candidate_buy_point"
+
+
+def test_z1_icbc_hand_calculation():
+    policy, equity_policy, macro, inputs, value_bank = _bank_v2_fixture()
+    out = value_bank(inputs["601398"], policy, equity_policy, macro)
+    bvps = 11.239444
+    roe_base = min(0.09996666666666666, 0.10718000000000001)
+    roe_pess = 0.09449999999999999 - 0.01
+    roe_opt = 0.10718000000000001
+    k = out["risk_free"] + out["equity_risk_premium"] + 0.02
+    expected = {
+        "pessimistic": bvps * (roe_pess - 0.015) / (k - 0.015),
+        "base": bvps * (roe_base - 0.02) / (k - 0.02),
+        "optimistic": bvps * (roe_opt - 0.025) / (k - 0.025),
+    }
+    for name, value in expected.items():
+        assert abs(out["values"][name] - value) < 0.02, name
+    assert out["conclusion"] == "wait"
+
+
+def test_z2_report_has_required_sections_and_sensitivity():
+    payload = json.loads((ROOT / "data" / "bank-pool" / "valuation-v2.json").read_text(encoding="utf-8"))
+    text = (ROOT / "docs" / "phase4l-bank-valuation-v2.md").read_text(encoding="utf-8")
+    assert payload["meta"]["policy"] == "bank-valuation-v2-draft"
+    assert payload["meta"]["policy_approved"] is False
+    assert len(payload["banks"]) == 36
+    assert len(payload["comparison_v1"]) == 36
+    assert {item["bank_premium"] for item in payload["sensitivity_k"]} == {0.01, 0.02, 0.03}
+    assert {item["margin_of_safety"] for item in payload["sensitivity_margin"]} == {0.20, 0.30, 0.40}
+    for section in ("三档 ROE", "敏感性", "第八批", "历史估值位置", "每股净资产", "门槛价"):
+        assert section in text, section
+    for item in payload["banks"]:
+        assert item["values"]["pessimistic"] is not None
+        assert item["multiples"]["base"] is not None
+        assert item["threshold_price"] is not None
+
+
+def test_z2_policy_has_basis_for_every_parameter():
+    policy = json.loads((ROOT / "data" / "policies" / "bank-valuation-v2-draft.json").read_text(encoding="utf-8"))
+    for name, node in policy["parameters"].items():
+        assert "basis" in node, name
+    assert policy["method"]["formula"]
+    assert policy["eligibility"]["bank_pool_required"] is True
+
+
+def test_z3_non_bank_pool_banks_only_values_and_undetermined():
+    payload = json.loads((ROOT / "data" / "bank-pool" / "valuation-v2.json").read_text(encoding="utf-8"))
+    pool_codes = {
+        "002839", "002966", "600036", "601009", "601166",
+        "601288", "601328", "601398", "601658", "601939", "601998",
+    }
+    non_pool = [item for item in payload["banks"] if item["code"] not in pool_codes]
+    assert len(non_pool) == 25
+    for item in non_pool:
+        assert item["conclusion"] == "undetermined"
+        for name in ("pessimistic", "base", "optimistic"):
+            assert item["values"][name] is not None
+        assert any("不在已批准银行池" in reason for reason in item["reasons"])
+
+
+def test_z4_history_position_same_source_and_card_line(service):
+    manifest = json.loads(
+        (ROOT / "data" / "bank-pool" / "valuation-v2" / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert any("value_analysis" in source for source in manifest["sources"])
+    assert any("dividend" in source for source in manifest["sources"])
+    assert "同源" in manifest["tables"][1]["definition_note"]
+    inputs = read_table(ROOT / "data" / "bank-pool" / "valuation-v2" / "inputs.csv.gz")
+    assert len(inputs) == 42
+    ok = [row for row in inputs if row["history_status"] == "ok"]
+    assert len(ok) == 41
+    for row in ok:
+        assert int(float(row["history_months"])) >= 60
+        assert row["history_start"] and row["history_end"]
+    text = service.ask("招商银行怎么样").markdown
+    assert "市净率处于近 10 年" in text
+    assert "股息率处于" in text
+    assert "同源同口径" in text
+    insufficient = service.ask("兰州银行怎么样").markdown
+    assert "不足 5 年" in insufficient

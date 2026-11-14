@@ -31,6 +31,7 @@ from engine.contracts import reason_codes as rc
 from engine.data.snapshot import SnapshotStore
 from engine.evidence.models import BusinessEvidence
 from engine.forward import quotes, update
+from engine.bank import history as bank_history
 from engine.forward.calendar import is_trading_day
 from engine.income.evaluator import evaluate_company as evaluate_income
 from engine.bank.evaluator import evaluate_company as evaluate_bank
@@ -1225,6 +1226,7 @@ class AskService:
             f"｜不良率 {npl if npl is not None else '—'}%"
             f"｜拨备覆盖率 {provision if provision is not None else '—'}%"
             f"｜核心一级 {cet1 if cet1 is not None else '—'}%",
+            bank_history.one_line(code),
             "为什么：银行的资本充足、资产质量与监管口径需要专用方法；本版只展示公开报表指标，"
             "不评价贵贱。",
             f"它是什么：{'银行池成员' if in_pool else '银行（不在银行池）'}｜所有制 {ownership}"

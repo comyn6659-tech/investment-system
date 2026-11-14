@@ -1,0 +1,2714 @@
+{
+  "meta": {
+    "as_of": "2026-11-14",
+    "generated_at": "2026-11-14T17:25:23+08:00",
+    "policy": "bank-valuation-v2-draft",
+    "policy_status": "draft_unapproved",
+    "policy_approved": false,
+    "policy_sha256": "3becbbca757d29f150972811d9b3219c2e0769aa19f6199d125d341d0b22a1fc",
+    "equity_policy": "equity-policy-v1.1",
+    "risk_free": 0.027629358333333333,
+    "equity_risk_premium": 0.0514,
+    "cost_of_equity": 0.09902935833333333,
+    "inputs": "data/bank-pool/valuation-v2/inputs.csv.gz",
+    "history": "data/bank-pool/valuation-v2/history.csv.gz",
+    "warning": "银行估值 v2 为未批准草案，只做试运行；不写正式账本，不改变 CLI 银行结论。"
+  },
+  "summary": {
+    "total": 36,
+    "candidate_buy_point": 7,
+    "wait": 4,
+    "avoid": 0,
+    "undetermined": 25,
+    "values_distribution": {
+      "pessimistic": {
+        "min": -0.21227115086661666,
+        "median": 9.637039988900707,
+        "max": 61.01831659668947
+      },
+      "base": {
+        "min": 0.1460418513246605,
+        "median": 11.884217742710174,
+        "max": 75.41518121272023
+      },
+      "optimistic": {
+        "min": 0.40535463977523306,
+        "median": 12.7263196827655,
+        "max": 83.15090378742758
+      }
+    }
+  },
+  "banks": [
+    {
+      "code": "000001",
+      "name": "平安银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 12.07,
+      "price_date": "2026-11-13",
+      "bvps": 24.564723,
+      "shares": 19405918198.0,
+      "roe": {
+        "base": 0.10203333333333335,
+        "pessimistic": 0.0815,
+        "optimistic": 0.10764
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 19.44027792072275,
+        "base": 25.498449596421086,
+        "optimistic": 27.421941165278685
+      },
+      "multiples": {
+        "pessimistic": 0.7913900726958227,
+        "base": 1.038010874228913,
+        "optimistic": 1.1163138768256693
+      },
+      "candidate_entry_price": 17.848914717494758,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 17.848914717494758,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "002142",
+      "name": "宁波银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 34.15,
+      "price_date": "2026-11-13",
+      "bvps": 37.121622,
+      "shares": 6603590792.0,
+      "roe": {
+        "base": 0.13926666666666665,
+        "pessimistic": 0.1211,
+        "optimistic": 0.14796
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 46.87176211171433,
+        "base": 56.02186593146871,
+        "optimistic": 61.65762805301457
+      },
+      "multiples": {
+        "pessimistic": 1.2626539355342374,
+        "base": 1.5091438065790528,
+        "optimistic": 1.6609626608722692
+      },
+      "candidate_entry_price": 39.21530615202809,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 39.21530615202809,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "002807",
+      "name": "江阴银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 4.45,
+      "price_date": "2026-11-13",
+      "bvps": 7.711314,
+      "shares": 2707532067.0,
+      "roe": {
+        "base": 0.11366000000000001,
+        "pessimistic": 0.09150000000000001,
+        "optimistic": 0.11366000000000001
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 7.020350181181717,
+        "base": 9.13890337048795,
+        "optimistic": 9.235323858428691
+      },
+      "multiples": {
+        "pessimistic": 0.9103960986651195,
+        "base": 1.1851291972403084,
+        "optimistic": 1.197632966110405
+      },
+      "candidate_entry_price": 6.397232359341565,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 6.397232359341565,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "002839",
+      "name": "张家港行",
+      "in_scope": true,
+      "in_bank_pool": true,
+      "data_complete": true,
+      "price": 4.51,
+      "price_date": "2026-11-13",
+      "bvps": 8.101556,
+      "shares": 2444344974.0,
+      "roe": {
+        "base": 0.1102,
+        "pessimistic": 0.0936,
+        "optimistic": 0.1127
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 7.578093112099809,
+        "base": 9.246694729796092,
+        "optimistic": 9.597630956097037
+      },
+      "multiples": {
+        "pessimistic": 0.9353873641186716,
+        "base": 1.141347999050564,
+        "optimistic": 1.1846651379188191
+      },
+      "candidate_entry_price": 6.472686310857264,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 6.472686310857264,
+      "margin_of_safety": 0.3,
+      "conclusion": "candidate_buy_point",
+      "reasons": [],
+      "status": "complete"
+    },
+    {
+      "code": "002936",
+      "name": "郑州银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 1.79,
+      "price_date": "2026-11-13",
+      "bvps": 5.246179,
+      "shares": 9092091358.0,
+      "roe": {
+        "base": 0.022199999999999998,
+        "pessimistic": 0.011600000000000001,
+        "optimistic": 0.030719999999999997
+      },
+      "asset_quality_deduction": true,
+      "deduction": 0.01,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": -0.21227115086661666,
+        "base": 0.1460418513246605,
+        "optimistic": 0.40535463977523306
+      },
+      "multiples": {
+        "pessimistic": -0.040462048829560844,
+        "base": 0.02783775607440396,
+        "optimistic": 0.07726664297486477
+      },
+      "candidate_entry_price": 0.10222929592726233,
+      "binding_condition": "pessimistic_value",
+      "threshold_price": -0.21227115086661666,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）",
+        "三档价值存在非正值，无法解释"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "002948",
+      "name": "青岛银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 6.53,
+      "price_date": "2026-11-13",
+      "bvps": 7.630564,
+      "shares": 5820354724.0,
+      "roe": {
+        "base": 0.1085,
+        "pessimistic": 0.0795,
+        "optimistic": 0.1085
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 5.857135979161252,
+        "base": 8.54498794171744,
+        "optimistic": 8.606748840521941
+      },
+      "multiples": {
+        "pessimistic": 0.7675888675019634,
+        "base": 1.1198370057203426,
+        "optimistic": 1.1279308895806315
+      },
+      "candidate_entry_price": 5.981491559202208,
+      "binding_condition": "pessimistic_value",
+      "threshold_price": 5.857135979161252,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "002958",
+      "name": "青农商行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 3.0,
+      "price_date": "2026-11-13",
+      "bvps": 7.201975,
+      "shares": 5555705649.0,
+      "roe": {
+        "base": 0.07629999999999999,
+        "pessimistic": 0.059699999999999996,
+        "optimistic": 0.08098000000000001
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 3.8311405547446062,
+        "base": 5.1306400690966845,
+        "optimistic": 5.446036134538067
+      },
+      "multiples": {
+        "pessimistic": 0.531956936082756,
+        "base": 0.7123934849949749,
+        "optimistic": 0.7561864814218415
+      },
+      "candidate_entry_price": 3.591448048367679,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 3.591448048367679,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "002966",
+      "name": "苏州银行",
+      "in_scope": true,
+      "in_bank_pool": true,
+      "data_complete": true,
+      "price": 9.63,
+      "price_date": "2026-11-13",
+      "bvps": 12.14519,
+      "shares": 4470662011.0,
+      "roe": {
+        "base": 0.11164,
+        "pessimistic": 0.08960000000000001,
+        "optimistic": 0.11164
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 10.782316942203634,
+        "base": 14.083186743154418,
+        "optimistic": 14.214080538993372
+      },
+      "multiples": {
+        "pessimistic": 0.8877849537309531,
+        "base": 1.1595690757538102,
+        "optimistic": 1.1703464942906099
+      },
+      "candidate_entry_price": 9.858230720208091,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 9.858230720208091,
+      "margin_of_safety": 0.3,
+      "conclusion": "candidate_buy_point",
+      "reasons": [],
+      "status": "complete"
+    },
+    {
+      "code": "600000",
+      "name": "浦发银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 10.4,
+      "price_date": "2026-11-13",
+      "bvps": 22.799486,
+      "shares": 33305838300.0,
+      "roe": {
+        "base": 0.05083333333333333,
+        "pessimistic": 0.0321,
+        "optimistic": 0.05995999999999999
+      },
+      "asset_quality_deduction": true,
+      "deduction": 0.01,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 4.639702341334472,
+        "base": 8.895227881031131,
+        "optimistic": 10.766945013504214
+      },
+      "multiples": {
+        "pessimistic": 0.20350030440749722,
+        "base": 0.3901503692246014,
+        "optimistic": 0.4722450766435793
+      },
+      "candidate_entry_price": 6.226659516721791,
+      "binding_condition": "pessimistic_value",
+      "threshold_price": 4.639702341334472,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "600015",
+      "name": "华夏银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 6.66,
+      "price_date": "2026-11-13",
+      "bvps": 20.396133,
+      "shares": 15914928468.0,
+      "roe": {
+        "base": 0.07623333333333333,
+        "pessimistic": 0.0632,
+        "optimistic": 0.07782
+      },
+      "asset_quality_deduction": true,
+      "deduction": 0.01,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 11.699406375331321,
+        "base": 14.512866735705707,
+        "optimistic": 14.552655450680998
+      },
+      "multiples": {
+        "pessimistic": 0.57360904517201,
+        "base": 0.711549916629084,
+        "optimistic": 0.7135007136245385
+      },
+      "candidate_entry_price": 10.159006714993994,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 10.159006714993994,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "600016",
+      "name": "民生银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 3.42,
+      "price_date": "2026-11-13",
+      "bvps": 13.123259,
+      "shares": 43782418502.0,
+      "roe": {
+        "base": 0.04403333333333333,
+        "pessimistic": 0.029299999999999993,
+        "optimistic": 0.04821999999999999
+      },
+      "asset_quality_deduction": true,
+      "deduction": 0.01,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 2.2332980689388013,
+        "base": 3.9908669970010076,
+        "optimistic": 4.116232814121154
+      },
+      "multiples": {
+        "pessimistic": 0.1701786171360941,
+        "base": 0.3041063959037163,
+        "optimistic": 0.31365934438397913
+      },
+      "candidate_entry_price": 2.793606897900705,
+      "binding_condition": "pessimistic_value",
+      "threshold_price": 2.2332980689388013,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "600036",
+      "name": "招商银行",
+      "in_scope": true,
+      "in_bank_pool": true,
+      "data_complete": true,
+      "price": 42.93,
+      "price_date": "2026-11-13",
+      "bvps": 46.867733,
+      "shares": 25219845601.0,
+      "roe": {
+        "base": 0.14716666666666667,
+        "pessimistic": 0.1244,
+        "optimistic": 0.15633999999999998
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 61.01831659668947,
+        "base": 75.41518121272023,
+        "optimistic": 83.15090378742758
+      },
+      "multiples": {
+        "pessimistic": 1.3019259241041052,
+        "base": 1.6091066579371403,
+        "optimistic": 1.774160994461319
+      },
+      "candidate_entry_price": 52.790626848904154,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 52.790626848904154,
+      "margin_of_safety": 0.3,
+      "conclusion": "candidate_buy_point",
+      "reasons": [],
+      "status": "complete"
+    },
+    {
+      "code": "600908",
+      "name": "无锡银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 6.14,
+      "price_date": "2026-11-13",
+      "bvps": 10.985482,
+      "shares": 2194681695.0,
+      "roe": {
+        "base": 0.10716666666666667,
+        "pessimistic": 0.09050000000000001,
+        "optimistic": 0.11313999999999999
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 9.870406099138169,
+        "base": 12.116609167289415,
+        "optimistic": 13.079410726757843
+      },
+      "multiples": {
+        "pessimistic": 0.8984954960681898,
+        "base": 1.1029656384025222,
+        "optimistic": 1.1906087258399625
+      },
+      "candidate_entry_price": 8.48162641710259,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 8.48162641710259,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "600919",
+      "name": "江苏银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 13.23,
+      "price_date": "2026-11-13",
+      "bvps": 15.343242,
+      "shares": 18351324463.0,
+      "roe": {
+        "base": 0.13728,
+        "pessimistic": 0.116,
+        "optimistic": 0.13728
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 18.441976384642555,
+        "base": 22.76945504441757,
+        "optimistic": 23.27102720522028
+      },
+      "multiples": {
+        "pessimistic": 1.2019608622898963,
+        "base": 1.4840054692755005,
+        "optimistic": 1.5166955722408784
+      },
+      "candidate_entry_price": 15.938618531092297,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 15.938618531092297,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "600926",
+      "name": "杭州银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 17.52,
+      "price_date": "2026-11-13",
+      "bvps": 19.878893,
+      "shares": 7249002548.0,
+      "roe": {
+        "base": 0.14528000000000002,
+        "pessimistic": 0.11330000000000001,
+        "optimistic": 0.14528000000000002
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 23.254910196366893,
+        "base": 31.512690569190386,
+        "optimistic": 32.29844623634116
+      },
+      "multiples": {
+        "pessimistic": 1.1698292352781863,
+        "base": 1.5852336731824244,
+        "optimistic": 1.6247608071707593
+      },
+      "candidate_entry_price": 22.05888339843327,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 22.05888339843327,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "600928",
+      "name": "西安银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 3.85,
+      "price_date": "2026-11-13",
+      "bvps": 8.39842,
+      "shares": 4444444445.0,
+      "roe": {
+        "base": 0.06976666666666667,
+        "pessimistic": 0.0574,
+        "optimistic": 0.07618000000000001
+      },
+      "asset_quality_deduction": true,
+      "deduction": 0.01,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 4.237721375753296,
+        "base": 5.288684831575776,
+        "optimistic": 5.806225331098936
+      },
+      "multiples": {
+        "pessimistic": 0.5045855501098178,
+        "base": 0.629723785137654,
+        "optimistic": 0.691347340463913
+      },
+      "candidate_entry_price": 3.702079382103043,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 3.702079382103043,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "601009",
+      "name": "南京银行",
+      "in_scope": true,
+      "in_bank_pool": true,
+      "data_complete": true,
+      "price": 12.81,
+      "price_date": "2026-11-13",
+      "bvps": 16.005607,
+      "shares": 12363567245.0,
+      "roe": {
+        "base": 0.12713333333333335,
+        "pessimistic": 0.11050000000000001,
+        "optimistic": 0.13622
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 18.190493165930206,
+        "base": 21.697430753529048,
+        "optimistic": 24.04645468524144
+      },
+      "multiples": {
+        "pessimistic": 1.1365075480067832,
+        "base": 1.3556143639868856,
+        "optimistic": 1.5023769286126691
+      },
+      "candidate_entry_price": 15.188201527470332,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 15.188201527470332,
+      "margin_of_safety": 0.3,
+      "conclusion": "candidate_buy_point",
+      "reasons": [],
+      "status": "complete"
+    },
+    {
+      "code": "601077",
+      "name": "渝农商行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 7.32,
+      "price_date": "2026-11-13",
+      "bvps": 12.67836,
+      "shares": 11357000000.0,
+      "roe": {
+        "base": 0.09346666666666666,
+        "pessimistic": 0.0818,
+        "optimistic": 0.09534
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 10.078792279246054,
+        "base": 11.785959896970775,
+        "optimistic": 12.046515902305874
+      },
+      "multiples": {
+        "pessimistic": 0.7949602534749016,
+        "base": 0.9296123392119151,
+        "optimistic": 0.9501635781209774
+      },
+      "candidate_entry_price": 8.250171927879542,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 8.250171927879542,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "601128",
+      "name": "常熟银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 6.39,
+      "price_date": "2026-11-13",
+      "bvps": 9.281538,
+      "shares": 3648180954.0,
+      "roe": {
+        "base": 0.13313999999999998,
+        "pessimistic": 0.1062,
+        "optimistic": 0.13313999999999998
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 10.073577644638684,
+        "base": 13.287634259799864,
+        "optimistic": 13.558209093216734
+      },
+      "multiples": {
+        "pessimistic": 1.0853349568399855,
+        "base": 1.4316198737536672,
+        "optimistic": 1.4607718131646645
+      },
+      "candidate_entry_price": 9.301343981859905,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 9.301343981859905,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "601166",
+      "name": "兴业银行",
+      "in_scope": true,
+      "in_bank_pool": true,
+      "data_complete": true,
+      "price": 19.83,
+      "price_date": "2026-11-13",
+      "bvps": 40.20864,
+      "shares": 21162864665.0,
+      "roe": {
+        "base": 0.09893333333333333,
+        "pessimistic": 0.0815,
+        "optimistic": 0.11494
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 31.820718532600168,
+        "base": 40.15978429956885,
+        "optimistic": 48.85041776691523
+      },
+      "multiples": {
+        "pessimistic": 0.7913900726958227,
+        "base": 0.9987849452149797,
+        "optimistic": 1.2149234036991856
+      },
+      "candidate_entry_price": 28.11184900969819,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 28.11184900969819,
+      "margin_of_safety": 0.3,
+      "conclusion": "candidate_buy_point",
+      "reasons": [],
+      "status": "complete"
+    },
+    {
+      "code": "601169",
+      "name": "北京银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 6.16,
+      "price_date": "2026-11-13",
+      "bvps": 13.77114,
+      "shares": 21142984272.0,
+      "roe": {
+        "base": 0.08026666666666667,
+        "pessimistic": 0.0511,
+        "optimistic": 0.08793999999999999
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 5.91624360652522,
+        "base": 10.501675851895968,
+        "optimistic": 11.70826778880406
+      },
+      "multiples": {
+        "pessimistic": 0.4296117537491609,
+        "base": 0.7625858027654913,
+        "optimistic": 0.8502032358108377
+      },
+      "candidate_entry_price": 7.351173096327177,
+      "binding_condition": "pessimistic_value",
+      "threshold_price": 5.91624360652522,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "601229",
+      "name": "上海银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 8.37,
+      "price_date": "2026-11-13",
+      "bvps": 17.758714,
+      "shares": 14317174642.0,
+      "roe": {
+        "base": 0.0902,
+        "pessimistic": 0.07690000000000001,
+        "optimistic": 0.09572
+      },
+      "asset_quality_deduction": true,
+      "deduction": 0.01,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 13.081908732890284,
+        "base": 15.774665884819388,
+        "optimistic": 16.964840468089072
+      },
+      "multiples": {
+        "pessimistic": 0.7366473007499463,
+        "base": 0.8882774892832548,
+        "optimistic": 0.955296676780147
+      },
+      "candidate_entry_price": 11.04226611937357,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 11.04226611937357,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "601288",
+      "name": "农业银行",
+      "in_scope": true,
+      "in_bank_pool": true,
+      "data_complete": true,
+      "price": 7.37,
+      "price_date": "2026-11-13",
+      "bvps": 8.276524,
+      "shares": 349983033873.0,
+      "roe": {
+        "base": 0.10510000000000001,
+        "pessimistic": 0.0916,
+        "optimistic": 0.10878000000000002
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 7.544764722409024,
+        "base": 8.912285348809721,
+        "optimistic": 9.366651235821648
+      },
+      "multiples": {
+        "pessimistic": 0.9115861589248123,
+        "base": 1.0768150190599002,
+        "optimistic": 1.1317131728031777
+      },
+      "candidate_entry_price": 6.238599744166804,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 6.238599744166804,
+      "margin_of_safety": 0.3,
+      "conclusion": "wait",
+      "reasons": [],
+      "status": "complete"
+    },
+    {
+      "code": "601328",
+      "name": "交通银行",
+      "in_scope": true,
+      "in_bank_pool": true,
+      "data_complete": true,
+      "price": 8.58,
+      "price_date": "2026-11-13",
+      "bvps": 13.438515,
+      "shares": 88363784223.0,
+      "roe": {
+        "base": 0.09046666666666668,
+        "pessimistic": 0.07380000000000002,
+        "optimistic": 0.09648
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 9.403673878663245,
+        "base": 11.98247558844957,
+        "optimistic": 12.975731167015608
+      },
+      "multiples": {
+        "pessimistic": 0.6997554326994645,
+        "base": 0.8916517627468191,
+        "optimistic": 0.9655628740984854
+      },
+      "candidate_entry_price": 8.3877329119147,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 8.3877329119147,
+      "margin_of_safety": 0.3,
+      "conclusion": "wait",
+      "reasons": [],
+      "status": "complete"
+    },
+    {
+      "code": "601398",
+      "name": "工商银行",
+      "in_scope": true,
+      "in_bank_pool": true,
+      "data_complete": true,
+      "price": 8.85,
+      "price_date": "2026-11-13",
+      "bvps": 11.239444,
+      "shares": 356406257089.0,
+      "roe": {
+        "base": 0.09996666666666666,
+        "pessimistic": 0.08449999999999999,
+        "optimistic": 0.10718000000000001
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 9.296052873583966,
+        "base": 11.372746670620192,
+        "optimistic": 12.47690819851539
+      },
+      "multiples": {
+        "pessimistic": 0.8270918804866116,
+        "base": 1.0118602548862907,
+        "optimistic": 1.1101001258172014
+      },
+      "candidate_entry_price": 7.960922669434134,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 7.960922669434134,
+      "margin_of_safety": 0.3,
+      "conclusion": "wait",
+      "reasons": [],
+      "status": "complete"
+    },
+    {
+      "code": "601577",
+      "name": "长沙银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 10.12,
+      "price_date": "2026-11-13",
+      "bvps": 19.227778,
+      "shares": 4021553754.0,
+      "roe": {
+        "base": 0.11850000000000001,
+        "pessimistic": 0.1024,
+        "optimistic": 0.12276000000000001
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 19.99905545551887,
+        "base": 23.964969132251806,
+        "optimistic": 25.391380117280058
+      },
+      "multiples": {
+        "pessimistic": 1.0401126669716527,
+        "base": 1.2463722606039973,
+        "optimistic": 1.3205571708431445
+      },
+      "candidate_entry_price": 16.775478392576264,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 16.775478392576264,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "601658",
+      "name": "邮储银行",
+      "in_scope": true,
+      "in_bank_pool": true,
+      "data_complete": true,
+      "price": 5.69,
+      "price_date": "2026-11-13",
+      "bvps": 8.941026,
+      "shares": 120095053492.0,
+      "roe": {
+        "base": 0.09786666666666666,
+        "pessimistic": 0.0767,
+        "optimistic": 0.10622000000000001
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 6.565101949388127,
+        "base": 8.809484296500361,
+        "optimistic": 9.80948839851037
+      },
+      "multiples": {
+        "pessimistic": 0.7342671802305604,
+        "base": 0.9852878513607232,
+        "optimistic": 1.0971322976256157
+      },
+      "candidate_entry_price": 6.166639007550253,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 6.166639007550253,
+      "margin_of_safety": 0.3,
+      "conclusion": "candidate_buy_point",
+      "reasons": [],
+      "status": "complete"
+    },
+    {
+      "code": "601818",
+      "name": "光大银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 3.22,
+      "price_date": "2026-11-13",
+      "bvps": 8.719543,
+      "shares": 59085551061.0,
+      "roe": {
+        "base": 0.06770000000000001,
+        "pessimistic": 0.05,
+        "optimistic": 0.07844000000000001
+      },
+      "asset_quality_deduction": true,
+      "deduction": 0.01,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 3.631873562444396,
+        "base": 5.262882172795912,
+        "optimistic": 6.294426811345005
+      },
+      "multiples": {
+        "pessimistic": 0.4165210908925383,
+        "base": 0.6035731657950322,
+        "optimistic": 0.7218757693316044
+      },
+      "candidate_entry_price": 3.684017520957138,
+      "binding_condition": "pessimistic_value",
+      "threshold_price": 3.631873562444396,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "601838",
+      "name": "成都银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 20.64,
+      "price_date": "2026-11-13",
+      "bvps": 21.977529,
+      "shares": 4238435356.0,
+      "roe": {
+        "base": 0.17326666666666668,
+        "pessimistic": 0.1439,
+        "optimistic": 0.17812
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 33.71325860733397,
+        "base": 42.62242136893643,
+        "optimistic": 45.45763081354099
+      },
+      "multiples": {
+        "pessimistic": 1.533987674744234,
+        "base": 1.9393636731834787,
+        "optimistic": 2.06836859655792
+      },
+      "candidate_entry_price": 29.835694958255498,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 29.835694958255498,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "601860",
+      "name": "紫金银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 2.54,
+      "price_date": "2026-11-13",
+      "bvps": 5.841469,
+      "shares": 3661104277.0,
+      "roe": {
+        "base": 0.06896666666666668,
+        "pessimistic": 0.041699999999999994,
+        "optimistic": 0.07636
+      },
+      "asset_quality_deduction": true,
+      "deduction": 0.01,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 1.8561039307392857,
+        "base": 3.61937982793947,
+        "optimistic": 4.052687401248356
+      },
+      "multiples": {
+        "pessimistic": 0.31774608933802195,
+        "base": 0.6196009647469618,
+        "optimistic": 0.6937788082498352
+      },
+      "candidate_entry_price": 2.533565879557629,
+      "binding_condition": "pessimistic_value",
+      "threshold_price": 1.8561039307392857,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "601916",
+      "name": "浙商银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 2.96,
+      "price_date": "2026-11-13",
+      "bvps": 6.691551,
+      "shares": 27464635963.0,
+      "roe": {
+        "base": 0.07246666666666668,
+        "pessimistic": 0.048,
+        "optimistic": 0.07715999999999999
+      },
+      "asset_quality_deduction": true,
+      "deduction": 0.01,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 2.627905143866881,
+        "base": 4.442442444226687,
+        "optimistic": 4.71476868120902
+      },
+      "multiples": {
+        "pessimistic": 0.39271988569867894,
+        "base": 0.6638883039562409,
+        "optimistic": 0.7045853317428232
+      },
+      "candidate_entry_price": 3.109709710958681,
+      "binding_condition": "pessimistic_value",
+      "threshold_price": 2.627905143866881,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "601939",
+      "name": "建设银行",
+      "in_scope": true,
+      "in_bank_pool": true,
+      "data_complete": true,
+      "price": 12.11,
+      "price_date": "2026-11-13",
+      "bvps": 14.050973,
+      "shares": 261600381459.0,
+      "roe": {
+        "base": 0.10763333333333332,
+        "pessimistic": 0.0904,
+        "optimistic": 0.11428
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 12.60801445129842,
+        "base": 15.58071109945112,
+        "optimistic": 16.945586152340688
+      },
+      "multiples": {
+        "pessimistic": 0.8973054358084966,
+        "base": 1.108870616963759,
+        "optimistic": 1.2060080218174705
+      },
+      "candidate_entry_price": 10.906497769615784,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 10.906497769615784,
+      "margin_of_safety": 0.3,
+      "conclusion": "wait",
+      "reasons": [],
+      "status": "complete"
+    },
+    {
+      "code": "601988",
+      "name": "中国银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 7.18,
+      "price_date": "2026-11-13",
+      "bvps": 8.661451,
+      "shares": 322212411814.0,
+      "roe": {
+        "base": 0.0852,
+        "pessimistic": 0.0694,
+        "optimistic": 0.09122000000000001
+      },
+      "asset_quality_deduction": true,
+      "deduction": 0.01,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 5.60736085274958,
+        "base": 7.145782492856293,
+        "optimistic": 7.747754379247964
+      },
+      "multiples": {
+        "pessimistic": 0.6473927812729738,
+        "base": 0.8250098618414274,
+        "optimistic": 0.894509982132089
+      },
+      "candidate_entry_price": 5.0020477449994045,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 5.0020477449994045,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "601997",
+      "name": "贵阳银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 5.99,
+      "price_date": "2026-11-13",
+      "bvps": 18.40097,
+      "shares": 3656198076.0,
+      "roe": {
+        "base": 0.0871,
+        "pessimistic": 0.0697,
+        "optimistic": 0.10258
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 11.978349935830959,
+        "base": 15.623372288968984,
+        "optimistic": 19.28352865321563
+      },
+      "multiples": {
+        "pessimistic": 0.6509629620520526,
+        "base": 0.8490515602693218,
+        "optimistic": 1.04796261573252
+      },
+      "candidate_entry_price": 10.936360602278288,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 10.936360602278288,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    },
+    {
+      "code": "601998",
+      "name": "中信银行",
+      "in_scope": true,
+      "in_bank_pool": true,
+      "data_complete": true,
+      "price": 9.31,
+      "price_date": "2026-11-13",
+      "bvps": 13.632021,
+      "shares": 55645162264.0,
+      "roe": {
+        "base": 0.09993333333333333,
+        "pessimistic": 0.08390000000000002,
+        "optimistic": 0.10302
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 11.177596325014584,
+        "base": 13.787950472835886,
+        "optimistic": 14.366871500237014
+      },
+      "multiples": {
+        "pessimistic": 0.8199515189284541,
+        "base": 1.0114384707033452,
+        "optimistic": 1.0539062036536633
+      },
+      "candidate_entry_price": 9.65156533098512,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 9.65156533098512,
+      "margin_of_safety": 0.3,
+      "conclusion": "candidate_buy_point",
+      "reasons": [],
+      "status": "complete"
+    },
+    {
+      "code": "603323",
+      "name": "苏农银行",
+      "in_scope": true,
+      "in_bank_pool": false,
+      "data_complete": true,
+      "price": 4.63,
+      "price_date": "2026-11-13",
+      "bvps": 9.11717,
+      "shares": 2220395581.0,
+      "roe": {
+        "base": 0.10882,
+        "pessimistic": 0.08310000000000001,
+        "optimistic": 0.10882
+      },
+      "asset_quality_deduction": false,
+      "deduction": 0.0,
+      "growth": {
+        "base": 0.02,
+        "pessimistic": 0.015,
+        "optimistic": 0.025
+      },
+      "risk_free": 0.027629358333333333,
+      "equity_risk_premium": 0.0514,
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "values": {
+        "pessimistic": 7.388837536246013,
+        "base": 10.246660943195899,
+        "optimistic": 10.322947633275675
+      },
+      "multiples": {
+        "pessimistic": 0.8104310368509102,
+        "base": 1.1238861338766195,
+        "optimistic": 1.132253498977827
+      },
+      "candidate_entry_price": 7.172662660237129,
+      "binding_condition": "margin_of_safety",
+      "threshold_price": 7.172662660237129,
+      "margin_of_safety": 0.3,
+      "conclusion": "undetermined",
+      "reasons": [
+        "不在已批准银行池（银行池 11 家）"
+      ],
+      "status": "undetermined"
+    }
+  ],
+  "sensitivity_k": [
+    {
+      "bank_premium": 0.01,
+      "cost_of_equity": 0.08902935833333332,
+      "candidate_count": 10,
+      "candidates": [
+        "002839 张家港行",
+        "002966 苏州银行",
+        "600036 招商银行",
+        "601009 南京银行",
+        "601166 兴业银行",
+        "601328 交通银行",
+        "601398 工商银行",
+        "601658 邮储银行",
+        "601939 建设银行",
+        "601998 中信银行"
+      ]
+    },
+    {
+      "bank_premium": 0.02,
+      "cost_of_equity": 0.09902935833333333,
+      "candidate_count": 7,
+      "candidates": [
+        "002839 张家港行",
+        "002966 苏州银行",
+        "600036 招商银行",
+        "601009 南京银行",
+        "601166 兴业银行",
+        "601658 邮储银行",
+        "601998 中信银行"
+      ]
+    },
+    {
+      "bank_premium": 0.03,
+      "cost_of_equity": 0.10902935833333333,
+      "candidate_count": 4,
+      "candidates": [
+        "002839 张家港行",
+        "600036 招商银行",
+        "601009 南京银行",
+        "601166 兴业银行"
+      ]
+    }
+  ],
+  "sensitivity_margin": [
+    {
+      "margin_of_safety": 0.2,
+      "candidate_count": 10,
+      "candidates": [
+        "002839 张家港行",
+        "002966 苏州银行",
+        "600036 招商银行",
+        "601009 南京银行",
+        "601166 兴业银行",
+        "601328 交通银行",
+        "601398 工商银行",
+        "601658 邮储银行",
+        "601939 建设银行",
+        "601998 中信银行"
+      ]
+    },
+    {
+      "margin_of_safety": 0.3,
+      "candidate_count": 7,
+      "candidates": [
+        "002839 张家港行",
+        "002966 苏州银行",
+        "600036 招商银行",
+        "601009 南京银行",
+        "601166 兴业银行",
+        "601658 邮储银行",
+        "601998 中信银行"
+      ]
+    },
+    {
+      "margin_of_safety": 0.4,
+      "candidate_count": 4,
+      "candidates": [
+        "002839 张家港行",
+        "600036 招商银行",
+        "601009 南京银行",
+        "601166 兴业银行"
+      ]
+    }
+  ],
+  "comparison_v1": [
+    {
+      "code": "000001",
+      "name": "平安银行",
+      "v1_base": 18.274520993699607,
+      "v2_base": 25.498449596421086,
+      "diff_pct": 0.3953005720484837,
+      "v1_conclusion": "wait",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.8713600168046557,
+      "reason": "v1 为通用股息折现（终值占比 87.1%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "002142",
+      "name": "宁波银行",
+      "v1_base": 64.59388786896594,
+      "v2_base": 56.02186593146871,
+      "diff_pct": -0.13270639406140539,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.9234971594641658,
+      "reason": "v1 为通用股息折现（终值占比 92.3%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "002807",
+      "name": "江阴银行",
+      "v1_base": 8.950207939262052,
+      "v2_base": 9.13890337048795,
+      "diff_pct": 0.021082798579253634,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.9183785797377344,
+      "reason": "v1 为通用股息折现（终值占比 91.8%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "002839",
+      "name": "张家港行",
+      "v1_base": 6.863412515267874,
+      "v2_base": 9.246694729796092,
+      "diff_pct": 0.3472444952458464,
+      "v1_conclusion": "wait",
+      "v2_conclusion": "candidate_buy_point",
+      "v1_terminal_share": 0.8912128223060743,
+      "reason": "v1 为通用股息折现（终值占比 89.1%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "002936",
+      "name": "郑州银行",
+      "v1_base": 1.7810490103378371,
+      "v2_base": 0.1460418513246605,
+      "diff_pct": -0.9180023399260874,
+      "v1_conclusion": "undetermined",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.98460469920953,
+      "reason": "v1 为通用股息折现（终值占比 98.5%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "002948",
+      "name": "青岛银行",
+      "v1_base": 12.78115062906149,
+      "v2_base": 8.54498794171744,
+      "diff_pct": -0.33143828832687083,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.9184377508659224,
+      "reason": "v1 为通用股息折现（终值占比 91.8%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "002958",
+      "name": "青农商行",
+      "v1_base": 5.370353670073022,
+      "v2_base": 5.1306400690966845,
+      "diff_pct": -0.044636464505526274,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.9088032651673694,
+      "reason": "v1 为通用股息折现（终值占比 90.9%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "002966",
+      "name": "苏州银行",
+      "v1_base": 15.815692328563351,
+      "v2_base": 14.083186743154418,
+      "diff_pct": -0.10954345528586222,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "candidate_buy_point",
+      "v1_terminal_share": 0.8841312824053862,
+      "reason": "v1 为通用股息折现（终值占比 88.4%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "600000",
+      "name": "浦发银行",
+      "v1_base": 15.550091302470413,
+      "v2_base": 8.895227881031131,
+      "diff_pct": -0.4279629805377437,
+      "v1_conclusion": "wait",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.8890175462116735,
+      "reason": "v1 为通用股息折现（终值占比 88.9%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "600015",
+      "name": "华夏银行",
+      "v1_base": 20.79865087620155,
+      "v2_base": 14.512866735705707,
+      "diff_pct": -0.3022207631596061,
+      "v1_conclusion": "undetermined",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.9065825845519921,
+      "reason": "v1 为通用股息折现（终值占比 90.7%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "600016",
+      "name": "民生银行",
+      "v1_base": 6.414804203770544,
+      "v2_base": 3.9908669970010076,
+      "diff_pct": -0.3778661249465378,
+      "v1_conclusion": "undetermined",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.8855954815206935,
+      "reason": "v1 为通用股息折现（终值占比 88.6%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "600036",
+      "name": "招商银行",
+      "v1_base": 67.7559595664537,
+      "v2_base": 75.41518121272023,
+      "diff_pct": 0.11304129843743882,
+      "v1_conclusion": "wait",
+      "v2_conclusion": "candidate_buy_point",
+      "v1_terminal_share": 0.8686826624351511,
+      "reason": "v1 为通用股息折现（终值占比 86.9%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "600908",
+      "name": "无锡银行",
+      "v1_base": 11.668997299069769,
+      "v2_base": 12.116609167289415,
+      "diff_pct": 0.038359068628401216,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.9159168174085432,
+      "reason": "v1 为通用股息折现（终值占比 91.6%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "600919",
+      "name": "江苏银行",
+      "v1_base": 28.216581487729666,
+      "v2_base": 22.76945504441757,
+      "diff_pct": -0.19304700130598204,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.8963934008235299,
+      "reason": "v1 为通用股息折现（终值占比 89.6%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "600926",
+      "name": "杭州银行",
+      "v1_base": 33.290504560774046,
+      "v2_base": 31.512690569190386,
+      "diff_pct": -0.05340303534114784,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.9119023596961271,
+      "reason": "v1 为通用股息折现（终值占比 91.2%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "600928",
+      "name": "西安银行",
+      "v1_base": 8.285851878014313,
+      "v2_base": 5.288684831575776,
+      "diff_pct": -0.36172105060087095,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.9456549953069842,
+      "reason": "v1 为通用股息折现（终值占比 94.6%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601009",
+      "name": "南京银行",
+      "v1_base": 26.455909750853813,
+      "v2_base": 21.697430753529048,
+      "diff_pct": -0.17986450067819704,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "candidate_buy_point",
+      "v1_terminal_share": 0.8963509769184737,
+      "reason": "v1 为通用股息折现（终值占比 89.6%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601077",
+      "name": "渝农商行",
+      "v1_base": 12.962126727698774,
+      "v2_base": 11.785959896970775,
+      "diff_pct": -0.09073872331572312,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.8840888208811251,
+      "reason": "v1 为通用股息折现（终值占比 88.4%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601128",
+      "name": "常熟银行",
+      "v1_base": 15.251217832012717,
+      "v2_base": 13.287634259799864,
+      "diff_pct": -0.12874929686541084,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.9263816893506045,
+      "reason": "v1 为通用股息折现（终值占比 92.6%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601166",
+      "name": "兴业银行",
+      "v1_base": 35.472531550968014,
+      "v2_base": 40.15978429956885,
+      "diff_pct": 0.13213753131394207,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "candidate_buy_point",
+      "v1_terminal_share": 0.8823869966193214,
+      "reason": "v1 为通用股息折现（终值占比 88.2%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601169",
+      "name": "北京银行",
+      "v1_base": 11.150429122077433,
+      "v2_base": 10.501675851895968,
+      "diff_pct": -0.05818191058646869,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.8949717123506657,
+      "reason": "v1 为通用股息折现（终值占比 89.5%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601229",
+      "name": "上海银行",
+      "v1_base": 16.799212275678805,
+      "v2_base": 15.774665884819388,
+      "diff_pct": -0.060987763833588324,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.8815323431074992,
+      "reason": "v1 为通用股息折现（终值占比 88.2%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601288",
+      "name": "农业银行",
+      "v1_base": 10.894627631718933,
+      "v2_base": 8.912285348809721,
+      "diff_pct": -0.1819559465380683,
+      "v1_conclusion": "wait",
+      "v2_conclusion": "wait",
+      "v1_terminal_share": 0.8878481421917859,
+      "reason": "v1 为通用股息折现（终值占比 88.8%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601328",
+      "name": "交通银行",
+      "v1_base": 13.434908596613027,
+      "v2_base": 11.98247558844957,
+      "diff_pct": -0.10810888646682855,
+      "v1_conclusion": "wait",
+      "v2_conclusion": "wait",
+      "v1_terminal_share": 0.8861685588676291,
+      "reason": "v1 为通用股息折现（终值占比 88.6%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601398",
+      "name": "工商银行",
+      "v1_base": 12.326146815731024,
+      "v2_base": 11.372746670620192,
+      "diff_pct": -0.07734778429655505,
+      "v1_conclusion": "wait",
+      "v2_conclusion": "wait",
+      "v1_terminal_share": 0.8827033985011087,
+      "reason": "v1 为通用股息折现（终值占比 88.3%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601577",
+      "name": "长沙银行",
+      "v1_base": 22.97163054852713,
+      "v2_base": 23.964969132251806,
+      "diff_pct": 0.043241971074986015,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.9182647190648877,
+      "reason": "v1 为通用股息折现（终值占比 91.8%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601658",
+      "name": "邮储银行",
+      "v1_base": 8.860730855888534,
+      "v2_base": 8.809484296500361,
+      "diff_pct": -0.005783558966145038,
+      "v1_conclusion": "wait",
+      "v2_conclusion": "candidate_buy_point",
+      "v1_terminal_share": 0.886863878285083,
+      "reason": "v1 为通用股息折现（终值占比 88.7%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601818",
+      "name": "光大银行",
+      "v1_base": 5.677255308029615,
+      "v2_base": 5.262882172795912,
+      "diff_pct": -0.07298828619661246,
+      "v1_conclusion": "undetermined",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.884441071297962,
+      "reason": "v1 为通用股息折现（终值占比 88.4%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601838",
+      "name": "成都银行",
+      "v1_base": 44.41182983089062,
+      "v2_base": 42.62242136893643,
+      "diff_pct": -0.04029125727914878,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.8952705598794365,
+      "reason": "v1 为通用股息折现（终值占比 89.5%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601860",
+      "name": "紫金银行",
+      "v1_base": 2.9186491770112544,
+      "v2_base": 3.61937982793947,
+      "diff_pct": 0.2400873172587929,
+      "v1_conclusion": "wait",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.8927269834424,
+      "reason": "v1 为通用股息折现（终值占比 89.3%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601916",
+      "name": "浙商银行",
+      "v1_base": 4.7955631382076325,
+      "v2_base": 4.442442444226687,
+      "diff_pct": -0.07363487536375676,
+      "v1_conclusion": "undetermined",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.8862746815691027,
+      "reason": "v1 为通用股息折现（终值占比 88.6%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601939",
+      "name": "建设银行",
+      "v1_base": 16.06777416419638,
+      "v2_base": 15.58071109945112,
+      "diff_pct": -0.030313038991460033,
+      "v1_conclusion": "wait",
+      "v2_conclusion": "wait",
+      "v1_terminal_share": 0.88403470968156,
+      "reason": "v1 为通用股息折现（终值占比 88.4%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601988",
+      "name": "中国银行",
+      "v1_base": 9.606380297354775,
+      "v2_base": 7.145782492856293,
+      "diff_pct": -0.2561420356402125,
+      "v1_conclusion": "wait",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.8888751753516717,
+      "reason": "v1 为通用股息折现（终值占比 88.9%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601997",
+      "name": "贵阳银行",
+      "v1_base": 15.209421776394665,
+      "v2_base": 15.623372288968984,
+      "diff_pct": 0.02721671597120007,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.9128803639577533,
+      "reason": "v1 为通用股息折现（终值占比 91.3%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "601998",
+      "name": "中信银行",
+      "v1_base": 13.73432123794159,
+      "v2_base": 13.787950472835886,
+      "diff_pct": 0.003904760487627449,
+      "v1_conclusion": "wait",
+      "v2_conclusion": "candidate_buy_point",
+      "v1_terminal_share": 0.8888917784171788,
+      "reason": "v1 为通用股息折现（终值占比 88.9%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    },
+    {
+      "code": "603323",
+      "name": "苏农银行",
+      "v1_base": 9.12068462162191,
+      "v2_base": 10.246660943195899,
+      "diff_pct": 0.123453048568821,
+      "v1_conclusion": "candidate_buy_point",
+      "v2_conclusion": "undetermined",
+      "v1_terminal_share": 0.9230864315114594,
+      "reason": "v1 为通用股息折现（终值占比 92.3%）；v2 用银行稳态合理市净率，直接以 ROE、g、k 定价，不再依赖高终值占比。"
+    }
+  ],
+  "history": [
+    {
+      "code": "601860",
+      "name": "紫金银行",
+      "status": "ok",
+      "months": 94,
+      "start": "2019-01",
+      "end": "2026-10",
+      "pb_current": 0.43482213,
+      "pb_percentile": 1.1,
+      "dy_current": 0.03937007874015748,
+      "dy_percentile": 86.2,
+      "monthly_rows": 95
+    },
+    {
+      "code": "601229",
+      "name": "上海银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.47131791,
+      "pb_percentile": 23.6,
+      "dy_current": 0.06212664277180407,
+      "dy_percentile": 70.8,
+      "monthly_rows": 107
+    },
+    {
+      "code": "002966",
+      "name": "苏州银行",
+      "status": "ok",
+      "months": 87,
+      "start": "2019-08",
+      "end": "2026-10",
+      "pb_current": 0.79290649,
+      "pb_percentile": 67.8,
+      "dy_current": 0.037383177570093455,
+      "dy_percentile": 44.8,
+      "monthly_rows": 88
+    },
+    {
+      "code": "601916",
+      "name": "浙商银行",
+      "status": "ok",
+      "months": 84,
+      "start": "2019-11",
+      "end": "2026-10",
+      "pb_current": 0.4423489,
+      "pb_percentile": 13.1,
+      "dy_current": 0.044256756756756756,
+      "dy_percentile": 22.6,
+      "monthly_rows": 85
+    },
+    {
+      "code": "603323",
+      "name": "苏农银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.507833,
+      "pb_percentile": 10.4,
+      "dy_current": 0.047516198704103674,
+      "dy_percentile": 86.8,
+      "monthly_rows": 107
+    },
+    {
+      "code": "600036",
+      "name": "招商银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.915982,
+      "pb_percentile": 20.8,
+      "dy_current": 0.0469601677148847,
+      "dy_percentile": 67.9,
+      "monthly_rows": 107
+    },
+    {
+      "code": "600926",
+      "name": "杭州银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.8813368,
+      "pb_percentile": 47.2,
+      "dy_current": 0.0639269406392694,
+      "dy_percentile": 97.2,
+      "monthly_rows": 107
+    },
+    {
+      "code": "601838",
+      "name": "成都银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.93914107,
+      "pb_percentile": 52.8,
+      "dy_current": 0.0683139534883721,
+      "dy_percentile": 97.2,
+      "monthly_rows": 107
+    },
+    {
+      "code": "600000",
+      "name": "浦发银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.45615063,
+      "pb_percentile": 43.4,
+      "dy_current": 0.04038461538461539,
+      "dy_percentile": 48.1,
+      "monthly_rows": 107
+    },
+    {
+      "code": "002807",
+      "name": "江阴银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.57707412,
+      "pb_percentile": 24.5,
+      "dy_current": 0.07191011235955055,
+      "dy_percentile": 96.2,
+      "monthly_rows": 107
+    },
+    {
+      "code": "001227",
+      "name": "兰州银行",
+      "status": "insufficient",
+      "months": 58,
+      "start": "2022-01",
+      "end": "2026-10",
+      "pb_current": 0.38458796,
+      "pb_percentile": null,
+      "dy_current": 0.03755868544600939,
+      "dy_percentile": null,
+      "monthly_rows": 59
+    },
+    {
+      "code": "601128",
+      "name": "常熟银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.68846351,
+      "pb_percentile": 3.8,
+      "dy_current": 0.03912363067292645,
+      "dy_percentile": 85.8,
+      "monthly_rows": 107
+    },
+    {
+      "code": "601187",
+      "name": "厦门银行",
+      "status": "ok",
+      "months": 73,
+      "start": "2020-10",
+      "end": "2026-10",
+      "pb_current": 0.62594366,
+      "pb_percentile": 28.8,
+      "dy_current": 0.03753753753753754,
+      "dy_percentile": 34.2,
+      "monthly_rows": 74
+    },
+    {
+      "code": "002958",
+      "name": "青农商行",
+      "status": "ok",
+      "months": 92,
+      "start": "2019-03",
+      "end": "2026-10",
+      "pb_current": 0.41655239,
+      "pb_percentile": 3.3,
+      "dy_current": 0.04,
+      "dy_percentile": 89.1,
+      "monthly_rows": 93
+    },
+    {
+      "code": "601818",
+      "name": "光大银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.36928541,
+      "pb_percentile": 6.6,
+      "dy_current": 0.05434782608695651,
+      "dy_percentile": 41.5,
+      "monthly_rows": 107
+    },
+    {
+      "code": "002839",
+      "name": "张家港行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.55668316,
+      "pb_percentile": 5.7,
+      "dy_current": 0.026607538802660754,
+      "dy_percentile": 34.0,
+      "monthly_rows": 107
+    },
+    {
+      "code": "000001",
+      "name": "平安银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.49135503,
+      "pb_percentile": 18.9,
+      "dy_current": 0.05045567522783761,
+      "dy_percentile": 74.5,
+      "monthly_rows": 107
+    },
+    {
+      "code": "600908",
+      "name": "无锡银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.55891947,
+      "pb_percentile": 9.4,
+      "dy_current": 0.03908794788273616,
+      "dy_percentile": 84.0,
+      "monthly_rows": 107
+    },
+    {
+      "code": "601577",
+      "name": "长沙银行",
+      "status": "ok",
+      "months": 98,
+      "start": "2018-09",
+      "end": "2026-10",
+      "pb_current": 0.52632187,
+      "pb_percentile": 23.5,
+      "dy_current": 0.04446640316205534,
+      "dy_percentile": 68.4,
+      "monthly_rows": 99
+    },
+    {
+      "code": "601665",
+      "name": "齐鲁银行",
+      "status": "ok",
+      "months": 65,
+      "start": "2021-06",
+      "end": "2026-10",
+      "pb_current": 0.79013477,
+      "pb_percentile": 73.8,
+      "dy_current": 0.036379562043795624,
+      "dy_percentile": 24.6,
+      "monthly_rows": 66
+    },
+    {
+      "code": "601288",
+      "name": "农业银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.89047044,
+      "pb_percentile": 90.6,
+      "dy_current": 0.05145183175033921,
+      "dy_percentile": 48.1,
+      "monthly_rows": 107
+    },
+    {
+      "code": "601077",
+      "name": "渝农商行",
+      "status": "ok",
+      "months": 85,
+      "start": "2019-10",
+      "end": "2026-10",
+      "pb_current": 0.57736172,
+      "pb_percentile": 77.6,
+      "dy_current": 0.043840163934426225,
+      "dy_percentile": 11.8,
+      "monthly_rows": 86
+    },
+    {
+      "code": "002948",
+      "name": "青岛银行",
+      "status": "ok",
+      "months": 94,
+      "start": "2019-01",
+      "end": "2026-10",
+      "pb_current": 0.85576895,
+      "pb_percentile": 60.6,
+      "dy_current": 0.027565084226646247,
+      "dy_percentile": 8.5,
+      "monthly_rows": 95
+    },
+    {
+      "code": "601825",
+      "name": "沪农商行",
+      "status": "ok",
+      "months": 63,
+      "start": "2021-08",
+      "end": "2026-10",
+      "pb_current": 0.67598288,
+      "pb_percentile": 81.0,
+      "dy_current": 0.04737459978655283,
+      "dy_percentile": 22.2,
+      "monthly_rows": 64
+    },
+    {
+      "code": "600015",
+      "name": "华夏银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.32653248,
+      "pb_percentile": 10.4,
+      "dy_current": 0.06306306306306307,
+      "dy_percentile": 74.5,
+      "monthly_rows": 107
+    },
+    {
+      "code": "601169",
+      "name": "北京银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.44731227,
+      "pb_percentile": 45.3,
+      "dy_current": 0.045129870129870124,
+      "dy_percentile": 18.9,
+      "monthly_rows": 107
+    },
+    {
+      "code": "601939",
+      "name": "建设银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.861862,
+      "pb_percentile": 78.3,
+      "dy_current": 0.03209744013212222,
+      "dy_percentile": 2.8,
+      "monthly_rows": 107
+    },
+    {
+      "code": "601998",
+      "name": "中信银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.68295084,
+      "pb_percentile": 80.2,
+      "dy_current": 0.040923737916219116,
+      "dy_percentile": 13.2,
+      "monthly_rows": 107
+    },
+    {
+      "code": "002936",
+      "name": "郑州银行",
+      "status": "ok",
+      "months": 98,
+      "start": "2018-09",
+      "end": "2026-10",
+      "pb_current": 0.34120072,
+      "pb_percentile": 3.1,
+      "dy_current": 0.0,
+      "dy_percentile": 63.3,
+      "monthly_rows": 99
+    },
+    {
+      "code": "600919",
+      "name": "江苏银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.86226888,
+      "pb_percentile": 94.3,
+      "dy_current": 0.0426379440665155,
+      "dy_percentile": 21.7,
+      "monthly_rows": 107
+    },
+    {
+      "code": "601963",
+      "name": "重庆银行",
+      "status": "ok",
+      "months": 69,
+      "start": "2021-02",
+      "end": "2026-10",
+      "pb_current": 0.66293124,
+      "pb_percentile": 63.8,
+      "dy_current": 0.039689991142604075,
+      "dy_percentile": 18.8,
+      "monthly_rows": 70
+    },
+    {
+      "code": "601997",
+      "name": "贵阳银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.32552632,
+      "pb_percentile": 6.6,
+      "dy_current": 0.050083472454090144,
+      "dy_percentile": 63.2,
+      "monthly_rows": 107
+    },
+    {
+      "code": "600928",
+      "name": "西安银行",
+      "status": "ok",
+      "months": 92,
+      "start": "2019-03",
+      "end": "2026-10",
+      "pb_current": 0.45841954,
+      "pb_percentile": 9.8,
+      "dy_current": 0.025974025974025976,
+      "dy_percentile": 32.6,
+      "monthly_rows": 93
+    },
+    {
+      "code": "601528",
+      "name": "瑞丰银行",
+      "status": "ok",
+      "months": 65,
+      "start": "2021-06",
+      "end": "2026-10",
+      "pb_current": 0.51397109,
+      "pb_percentile": 10.8,
+      "dy_current": 0.05667276051188301,
+      "dy_percentile": 96.9,
+      "monthly_rows": 66
+    },
+    {
+      "code": "601009",
+      "name": "南京银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.80034454,
+      "pb_percentile": 41.5,
+      "dy_current": 0.04130757220921155,
+      "dy_percentile": 16.0,
+      "monthly_rows": 107
+    },
+    {
+      "code": "601988",
+      "name": "中国银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.82896042,
+      "pb_percentile": 98.1,
+      "dy_current": 0.03151810584958217,
+      "dy_percentile": 4.7,
+      "monthly_rows": 107
+    },
+    {
+      "code": "002142",
+      "name": "宁波银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.91994903,
+      "pb_percentile": 29.2,
+      "dy_current": 0.04685212298682284,
+      "dy_percentile": 100.0,
+      "monthly_rows": 107
+    },
+    {
+      "code": "600016",
+      "name": "民生银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.26060601,
+      "pb_percentile": 0.9,
+      "dy_current": 0.049999999999999996,
+      "dy_percentile": 22.6,
+      "monthly_rows": 107
+    },
+    {
+      "code": "601328",
+      "name": "交通银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.63846342,
+      "pb_percentile": 81.1,
+      "dy_current": 0.037843822843822844,
+      "dy_percentile": 3.8,
+      "monthly_rows": 107
+    },
+    {
+      "code": "601398",
+      "name": "工商银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.78740553,
+      "pb_percentile": 76.4,
+      "dy_current": 0.05213559322033899,
+      "dy_percentile": 50.0,
+      "monthly_rows": 107
+    },
+    {
+      "code": "601658",
+      "name": "邮储银行",
+      "status": "ok",
+      "months": 83,
+      "start": "2019-12",
+      "end": "2026-10",
+      "pb_current": 0.63639229,
+      "pb_percentile": 39.8,
+      "dy_current": 0.03836555360281195,
+      "dy_percentile": 20.5,
+      "monthly_rows": 84
+    },
+    {
+      "code": "601166",
+      "name": "兴业银行",
+      "status": "ok",
+      "months": 106,
+      "start": "2018-01",
+      "end": "2026-10",
+      "pb_current": 0.49317759,
+      "pb_percentile": 20.8,
+      "dy_current": 0.05375693393847706,
+      "dy_percentile": 61.3,
+      "monthly_rows": 107
+    }
+  ],
+  "history_summary": {
+    "total": 42,
+    "ok": 41,
+    "insufficient": 1
+  }
+}

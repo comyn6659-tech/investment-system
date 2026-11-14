@@ -56,6 +56,18 @@ data/bank-pool/
 旧版 `data/policy-inputs/bank-valuation-rehearsal-v1.json` 保留为历史，**不再被读取**。
 **预演不写入正式结论账本，不改变 CLI 结论；银行估值模型仍为 research。**
 
+## 银行专用估值 v2 试运行（第十二批）
+
+- 草案：`data/policies/bank-valuation-v2-draft.json`，参数与依据全部版本化；状态为
+  `draft_unapproved`，只做试运行。
+- 输入/历史数据：`valuation-v2/inputs.csv.gz`（36 家估值输入 + 42 家历史位置）、
+  `valuation-v2/history.csv.gz`（月末 PB / 滚动 12 个月股息率）、`valuation-v2/manifest.json`。
+- 报告：`valuation-v2.json` 与 `docs/phase4l-bank-valuation-v2.md`；36 家中 25 家不在银行池，
+  只给价值数字与无法判断，不出现候选/等待/回避。
+- 历史位置：东方财富同源收盘价/市净率 + 分红（除权除息日），42 家中 41 家至少 5 年，
+  兰州银行 58 个月不足 5 年，不计算分位；只描述，不给买点。
+- **不写正式账本，不改变 CLI 银行结论；银行专用估值是否启用仍待股东决策。**
+
 ## 校验
 
 `engine.quality.snapshot.load_snapshot_dir(path)` 逐表核对 `content_hash` 与行数，
