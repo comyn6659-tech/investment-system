@@ -128,6 +128,11 @@ def _label(conclusion: str | None) -> str:
     return CONCLUSION_LABELS.get(str(conclusion), "无法判断")
 
 
+def _plain_condition_label(label: str) -> str:
+    """条款标签转成股东能读的中文，不改变条件含义。"""
+    return str(label).replace("ROE", "净资产收益率")
+
+
 def _clean_reason(text: str | None) -> str:
     """把内部英文标记换成中文，卡片默认不出现内部条件名。"""
     value = str(text or "")
@@ -947,11 +952,13 @@ class AskService:
                     f"｜门槛 {_money(row['entry'])}｜{_pct_number(row['distance'])}"
                     f"｜{_label(row['conclusion'])}"
                 )
+        price_dates = sorted({row["price_date"] for row in rows if row.get("price_date")})
+        data_date = price_dates[-1] if price_dates else self.analysis_date.isoformat()
         lines += [
             "",
             "入池不等于买入：银行池只说明通过质量筛选，不代表现在便宜。",
             "说明：排序只按「现价距候选门槛」，不代表公司质量或收益预期；无法判断的标的不参与排行。",
-            "来源与日期：价格 腾讯财经（最新交易日）；银行专用估值政策（已批准 2026-11-14，复核 2027-05-31）。",
+            f"来源与日期：价格 腾讯财经（{data_date}）；银行专用估值政策（已批准 2026-11-14，复核 2027-05-31）。",
             "不构成投资建议。",
         ]
         return {
@@ -1238,10 +1245,12 @@ class AskService:
             f"｜距门槛 {_pct_number(distance)}",
             "正式结论（银行专用估值政策，已批准 2026-11-14）",
             "关键指标："
-            f"市净率 {pb:.2f} 倍｜股息率 {_pct(dividend_yield)}｜"
+            f"市净率 {f'{pb:.2f} 倍' if pb is not None else '—'}｜股息率 {_pct(dividend_yield)}｜"
             f"不良率 {indicator.get('npl_ratio') or '—'}%｜拨备覆盖率 "
             f"{indicator.get('provision_coverage') or '—'}%｜核心一级 "
             f"{indicator.get('core_tier1_ratio') or '—'}%",
+            "市净率口径：普通股口径 = 价格 ÷ 每股净资产；"
+            "每股净资产 =（归母净资产 − 其他权益工具）÷ 股本（与银行 v2.1 估值同口径）。",
             "三档价值（元/股）："
             f"悲观 {_money(values.get('pessimistic'))}（最悲观假设下每股值多少）"
             f"｜基准 {_money(values.get('base'))}（安全边际的计算基准）"
@@ -1259,7 +1268,8 @@ class AskService:
             ),
             f"它是什么：银行池成员｜所有制 {ownership}｜周期属性 {cycle_text('bank')}｜等级 B（银行池最高等级）",
             "局限：净资产收益率仍在下滑；报表坏账可能低估；只能前向验证。",
-            "来源与日期：行情 腾讯财经（最新交易日）；财务 东方财富 2025 年报 / 2026 三季报；"
+            "来源与日期：行情 腾讯财经（"
+            f"{price_date or '—'}）；财务 东方财富 2025 年报 / 2026 三季报；"
             "银行专用估值政策（已批准 2026-11-14，复核 2027-05-31）。",
             "不构成投资建议。",
         ]
@@ -1267,7 +1277,8 @@ class AskService:
             lines += [
                 "",
                 "【详情】",
-                f"- 每股净资产：{_money(valuation.get('bvps'))} 元",
+                f"- 普通股口径每股净资产：{_money(valuation.get('bvps'))} 元"
+                "（=（归母净资产 − 其他权益工具）÷ 股本）",
                 f"- 银行股权成本 k：{_pct(valuation.get('cost_of_equity'), 2)}；银行溢价：{_pct(valuation.get('bank_premium'), 1)}",
                 f"- 基准价值对应合理市净率：{_money((valuation.get('multiples') or {}).get('base'), 3)}",
                 f"- 资产质量扣减：{'是' if valuation.get('asset_quality_deduction') else '否'}",
@@ -1331,6 +1342,38 @@ class AskService:
         rows.sort(key=lambda item: item["distance"])
         return rows
 
+    def _bank_pool_condition_lines(self, code: str) -> list[str]:
+        """非银行池银行：逐条给出未通过/待定/未检验的银行池条件（条件、实际值、门槛、状态）。"""
+        try:
+            result = self._company_result("bank", code)
+        except Exception:  # noqa: BLE001 - 评估失败时不给条件，避免编造
+            return []
+        if result is None:
+            return []
+        failing = [item for item in result.conditions if item.status == "fail"]
+        pending = [item for item in result.conditions if item.status == "pending"]
+        untested = [item for item in result.conditions if item.status == "untested"]
+        lines: list[str] = []
+        if failing:
+            lines.append(f"未通过银行池条件（{len(failing)} 项）：")
+            for item in failing[:8]:
+                lines.append(f"- {_plain_condition_label(item.label)}：{item.reason}")
+        elif result.status == "out_of_scope" and result.reason:
+            lines.append(f"未通过银行池条件：范围外——{result.reason}")
+        if pending:
+            lines.append(
+                "待定银行池条件："
+                + "；".join(
+                    f"{_plain_condition_label(item.label)}（{item.reason}）" for item in pending
+                )
+            )
+        if untested:
+            lines.append(
+                "未检验银行池条件："
+                + "、".join(_plain_condition_label(item.label) for item in untested)
+            )
+        return lines
+
     def _bank_card(self, target: Target | None, *, detail: bool = False) -> dict[str, Any]:
         if target is None:
             return {"markdown": self._help_card(Intent("unrecognized")), "data": {}}
@@ -1354,7 +1397,15 @@ class AskService:
                     equity_basis = "2025 归母净利润 ÷ 加权 ROE 推算"
             except (TypeError, ValueError, KeyError):
                 equity = None
-        pb = price * shares / equity if price and shares and equity else None
+        valuation = bank_valuation_for(code, price=price, price_date=price_date)
+        # 市净率与估值使用同一普通股口径：BVPS =（归母净资产 − 其他权益工具）÷ 股本。
+        bvps = (valuation or {}).get("bvps")
+        if bvps is None and inputs:
+            try:
+                bvps = float(inputs["bvps"])
+            except (TypeError, ValueError, KeyError):
+                bvps = None
+        pb = price / float(bvps) if price is not None and bvps else None
         dividend_yield = None
         roe = None
         if inputs:
@@ -1377,7 +1428,6 @@ class AskService:
             or self.ownership.get(code)
             or "未标记"
         )
-        valuation = bank_valuation_for(code, price=price, price_date=price_date)
         if in_pool and valuation and valuation.get("conclusion") in (
             "candidate_buy_point",
             "wait",
@@ -1397,6 +1447,9 @@ class AskService:
             f"是否在银行池：{'是' if in_pool else '否'}（银行池共 {len(self.pool_sets['bank'])} 家）"
             f"｜现价 {_money(price)} 元（{price_date or '日期未知'}）",
             f"关键指标：市净率 {pb:.2f} 倍" if pb is not None else "关键指标：市净率 —",
+            "市净率口径：普通股口径 = 价格 ÷ 每股净资产；"
+            "每股净资产 =（归母净资产 − 其他权益工具）÷ 股本"
+            + ("（与银行 v2.1 估值同口径）。" if pb is not None else "；该行普通股每股净资产缺失，市净率暂不展示。"),
             f"股息率 {_pct(dividend_yield)}｜净资产收益率 {_pct(roe)}"
             f"｜不良率 {npl if npl is not None else '—'}%"
             f"｜拨备覆盖率 {provision if provision is not None else '—'}%"
@@ -1415,6 +1468,7 @@ class AskService:
             bank_history.one_line(code),
             *([implicit_line] if implicit_line else []),
             "为什么：非银行池未通过银行池规则，只展示公开指标与 v2.1 试算价值，不给买卖结论。",
+            *self._bank_pool_condition_lines(code),
             f"它是什么：{'银行池成员' if in_pool else '银行（不在银行池）'}｜所有制 {ownership}"
             f"｜周期属性 {cycle_text('bank')}｜等级 —（非银行池不评等级）",
             "局限：净资产收益率仍在下滑；报表坏账可能低估；只能前向验证。",
@@ -1427,7 +1481,8 @@ class AskService:
                 "",
                 "【详情】",
                 f"- 总股本：{shares:,.0f}" if shares else "- 总股本：—",
-                f"- 归母净资产：{equity:,.0f} 元（{equity_basis}）" if equity else "- 归母净资产：—",
+                f"- 归属母公司净资产：{equity:,.0f} 元（{equity_basis}）" if equity else "- 归属母公司净资产：—",
+                f"- 普通股口径每股净资产：{float(bvps):,.2f} 元" if bvps else "- 普通股口径每股净资产：—",
                 f"- 近 3 年派息率：{float(inputs['payout_3y']):.1%}" if inputs and inputs.get("payout_3y") else "- 近 3 年派息率：—",
                 f"- 数据完整：{inputs.get('data_complete') if inputs else '—'}",
             ]

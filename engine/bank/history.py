@@ -67,7 +67,8 @@ def one_line(code: str) -> str:
         return (
             f"历史位置：市净率处于近 10 年 {item['pb_percentile']:.0f}% 分位，"
             f"股息率处于 {item['dy_percentile']:.0f}% 分位"
-            f"（可用 {item['months']} 个月月末序列；同源同口径，描述性，不给买点）。"
+            f"（东方财富市场市净率与分红数据，可用 {item['months']} 个月月末序列；"
+            "市净率与估值同按普通股口径（价格 ÷ 每股净资产）计算，同源同口径，描述性，不给买点）。"
         )
     if item["status"] == "insufficient":
         return (

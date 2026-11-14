@@ -1,6 +1,6 @@
 # 对话入口端到端验收（batch4k）
 
-- 生成时间：2026-11-14T18:33:19+08:00
+- 生成时间：2026-11-14T20:41:23+08:00
 - 政策：`equity-policy-v1.1`（已批准）
 - 固定问题集：67 条，通过 67 条；端到端全部通过：是
 - 问题集测试使用批量快照固定价格；30 只测试股 / 指数 / 银行 / ETF 使用当日实时行情。
@@ -15,10 +15,10 @@
 | q04 | 单只个股 | 五粮液值得买吗 | stock | stock | undetermined | 10 | 通过 |
 | q05 | 单只个股 | 格力电器现在能买吗 | stock | stock | undetermined | 10 | 通过 |
 | q06 | 单只个股 | 京东方A怎么样 | stock | stock | undetermined | 10 | 通过 |
-| q07 | 银行 | 招商银行怎么样 | bank | bank | candidate_buy_point | 14 | 通过 |
-| q08 | 银行 | 工商银行贵不贵 | bank | bank | wait | 14 | 通过 |
-| q09 | 银行 | 招行股息率多少 | bank | bank | candidate_buy_point | 14 | 通过 |
-| q10 | 银行 | 平安银行怎么样 | bank | bank | undetermined | 13 | 通过 |
+| q07 | 银行 | 招商银行怎么样 | bank | bank | candidate_buy_point | 15 | 通过 |
+| q08 | 银行 | 工商银行贵不贵 | bank | bank | wait | 15 | 通过 |
+| q09 | 银行 | 招行股息率多少 | bank | bank | candidate_buy_point | 15 | 通过 |
+| q10 | 银行 | 平安银行怎么样 | bank | bank | undetermined | 16 | 通过 |
 | q11 | 指数 | 沪深300 现在什么位置 | index | index | undetermined | 13 | 通过 |
 | q12 | 指数 | 中证500 贵不贵 | index | index | undetermined | 13 | 通过 |
 | q13 | 指数 | 中证1000 什么位置 | index | index | undetermined | 13 | 通过 |
@@ -70,9 +70,9 @@
 | q59 | 排行 | 好公司池里价格合适的公司 | ranking | ranking | — | 15 | 通过 |
 | q60 | 排行 | 收息池离买点最近的公司 | ranking | ranking | — | 16 | 通过 |
 | q61 | 排行 | 银行池里哪些便宜 | ranking | ranking | — | 18 | 通过 |
-| q62 | 银行 | 招商银行怎么样 | bank | bank | candidate_buy_point | 14 | 通过 |
-| q63 | 银行 | 工商银行怎么样 | bank | bank | wait | 14 | 通过 |
-| q64 | 银行 | 平安银行怎么样 | bank | bank | undetermined | 13 | 通过 |
+| q62 | 银行 | 招商银行怎么样 | bank | bank | candidate_buy_point | 15 | 通过 |
+| q63 | 银行 | 工商银行怎么样 | bank | bank | wait | 15 | 通过 |
+| q64 | 银行 | 平安银行怎么样 | bank | bank | undetermined | 16 | 通过 |
 | q65 | 排行 | 银行池里谁离买点最近 | ranking | ranking | — | 18 | 通过 |
 | q66 | 排行 | 银行里有哪些买点 | ranking | ranking | — | 18 | 通过 |
 | q67 | 排行 | 现在有哪些候选买点 | ranking | ranking | — | 22 | 通过 |
@@ -125,8 +125,8 @@
 
 | 问题 | 意图 | 结论 | 行数 | 结果 |
 |---|---|---|---:|---|
-| 招商银行怎么样 | bank | candidate_buy_point | 14 | 通过 |
-| 工商银行怎么样 | bank | wait | 14 | 通过 |
+| 招商银行怎么样 | bank | candidate_buy_point | 15 | 通过 |
+| 工商银行怎么样 | bank | wait | 15 | 通过 |
 
 ## 5. 三只 ETF
 
