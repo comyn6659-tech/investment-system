@@ -464,7 +464,8 @@ def test_z4_history_position_same_source_and_card_line(service):
     text = service.ask("招商银行怎么样").markdown
     assert "市净率处于近 10 年" in text
     assert "股息率处于" in text
-    assert "同源同口径" in text
+    assert "东方财富市场市净率" in text
+    assert "未做换算" in text
     insufficient = service.ask("兰州银行怎么样").markdown
     assert "不足 5 年" in insufficient
 

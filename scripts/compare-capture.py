@@ -24,9 +24,12 @@ FIX1_MARKERS = ("未通过银行池条件", "待定银行池条件", "未检验�
 PB_LINE = re.compile(r"^(关键指标：市净率 )[0-9]+(?:\.[0-9]+)?( 倍)")
 SOURCE_LINE = re.compile(r"^(来源与日期：.*?)（最新交易日）")
 SOURCE_DATE_LINE = re.compile(r"^(来源与日期：.*?)（20\d\d-\d\d-\d\d）(.*)$")
-HISTORY_INSERTED = (
-    "东方财富市场市净率与分红数据，",
-    "市净率与估值同按普通股口径（价格 ÷ 每股净资产）计算，",
+HISTORY_NORMALIZATION = (
+    ("历史分位用东方财富市场市净率与分红数据，", ""),
+    (
+        "市场市净率与卡片普通股口径可能略有差异，未做换算，只作描述，",
+        "同源同口径，描述性，",
+    ),
 )
 
 
@@ -58,8 +61,8 @@ def _normalize_history_line(text: str) -> tuple[str, bool]:
     if not text.startswith("历史位置："):
         return text, False
     new = text
-    for piece in HISTORY_INSERTED:
-        new = new.replace(piece, "")
+    for inserted, original in HISTORY_NORMALIZATION:
+        new = new.replace(inserted, original)
     return new, new != text
 
 
