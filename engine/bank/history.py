@@ -6,6 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from engine.bank.valuation_v2 import load_policy
 from engine.quality.tables import read_table
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -34,6 +35,32 @@ def position(code: str) -> dict[str, Any]:
     }
 
 
+def implicit_return(code: str, price: float | None) -> float | None:
+    row = _rows().get(str(code).zfill(6)) or {}
+    if price is None or row.get("bvps") in (None, "") or row.get("roe_2025") in (None, ""):
+        return None
+    try:
+        bvps = float(row["bvps"])
+        latest_roe = float(row["roe_2025"])
+        if bvps <= 0 or price <= 0:
+            return None
+        pb = price / bvps
+        growth = float(load_policy()["parameters"]["implicit_return"]["growth"])
+        return growth + (latest_roe - growth) / pb
+    except (TypeError, ValueError, KeyError, ZeroDivisionError):
+        return None
+
+
+def implicit_return_line(code: str, price: float | None) -> str | None:
+    value = implicit_return(code, price)
+    if value is None:
+        return None
+    return (
+        f"隐含长期回报率：约 {value:.1%}（假设净资产收益率保持最新水平、按现价买入；"
+        "描述性，不参与结论）。"
+    )
+
+
 def one_line(code: str) -> str:
     item = position(code)
     if item["status"] == "ok" and item["pb_percentile"] is not None and item["dy_percentile"] is not None:
@@ -58,4 +85,4 @@ def _num(value):
         return None
 
 
-__all__ = ["one_line", "position"]
+__all__ = ["implicit_return", "implicit_return_line", "one_line", "position"]

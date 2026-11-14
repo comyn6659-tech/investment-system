@@ -68,6 +68,15 @@ data/bank-pool/
   兰州银行 58 个月不足 5 年，不计算分位；只描述，不给买点。
 - **不写正式账本，不改变 CLI 银行结论；银行专用估值是否启用仍待股东决策。**
 
+## 银行估值 v2.1 修订（第十二批收尾）
+
+- 草案：`data/policies/bank-valuation-v2.1-draft.json`；基准 ROE 纳入最新财年，悲观 ROE 增加近 3 年
+  下滑速度外推 3 年，乐观 ROE 改近 3 年平均；新增描述性隐含长期回报率。
+- 报告：`valuation-v2.1.json` 与 `docs/phase4l-bank-valuation-v2.1.md`；保留 v2 基线
+  `valuation-v2.json` 供逐家对照。
+- 银行卡片新增隐含长期回报率一行（仅描述，不参与结论）。
+- **仍不写正式账本、不改变 CLI 银行结论。**
+
 ## 校验
 
 `engine.quality.snapshot.load_snapshot_dir(path)` 逐表核对 `content_hash` 与行数，

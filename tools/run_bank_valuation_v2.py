@@ -69,7 +69,7 @@ def _digest(path: Path) -> str:
 
 
 def main() -> int:
-    policy = load_policy()
+    policy = load_policy(ROOT / "data" / "policies" / "bank-valuation-v2-draft.json")
     equity_policy = load_equity_policy(EQUITY_POLICY)
     series = Path(equity_policy.node("discount_rate.risk_free")["series_file"])
     if not series.is_absolute():

@@ -496,3 +496,19 @@
 | Z4 | 历史位置同源同口径、至少 5 年；银行卡片显示一行分位 | `tools/build_bank_valuation_v2_data.py`、`data/bank-pool/valuation-v2/`、`engine/bank/history.py`、`engine/ask/service.py` | 42 家中 41 家 ≥60 个月，兰州银行 58 个月不足 5 年；招商/平安卡片显示 PB/股息率分位行；`test_z4_history_position_same_source_and_card_line` | ✅ |
 | Z5 | 正式账本、CLI 银行结论、其他结果不变；干净目录全部测试通过 | 全项目 | 未写账本；CLI 银行仍“无法判断”；干净归档 **688 passed + 1 skipped**；账本 99 条旧记录不变 | ✅ |
 | Z6 | DELIVERY.md 一页以内 | `DELIVERY.md` | 见入口文件 | ✅ |
+
+
+---
+
+# 第四阶段第十二批收尾验收清单（银行估值 v2.1 / ZR1–ZR5）
+
+对应文件：`batch4l-r-bank-valuation-v21-instructions.md`。只改银行估值试运行（草案、计算、报告、
+银行卡片一行描述）；仍不写正式账本、CLI 银行结论不变。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| ZR1 | 基准 ROE=min(最新,3 年平均,5 年平均)；悲观=min(5 年最低−1pp, 最新−3×近 3 年年均下滑)，未下滑不适用；乐观=近 3 年平均；招商、兴业手算（含外推） | `data/policies/bank-valuation-v2.1-draft.json`、`engine/bank/valuation_v2.py` | `test_zr1_cmb_hand_calculation_with_decline`、`test_zr1_industrial_bank_hand_calculation_with_decline` | ✅ |
+| ZR2 | 隐含长期回报率=g+(最新 ROE−g)/现价 PB，g=2%；报告逐家列出并与 k 对比；卡片一行 | `engine/bank/valuation_v2.py`、`engine/bank/history.py`、`engine/ask/service.py` | `test_zr2_implicit_return_formula_and_card_line`；招商卡片“约 14.5%” | ✅ |
+| ZR3 | 报告含 v2→v2.1 对照（三档 ROE/价值/结论）与 k 溢价 × 安全边际 3×3 矩阵（每格名单） | `tools/run_bank_valuation_v21.py`、`data/bank-pool/valuation-v2.1.json`、`docs/phase4l-bank-valuation-v2.1.md` | 36 家 v2 对照；3×3 九格均有数量+名单；`test_zr3_report_has_comparison_and_3x3_matrix` | ✅ |
+| ZR4 | 正式账本、CLI 银行结论、其他结果不变；干净目录全部测试通过 | 全项目 | 本地 **690 passed**；干净归档 **689 passed + 1 skipped**；账本 99 条不变；CLI 银行仍“无法判断” | ✅ |
+| ZR5 | DELIVERY.md 一页以内 | `DELIVERY.md` | 见入口文件 | ✅ |

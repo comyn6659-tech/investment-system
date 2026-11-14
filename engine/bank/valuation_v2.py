@@ -15,7 +15,7 @@ from engine.policy.equity import EquityPolicy
 from engine.policy.valuation import normalized_risk_free
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-DEFAULT_POLICY = ROOT / "data" / "policies" / "bank-valuation-v2-draft.json"
+DEFAULT_POLICY = ROOT / "data" / "policies" / "bank-valuation-v2.1-draft.json"
 POLICY_SCHEMA = "bank-valuation-policy/1"
 
 
@@ -51,6 +51,8 @@ class BankValuationInputs:
     shares: float | None
     price: float | None
     price_date: str | None
+    roe_latest: float | None
+    roe_2022: float | None
     roe_3y_avg: float | None
     roe_5y_avg: float | None
     roe_5y_min: float | None
@@ -71,6 +73,8 @@ class BankValuationInputs:
             shares=_num(row.get("shares")),
             price=_num(row.get("price")),
             price_date=str(row.get("price_date") or "") or None,
+            roe_latest=_num(row.get("roe_2025")),
+            roe_2022=_num(row.get("roe_2022")),
             roe_3y_avg=_num(row.get("roe_3y_avg")),
             roe_5y_avg=_num(row.get("roe_5y_avg")),
             roe_5y_min=_num(row.get("roe_5y_min")),
@@ -121,16 +125,51 @@ def value_bank(
     deduction = 1.0 if _asset_quality_deduction(inputs, policy) else 0.0
     deduct = float(policy["parameters"]["asset_quality_deduction"]["deduction"]) * deduction
 
-    roe = {
-        "base": (min(inputs.roe_3y_avg, inputs.roe_5y_avg) - deduct)
-        if inputs.roe_3y_avg is not None and inputs.roe_5y_avg is not None
-        else None,
-        "pessimistic": (
-            inputs.roe_5y_min - float(policy["parameters"]["roe_pessimistic"]["deduction"]) - deduct
+    base_mode = policy["parameters"]["roe_base"].get("mode", "min_3y_5y")
+    if base_mode == "min_latest_3y_5y":
+        base_available = (
+            inputs.roe_latest is not None
+            and inputs.roe_3y_avg is not None
+            and inputs.roe_5y_avg is not None
         )
+        base_raw = (
+            min(inputs.roe_latest, inputs.roe_3y_avg, inputs.roe_5y_avg)
+            if base_available
+            else None
+        )
+    else:
+        base_raw = (
+            min(inputs.roe_3y_avg, inputs.roe_5y_avg)
+            if inputs.roe_3y_avg is not None and inputs.roe_5y_avg is not None
+            else None
+        )
+
+    pessimistic_node = policy["parameters"]["roe_pessimistic"]
+    pessimistic_raw = (
+        inputs.roe_5y_min - float(pessimistic_node["deduction"])
         if inputs.roe_5y_min is not None
-        else None,
-        "optimistic": (inputs.roe_5y_avg - deduct) if inputs.roe_5y_avg is not None else None,
+        else None
+    )
+    decline_annual = None
+    decline_extrapolated = None
+    decline_years = int(pessimistic_node.get("decline_years", 0))
+    if (
+        pessimistic_node.get("mode") == "min5y_deduction_or_decline_extrapolation"
+        and decline_years > 0
+        and inputs.roe_latest is not None
+        and inputs.roe_2022 is not None
+        and inputs.roe_latest < inputs.roe_2022
+    ):
+        decline_annual = (inputs.roe_2022 - inputs.roe_latest) / decline_years
+        decline_extrapolated = inputs.roe_latest - decline_years * decline_annual
+        pessimistic_raw = min(pessimistic_raw, decline_extrapolated)
+
+    optimistic_mode = policy["parameters"]["roe_optimistic"].get("mode", "5y_avg")
+    optimistic_source = inputs.roe_3y_avg if optimistic_mode == "3y_avg" else inputs.roe_5y_avg
+    roe = {
+        "base": (base_raw - deduct) if base_raw is not None else None,
+        "pessimistic": (pessimistic_raw - deduct) if pessimistic_raw is not None else None,
+        "optimistic": (optimistic_source - deduct) if optimistic_source is not None else None,
     }
     g = {
         "base": _cap_growth(growth["base"], rf),
@@ -147,6 +186,22 @@ def value_bank(
             continue
         multiples[name] = (roe_value - g[name]) / (k - g[name])
         values[name] = inputs.bvps * multiples[name]
+
+    pb_current = (
+        inputs.price / inputs.bvps
+        if inputs.price is not None and inputs.bvps not in (None, 0)
+        else None
+    )
+    implicit_return = None
+    implicit_node = policy["parameters"].get("implicit_return") or {}
+    if (
+        implicit_node
+        and inputs.roe_latest is not None
+        and pb_current is not None
+        and pb_current > 0
+    ):
+        implicit_g = float(implicit_node["growth"])
+        implicit_return = implicit_g + (inputs.roe_latest - implicit_g) / pb_current
 
     base_value = values.get("base")
     pessimistic = values.get("pessimistic")
@@ -204,6 +259,14 @@ def value_bank(
         "bvps": inputs.bvps,
         "shares": inputs.shares,
         "roe": roe,
+        "roe_latest": inputs.roe_latest,
+        "decline_annual": decline_annual,
+        "decline_extrapolated": decline_extrapolated,
+        "pb_current": pb_current,
+        "implicit_return": implicit_return,
+        "implicit_return_vs_k": (
+            implicit_return - k if implicit_return is not None else None
+        ),
         "asset_quality_deduction": bool(deduction),
         "deduction": deduct,
         "growth": g,

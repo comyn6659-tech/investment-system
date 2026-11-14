@@ -1,6 +1,6 @@
 # 对话入口端到端验收（batch4k）
 
-- 生成时间：2026-11-14T17:31:15+08:00
+- 生成时间：2026-11-14T17:54:33+08:00
 - 政策：`equity-policy-v1.1`（已批准）
 - 固定问题集：61 条，通过 61 条；端到端全部通过：是
 - 问题集测试使用批量快照固定价格；30 只测试股 / 指数 / 银行 / ETF 使用当日实时行情。
@@ -15,10 +15,10 @@
 | q04 | 单只个股 | 五粮液值得买吗 | stock | stock | undetermined | 10 | 通过 |
 | q05 | 单只个股 | 格力电器现在能买吗 | stock | stock | undetermined | 10 | 通过 |
 | q06 | 单只个股 | 京东方A怎么样 | stock | stock | undetermined | 10 | 通过 |
-| q07 | 银行 | 招商银行怎么样 | bank | bank | undetermined | 11 | 通过 |
-| q08 | 银行 | 工商银行贵不贵 | bank | bank | undetermined | 11 | 通过 |
-| q09 | 银行 | 招行股息率多少 | bank | bank | undetermined | 11 | 通过 |
-| q10 | 银行 | 平安银行怎么样 | bank | bank | undetermined | 11 | 通过 |
+| q07 | 银行 | 招商银行怎么样 | bank | bank | undetermined | 12 | 通过 |
+| q08 | 银行 | 工商银行贵不贵 | bank | bank | undetermined | 12 | 通过 |
+| q09 | 银行 | 招行股息率多少 | bank | bank | undetermined | 12 | 通过 |
+| q10 | 银行 | 平安银行怎么样 | bank | bank | undetermined | 12 | 通过 |
 | q11 | 指数 | 沪深300 现在什么位置 | index | index | undetermined | 13 | 通过 |
 | q12 | 指数 | 中证500 贵不贵 | index | index | undetermined | 13 | 通过 |
 | q13 | 指数 | 中证1000 什么位置 | index | index | undetermined | 13 | 通过 |
@@ -119,8 +119,8 @@
 
 | 问题 | 意图 | 结论 | 行数 | 结果 |
 |---|---|---|---:|---|
-| 招商银行怎么样 | bank | undetermined | 11 | 通过 |
-| 工商银行怎么样 | bank | undetermined | 11 | 通过 |
+| 招商银行怎么样 | bank | undetermined | 12 | 通过 |
+| 工商银行怎么样 | bank | undetermined | 12 | 通过 |
 
 ## 5. 三只 ETF
 

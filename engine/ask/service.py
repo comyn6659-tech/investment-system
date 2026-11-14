@@ -1216,6 +1216,7 @@ class AskService:
             or self.ownership.get(code)
             or "未标记"
         )
+        implicit_line = bank_history.implicit_return_line(code, price)
         lines = [
             "**结论：无法判断** — 银行专用估值方法还没启用（股东 2026-11-13 决定），所以只列指标、不下结论。",
             "",
@@ -1227,6 +1228,7 @@ class AskService:
             f"｜拨备覆盖率 {provision if provision is not None else '—'}%"
             f"｜核心一级 {cet1 if cet1 is not None else '—'}%",
             bank_history.one_line(code),
+            *([implicit_line] if implicit_line else []),
             "为什么：银行的资本充足、资产质量与监管口径需要专用方法；本版只展示公开报表指标，"
             "不评价贵贱。",
             f"它是什么：{'银行池成员' if in_pool else '银行（不在银行池）'}｜所有制 {ownership}"

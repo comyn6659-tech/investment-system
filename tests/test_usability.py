@@ -342,79 +342,98 @@ def _bank_v2_fixture():
         row["code"]: row
         for row in read_table(Path("data/bank-pool/valuation-v2/inputs.csv.gz"))
     }
-    pool_codes = {"600036", "601398"}
+    pool_codes = {"600036", "601398", "601166"}
     inputs = {
         code: BankValuationInputs.from_row(rows[code], in_bank_pool=code in pool_codes)
-        for code in ("600036", "601398")
+        for code in ("600036", "601398", "601166")
     }
     return policy, equity_policy, macro, inputs, value_bank
 
 
-def test_z1_cmb_hand_calculation():
+def test_zr1_cmb_hand_calculation_with_decline():
     policy, equity_policy, macro, inputs, value_bank = _bank_v2_fixture()
     out = value_bank(inputs["600036"], policy, equity_policy, macro)
-    bvps = 46.867733
-    roe_base = min(0.14716666666666667, 0.15633999999999998)
-    roe_pess = 0.1344 - 0.01
-    roe_opt = 0.15633999999999998
+    # 最新 13.44%、近 3 年平均 14.7167%、近 5 年平均 15.634%：基准取最新
+    assert abs(out["roe"]["base"] - 0.1344) < 1e-12
+    # 2022 17.06% -> 2025 13.44%，3 年年均下滑 1.2067pp；外推 3 年 = 9.82%
+    assert abs(out["decline_annual"] - (0.1706 - 0.1344) / 3) < 1e-12
+    assert abs(out["decline_extrapolated"] - 0.0982) < 1e-12
+    assert abs(out["roe"]["pessimistic"] - 0.0982) < 1e-12
+    assert abs(out["roe"]["optimistic"] - (0.1449 + 0.1622 + 0.1344) / 3) < 1e-12
     k = out["risk_free"] + out["equity_risk_premium"] + 0.02
+    bvps = 46.867733
     expected = {
-        "pessimistic": bvps * (roe_pess - 0.015) / (k - 0.015),
-        "base": bvps * (roe_base - 0.02) / (k - 0.02),
-        "optimistic": bvps * (roe_opt - 0.025) / (k - 0.025),
+        "pessimistic": bvps * (0.0982 - 0.015) / (k - 0.015),
+        "base": bvps * (0.1344 - 0.02) / (k - 0.02),
+        "optimistic": bvps * (((0.1449 + 0.1622 + 0.1344) / 3) - 0.025) / (k - 0.025),
     }
     for name, value in expected.items():
         assert abs(out["values"][name] - value) < 0.02, name
-    assert abs(out["cost_of_equity"] - k) < 1e-12
-    assert out["asset_quality_deduction"] is False
     assert out["conclusion"] == "candidate_buy_point"
+    assert out["binding_condition"] == "pessimistic_value"
 
 
-def test_z1_icbc_hand_calculation():
+def test_zr1_industrial_bank_hand_calculation_with_decline():
     policy, equity_policy, macro, inputs, value_bank = _bank_v2_fixture()
-    out = value_bank(inputs["601398"], policy, equity_policy, macro)
-    bvps = 11.239444
-    roe_base = min(0.09996666666666666, 0.10718000000000001)
-    roe_pess = 0.09449999999999999 - 0.01
-    roe_opt = 0.10718000000000001
+    out = value_bank(inputs["601166"], policy, equity_policy, macro)
+    assert abs(out["roe"]["base"] - 0.0915) < 1e-12
+    assert abs(out["decline_annual"] - (0.1385 - 0.0915) / 3) < 1e-12
+    assert abs(out["decline_extrapolated"] - 0.0445) < 1e-12
+    assert abs(out["roe"]["pessimistic"] - 0.0445) < 1e-12
+    assert abs(out["roe"]["optimistic"] - (0.1064 + 0.0989 + 0.0915) / 3) < 1e-12
     k = out["risk_free"] + out["equity_risk_premium"] + 0.02
+    bvps = 40.20864
     expected = {
-        "pessimistic": bvps * (roe_pess - 0.015) / (k - 0.015),
-        "base": bvps * (roe_base - 0.02) / (k - 0.02),
-        "optimistic": bvps * (roe_opt - 0.025) / (k - 0.025),
+        "pessimistic": bvps * (0.0445 - 0.015) / (k - 0.015),
+        "base": bvps * (0.0915 - 0.02) / (k - 0.02),
+        "optimistic": bvps * (((0.1064 + 0.0989 + 0.0915) / 3) - 0.025) / (k - 0.025),
     }
     for name, value in expected.items():
         assert abs(out["values"][name] - value) < 0.02, name
     assert out["conclusion"] == "wait"
 
 
-def test_z2_report_has_required_sections_and_sensitivity():
-    payload = json.loads((ROOT / "data" / "bank-pool" / "valuation-v2.json").read_text(encoding="utf-8"))
-    text = (ROOT / "docs" / "phase4l-bank-valuation-v2.md").read_text(encoding="utf-8")
-    assert payload["meta"]["policy"] == "bank-valuation-v2-draft"
-    assert payload["meta"]["policy_approved"] is False
+def test_zr2_implicit_return_formula_and_card_line():
+    policy, equity_policy, macro, inputs, value_bank = _bank_v2_fixture()
+    out = value_bank(inputs["600036"], policy, equity_policy, macro)
+    expected = 0.02 + (0.1344 - 0.02) / (42.93 / 46.867733)
+    assert abs(out["implicit_return"] - expected) < 1e-12
+    assert abs(out["implicit_return_vs_k"] - (expected - out["cost_of_equity"])) < 1e-12
+    text = AskService(allow_update=False, write_ledger=False).ask("招商银行怎么样").markdown
+    assert "隐含长期回报率：约 14.5%" in text
+    assert "描述性，不参与结论" in text
+
+
+def test_zr3_report_has_comparison_and_3x3_matrix():
+    payload = json.loads((ROOT / "data" / "bank-pool" / "valuation-v2.1.json").read_text(encoding="utf-8"))
+    text = (ROOT / "docs" / "phase4l-bank-valuation-v2.1.md").read_text(encoding="utf-8")
+    assert payload["meta"]["policy"] == "bank-valuation-v2.1-draft"
     assert len(payload["banks"]) == 36
+    assert len(payload["comparison_v2"]) == 36
     assert len(payload["comparison_v1"]) == 36
-    assert {item["bank_premium"] for item in payload["sensitivity_k"]} == {0.01, 0.02, 0.03}
-    assert {item["margin_of_safety"] for item in payload["sensitivity_margin"]} == {0.20, 0.30, 0.40}
-    for section in ("三档 ROE", "敏感性", "第八批", "历史估值位置", "每股净资产", "门槛价"):
+    assert len(payload["matrix"]) == 3
+    assert all(len(row) == 3 for row in payload["matrix"])
+    for row in payload["matrix"]:
+        for cell in row:
+            assert cell["candidate_count"] == len(cell["candidates"])
+            assert cell["candidate_count"] >= 0
+    for section in ("3×3", "v2 → v2.1", "隐含长期回报率", "逐家结果", "敏感性"):
         assert section in text, section
-    for item in payload["banks"]:
-        assert item["values"]["pessimistic"] is not None
-        assert item["multiples"]["base"] is not None
-        assert item["threshold_price"] is not None
 
 
-def test_z2_policy_has_basis_for_every_parameter():
-    policy = json.loads((ROOT / "data" / "policies" / "bank-valuation-v2-draft.json").read_text(encoding="utf-8"))
+def test_zr3_policy_has_basis_for_every_parameter():
+    policy = json.loads((ROOT / "data" / "policies" / "bank-valuation-v2.1-draft.json").read_text(encoding="utf-8"))
     for name, node in policy["parameters"].items():
         assert "basis" in node, name
+    assert policy["parameters"]["roe_base"]["mode"] == "min_latest_3y_5y"
+    assert policy["parameters"]["roe_pessimistic"]["mode"] == "min5y_deduction_or_decline_extrapolation"
+    assert policy["parameters"]["roe_optimistic"]["mode"] == "3y_avg"
+    assert policy["parameters"]["implicit_return"]["growth"] == 0.02
     assert policy["method"]["formula"]
-    assert policy["eligibility"]["bank_pool_required"] is True
 
 
-def test_z3_non_bank_pool_banks_only_values_and_undetermined():
-    payload = json.loads((ROOT / "data" / "bank-pool" / "valuation-v2.json").read_text(encoding="utf-8"))
+def test_zr3_non_bank_pool_banks_only_values_and_undetermined():
+    payload = json.loads((ROOT / "data" / "bank-pool" / "valuation-v2.1.json").read_text(encoding="utf-8"))
     pool_codes = {
         "002839", "002966", "600036", "601009", "601166",
         "601288", "601328", "601398", "601658", "601939", "601998",
