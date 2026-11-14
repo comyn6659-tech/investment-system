@@ -6,7 +6,7 @@
 |---|---|
 | 项目 | `/Users/comyn/Documents/deepseek-harness/投资/investment-system/` |
 | 本轮阶段 | 第四阶段第十一批第三次收尾：**试用第二轮修正（X1–X7）** |
-| 本轮实现提交 | `（本次收尾提交，见 git log）` |
+| 本轮实现提交 | `617d618` |
 
 ## 1. 结果
 
