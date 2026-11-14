@@ -6,7 +6,7 @@
 |---|---|
 | 项目 | `/Users/comyn/Documents/deepseek-harness/投资/investment-system/` |
 | 本轮阶段 | 第五阶段：**整理收尾**（整理 + 三处修正 + 文档合并） |
-| 本轮实现提交 | `63b14c3` |
+| 本轮实现提交 | `2c8c809` |
 
 ## 1. 系统是什么、怎么用
 
