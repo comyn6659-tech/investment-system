@@ -419,9 +419,9 @@
 | S2 | 正式与研究标签正确（测试） | `engine/policy/trial.py`、`engine/ask/service.py`、`engine/models/registry.py` | 正式结论标签 `正式结论（政策 equity-policy-v1.1，已批准）`、`is_trial_only=false`；validated 版本 `0.2.0`；指数/ETF/银行卡片无「正式结论」；`test_live_policy_conclusion_label_is_formal`、`test_formal_and_research_labels`、`test_research_never_has_formal_conclusion`、`test_validated_model_versions_have_no_research_suffix` | ✅ |
 | S3 | 创业板指与 159915 移出；其余指数、ETF 结果不变 | `data/registry/instruments.json`、`engine/contracts/reason_codes.py` | 399006 scope out_of_scope + `INDEX_REMOVED_OFFICIAL_HISTORY_UNAVAILABLE`；159915 scope out_of_scope + `ETF_TRACKING_INDEX_REMOVED`；官方估值账本旧 4 条（含 399006 2026-11-11）不变；沪深300/中证500/中证1000/恒生科技/510300/510500/512100 不变；`test_cli_chinext_is_out_of_scope`、`test_etf_159915_registry_and_product_check`、`test_existing_official_valuation_ledger_records_unchanged`、`test_other_indices_and_etfs_still_available` | ✅ |
 | S4 | `update` 只追加、重复跳过；定时脚本可安装可卸载，未经股东执行不自动安装 | `engine/forward/*`、`tools/update.py`、`scripts/install-daily-update.sh`、`scripts/uninstall-daily-update.sh` | 行情/官方估值/恒生科技月度/周信号均内容一致跳过、不同冲突；`tools/update.py --check` 0 问题；plist 经 `plistlib` 校验（18:30、RunAtLoad=false）；dry-run 不创建 LaunchAgents；引擎代码无自动调用安装脚本；`test_quote_snapshot_is_append_only_and_deduped`、`test_official_append_skips_duplicates_and_conflicts`、`test_hstech_parse_and_append`、`test_update_light_skips_heavy_series_and_logs`、`test_launchd_scripts_are_manual_only` | ✅ |
-| S5 | `ask` 覆盖第二节全部意图，每类 ≥3 种说法有测试 | `engine/ask/*`、`data/ask/questions.json`、`tests/test_dialog.py` | 61 条问题覆盖 10 类（单股 6、银行 4、指数 4、ETF 4、池名单 4、是否在池 8、排行 16、历史 5、状态 4、范围外/歧义 6）；`test_question_set_has_at_least_40_and_covers_every_intent`、`test_every_question_matches_expected` | ✅ |
+| S5 | `ask` 覆盖第二节全部意图，每类 ≥3 种说法有测试 | `engine/ask/*`、`data/ask/questions.json`、`tests/test_dialog.py` | 67 条问题覆盖 10 类（单股 6、银行 7、指数 4、ETF 4、池名单 4、是否在池 8、排行 19、历史 5、状态 4、范围外/歧义 6）；`test_question_set_has_at_least_40_and_covers_every_intent`、`test_every_question_matches_expected` | ✅ |
 | S6 | 卡片结构符合第二节第 4 条；默认 ≤25 行 | `engine/ask/service.py`、`docs/phase4k-samples.md` | 第一行结论；现价/门槛/距门槛/三档价值及用途；起约束与中文未满足条件；池/所有制/周期属性/等级含义；局限；来源日期与政策版本；末行免责声明；全部问题集 8–10 行；`test_card_structure`、`test_detail_expands_and_keeps_disclaimer` | ✅ |
-| S7 | 端到端问题集 ≥40 条全部通过；禁用词扫描、日期来源检查通过 | `tools/run_ask_acceptance.py`、`docs/phase4k-acceptance.md` | 61/61 问题、30/30 测试股、4/4 指数（含 HSTECH）、2/2 银行、3/3 ETF；禁用词 0；日期/来源/免责声明齐全；研究模型无正式结论；`test_forbidden_words_absent`、`test_every_question_matches_expected` | ✅ |
+| S7 | 端到端问题集 ≥40 条全部通过；禁用词扫描、日期来源检查通过 | `tools/run_ask_acceptance.py`、`docs/phase4k-acceptance.md` | 67/67 问题、30/30 测试股、4/4 指数（含 HSTECH）、2/2 银行、3/3 ETF；禁用词 0；日期/来源/免责声明齐全；研究模型无正式结论；`test_forbidden_words_absent`、`test_every_question_matches_expected` | ✅ |
 | S8 | 全部既有测试通过；所有账本只追加 | 既有模块；`data/ledger/*` | 本地 **683 passed**；`equity-conclusions.jsonl` 99 条 `--check` 0 问题；候选 A 3、官方估值 4、恒生科技月度 1、三池/银行账本 0 问题；`test_pool_valuation.py::test_policy_and_valuation_code_unchanged` 已更新为「仅允许结论标签与账本改判能力变化」；账本 `check` 全部通过 | ✅ |
 | S9 | DELIVERY.md 一页以内，附 5 个真实问答样例 | `DELIVERY.md`、`docs/phase4k-samples.md` | 入口 §1–§8；5 个真实样例（茅台、招商银行、沪深300、好公司池、比亚迪） | ✅ |
 
@@ -437,7 +437,7 @@
 | T1 | `ask`、`update`、池成员估值及测试不读 `data/cache/` 或被忽略路径；所有制改读已提交快照；扫描测试 | `engine/ask/service.py`、`tools/run_pool_valuation.py`、`tools/run_income_pool.py`、`tests/test_clean_inputs.py` | 所有制/分红改读 `data/income-pool/snapshot-qps-d8fb7e3718675b93/`；`update` 状态改读 `data/ledger/update-log.jsonl`；运行时扫描 0 命中；`test_runtime_code_has_no_cache_directory_reference`、`test_ownership_comes_from_committed_snapshot` | ✅ |
 | T2 | 最新正式结论遇无法判断时追加改判记录；原因码/中文原因/政策/快照/分析日；旧记录不改；从未有正式结论不写 | `engine/policy/conclusion_ledger.py`、`engine/policy/conclusion.py`、`engine/cli.py`、`engine/ask/service.py`、`tools/run_cyclical_rerun.py` | 君正 601216、扬农 600486 各 1 条 reversal（`MODEL_FAMILY_NOT_IMPLEMENTED` + `CYCLICAL_INDUSTRY_LIST_MATCH`）；账本 99 条 0 问题；历史问答 2 条且最新为无法判断；`test_reversal.py` 7 项 | ✅ |
 | T3 | 非 macOS 跳过 launchd 测试并注明原因 | `tests/test_forward_update.py` | `@pytest.mark.skipif(sys.platform != "darwin", reason="定时任务只支持 macOS（launchd）")`；macOS 下 plist 校验通过 | ✅ |
-| U1 | 干净目录（`git archive`）中全部测试与 61 条问题集通过；代码扫描通过 | `scripts/verify-clean-archive.sh`、`tests/test_clean_inputs.py` | `git archive HEAD` 到临时目录（无 `.venv`/`data/cache`）：**682 passed + 1 skipped**（无 `.git` 的 diff 测试跳过）、问题集 **61/61**、30 股/4 指数/2 银行/3 ETF 全过 | ✅ |
+| U1 | 干净目录（`git archive`）中全部测试与 67 条问题集通过；代码扫描通过 | `scripts/verify-clean-archive.sh`、`tests/test_clean_inputs.py` | `git archive HEAD` 到临时目录（无 `.venv`/`data/cache`）：**682 passed + 1 skipped**（无 `.git` 的 diff 测试跳过）、问题集 **67/67**、30 股/4 指数/2 银行/3 ETF 全过 | ✅ |
 | U2 | 君正、扬农各一条改判；“君正集团以前的结论”显示两条，最新为无法判断及原因；旧记录不变 | `data/ledger/equity-conclusions.jsonl`、`engine/ask/service.py` | 601216/600486 各 2 条；最新 `record_type=reversal`、`conclusion=undetermined`、原因码/中文原因/分析日/快照/`reversal_of` 齐全；旧记录 record_id 未变；`test_real_ledger_has_two_reversals_for_junzheng_and_yangnong`、`test_history_question_shows_two_records_and_reason` | ✅ |
 | U3 | 其他账本、结论、池名单不变；全部测试通过 | 既有模块 | 候选 A 3、官方估值 4、三池/银行账本不变；池名单 138/142/11 不变；本地 683 passed | ✅ |
 | U4 | DELIVERY.md 一页以内 | `DELIVERY.md` | 81 行；含 U1–U4、复现命令、干净归档结果 | ✅ |
@@ -453,11 +453,11 @@
 | 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
 |---|---|---|---|---|
 | V1/W1 | 新增 `CLAUDE.md`；Claude Code 新会话问两句均调用 `./ask` 并原样返回（截图/会话记录） | `CLAUDE.md`、`SKILL.md`、`docs/phase4k-r2-claude-session.md`、`docs/evidence/*.png` | 新会话 `f166b587...` 实际执行 `./ask "A股有哪些值得投资的公司"`、`./ask "茅台怎么样"`；两张窗口截图；`test_w1_claude_code_session_evidence_present`、`test_v1_claude_md_requires_ask_and_verbatim` | ✅ |
-| V2/W2 | 推荐/值得投资问法 → 池名单/排行卡并写“入池不等于买入”；比亚迪三个“好不好”问法 → 是否在池成绩单 | `engine/ask/intent.py`、`engine/ask/service.py`、`data/ask/questions.json` | 61 条问题集；`test_v2_recommendation_questions_are_ranking`、`test_v2_byd_membership_questions_are_scorecards`；`test_every_question_matches_expected` | ✅ |
+| V2/W2 | 推荐/值得投资问法 → 池名单/排行卡并写“入池不等于买入”；比亚迪三个“好不好”问法 → 是否在池成绩单 | `engine/ask/intent.py`、`engine/ask/service.py`、`data/ask/questions.json` | 67 条问题集；`test_v2_recommendation_questions_are_ranking`、`test_v2_byd_membership_questions_are_scorecards`；`test_every_question_matches_expected` | ✅ |
 | V3/W3 | 已更新/非交易日/接口超时三种情形 15 秒内出结果并注明数据日期 | `engine/ask/service.py`、`engine/forward/calendar.py`、`data/calendar/cn-trading-holidays-2026.json`、`engine/forward/quotes.py` | 日历测试（周末/国庆）；非交易日跳过；已更新跳过；0.2 秒超时模拟；`test_v3_*` 5 项；默认预算 10 秒 | ✅ |
-| V4/W4 | 默认卡片术语扫描 0；每个原因码有中文解释；同一原因不重复 | `engine/ask/plain.py`、`engine/ask/service.py` | `BANNED_TERMS` 扫描 61 条 + 30 只测试股 0 命中；`REASON_PLAIN` 覆盖全部出现的 reason code；比亚迪卡片每条原因仅 1 次；`test_v4_*` 3 项 | ✅ |
+| V4/W4 | 默认卡片术语扫描 0；每个原因码有中文解释；同一原因不重复 | `engine/ask/plain.py`、`engine/ask/service.py` | `BANNED_TERMS` 扫描 67 条 + 30 只测试股 0 命中；`REASON_PLAIN` 覆盖全部出现的 reason code；比亚迪卡片每条原因仅 1 次；`test_v4_*` 3 项 | ✅ |
 | V5 | 非周期公司显示“非周期”，不显示“非金融企业” | `engine/ask/plain.py`、`engine/ask/service.py` | 茅台/比亚迪显示“非周期”；神华“明显周期”；平安“非周期（保险）”；`test_v5_cycle_label` | ✅ |
-| W5 | 干净目录（`git archive`）全部测试与 61 条问题集通过；账本旧记录不变 | `scripts/verify-clean-archive.sh`、`data/ledger/equity-conclusions.jsonl` | 干净归档 **682 passed + 1 skipped**（无 `.git` 的 diff 测试跳过）；问题集 61/61；账本 99 条 `--check` 0 问题，前 98 条不变 | ✅ |
+| W5 | 干净目录（`git archive`）全部测试与 67 条问题集通过；账本旧记录不变 | `scripts/verify-clean-archive.sh`、`data/ledger/equity-conclusions.jsonl` | 干净归档 **682 passed + 1 skipped**（无 `.git` 的 diff 测试跳过）；问题集 67/67；账本 99 条 `--check` 0 问题，前 98 条不变 | ✅ |
 | W6 | DELIVERY.md 一页以内 | `DELIVERY.md` | 见入口文件 | ✅ |
 
 
@@ -477,7 +477,7 @@
 | X5 | 银行卡片大白话，不出现 bank-check/draft 等内部名 | `engine/ask/service.py` | 首句“银行专用估值方法还没启用（股东 2026-11-13 决定），所以只列指标、不下结论”；Y2 扫描 | ✅ |
 | X6/Y3 | 指数卡片两 PE 来源/用途/差异说明、分位直白句、信号中文、默认无 entry/exit/研究画像 | `engine/ask/service.py` | 沪深300/中证500/中证1000/恒生科技卡片；`test_x6_*`；中证500/1000 同测 | ✅ |
 | X7/Y3 | 结论行位置概括；分档版本化配置 | `data/policies/index-position-bands-v1.json`、`engine/ask/index_bands.py`、`engine/ask/service.py` | 20/40/60/80 边界测试；`test_x7_index_position_bands`、`test_x7_index_conclusion_has_position_summary`、`test_x7_bands_config_is_versioned` | ✅ |
-| Y4 | 干净目录（`git archive`）全部测试与 61 条问题集通过；账本旧记录不变 | `scripts/verify-clean-archive.sh`、`data/ledger/equity-conclusions.jsonl` | 干净归档 **682 passed + 1 skipped**；问题集 61/61；账本 99 条 0 问题，前 98 条不变 | ✅ |
+| Y4 | 干净目录（`git archive`）全部测试与 67 条问题集通过；账本旧记录不变 | `scripts/verify-clean-archive.sh`、`data/ledger/equity-conclusions.jsonl` | 干净归档 **682 passed + 1 skipped**；问题集 67/67；账本 99 条 0 问题，前 98 条不变 | ✅ |
 | Y5 | DELIVERY.md 一页以内，附平安银行、沪深300、“收息池有哪些公司现在的价格很合适”三张卡片原文 | `DELIVERY.md` | 见入口文件 | ✅ |
 
 
@@ -512,3 +512,20 @@
 | ZR3 | 报告含 v2→v2.1 对照（三档 ROE/价值/结论）与 k 溢价 × 安全边际 3×3 矩阵（每格名单） | `tools/run_bank_valuation_v21.py`、`data/bank-pool/valuation-v2.1.json`、`docs/phase4l-bank-valuation-v2.1.md` | 36 家 v2 对照；3×3 九格均有数量+名单；`test_zr3_report_has_comparison_and_3x3_matrix` | ✅ |
 | ZR4 | 正式账本、CLI 银行结论、其他结果不变；干净目录全部测试通过 | 全项目 | 本地 **690 passed**；干净归档 **689 passed + 1 skipped**；账本 99 条不变；CLI 银行仍“无法判断” | ✅ |
 | ZR5 | DELIVERY.md 一页以内 | `DELIVERY.md` | 见入口文件 | ✅ |
+
+
+---
+
+# 第四阶段第十三批验收清单（银行买点批准落地 B1–B6）
+
+对应文件：`batch4m-bank-approval-instructions.md` 与 `decision4-package.md`。范围：批准 v2.1、
+模型状态、ask/CLI 银行正式结论、账本 11 条首写、文档更新；不改 v2.1 参数、个股政策、三池与指数。
+
+| 编号 | 通过标准 | 实现位置 | 测试 / 证据 | 状态 |
+|---|---|---|---|---|
+| B1 | 批准文件参数与草案逐项相同；批准日期、决策④、已知缺口/补救、复核日齐全 | `data/policies/bank-valuation-v2.1.json`、`data/policies/bank-valuation-v2.1-draft.json` | `test_b1_approved_policy_matches_draft_and_has_approval_record`；旧 `bank-check`/通用股息路线标注取代 | ✅ |
+| B2 | 只有银行 v2.1 为 validated，其余模型状态不变 | `engine/models/registry.py` | `bank_valuation_v2` 2.1.0 validated；`test_b2_only_bank_v21_model_is_newly_validated`、`test_p2_only_policy_routes_are_validated` | ✅ |
+| B3 | 11 家银行池成员 CLI 结论与 v2.1 试运行逐家相同（3 候选/8 等待）；账本 11 条，旧 99 条不变 | `engine/ask/service.py`、`engine/cli.py`、`engine/bank/conclusion.py`、`data/ledger/equity-conclusions.jsonl` | `test_b3_cli_bank_conclusions_match_v21_and_ledger_has_11`；`test_cli_bank_conclusion_is_formal_v21`；账本 110 条 0 问题 | ✅ |
+| B4 | 非银行池不出现候选/等待/回避；银行排行与“现在有哪些候选买点”含银行部分 | `engine/ask/service.py`、`engine/ask/intent.py` | `test_b4_non_bank_pool_has_no_formal_conclusion_and_rank_includes_bank`；6 条银行问法入问题集 | ✅ |
+| B5 | 卡片术语扫描 0；局限三条齐全；干净目录全部测试与问题集通过（银行问法 ≥5） | 全项目 | `test_b5_bank_question_set_terms_and_limits`；本地 **694 passed**；干净归档 **693 passed + 1 skipped**、问题集 67/67 | ✅ |
+| B6 | DELIVERY.md 一页以内，附招商银行、平安银行卡片原文 | `DELIVERY.md` | 见入口文件 | ✅ |

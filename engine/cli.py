@@ -31,6 +31,77 @@ from engine.reporting.json_exporter import export_json
 from engine.reporting.text_summary import render_text
 
 TZ = ZoneInfo("Asia/Singapore")
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def _bank_query(query: str) -> tuple[str, str] | None:
+    """识别银行池/银行样本名称或代码，返回 (code, name)。"""
+    from engine.quality.tables import read_table
+
+    path = ROOT / "data" / "bank-pool" / "valuation-v2" / "inputs.csv.gz"
+    if not path.exists():
+        return None
+    text = str(query or "").strip()
+    for row in read_table(path):
+        code = str(row["code"]).zfill(6)
+        name = str(row.get("name") or "")
+        if text == code or text == name or (name and name in text):
+            return code, name
+    return None
+
+
+def _bank_cli(query: str, *, as_json: bool, analysis_date: str | None) -> tuple[str, int]:
+    from engine.ask.service import AskService
+    from engine.bank.conclusion import append_bank_formal, valuation_for
+
+    service = AskService(allow_update=False, write_ledger=False)
+    card = service.ask(query)
+    code = str(card.target.code if card.target else "").zfill(6)
+    conclusion = str(card.data.get("conclusion") or "undetermined")
+    payload = {
+        "query": query,
+        "instrument_id": f"EQUITY:{code}.{'SH' if code.startswith('6') else 'SZ'}" if code else None,
+        "asset_class": "equity",
+        "analysis_status": "complete" if conclusion in ("candidate_buy_point", "wait", "avoid") else "insufficient_data",
+        "model_id": "bank_valuation_v2",
+        "model_version": "2.1.0",
+        "model_status": "validated",
+        "policy": {
+            "policy_id": "bank-valuation-v2.1",
+            "status": "approved",
+            "approved_at": "2026-11-14",
+            "review_date": "2027-05-31",
+        },
+        "decision": {
+            "candidate_buy_point": "candidate",
+            "wait": "wait",
+            "avoid": "avoid",
+        }.get(conclusion, "undetermined"),
+        "conclusion": conclusion,
+        "conclusion_label": {
+            "candidate_buy_point": "候选买点",
+            "wait": "等待",
+            "avoid": "回避",
+        }.get(conclusion, "无法判断"),
+        "price": card.data.get("price"),
+        "price_date": card.data.get("price_date"),
+        "threshold_price": card.data.get("threshold_price"),
+        "values": card.data.get("values") or {},
+        "implicit_return": card.data.get("implicit_return"),
+        "card": card.markdown,
+    }
+    if conclusion in ("candidate_buy_point", "wait", "avoid"):
+        valuation = valuation_for(
+            code, price=card.data.get("price"), price_date=card.data.get("price_date")
+        )
+        if valuation is not None:
+            append_bank_formal(
+                valuation,
+                ledger_path=ROOT / "data" / "ledger" / "equity-conclusions.jsonl",
+                analysis_date=analysis_date or service.analysis_date.isoformat(),
+            )
+    text = json.dumps(payload, ensure_ascii=False, indent=2) if as_json else card.markdown
+    return text, 0
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -145,6 +216,14 @@ def main(argv: list[str] | None = None) -> int:
     if query is None:
         print("缺少标的名称或代码。示例：python -m engine.cli '沪深300'", file=sys.stderr)
         return 2
+
+    bank_query = _bank_query(query)
+    if bank_query is not None:
+        text, code = _bank_cli(query, as_json=args.json, analysis_date=args.analysis_date)
+        if args.out:
+            Path(args.out).write_text(text + "\n", encoding="utf-8")
+        print(text)
+        return code
 
     config = AnalyzerConfig(
         registry_path=Path(args.registry) if args.registry else AnalyzerConfig.registry_path,

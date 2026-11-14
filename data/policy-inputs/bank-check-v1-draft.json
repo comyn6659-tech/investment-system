@@ -21,6 +21,7 @@
   "margin_basis": "个股政策 v1.1 grade.B.margin_of_safety = 40%；银行最高 B 级，不评 A",
   "max_loss_years_7": 1,
   "loss_basis": "个股政策 v1.1 grade.B：最近 7 个财年至多 1 年亏损",
-  "note": "银行检查参数保持 draft，决策③明确不启用；本文件仅作为预演/未来复审的历史参数，不进入正式结论。",
-  "decision3": "不启用（2026-11-13，决策③-4）；银行模型保持 research，只展示银行池与描述性数据；以后另做银行专用估值再提请"
+  "note": "银行检查草案已停止使用；银行买点改由 bank-valuation-v2.1 的合理市净率法给出。本文件仅保留为历史。",
+  "decision3": "不启用（2026-11-13，决策③-4）；已被 bank-valuation-v2.1 取代（2026-11-14，决策④）。",
+  "superseded_by": "bank-valuation-v2.1（2026-11-14 决策④批准）"
 }

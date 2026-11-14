@@ -223,8 +223,8 @@ def test_x1_pool_and_price_words_go_ranking(service):
         result = service.ask(question)
         assert result.intent.name == "ranking", question
         if "银行池" in question:
-            assert "银行池不排行" in result.markdown, question
-            assert "不良率" in result.markdown, question
+            assert "银行池" in result.markdown, question
+            assert ("候选买点" in result.markdown) or ("距门槛" in result.markdown), question
         else:
             assert "入池不等于买入" in result.markdown, question
 
@@ -244,7 +244,7 @@ def test_x3_x4_x5_bank_card_for_banks_outside_pool(service):
         for label in ("不良率", "拨备覆盖率", "核心一级", "所有制"):
             assert label in text, (question, label)
         assert ownership in text, (question, ownership)
-        assert "银行专用估值方法还没启用（股东 2026-11-13 决定）" in text
+        assert "不在银行池" in text and "只给价值数字" in text
         for internal in ("bank-check", "draft", "bank-pool", "equity-policy", "ROE"):
             assert internal not in text, (question, internal)
 
@@ -467,3 +467,99 @@ def test_z4_history_position_same_source_and_card_line(service):
     assert "同源同口径" in text
     insufficient = service.ask("兰州银行怎么样").markdown
     assert "不足 5 年" in insufficient
+
+
+# --- batch4m：银行买点批准落地 ---------------------------------------------
+def test_b1_approved_policy_matches_draft_and_has_approval_record():
+    approved = json.loads((ROOT / "data" / "policies" / "bank-valuation-v2.1.json").read_text(encoding="utf-8"))
+    draft = json.loads((ROOT / "data" / "policies" / "bank-valuation-v2.1-draft.json").read_text(encoding="utf-8"))
+    assert approved["status"] == "approved" and approved["approved"] is True
+    assert approved["parameters"] == draft["parameters"]
+    assert approved["method"] == draft["method"]
+    approval = approved["approval"]
+    assert approval["approved_at"] == "2026-11-14"
+    assert approval["next_review"] == "2027-05-31"
+    assert "决策④" in approval["decision"]
+    assert approved["known_gaps"] and approved["remediation"]
+    old = json.loads((ROOT / "data" / "policy-inputs" / "bank-check-v1-draft.json").read_text(encoding="utf-8"))
+    assert old["approved"] is False
+    assert "bank-valuation-v2.1" in old["superseded_by"]
+
+
+def test_b2_only_bank_v21_model_is_newly_validated():
+    from engine.models.registry import MODELS_BY_ID, VALIDATED_MODEL_IDS
+
+    assert MODELS_BY_ID["bank_valuation_v2"].status == "validated"
+    assert MODELS_BY_ID["bank_valuation_v2"].version == "2.1.0"
+    assert MODELS_BY_ID["bank_dividend_discount"].status == "research"
+    assert MODELS_BY_ID["bank_dividend_discount"].version.endswith("-research")
+    assert MODELS_BY_ID["index_valuation_profile"].status == "research"
+    assert MODELS_BY_ID["index_strategy_a_valuation_reversion"].status == "research"
+    assert MODELS_BY_ID["etf_execution_check"].status == "planned"
+    assert VALIDATED_MODEL_IDS == {
+        "equity_dcf_fcff",
+        "equity_dividend_discount",
+        "bank_valuation_v2",
+    }
+
+
+def test_b3_cli_bank_conclusions_match_v21_and_ledger_has_11(service):
+    ledger = [
+        json.loads(line)
+        for line in (ROOT / "data" / "ledger" / "equity-conclusions.jsonl").read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    assert len(ledger) == 110
+    assert len(ledger[:99]) == 99
+    assert all(str(row["code"]).zfill(6) not in {
+        "002839", "002966", "600036", "601009", "601166", "601288",
+        "601328", "601398", "601658", "601939", "601998",
+    } for row in ledger[:99])
+    bank_rows = ledger[99:]
+    assert len(bank_rows) == 11
+    assert all(row.get("record_type", "formal") == "formal" for row in bank_rows)
+    payload = json.loads((ROOT / "data" / "bank-pool" / "valuation-v2.1.json").read_text(encoding="utf-8"))
+    expected = {
+        item["code"]: item["conclusion"]
+        for item in payload["banks"]
+        if item["code"] in {
+            "002839", "002966", "600036", "601009", "601166", "601288",
+            "601328", "601398", "601658", "601939", "601998",
+        }
+    }
+    assert len(expected) == 11
+    labels = {"candidate_buy_point": "候选买点", "wait": "等待", "avoid": "回避"}
+    for code, conclusion in expected.items():
+        text = service.ask(f"{next(item['name'] for item in payload['banks'] if item['code'] == code)}怎么样").markdown
+        assert f"**结论：{labels[conclusion]}**" in text
+        assert f"**结论：{labels[conclusion]}**" in text
+    assert sum(1 for value in expected.values() if value == "candidate_buy_point") == 3
+
+
+def test_b4_non_bank_pool_has_no_formal_conclusion_and_rank_includes_bank(service):
+    for question in ("平安银行怎么样", "宁波银行怎么样", "上海银行怎么样"):
+        text = service.ask(question).markdown
+        assert "**结论：无法判断**" in text
+        for label in ("候选买点", "等待", "回避"):
+            assert label not in text, (question, label)
+        assert "三档价值" in text and "隐含长期回报率" in text
+    ranked = service.ask("银行池里谁离买点最近").markdown
+    assert "银行池" in ranked and "候选买点" in ranked and "距门槛" in ranked
+    all_rank = service.ask("现在有哪些候选买点").markdown
+    assert "银行部分" in all_rank and "银行候选买点" in all_rank
+    bank_rank = service.ask("银行里有哪些买点").markdown
+    assert "银行池" in bank_rank and "候选买点" in bank_rank
+
+
+def test_b5_bank_question_set_terms_and_limits(service):
+    questions = json.loads((ROOT / "data" / "ask" / "questions.json").read_text(encoding="utf-8"))["questions"]
+    bank_questions = [item for item in questions if item["category"] == "银行"]
+    assert len(bank_questions) >= 5
+    banned = set(BANNED_TERMS) | {
+        "bank-check", "draft", "bank-pool", "equity-policy", "ROE", "研究画像", "entry", "exit"
+    }
+    for question in ("招商银行怎么样", "工商银行怎么样", "平安银行怎么样", "张家港行怎么样"):
+        text = service.ask(question).markdown
+        for term in banned:
+            assert term not in text, (question, term)
+        assert "局限：净资产收益率仍在下滑；报表坏账可能低估；只能前向验证。" in text

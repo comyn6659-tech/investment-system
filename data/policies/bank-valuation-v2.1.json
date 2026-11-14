@@ -1,0 +1,130 @@
+{
+  "schema_version": "bank-valuation-policy/1",
+  "policy_id": "bank-valuation-v2.1",
+  "label": "银行专用估值政策 v2.1（已批准）",
+  "status": "approved",
+  "approved": true,
+  "version_date": "2026-11-14",
+  "basis": "施工单 batch4l-r：在 v2 基础上修订三档 ROE 规则并新增描述性隐含长期回报率；仍只做试运行，是否启用由股东决定。",
+  "method": {
+    "name": "合理市净率法（剩余收益法的稳态形式）",
+    "formula": "每股价值 = 最新每股净资产 × (ROE − g) ÷ (k − g)",
+    "note": "ROE 为三档普通股 ROE；k 为银行股权成本；g 为长期增长；每股净资产只算普通股。"
+  },
+  "parameters": {
+    "roe_base": {
+      "rule": "min(最新财年 ROE, 近 3 年平均 ROE, 近 5 年平均 ROE)",
+      "mode": "min_latest_3y_5y",
+      "basis": "不假设盈利能力回升；把最新财年也纳入下限，避免最新一年已下滑而 3/5 年平均仍偏高。"
+    },
+    "roe_pessimistic": {
+      "rule": "min(近 5 年最低 ROE − 1 个百分点, 最新财年 ROE − 3 × 近 3 年年均下滑幅度)；近 3 年未下滑时后一项不适用",
+      "mode": "min5y_deduction_or_decline_extrapolation",
+      "deduction": 0.01,
+      "decline_years": 3,
+      "basis": "覆盖净息差继续下行、坏账暴露；若 ROE 最近在持续下滑，再按最近速度外推 3 年。"
+    },
+    "roe_optimistic": {
+      "rule": "近 3 年平均 ROE",
+      "mode": "3y_avg",
+      "basis": "乐观情景不假设超过近 3 年平均；v2.1 不再用 5 年平均，避免把更早的高盈利年份带入。"
+    },
+    "asset_quality_deduction": {
+      "trigger": "拨备覆盖率 < 200% 或不良率 5 年上升 > 0.3 个百分点",
+      "deduction": 0.01,
+      "basis": "报表不良率可能低估真实坏账；触发时三档 ROE 各再减 1 个百分点。",
+      "npl_change_years": 5,
+      "trigger_provision_coverage_pct": 200.0,
+      "trigger_npl_change_pp": 0.3
+    },
+    "growth": {
+      "base": 0.02,
+      "pessimistic": 0.015,
+      "optimistic": 0.025,
+      "cap": "g ≤ 规范化无风险利率",
+      "basis": "与个股政策一致；长期增长不得超过规范化无风险利率。"
+    },
+    "cost_of_equity": {
+      "rule": "个股政策股权成本 + 银行业溢价",
+      "bank_premium": 0.02,
+      "premium_sensitivity": [
+        0.01,
+        0.02,
+        0.03
+      ],
+      "basis": "银行杠杆十几倍、资产质量不透明；这是对整个行业的溢价，不是逐家主观加点。"
+    },
+    "book_value_per_share": {
+      "rule": "(最新报告期归母净资产 − 其他权益工具（优先股、永续债）) ÷ 总股本",
+      "basis": "只算普通股，避免把优先股/永续债持有人权益算给普通股股东。"
+    },
+    "margin_of_safety": {
+      "value": 0.3,
+      "sensitivity": [
+        0.2,
+        0.3,
+        0.4
+      ],
+      "basis": "银行池已过质量筛选；与个股 A 级 25%、B 级 40% 并列为政策选择。"
+    },
+    "implicit_return": {
+      "growth": 0.02,
+      "formula": "g + (最新财年 ROE − g) ÷ 现价市净率，g = 2%",
+      "basis": "描述性指标：如果 ROE 保持在最近一年水平，按现价买入的长期年化回报；不参与结论。",
+      "compare_to": "cost_of_equity"
+    }
+  },
+  "eligibility": {
+    "bank_pool_required": true,
+    "bank_pool_policy": "bank-pool-v1",
+    "required_fields": [
+      "bvps",
+      "roe_3y_avg",
+      "roe_5y_avg",
+      "roe_5y_min",
+      "npl_ratio",
+      "provision_coverage",
+      "shares",
+      "price"
+    ],
+    "max_loss_years_7": 0,
+    "note": "全部满足才给候选/等待/回避；其余银行只给价值数字与无法判断及原因。"
+  },
+  "conclusion": {
+    "candidate_buy_point": "现价 ≤ 基准价值 × (1 − 安全边际) 且 ≤ 悲观价值",
+    "avoid": "现价 > 乐观价值",
+    "wait": "其余",
+    "undetermined": "不满足 eligibility、数据不足或价值不可解释",
+    "binding": "安全边际（基准价值 × (1 − M)）与悲观价值孰低"
+  },
+  "notes": [
+    "本政策已批准；参数与 bank-valuation-v2.1-draft 逐项相同。",
+    "正式 CLI 银行结论只覆盖银行池 11 家；非银行池只给价值数字与无法判断。",
+    "不写改个股政策、三池、指数与账本旧记录。"
+  ],
+  "approval_date": "2026-11-14",
+  "approval": {
+    "decision": "决策④（2026-11-14）：启用银行买点；未另指定参数，按设计方建议 k 溢价 +2.0pp、安全边际 30% 执行。",
+    "approved_at": "2026-11-14",
+    "approved_by": "股东",
+    "decision_document": "decision4-package.md",
+    "next_review": "2027-05-31",
+    "scope": "仅银行池 11 家给正式结论；非银行池只给价值数字与无法判断。"
+  },
+  "known_gaps": [
+    "未经独立 AI 审查（设计方自审）。",
+    "ROE 仍在逐年下滑；模型基准假设停在最近一年，悲观假设再按近 3 年速度下滑 3 年。",
+    "报表不良率与拨备可能低估真实坏账。",
+    "无法历史回测，只能前向验证。",
+    "行业溢价 2.0pp 为政策选择，不是逐家主观加点。"
+  ],
+  "remediation": [
+    "结论账本逐条记录，2027-05-31 复盘；到期前不因短期结果改参数。",
+    "若 ROE 下滑超过悲观假设或资产质量证据恶化，按改判规则追加无法判断记录。",
+    "独立审查与历史回测作为下一次政策复核的前置项。"
+  ],
+  "supersedes": [
+    "bank-check-v1-draft",
+    "bank-valuation-rehearsal-v1（第八批通用股息折现银行路线）"
+  ]
+}

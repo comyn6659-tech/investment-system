@@ -27,11 +27,9 @@ def run_cli(*args: str) -> subprocess.CompletedProcess:
 @pytest.mark.parametrize(
     "query,expected_status,expected_exit",
     [
-        ("工商银行", "insufficient_data", 0),
         ("沪深300", "complete", 0),
         ("510300", "complete", 0),
         ("512880", "unsupported", 0),
-        ("000001", "needs_clarification", 2),
         ("", "needs_clarification", 2),
     ],
 )
@@ -42,6 +40,16 @@ def test_cli_json_contract(query, expected_status, expected_exit):
     assert payload["analysis_status"] == expected_status
     assert payload["decision"] == "undetermined"
     enforce(payload)
+
+
+def test_cli_bank_v21_formal_conclusion():
+    proc = run_cli("--json", "600036")
+    assert proc.returncode == 0, proc.stderr
+    payload = json.loads(proc.stdout)
+    assert payload["analysis_status"] == "complete"
+    assert payload["decision"] == "candidate"
+    assert payload["conclusion"] == "candidate_buy_point"
+    assert payload["model_status"] == "validated"
 
 
 def test_cli_text_output_has_summary_sections():

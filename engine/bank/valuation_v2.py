@@ -15,7 +15,7 @@ from engine.policy.equity import EquityPolicy
 from engine.policy.valuation import normalized_risk_free
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-DEFAULT_POLICY = ROOT / "data" / "policies" / "bank-valuation-v2.1-draft.json"
+DEFAULT_POLICY = ROOT / "data" / "policies" / "bank-valuation-v2.1.json"
 POLICY_SCHEMA = "bank-valuation-policy/1"
 
 
@@ -28,8 +28,10 @@ def load_policy(path: Path | None = None) -> dict[str, Any]:
     payload = json.loads(node.read_text(encoding="utf-8"))
     if payload.get("schema_version") != POLICY_SCHEMA:
         raise BankValuationV2Error(f"银行估值 v2 schema 非法：{payload.get('schema_version')!r}")
-    if payload.get("status") != "draft_unapproved":
-        raise BankValuationV2Error("银行估值 v2 必须是未批准草案")
+    if payload.get("status") not in ("draft_unapproved", "approved"):
+        raise BankValuationV2Error(f"银行估值 v2.1 状态非法：{payload.get('status')!r}")
+    if payload.get("status") == "approved" and not payload.get("approved"):
+        raise BankValuationV2Error("银行估值 v2.1 标记 approved 但 approved 字段不为 true")
     return payload
 
 

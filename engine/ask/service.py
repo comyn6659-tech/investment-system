@@ -32,6 +32,7 @@ from engine.data.snapshot import SnapshotStore
 from engine.evidence.models import BusinessEvidence
 from engine.forward import quotes, update
 from engine.bank import history as bank_history
+from engine.bank.conclusion import append_bank_formal, valuation_for as bank_valuation_for
 from engine.forward.calendar import is_trading_day
 from engine.income.evaluator import evaluate_company as evaluate_income
 from engine.bank.evaluator import evaluate_company as evaluate_bank
@@ -650,10 +651,11 @@ class AskService:
                             else ""
                         )
                     )
+        policies = sorted({str(row.get("policy_version")) for row in records if row.get("policy_version")})
         lines += [
             "",
             f"数据与来源：账本 data/ledger/equity-conclusions.jsonl（只追加）；分析日 {self.analysis_date.isoformat()}；"
-            "政策 equity-policy-v1.1（已批准 2026-11-12）。",
+            f"政策 {'、'.join(policies) if policies else '—'}。",
             "账本只追加、不改旧记录；同一标的同分析日同快照内容不同会报冲突，不覆盖。",
             "不构成投资建议。",
         ]
@@ -893,6 +895,22 @@ class AskService:
                     f"｜门槛 {_money(row['entry'])}｜{_pct_number(row['distance'])}"
                     f"｜{_label(row['conclusion'])}"
                 )
+        if pool == "all":
+            bank_rows = self._bank_ranking_rows()
+            bank_candidates = [
+                row for row in bank_rows if row["conclusion"] == "candidate_buy_point"
+            ]
+            lines += ["", "银行部分（银行专用估值）："]
+            if bank_candidates:
+                lines.append(f"银行候选买点（{len(bank_candidates)} 家）：")
+                for row in bank_candidates:
+                    lines.append(
+                        f"- {row['code']} {row['name']}：现价 {_money(row['price'])} 元"
+                        f"｜门槛 {_money(row['entry'])}｜距门槛 {_pct_number(row['distance'])}"
+                        f"｜候选买点"
+                    )
+            else:
+                lines.append("银行池当前没有候选买点。")
         lines += [
             "",
             "入池不等于买入：池名单只说明历史公开数据满足规则，不代表现在值得买。",
@@ -904,40 +922,41 @@ class AskService:
         return {"markdown": "\n".join(lines), "data": {"pool": pool, "count": len(codes), "candidates": candidates, "ranking": rows}}
 
     def _bank_pool_ranking(self, *, detail: bool = False) -> dict[str, Any]:
-        inputs = self._bank_inputs()
-        rows = sorted(self.pool_rows["bank"].values(), key=lambda row: str(row["code"]))
+        rows = self._bank_ranking_rows()
+        candidates = [row for row in rows if row["conclusion"] == "candidate_buy_point"]
         lines = [
-            "**结论：银行池不排行** — 银行专用估值方法还没启用（股东 2026-11-13 决定），"
-            "所以只列指标、不按价格排高低。",
+            f"**结论：银行池{'有 ' + str(len(candidates)) + ' 个候选买点' if candidates else '当前没有候选买点'}**"
+            " — 按银行专用估值的现价距门槛排序。",
             "",
         ]
-        for row in rows[: (50 if detail else 15)]:
-            code = str(row["code"]).zfill(6)
-            indicator = self._bank_indicator(code)
-            quote = (self.quote_rows.get(code) or {}) if self.use_live_quotes else {}
-            price = quote.get("price")
-            if price is None and inputs.get(code):
-                try:
-                    price = float(inputs[code]["price"])
-                except (TypeError, ValueError, KeyError):
-                    price = None
-            ownership = self._bank_ownership(code) or row.get("ownership") or "未标记"
-            lines.append(
-                f"- {code} {row['name']}：现价 {_money(price)} 元"
-                f"｜不良率 {indicator.get('npl_ratio') or row.get('npl_ratio') or '—'}%"
-                f"｜拨备覆盖率 {indicator.get('provision_coverage') or row.get('provision_coverage') or '—'}%"
-                f"｜核心一级 {indicator.get('core_tier1_ratio') or row.get('core_tier1_ratio') or '—'}%"
-                f"｜所有制 {ownership}"
-            )
+        if candidates:
+            lines.append("候选买点（现价不高于门槛价，且不高于悲观价值）：")
+            for row in candidates:
+                lines.append(
+                    f"- {row['code']} {row['name']}：现价 {_money(row['price'])} 元"
+                    f"｜门槛 {_money(row['entry'])}｜距门槛 {_pct_number(row['distance'])}"
+                )
+        else:
+            lines.append("银行池当前没有同时满足安全边际与悲观价值约束的标的。")
+        closest = [row for row in rows if row["conclusion"] != "candidate_buy_point"][: (20 if detail else 5)]
+        if closest:
+            lines += ["", "距候选门槛最近（尚未到买点）："]
+            for row in closest:
+                lines.append(
+                    f"- {row['code']} {row['name']}：现价 {_money(row['price'])} 元"
+                    f"｜门槛 {_money(row['entry'])}｜{_pct_number(row['distance'])}"
+                    f"｜{_label(row['conclusion'])}"
+                )
         lines += [
             "",
-            "想看单家银行详情，可问：平安银行怎么样。",
-            "来源与日期：银行指标 东方财富 2026 三季报；行情 腾讯财经（最新交易日）；规则已批准（2026-11-13）。",
+            "入池不等于买入：银行池只说明通过质量筛选，不代表现在便宜。",
+            "说明：排序只按「现价距候选门槛」，不代表公司质量或收益预期；无法判断的标的不参与排行。",
+            "来源与日期：价格 腾讯财经（最新交易日）；银行专用估值政策（已批准 2026-11-14，复核 2027-05-31）。",
             "不构成投资建议。",
         ]
         return {
             "markdown": "\n".join(lines),
-            "data": {"pool": "bank", "count": len(rows), "ranked": False},
+            "data": {"pool": "bank", "count": len(rows), "candidates": candidates, "ranking": rows},
         }
 
     # --- 卡片：池名单 -------------------------------------------------------
@@ -1170,6 +1189,148 @@ class AskService:
                 self._bank_rows = {str(row["code"]).zfill(6): row for row in csv.DictReader(handle)}
         return self._bank_rows
 
+    def _bank_formal_card(
+        self,
+        target: Target,
+        valuation: dict[str, Any],
+        *,
+        detail: bool = False,
+        pb: float | None = None,
+        dividend_yield: float | None = None,
+    ) -> dict[str, Any]:
+        code = target.code
+        price = valuation.get("price")
+        price_date = valuation.get("price_date")
+        threshold = valuation.get("threshold_price")
+        values = valuation.get("values") or {}
+        roe = valuation.get("roe") or {}
+        binding = (
+            "安全边际（基准价值打折后的价格）"
+            if valuation.get("binding_condition") == "margin_of_safety"
+            else "悲观价值"
+        )
+        distance = (
+            (float(price) / float(threshold) - 1.0) * 100.0
+            if price is not None and threshold not in (None, 0)
+            else None
+        )
+        conclusion = valuation.get("conclusion")
+        headline = {
+            "candidate_buy_point": "候选买点",
+            "wait": "等待",
+            "avoid": "回避",
+        }.get(conclusion, "无法判断")
+        if conclusion == "candidate_buy_point":
+            reason = "现价不高于门槛价，也不高于悲观价值。"
+        elif conclusion == "wait":
+            reason = "现价仍高于门槛价，未同时满足安全边际与悲观价值约束。"
+        elif conclusion == "avoid":
+            reason = "现价高于乐观价值，按规则判回避。"
+        else:
+            reason = "银行数据不完整，暂不给正式结论。"
+        indicator = self._bank_indicator(code) or {}
+        ownership = self._bank_ownership(code) or "未标记"
+        implicit = valuation.get("implicit_return")
+        lines = [
+            f"**结论：{headline}** — {reason}",
+            "",
+            f"现价 {_money(price)} 元（{price_date or '日期未知'}）｜门槛 {_money(threshold)} 元"
+            f"｜距门槛 {_pct_number(distance)}",
+            "正式结论（银行专用估值政策，已批准 2026-11-14）",
+            "关键指标："
+            f"市净率 {pb:.2f} 倍｜股息率 {_pct(dividend_yield)}｜"
+            f"不良率 {indicator.get('npl_ratio') or '—'}%｜拨备覆盖率 "
+            f"{indicator.get('provision_coverage') or '—'}%｜核心一级 "
+            f"{indicator.get('core_tier1_ratio') or '—'}%",
+            "三档价值（元/股）："
+            f"悲观 {_money(values.get('pessimistic'))}（最悲观假设下每股值多少）"
+            f"｜基准 {_money(values.get('base'))}（安全边际的计算基准）"
+            f"｜乐观 {_money(values.get('optimistic'))}（高于它就判回避）",
+            f"为什么：起约束条件 {binding}；{reason}",
+            "三档净资产收益率："
+            f"基准 {_pct(roe.get('base'))}（假设停在最近一年）"
+            f"｜悲观 {_pct(roe.get('pessimistic'))}（再按近 3 年速度下滑 3 年）"
+            f"｜乐观 {_pct(roe.get('optimistic'))}（近 3 年平均）",
+            bank_history.one_line(code),
+            *(
+                [f"隐含长期回报率：约 {implicit:.1%}（假设净资产收益率保持最新水平、按现价买入；描述性，不参与结论）。"]
+                if implicit is not None
+                else []
+            ),
+            f"它是什么：银行池成员｜所有制 {ownership}｜周期属性 {cycle_text('bank')}｜等级 B（银行池最高等级）",
+            "局限：净资产收益率仍在下滑；报表坏账可能低估；只能前向验证。",
+            "来源与日期：行情 腾讯财经（最新交易日）；财务 东方财富 2025 年报 / 2026 三季报；"
+            "银行专用估值政策（已批准 2026-11-14，复核 2027-05-31）。",
+            "不构成投资建议。",
+        ]
+        if detail:
+            lines += [
+                "",
+                "【详情】",
+                f"- 每股净资产：{_money(valuation.get('bvps'))} 元",
+                f"- 银行股权成本 k：{_pct(valuation.get('cost_of_equity'), 2)}；银行溢价：{_pct(valuation.get('bank_premium'), 1)}",
+                f"- 基准价值对应合理市净率：{_money((valuation.get('multiples') or {}).get('base'), 3)}",
+                f"- 资产质量扣减：{'是' if valuation.get('asset_quality_deduction') else '否'}",
+            ]
+        ledger = None
+        if self.write_ledger:
+            ledger = append_bank_formal(
+                valuation,
+                ledger_path=self.ledger_path,
+                analysis_date=self.analysis_date.isoformat(),
+            )
+        return {
+            "markdown": "\n".join(lines),
+            "data": {
+                "code": code,
+                "conclusion": conclusion,
+                "in_bank_pool": True,
+                "price": price,
+                "price_date": price_date,
+                "threshold_price": threshold,
+                "values": values,
+                "implicit_return": implicit,
+                "ledger": ledger,
+            },
+        }
+
+    def _bank_ranking_rows(self) -> list[dict[str, Any]]:
+        rows = []
+        for code in sorted(self.pool_sets["bank"]):
+            quote = (self.quote_rows.get(code) or {}) if self.use_live_quotes else {}
+            price = quote.get("price")
+            price_date = quote.get("price_date")
+            valuation = bank_valuation_for(code, price=price, price_date=price_date)
+            if valuation is None or valuation.get("conclusion") not in (
+                "candidate_buy_point",
+                "wait",
+                "avoid",
+            ):
+                continue
+            threshold = valuation.get("threshold_price")
+            price = valuation.get("price")
+            distance = (
+                (float(price) / float(threshold) - 1.0) * 100.0
+                if price is not None and threshold not in (None, 0)
+                else None
+            )
+            if distance is None:
+                continue
+            rows.append(
+                {
+                    "code": code,
+                    "name": valuation["name"],
+                    "price": price,
+                    "price_date": valuation.get("price_date"),
+                    "entry": threshold,
+                    "distance": distance,
+                    "conclusion": valuation["conclusion"],
+                    "values": valuation.get("values") or {},
+                }
+            )
+        rows.sort(key=lambda item: item["distance"])
+        return rows
+
     def _bank_card(self, target: Target | None, *, detail: bool = False) -> dict[str, Any]:
         if target is None:
             return {"markdown": self._help_card(Intent("unrecognized")), "data": {}}
@@ -1216,9 +1377,22 @@ class AskService:
             or self.ownership.get(code)
             or "未标记"
         )
+        valuation = bank_valuation_for(code, price=price, price_date=price_date)
+        if in_pool and valuation and valuation.get("conclusion") in (
+            "candidate_buy_point",
+            "wait",
+            "avoid",
+        ):
+            return self._bank_formal_card(
+                target, valuation, detail=detail, pb=pb, dividend_yield=dividend_yield
+            )
         implicit_line = bank_history.implicit_return_line(code, price)
+        if in_pool:
+            conclusion_text = "银行数据不完整，暂不给正式结论。"
+        else:
+            conclusion_text = "不在银行池（未通过：银行池规则）；只给价值数字，不给买卖结论。"
         lines = [
-            "**结论：无法判断** — 银行专用估值方法还没启用（股东 2026-11-13 决定），所以只列指标、不下结论。",
+            f"**结论：无法判断** — {conclusion_text}",
             "",
             f"是否在银行池：{'是' if in_pool else '否'}（银行池共 {len(self.pool_sets['bank'])} 家）"
             f"｜现价 {_money(price)} 元（{price_date or '日期未知'}）",
@@ -1227,15 +1401,25 @@ class AskService:
             f"｜不良率 {npl if npl is not None else '—'}%"
             f"｜拨备覆盖率 {provision if provision is not None else '—'}%"
             f"｜核心一级 {cet1 if cet1 is not None else '—'}%",
+            *(
+                [
+                    "三档价值（元/股）："
+                    f"悲观 {_money(valuation['values'].get('pessimistic'))}"
+                    f"｜基准 {_money(valuation['values'].get('base'))}"
+                    f"｜乐观 {_money(valuation['values'].get('optimistic'))}"
+                    "（v2.1 试算，只给数字）"
+                ]
+                if valuation and valuation.get("values")
+                else []
+            ),
             bank_history.one_line(code),
             *([implicit_line] if implicit_line else []),
-            "为什么：银行的资本充足、资产质量与监管口径需要专用方法；本版只展示公开报表指标，"
-            "不评价贵贱。",
+            "为什么：非银行池未通过银行池规则，只展示公开指标与 v2.1 试算价值，不给买卖结论。",
             f"它是什么：{'银行池成员' if in_pool else '银行（不在银行池）'}｜所有制 {ownership}"
-            f"｜周期属性 {cycle_text('bank')}｜等级 —（银行模型未启用，不评等级）",
-            "局限：银行指标是公开报表口径，未做银行专用估值；不良率、拨备与核心一级可能随季报更新。",
+            f"｜周期属性 {cycle_text('bank')}｜等级 —（非银行池不评等级）",
+            "局限：净资产收益率仍在下滑；报表坏账可能低估；只能前向验证。",
             f"来源与日期：行情 腾讯财经（{price_date or '—'}）；财务 东方财富 2025 年报 / 2026 三季报；"
-            "政策与银行规则均已批准（2026-11-13）。",
+            "银行专用估值政策（已批准 2026-11-14，复核 2027-05-31）。",
             "不构成投资建议。",
         ]
         if detail:

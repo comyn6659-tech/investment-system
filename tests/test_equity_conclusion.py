@@ -93,7 +93,11 @@ def test_p1_policy_version_uses_approved_identifier(approved):
 def test_p2_only_policy_routes_are_validated():
     validated = {m.model_id for m in MODELS if m.status == "validated"}
     assert validated == set(VALIDATED_MODEL_IDS)
-    assert validated == {"equity_dcf_fcff", "equity_dividend_discount"}
+    assert validated == {
+        "equity_dcf_fcff",
+        "equity_dividend_discount",
+        "bank_valuation_v2",
+    }
     for model_id in (
         "bank_dividend_discount",
         "index_valuation_profile",
@@ -101,6 +105,8 @@ def test_p2_only_policy_routes_are_validated():
         "etf_execution_check",
     ):
         assert MODELS_BY_ID[model_id].status != "validated"
+    assert MODELS_BY_ID["bank_valuation_v2"].status == "validated"
+    assert MODELS_BY_ID["bank_dividend_discount"].status == "research"
 
 
 def test_p2_formal_result_requires_validated_policy_model(policy_results):

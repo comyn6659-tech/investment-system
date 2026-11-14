@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""对话入口端到端验收：61 条固定问题 + 30 只测试股 + 三只指数 + 恒生科技 + 两家银行 + 三只 ETF。
+"""对话入口端到端验收：67 条固定问题 + 30 只测试股 + 三只指数 + 恒生科技 + 两家银行 + 三只 ETF。
 
 输出：
 - `data/ask/acceptance.json`
@@ -130,7 +130,7 @@ def _report_rows() -> dict:
         index_rows.append(_single(service, question, research=True))
     bank_rows = []
     for question in ("招商银行怎么样", "工商银行怎么样"):
-        bank_rows.append(_single(service, question, research=True))
+        bank_rows.append(_single(service, question))
     etf_rows = []
     for question in ("510300 能买吗", "510500 能买吗", "512100 能买吗"):
         etf_rows.append(_single(service, question, research=True))

@@ -81,12 +81,15 @@
       "expect": {
         "intent": "bank",
         "code": "600036",
-        "conclusion": "undetermined",
+        "conclusion": "candidate_buy_point",
         "contains": [
-          "银行专用估值方法还没启用",
+          "正式结论",
+          "门槛",
+          "三档价值",
+          "三档净资产收益率",
+          "隐含长期回报率",
           "市净率",
           "股息率",
-          "净资产收益率",
           "不良率",
           "拨备覆盖率",
           "核心一级"
@@ -100,10 +103,11 @@
       "expect": {
         "intent": "bank",
         "code": "601398",
-        "conclusion": "undetermined",
+        "conclusion": "wait",
         "contains": [
-          "银行专用估值方法还没启用",
-          "市净率"
+          "结论：等待",
+          "门槛",
+          "三档价值"
         ]
       }
     },
@@ -114,7 +118,7 @@
       "expect": {
         "intent": "bank",
         "code": "600036",
-        "conclusion": "undetermined",
+        "conclusion": "candidate_buy_point",
         "contains": [
           "净资产收益率",
           "股息率"
@@ -441,7 +445,8 @@
         "code": "600036",
         "contains": [
           "历史结论",
-          "0 条"
+          "1 条",
+          "bank-valuation-v2.1"
         ]
       }
     },
@@ -770,9 +775,95 @@
       "expect": {
         "intent": "ranking",
         "contains": [
-          "银行池不排行",
-          "只列指标",
-          "不良率"
+          "银行池",
+          "候选买点",
+          "距门槛"
+        ]
+      }
+    },
+    {
+      "id": "q62",
+      "category": "银行",
+      "question": "招商银行怎么样",
+      "expect": {
+        "intent": "bank",
+        "contains": [
+          "结论：候选买点",
+          "正式结论",
+          "门槛",
+          "三档价值",
+          "三档净资产收益率",
+          "隐含长期回报率",
+          "历史位置",
+          "所有制",
+          "局限"
+        ],
+        "conclusion": "candidate_buy_point"
+      }
+    },
+    {
+      "id": "q63",
+      "category": "银行",
+      "question": "工商银行怎么样",
+      "expect": {
+        "intent": "bank",
+        "contains": [
+          "结论：等待",
+          "三档价值",
+          "隐含长期回报率"
+        ],
+        "conclusion": "wait"
+      }
+    },
+    {
+      "id": "q64",
+      "category": "银行",
+      "question": "平安银行怎么样",
+      "expect": {
+        "intent": "bank",
+        "contains": [
+          "无法判断",
+          "不在银行池",
+          "三档价值",
+          "隐含长期回报率"
+        ],
+        "conclusion": "undetermined"
+      }
+    },
+    {
+      "id": "q65",
+      "category": "排行",
+      "question": "银行池里谁离买点最近",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "银行池",
+          "候选买点",
+          "距门槛"
+        ]
+      }
+    },
+    {
+      "id": "q66",
+      "category": "排行",
+      "question": "银行里有哪些买点",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "银行池",
+          "候选买点"
+        ]
+      }
+    },
+    {
+      "id": "q67",
+      "category": "排行",
+      "question": "现在有哪些候选买点",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "银行部分",
+          "银行候选买点"
         ]
       }
     }

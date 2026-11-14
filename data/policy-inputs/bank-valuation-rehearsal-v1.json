@@ -14,21 +14,39 @@
   "scenarios": {
     "bear": {
       "note": "净利润零增长、股权成本 9.5%、终值增长 1.5%",
-      "net_profit_growth": [0.0, 0.0, 0.0, 0.0, 0.0],
+      "net_profit_growth": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
       "payout_adjust": 0.0,
       "cost_of_equity": 0.095,
       "terminal_growth": 0.015
     },
     "base": {
       "note": "净利润 2%–3% 增长、股权成本 9.0%、终值增长 2.0%",
-      "net_profit_growth": [0.02, 0.03, 0.03, 0.03, 0.03],
+      "net_profit_growth": [
+        0.02,
+        0.03,
+        0.03,
+        0.03,
+        0.03
+      ],
       "payout_adjust": 0.0,
       "cost_of_equity": 0.09,
       "terminal_growth": 0.02
     },
     "bull": {
       "note": "净利润 4% 增长、股权成本 8.5%、终值增长 2.5%",
-      "net_profit_growth": [0.04, 0.04, 0.04, 0.04, 0.04],
+      "net_profit_growth": [
+        0.04,
+        0.04,
+        0.04,
+        0.04,
+        0.04
+      ],
       "payout_adjust": 0.02,
       "cost_of_equity": 0.085,
       "terminal_growth": 0.025
@@ -37,6 +55,8 @@
   "notes": [
     "本文件只是预演假设，approved=false；银行估值模型仍为 research，是否启用由股东在决策③决定。",
     "派息率以最近 5 个财年实际分红合计 ÷ 归母净利润合计为基准，情景中只做小幅调整，不超过 90%。",
-    "预演不写入正式结论账本，不改变 CLI 结论。"
-  ]
+    "预演不写入正式结论账本，不改变 CLI 结论。",
+    "第八批通用股息折现银行路线已被 bank-valuation-v2.1 取代；本文件仅保留为历史。"
+  ],
+  "superseded_by": "bank-valuation-v2.1（2026-11-14 决策④批准）"
 }

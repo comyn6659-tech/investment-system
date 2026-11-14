@@ -1,8 +1,8 @@
 # 对话入口端到端验收（batch4k）
 
-- 生成时间：2026-11-14T17:54:33+08:00
+- 生成时间：2026-11-14T18:33:19+08:00
 - 政策：`equity-policy-v1.1`（已批准）
-- 固定问题集：61 条，通过 61 条；端到端全部通过：是
+- 固定问题集：67 条，通过 67 条；端到端全部通过：是
 - 问题集测试使用批量快照固定价格；30 只测试股 / 指数 / 银行 / ETF 使用当日实时行情。
 
 ## 1. 固定问题集
@@ -15,10 +15,10 @@
 | q04 | 单只个股 | 五粮液值得买吗 | stock | stock | undetermined | 10 | 通过 |
 | q05 | 单只个股 | 格力电器现在能买吗 | stock | stock | undetermined | 10 | 通过 |
 | q06 | 单只个股 | 京东方A怎么样 | stock | stock | undetermined | 10 | 通过 |
-| q07 | 银行 | 招商银行怎么样 | bank | bank | undetermined | 12 | 通过 |
-| q08 | 银行 | 工商银行贵不贵 | bank | bank | undetermined | 12 | 通过 |
-| q09 | 银行 | 招行股息率多少 | bank | bank | undetermined | 12 | 通过 |
-| q10 | 银行 | 平安银行怎么样 | bank | bank | undetermined | 12 | 通过 |
+| q07 | 银行 | 招商银行怎么样 | bank | bank | candidate_buy_point | 14 | 通过 |
+| q08 | 银行 | 工商银行贵不贵 | bank | bank | wait | 14 | 通过 |
+| q09 | 银行 | 招行股息率多少 | bank | bank | candidate_buy_point | 14 | 通过 |
+| q10 | 银行 | 平安银行怎么样 | bank | bank | undetermined | 13 | 通过 |
 | q11 | 指数 | 沪深300 现在什么位置 | index | index | undetermined | 13 | 通过 |
 | q12 | 指数 | 中证500 贵不贵 | index | index | undetermined | 13 | 通过 |
 | q13 | 指数 | 中证1000 什么位置 | index | index | undetermined | 13 | 通过 |
@@ -37,12 +37,12 @@
 | q26 | 是否在池 | 招商银行在不在银行池 | membership | membership | — | 8 | 通过 |
 | q27 | 是否在池 | 中国平安在不在好公司池 | membership | membership | — | 8 | 通过 |
 | q28 | 排行 | 好公司里谁离买点最近 | ranking | ranking | — | 15 | 通过 |
-| q29 | 排行 | 现在有哪些候选买点 | ranking | ranking | — | 16 | 通过 |
+| q29 | 排行 | 现在有哪些候选买点 | ranking | ranking | — | 22 | 通过 |
 | q30 | 排行 | 收息池里谁离买点最近 | ranking | ranking | — | 16 | 通过 |
-| q31 | 排行 | 离买点最近的股票有哪些 | ranking | ranking | — | 16 | 通过 |
+| q31 | 排行 | 离买点最近的股票有哪些 | ranking | ranking | — | 22 | 通过 |
 | q32 | 历史 | 茅台以前的结论 | history | history | — | 10 | 通过 |
 | q33 | 历史 | 600519 历史结论 | history | history | — | 10 | 通过 |
-| q34 | 历史 | 招行的结论记录 | history | history | — | 8 | 通过 |
+| q34 | 历史 | 招行的结论记录 | history | history | — | 7 | 通过 |
 | q35 | 状态 | 数据是哪天的 | status | status | — | 12 | 通过 |
 | q36 | 状态 | 规则什么时候复核 | status | status | — | 12 | 通过 |
 | q37 | 状态 | 数据更新到哪天 | status | status | — | 12 | 通过 |
@@ -55,9 +55,9 @@
 | q44 | 范围外/歧义 | 平安 | ambiguous | ambiguous | — | 11 | 通过 |
 | q45 | 历史 | 君正集团以前的结论 | history | history | — | 8 | 通过 |
 | q46 | 历史 | 扬农化工以前的结论 | history | history | — | 8 | 通过 |
-| q47 | 排行 | A股有哪些值得投资的公司 | ranking | ranking | — | 16 | 通过 |
-| q48 | 排行 | 有什么好股票 | ranking | ranking | — | 16 | 通过 |
-| q49 | 排行 | 推荐几只股票 | ranking | ranking | — | 16 | 通过 |
+| q47 | 排行 | A股有哪些值得投资的公司 | ranking | ranking | — | 22 | 通过 |
+| q48 | 排行 | 有什么好股票 | ranking | ranking | — | 22 | 通过 |
+| q49 | 排行 | 推荐几只股票 | ranking | ranking | — | 22 | 通过 |
 | q50 | 是否在池 | 为什么比亚迪不是好公司 | membership | membership | — | 10 | 通过 |
 | q51 | 是否在池 | 比亚迪算不算好公司 | membership | membership | — | 10 | 通过 |
 | q52 | 是否在池 | 比亚迪是好公司吗 | membership | membership | — | 10 | 通过 |
@@ -69,7 +69,13 @@
 | q58 | 排行 | 收息池哪些能买 | ranking | ranking | — | 16 | 通过 |
 | q59 | 排行 | 好公司池里价格合适的公司 | ranking | ranking | — | 15 | 通过 |
 | q60 | 排行 | 收息池离买点最近的公司 | ranking | ranking | — | 16 | 通过 |
-| q61 | 排行 | 银行池里哪些便宜 | ranking | ranking | — | 17 | 通过 |
+| q61 | 排行 | 银行池里哪些便宜 | ranking | ranking | — | 18 | 通过 |
+| q62 | 银行 | 招商银行怎么样 | bank | bank | candidate_buy_point | 14 | 通过 |
+| q63 | 银行 | 工商银行怎么样 | bank | bank | wait | 14 | 通过 |
+| q64 | 银行 | 平安银行怎么样 | bank | bank | undetermined | 13 | 通过 |
+| q65 | 排行 | 银行池里谁离买点最近 | ranking | ranking | — | 18 | 通过 |
+| q66 | 排行 | 银行里有哪些买点 | ranking | ranking | — | 18 | 通过 |
+| q67 | 排行 | 现在有哪些候选买点 | ranking | ranking | — | 22 | 通过 |
 
 ## 2. 30 只测试股
 
@@ -101,8 +107,8 @@
 | 601857 | 中国石油 | stock | undetermined | 12.39 | 2026-11-13 | C | unsupported | 通过 |
 | 000002 | 万科Ａ | stock | undetermined | 3.06 | 2026-11-13 | C | unsupported | 通过 |
 | 601012 | 隆基绿能 | stock | undetermined | 11.7 | 2026-11-13 | C | unsupported | 通过 |
-| 600036 | 招商银行 | bank | undetermined | — | — | — | — | 通过 |
-| 601398 | 工商银行 | bank | undetermined | — | — | — | — | 通过 |
+| 600036 | 招商银行 | bank | candidate_buy_point | 42.93 | 2026-11-13 | — | — | 通过 |
+| 601398 | 工商银行 | bank | wait | 8.85 | 2026-11-13 | — | — | 通过 |
 | 601318 | 中国平安 | stock | undetermined | 53.8 | 2026-11-13 | C | unsupported | 通过 |
 | 600030 | 中信证券 | stock | undetermined | 25.0 | 2026-11-13 | C | unsupported | 通过 |
 
@@ -119,8 +125,8 @@
 
 | 问题 | 意图 | 结论 | 行数 | 结果 |
 |---|---|---|---:|---|
-| 招商银行怎么样 | bank | undetermined | 12 | 通过 |
-| 工商银行怎么样 | bank | undetermined | 12 | 通过 |
+| 招商银行怎么样 | bank | candidate_buy_point | 14 | 通过 |
+| 工商银行怎么样 | bank | wait | 14 | 通过 |
 
 ## 5. 三只 ETF
 

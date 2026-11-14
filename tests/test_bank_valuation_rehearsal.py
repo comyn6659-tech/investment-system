@@ -201,15 +201,17 @@ def test_bank_pool_and_other_ledgers_unchanged(rehearsal):
         for line in (ROOT / "data" / "ledger" / "equity-conclusions.jsonl").read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
-    assert len(conclusions) >= 7
-    assert not any(row.get("code") == "600036" for row in conclusions)
+    assert len(conclusions) == 110
+    bank_rows = [row for row in conclusions if row.get("policy_version") == "bank-valuation-v2.1"]
+    assert len(bank_rows) == 11
+    assert any(str(row.get("code")).zfill(6) == "600036" for row in bank_rows)
     quality = json.loads((ROOT / "data" / "quality-pool" / "report.json").read_text(encoding="utf-8"))
     assert quality["counts"]["in_pool"] == 138
     income = json.loads((ROOT / "data" / "income-pool" / "report.json").read_text(encoding="utf-8"))
     assert income["counts"]["in_pool"] == 142
 
 
-def test_cli_bank_conclusion_unchanged():
+def test_cli_bank_conclusion_is_formal_v21():
     result = subprocess.run(
         [sys.executable, "-m", "engine.cli", "--json", "600036"],
         cwd=ROOT,
@@ -219,5 +221,7 @@ def test_cli_bank_conclusion_unchanged():
     )
     assert result.returncode == 0, result.stderr[-500:]
     payload = json.loads(result.stdout)
-    assert payload["analysis_status"] == "insufficient_data"
-    assert payload.get("valuation") is None
+    assert payload["analysis_status"] == "complete"
+    assert payload["conclusion"] == "candidate_buy_point"
+    assert payload["model_status"] == "validated"
+    assert payload["model_id"] == "bank_valuation_v2"

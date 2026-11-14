@@ -15,6 +15,7 @@ data/cache/*
 data/policy-trial/cache/
 data/policy-trial/logs/
 data/*/build.log
+data/logs/
 
 # 工具产物
 reports/_runtime/

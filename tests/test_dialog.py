@@ -92,14 +92,14 @@ def test_card_structure(service):
 def test_formal_and_research_labels(service):
     formal = service.ask("茅台怎么样").markdown
     assert FORMAL_LABEL in formal
-    for question in ("沪深300 现在什么位置", "510300 能买吗", "招商银行怎么样"):
+    for question in ("沪深300 现在什么位置", "510300 能买吗"):
         text = service.ask(question).markdown
         assert "正式结论" not in text, question
         assert ("研究" in text) or ("未启用" in text), question
 
 
 def test_research_never_has_formal_conclusion(service):
-    for question in ("沪深300 现在什么位置", "恒生科技", "510300 能买吗", "招商银行怎么样"):
+    for question in ("沪深300 现在什么位置", "恒生科技", "510300 能买吗"):
         text = service.ask(question).markdown
         assert "正式结论" not in text
         assert "**结论：无法判断**" in text

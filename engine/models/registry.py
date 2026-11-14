@@ -110,6 +110,33 @@ MODELS: tuple[ModelDescriptor, ...] = (
         notes=(
             "研究版：复用股息折现数学，但必须先过资本充足与资产质量检查；"
             "监管下限必须来自可核实来源，缺失即 insufficient_data。参数未获批准。"
+            "2026-11-14 决策④后已被 bank_valuation_v2 取代，第八批通用股息折现银行路线不启用。"
+        ),
+    ),
+    ModelDescriptor(
+        model_id="bank_valuation_v2",
+        version="2.1.0",
+        applies_to="equity",
+        status="validated",
+        implemented=True,
+        required_fields=(
+            "bank.bvps",
+            "bank.roe_latest",
+            "bank.roe_3y_avg",
+            "bank.roe_5y_avg",
+            "bank.roe_5y_min",
+            "bank.npl_ratio",
+            "bank.provision_coverage",
+            "profile.total_shares",
+            "price.close",
+        ),
+        supports=("已批准银行池（11 家）",),
+        failure_status="insufficient_data",
+        notes=(
+            "已按股东决策④于 2026-11-14 批准（bank-valuation-v2.1）："
+            "合理市净率法（剩余收益法稳态形式），k = 个股股权成本 + 2.0pp，安全边际 30%；"
+            "只有银行池 11 家给正式结论，非银行池只给价值数字与无法判断。"
+            "下次复核 2027-05-31。"
         ),
     ),
     ModelDescriptor(
@@ -182,8 +209,11 @@ MODELS: tuple[ModelDescriptor, ...] = (
 
 MODELS_BY_ID = {m.model_id: m for m in MODELS}
 
-# 政策批准只覆盖这两条路线；其余模型（银行股息、指数画像、候选 A、ETF 等）保持原状态
-VALIDATED_MODEL_IDS = frozenset({"equity_dcf_fcff", "equity_dividend_discount"})
+# 个股政策与 2026-11-14 决策④批准的银行 v2.1 为 validated；
+# 其余模型（银行通用股息、指数画像、候选 A、ETF 等）保持原状态。
+VALIDATED_MODEL_IDS = frozenset(
+    {"equity_dcf_fcff", "equity_dividend_discount", "bank_valuation_v2"}
+)
 
 
 def for_asset(asset_class: str) -> list[ModelDescriptor]:

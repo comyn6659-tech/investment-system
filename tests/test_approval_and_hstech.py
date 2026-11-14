@@ -113,10 +113,12 @@ def test_annual_rerun_command_orders_build_then_run_for_three_pools():
 
 
 # --- Q3 银行估值不启用 -------------------------------------------------------
-def test_bank_valuation_not_enabled():
+def test_bank_valuation_v21_enabled():
     config = json.loads((ROOT / "data" / "policy-inputs" / "bank-check-v1-draft.json").read_text(encoding="utf-8"))
     assert config["approved"] is False
-    assert "不启用" in config["decision3"]
+    assert "bank-valuation-v2.1" in config["superseded_by"]
+    approved = json.loads((ROOT / "data" / "policies" / "bank-valuation-v2.1.json").read_text(encoding="utf-8"))
+    assert approved["status"] == "approved" and approved["approved"] is True
     run = subprocess.run(
         [sys.executable, "-m", "engine.cli", "--json", "600036"],
         cwd=ROOT,
@@ -126,15 +128,15 @@ def test_bank_valuation_not_enabled():
     )
     assert run.returncode == 0
     payload = json.loads(run.stdout)
-    assert payload["analysis_status"] == "insufficient_data"
-    assert payload.get("valuation") is None
+    assert payload["analysis_status"] == "complete"
+    assert payload["conclusion"] == "candidate_buy_point"
     rows = [
         json.loads(line)
         for line in EQUITY_LEDGER.read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
-    assert len(rows) >= 7
-    assert not any(str(row.get("code")) == "600036" for row in rows)
+    assert len(rows) == 110
+    assert any(str(row.get("code")) == "600036" for row in rows)
 
 
 # --- Q4 HSTECH 可行性 --------------------------------------------------------
