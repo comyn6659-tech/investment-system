@@ -182,5 +182,5 @@ def test_ask_card_uses_chinese_condition_names():
 
     service = AskService(allow_update=False, write_ledger=False, use_live_quotes=False)
     text = service.ask("茅台怎么样").markdown
-    assert "近似项影响" in text
+    assert "少量近似处理" in text
     assert "approximation_impact" not in text

@@ -6,6 +6,9 @@
 from __future__ import annotations
 
 import json
+import re
+import threading
+import time
 from collections import Counter
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
@@ -14,11 +17,20 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from engine.ask.intent import SUPPORTED_QUESTIONS, Intent, parse
+from engine.ask.plain import (
+    BANNED_TERMS,
+    cycle_text,
+    reason_plain,
+    record_reasons,
+    route_reason,
+    unmet_plain,
+)
 from engine.ask.resolve import Target, TargetIndex, board_only, overseas
 from engine.contracts import reason_codes as rc
 from engine.data.snapshot import SnapshotStore
 from engine.evidence.models import BusinessEvidence
 from engine.forward import quotes, update
+from engine.forward.calendar import is_trading_day
 from engine.income.evaluator import evaluate_company as evaluate_income
 from engine.bank.evaluator import evaluate_company as evaluate_bank
 from engine.policy.conclusion import build_policy_conclusion
@@ -156,6 +168,7 @@ class AskService:
         write_ledger: bool = True,
         ledger_path: Path | None = None,
         use_live_quotes: bool = True,
+        update_timeout: float = 10.0,
     ):
         self.root = root
         self.allow_update = allow_update
@@ -164,6 +177,7 @@ class AskService:
         self.write_ledger = write_ledger
         self.ledger_path = Path(ledger_path or LEDGER)
         self.use_live_quotes = use_live_quotes
+        self.update_timeout = float(update_timeout)
         self._batch: BatchStore | None = None
         self._catalog = None
         self._target_index: TargetIndex | None = None
@@ -286,26 +300,89 @@ class AskService:
             return self._update_note
         note: dict[str, Any] = {"attempted": False}
         try:
-            if update.should_attempt(self.clock):
-                payload = update.run(now=self.clock, light=True)
+            if not is_trading_day(self.clock.date()):
                 note = {
-                    "attempted": True,
-                    "status": payload["status"],
-                    "run_at": payload["run_at"],
-                    "steps": {item["step"]: item["status"] for item in payload["steps"]},
+                    "attempted": False,
+                    "status": "skipped",
+                    "reason": "非交易日，跳过自动更新",
                 }
-            else:
+            elif not update.should_attempt(self.clock):
                 state = update.last_run()
                 note = {
                     "attempted": False,
-                    "status": state.get("last_status"),
-                    "run_at": state.get("last_run_at"),
+                    "status": state.get("status"),
+                    "run_at": state.get("run_at"),
                     "reason": "今日已成功更新，跳过联网",
                 }
+            else:
+                result: dict[str, Any] = {}
+
+                def worker() -> None:
+                    try:
+                        result["payload"] = update.run(now=self.clock, light=True)
+                    except Exception as exc:  # noqa: BLE001
+                        result["error"] = f"{type(exc).__name__}: {exc}"
+
+                thread = threading.Thread(target=worker, daemon=True)
+                started = time.monotonic()
+                thread.start()
+                thread.join(self.update_timeout)
+                if thread.is_alive():
+                    note = {
+                        "attempted": True,
+                        "status": "timeout",
+                        "seconds": round(time.monotonic() - started, 1),
+                        "reason": f"自动更新超过 {self.update_timeout:g} 秒",
+                    }
+                elif "error" in result:
+                    note = {
+                        "attempted": True,
+                        "status": "failed",
+                        "error": result["error"],
+                    }
+                else:
+                    payload = result.get("payload") or {}
+                    note = {
+                        "attempted": True,
+                        "status": payload.get("status", "ok"),
+                        "run_at": payload.get("run_at"),
+                        "steps": {item["step"]: item["status"] for item in payload.get("steps", [])},
+                    }
         except Exception as exc:  # noqa: BLE001 - 失败不阻断回答
             note = {"attempted": True, "status": "failed", "error": f"{type(exc).__name__}: {exc}"}
         self._update_note = note
         return note
+
+    def _data_date(self, markdown: str) -> str:
+        match = re.search(r"20\d\d-\d\d-\d\d", markdown)
+        if match:
+            return match.group(0)
+        try:
+            payload = quotes.latest_snapshot()
+            if payload:
+                return str(payload["price_date"])
+        except Exception:  # noqa: BLE001
+            pass
+        return self.analysis_date.isoformat()
+
+    def _update_notice(self, markdown: str) -> str | None:
+        note = self._update_note or {}
+        status = note.get("status")
+        data_date = self._data_date(markdown)
+        if status == "timeout":
+            return (
+                f"数据更新：自动更新超过 {self.update_timeout:g} 秒，本次未能更新；"
+                f"数据截至 {data_date}。"
+            )
+        if status == "failed":
+            return (
+                "数据更新：自动更新失败（"
+                + str(note.get("error") or "网络不可用")
+                + f"）；数据截至 {data_date}，本次未能更新。"
+            )
+        if status == "skipped" and "非交易日" in str(note.get("reason") or ""):
+            return f"数据更新：非交易日，未抓取新行情；数据截至 {data_date}。"
+        return None
 
     # --- 入口 ---------------------------------------------------------------
     def ask(self, question: str, *, detail: bool = False) -> AskResult:
@@ -356,12 +433,8 @@ class AskService:
             data.update(result["data"])
         else:
             markdown = self._help_card(intent)
-        if self._update_note and self._update_note.get("status") == "failed":
-            notice = (
-                "数据更新：自动 update 失败（"
-                + str(self._update_note.get("error") or "网络不可用")
-                + "）；以下按本地最新数据回答，行情日期见上。"
-            )
+        notice = self._update_notice(markdown)
+        if notice:
             lines = markdown.splitlines()
             if lines and lines[-1] == "不构成投资建议。":
                 lines.insert(len(lines) - 1, notice)
@@ -636,7 +709,7 @@ class AskService:
             "pools": pools,
             "ownership": ownership,
             "family": family,
-            "cycle_label": family_label(family),
+            "cycle_label": cycle_text(family),
             "industry": self.batch.industry_for(code) or (evidence.industry_clue or ""),
             "name": self.batch.name_for(code),
             "ledger": None,
@@ -696,7 +769,34 @@ class AskService:
                 f"现价 {_money(price)} 元（{block.get('price_date')}）高于乐观情景价值 "
                 f"{_money(optimistic.get('value'))} 元，按政策判「回避」。"
             )
-        return _clean_reason(self._undetermined_reason(result))
+        return self._plain_headline(result)
+
+    def _plain_headline(self, result: dict[str, Any]) -> str:
+        record = result["record"]
+        route = record.get("route") or {}
+        if route.get("status") == "family_not_implemented":
+            return route_reason(record)
+        reasons = record_reasons(record, headline_only=True)
+        if reasons:
+            return reasons[0]
+        status = record.get("status")
+        if status == "insufficient_data":
+            return "这家公司缺必要的资料，系统无法判断。"
+        if status == "partial":
+            return "部分数据没有对上，系统只给部分结果，不给正式结论。"
+        return "按已批准政策，这次评估不给正式结论。"
+
+    def _plain_extras(self, result: dict[str, Any]) -> list[str]:
+        record = result["record"]
+        route = record.get("route") or {}
+        if route.get("status") == "family_not_implemented":
+            return []
+        headline = self._plain_headline(result)
+        reasons = record_reasons(record)
+        extras = [text for text in reasons if text != headline]
+        if "五年以后" in headline:
+            extras = [text for text in extras if "五年以后" not in text]
+        return extras
 
     def _undetermined_reason(self, result: dict[str, Any]) -> str:
         record = result["record"]
@@ -789,6 +889,7 @@ class AskService:
                 )
         lines += [
             "",
+            "入池不等于买入：池名单只说明历史公开数据满足规则，不代表现在值得买。",
             "说明：排序只按「现价距候选门槛」，不代表公司质量或收益预期；无法判断的标的不参与排行。",
             f"来源与日期：价格 腾讯财经（{data_date}）；政策 equity-policy-v1.1（已批准 2026-11-12）；"
             "财务 东方财富批量快照 2026-11-12。",
@@ -855,7 +956,7 @@ class AskService:
                 lines.append(f"{name}（{len(rows)} 家）：" + "、".join(f"{row['code']} {row['name']}" for row in rows))
         lines += [
             "",
-            "说明：入池只说明历史公开数据满足规则，不说明现在便宜；名单每年复盘。",
+            "入池不等于买入：入池只说明历史公开数据满足规则，不说明现在便宜；名单每年复盘。",
             "不构成投资建议。",
         ]
         return {"markdown": "\n".join(lines), "data": {"pool": pool, "ownership": ownership, "counts": {item[0]: len(item[3]) for item in sections}}}
@@ -903,7 +1004,7 @@ class AskService:
             headline = f"**结论：不在{label}** — 未通过 {len(failing)} 条条件。"
         lines = [headline, "", f"标的：{result.name}（{target.code}）｜行业 {result.industry or '—'}｜板块 {result.board or '—'}"]
         if failing:
-            lines.append("未通过条件：")
+            lines.append("成绩单（未通过条件）：")
             for item in failing[: (10 if detail else 5)]:
                 lines.append(f"- {item.label}：{item.reason}")
         if result.reason and not in_pool and not failing:
@@ -912,11 +1013,11 @@ class AskService:
             metrics = self.pool_rows[pool].get(target.code) or result.metrics
             bits = []
             for key, label_text in (
-                ("roe_average", "ROE 平均"),
-                ("roe_recent_average", "近 3 年 ROE"),
-                ("cash_conversion", "现金转换"),
+                ("roe_average", "平均净资产收益率"),
+                ("roe_recent_average", "近 3 年净资产收益率"),
+                ("cash_conversion", "经营现金流与利润的匹配"),
                 ("dividend_payout", "分红率"),
-                ("net_debt_to_ebitda", "净负债/EBITDA"),
+                ("net_debt_to_ebitda", "有息负债水平"),
                 ("npl_ratio", "不良率"),
                 ("provision_coverage", "拨备覆盖率"),
                 ("core_tier1_ratio", "核心一级"),
@@ -935,6 +1036,8 @@ class AskService:
                     "roe_recent_average",
                 ):
                     bits.append(f"{label_text} {float(value):.2f}%")
+                elif key == "net_debt_to_ebitda":
+                    bits.append(f"{label_text} {float(value):.2f} 倍")
                 else:
                     bits.append(f"{label_text} {_pct(value)}")
             if bits:
@@ -943,7 +1046,7 @@ class AskService:
             "",
             f"规则：{label} {self._pool_policy(pool).policy_id}（已批准）；快照 2026-11-12；"
             "入池结果见 data/quality-pool/report.json 等固定文件。",
-            "说明：未入池只说明历史公开数据未满足规则，不代表公司质量差；入池也不说明现在便宜。",
+            "说明：未入池只说明历史公开数据未满足规则，不代表公司质量差；入池不等于买入。",
             "不构成投资建议。",
         ]
         if detail:
@@ -1037,7 +1140,7 @@ class AskService:
             f"为什么：银行要先确认资本充足、资产质量与监管下限证据；银行估值模型尚未启用，"
             "按已批准政策只能给「无法判断」。",
             f"它是什么：{'银行池成员' if in_pool else '银行（不在银行池）'}｜所有制 {ownership}"
-            "｜周期属性 银行｜等级 —（银行模型未启用，不评等级）",
+            f"｜周期属性 {cycle_text('bank')}｜等级 —（银行模型未启用，不评等级）",
             "局限：银行指标是公开报表口径，未做银行专用估值；不良率、拨备与核心一级可能随季报更新。",
             f"来源与日期：行情 腾讯财经（{price_date or '—'}）；财务 东方财富 2025 年报 / 2026 三季报；"
             f"政策 equity-policy-v1.1（已批准 2026-11-12）；银行规则 bank-pool-v1（已批准 2026-11-13）。",
@@ -1284,25 +1387,39 @@ class AskService:
         if formal and (values.get("pessimistic") or values.get("base") or values.get("optimistic")):
             lines.append(
                 "三档价值（元/股）："
-                f"悲观 {_money((values.get('pessimistic') or {}).get('value'))}"
-                f"（{usage.get('pessimistic') or '候选买点的第二道约束'}）"
-                f"｜基准 {_money((values.get('base') or {}).get('value'))}"
-                f"（{usage.get('base') or '安全边际基准'}）"
-                f"｜乐观 {_money((values.get('optimistic') or {}).get('value'))}"
-                f"（{usage.get('optimistic') or '回避线'}）"
+                f"悲观 {_money((values.get('pessimistic') or {}).get('value'))}（最悲观假设下每股值多少）"
+                f"｜基准 {_money((values.get('base') or {}).get('value'))}（安全边际的计算基准）"
+                f"｜乐观 {_money((values.get('optimistic') or {}).get('value'))}（高于它就判回避）"
             )
         else:
-            lines.append(f"三档价值：无（{_clean_reason(self._undetermined_reason(result))}）")
+            lines.append("三档价值：无（本次不给三档价值）")
         binding = block.get("binding_condition") or {}
-        unmet = condition_labels(grade.get("unmet_conditions") or [])
+        unmet_names = grade.get("unmet_conditions") or []
+        unmet = list(dict.fromkeys(unmet_plain(name) for name in unmet_names))
+        binding_name = str(binding.get("name") or "")
+        binding_label = {
+            "margin_of_safety": "安全边际（现价需低于基准价值打折后的价格）",
+            "pessimistic_value": "悲观情景价值",
+        }.get(binding_name, str(binding.get("label") or "—"))
         binding_text = (
-            f"{binding.get('label') or '—'}（{_money((binding.get('price') or {}).get('value'))} 元）"
+            f"{binding_label}：{_money((binding.get('price') or {}).get('value'))} 元"
             if formal
             else "不适用（无法判断）"
         )
+        if formal:
+            why_text = (
+                f"起约束条件 {binding_text}"
+                f"｜主要未满足条件：{'、'.join(unmet) if unmet else '无'}"
+            )
+        else:
+            extras = [text.rstrip("。") for text in self._plain_extras(result)]
+            why_text = (
+                "；".join(extras) + "。"
+                if extras
+                else "没有更多原因；加 --detail 可看原始原因码与条件。"
+            )
         lines += [
-            f"为什么：起约束条件 {binding_text}"
-            f"｜主要未满足条件：{'、'.join(unmet) if unmet else '无'}",
+            f"为什么：{why_text}",
             f"它是什么：{pool_text}｜所有制 {result['ownership']}｜周期属性 {result['cycle_label']}"
             f"｜等级 {grade_value}（{grade.get('meaning') or '数据完整度与模型稳定性，不是公司质量'}）",
             f"局限：本结果只按已批准政策与固定输入计算，不预测股价，也不保证收益。{self._limitation(result)}",
@@ -1315,20 +1432,25 @@ class AskService:
 
     def _limitation(self, result: dict[str, Any]) -> str:
         record = result["record"]
+        unmet = set((record.get("grade") or {}).get("unmet_conditions") or [])
         parts = []
         terminal = (record.get("terminal_share") or {}).get("base")
-        if terminal is not None and terminal >= 0.5:
-            parts.append(f"基准情景终值占比 {terminal:.1%}，对长期假设敏感")
+        if terminal is not None and terminal >= 0.5 and "terminal_continuity_guardrail" not in unmet:
+            parts.append(f"价值中有 {terminal:.1%} 来自五年以后的假设，对长期假设敏感")
         approximations = record.get("approximations") or {}
         impact = approximations.get("total_impact_per_share")
-        if impact:
-            parts.append(f"计入等级的近似项合计 {impact:.2f} 元/股")
+        if impact and "approximation_impact" not in unmet:
+            parts.append(f"少量近似处理影响了等级（合计 {impact:.2f} 元/股）")
         cross = record.get("cross_check") or {}
         divergence = cross.get("divergence")
-        if divergence is not None and abs(divergence) >= 0.25:
-            parts.append(f"两条路线价值分歧 {divergence:+.1%}")
+        if (
+            divergence is not None
+            and abs(divergence) >= 0.25
+            and "cross_check_divergence" not in unmet
+        ):
+            parts.append(f"两种算法结果差异 {divergence:+.1%}")
         if not parts:
-            parts.append("未触发额外的单项局限")
+            parts.append("更多原始数字与条件见 --detail")
         return "；".join(parts) + "。"
 
     def _sources_line(self, result: dict[str, Any]) -> str:
@@ -1409,6 +1531,10 @@ class AskService:
             "values": result["record"].get("values"),
             "ledger": result.get("ledger"),
             "snapshot_id": result["record"].get("snapshot_id"),
+            "reason_codes": list(result["record"].get("reason_codes") or []),
+            "reason_explanations": [
+                reason_plain(code) for code in (result["record"].get("reason_codes") or [])
+            ],
         }
 
     @staticmethod

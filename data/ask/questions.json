@@ -44,7 +44,7 @@
         "code": "000858",
         "conclusion": "undetermined",
         "contains": [
-          "基期异常变动"
+          "同比变化过大"
         ]
       }
     },
@@ -57,7 +57,7 @@
         "code": "000651",
         "conclusion": "undetermined",
         "contains": [
-          "勾稽"
+          "经营现金流"
         ]
       }
     },
@@ -70,7 +70,7 @@
         "code": "000725",
         "conclusion": "undetermined",
         "contains": [
-          "悲观情景价值非正"
+          "按最悲观的经营假设"
         ]
       }
     },
@@ -523,7 +523,7 @@
         "code": "601318",
         "conclusion": "undetermined",
         "contains": [
-          "保险企业路线首版未实现"
+          "保险公司需要专门的估值方法"
         ]
       }
     },
@@ -587,6 +587,79 @@
           "账本记录共 2 条",
           "无法判断（改判）",
           "明显周期"
+        ]
+      }
+    },
+    {
+      "id": "q47",
+      "category": "排行",
+      "question": "A股有哪些值得投资的公司",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "入池不等于买入"
+        ]
+      }
+    },
+    {
+      "id": "q48",
+      "category": "排行",
+      "question": "有什么好股票",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "入池不等于买入"
+        ]
+      }
+    },
+    {
+      "id": "q49",
+      "category": "排行",
+      "question": "推荐几只股票",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "入池不等于买入"
+        ]
+      }
+    },
+    {
+      "id": "q50",
+      "category": "是否在池",
+      "question": "为什么比亚迪不是好公司",
+      "expect": {
+        "intent": "membership",
+        "code": "002594",
+        "contains": [
+          "不在好公司池",
+          "成绩单",
+          "未通过"
+        ]
+      }
+    },
+    {
+      "id": "q51",
+      "category": "是否在池",
+      "question": "比亚迪算不算好公司",
+      "expect": {
+        "intent": "membership",
+        "code": "002594",
+        "contains": [
+          "不在好公司池",
+          "成绩单"
+        ]
+      }
+    },
+    {
+      "id": "q52",
+      "category": "是否在池",
+      "question": "比亚迪是好公司吗",
+      "expect": {
+        "intent": "membership",
+        "code": "002594",
+        "contains": [
+          "不在好公司池",
+          "成绩单"
         ]
       }
     }

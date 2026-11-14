@@ -18,6 +18,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from engine.data.snapshot import stable_digest
+from engine.forward.calendar import is_trading_day, previous_trading_day
 
 TZ = ZoneInfo("Asia/Singapore")
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -56,9 +57,7 @@ def _codes() -> list[str]:
 
 
 def _prev_trading_day(day: date) -> date:
-    while day.weekday() >= 5:
-        day -= timedelta(days=1)
-    return day
+    return previous_trading_day(day)
 
 
 def fetch_quotes(codes: list[str], *, now: datetime | None = None, timeout: int = 30) -> list[dict]:
@@ -211,6 +210,15 @@ def is_fresh(now: datetime | None = None) -> bool:
 def refresh(*, now: datetime | None = None, skip_network: bool = False) -> dict[str, Any]:
     """刷新全市场行情；已存在同一价格日期则跳过。返回摘要（不抛网络错误以外的异常）。"""
     clock = _now(now)
+    if not is_trading_day(clock.date()):
+        payload = latest_snapshot()
+        return {
+            "status": "skipped",
+            "reason": "非交易日，跳过行情抓取",
+            "price_date": payload["price_date"] if payload else None,
+            "rows": len(payload["rows"]) if payload else 0,
+            "file": f"quotes-{payload['price_date']}.json" if payload else None,
+        }
     payload = latest_snapshot()
     expected = expected_price_date(clock)
     if payload is not None and payload["price_date"] >= expected:

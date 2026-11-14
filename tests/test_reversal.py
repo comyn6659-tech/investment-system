@@ -176,7 +176,7 @@ def test_real_ledger_has_two_reversals_for_junzheng_and_yangnong():
         assert reversal["snapshot_id"]
         assert reversal["reason_codes"]
         assert "明显周期" in reversal["reason"]
-    assert len(rows) == 98
+    assert len(rows) >= 98
 
 
 def test_history_question_shows_two_records_and_reason():

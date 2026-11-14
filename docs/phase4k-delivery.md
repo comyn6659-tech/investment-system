@@ -9,7 +9,7 @@
 1. 补遗留：周期行业清单版本化、结论标签修正、创业板指/159915 移出、小问题修正、
    前向记录 `update` 与定时脚本；
 2. 做对话入口：`./ask "<中文问题>"`，规则化意图 + 固定结构卡片，不调用任何大模型；
-3. 端到端验收：46 条固定问题集 + 30 只测试股 + 三只指数 + 恒生科技 + 两家银行 + 三只 ETF。
+3. 端到端验收：52 条固定问题集 + 30 只测试股 + 三只指数 + 恒生科技 + 两家银行 + 三只 ETF。
 
 不做：不改政策/池规则阈值；不启用银行估值；不加新标的类型。
 
@@ -97,13 +97,13 @@
 
 ## 7. 端到端验收
 
-- 固定问题集：`data/ask/questions.json` 46 条，覆盖 10 类意图，每类 ≥3 种说法；
-  `tests/test_dialog.py` 全部自动测试；验收报告 `docs/phase4k-acceptance.md` 46/46。
+- 固定问题集：`data/ask/questions.json` 52 条，覆盖 10 类意图，每类 ≥3 种说法；
+  `tests/test_dialog.py` 全部自动测试；验收报告 `docs/phase4k-acceptance.md` 52/52。
 - 30 只测试股、3 只指数、恒生科技、2 家银行、3 只 ETF 各跑一次，结果在验收报告；
   全部通过，默认卡片行数 8–10 行。
 - 输出扫描：禁用词 0 命中；每张卡片有日期与来源；研究模型无「正式结论」；末行免责声明。
 - 真实问答样例：`docs/phase4k-samples.md`（5 个）。
-- 全部测试：本地 **660 passed**；`git archive` 干净归档 **659 passed + 1 skipped**（无 `.git` 元数据），46 条问题集 46/46。
+- 全部测试：本地 **674 passed**；`git archive` 干净归档预期 **673 passed + 1 skipped**（无 `.git` 元数据），52 条问题集 52/52。
 
 ## 7.1 收尾（batch4k-r）
 
@@ -111,15 +111,33 @@
   忽略的路径；所有制与收入池分红改读 `data/income-pool/snapshot-qps-d8fb7e3718675b93/`。
   `update` 状态改读已提交的 `data/ledger/update-log.jsonl`，删除隐藏状态文件。
   新增 `tests/test_clean_inputs.py` 扫描运行时引用；`scripts/verify-clean-archive.sh`
-  把 `git archive` 到无缓存目录后跑全部测试 + 46 条问题集。
+  把 `git archive` 到无缓存目录后跑全部测试 + 52 条问题集。
 - **T2 改判记录**：账本最新为正式结论、新评估为无法判断时，追加 `record_type=reversal`、
   `conclusion=undetermined` 记录（原因码、中文原因、政策版本、快照 ID、分析日、`reversal_of`）；
   旧记录不改，从未有正式结论的标的不写。君正集团、扬农化工各 1 条；历史问答显示 2 条。
 - **T3 launchd 测试**：非 macOS 环境跳过并注明「定时任务只支持 macOS（launchd）」。
 
+## 7.2 第二次收尾（可用性，V1–V5）
+
+- **V1 Claude Code 不调用系统**：项目根目录新增 `CLAUDE.md`，规定任何投资/股票/指数/ETF/银行/
+  三池问题必须先运行 `./ask "<原问题>"`、逐字原样呈现、不得用自身知识回答或补充买卖意见；
+  不支持的问题列出可用问法。新会话实测：`docs/phase4k-r2-claude-session.md` 与
+  `docs/evidence/claude-code-q1.png`、`claude-code-q2.png`。
+- **V2 意图补充**：「A股有哪些值得投资的公司」「有什么好股票」「推荐几只股票」→ 排行卡片并写
+  「入池不等于买入」；「为什么比亚迪不是好公司」「比亚迪算不算好公司」「比亚迪是好公司吗」→
+  是否在池成绩单，不再走个股估值卡。问题集 52 条。
+- **V3 更新不让人等**：当天已成功更新则跳过；非交易日（周末 + 2026 交易所休市日）跳过自动更新；
+  单次更新总时限 10 秒，超时用已有数据作答并注明「数据截至 X，本次未能更新」。
+  交易日历：`data/calendar/cn-trading-holidays-2026.json`（上交所 2026 休市安排）。
+- **V4 大白话**：默认卡片不出现 FCFF/主模型/机制默认/终值连续性护栏/EBITDA 等内部术语；
+  原因码统一映射为中文解释；同一原因不重复（先给结论原因，再列其他原因；局限不重复）。
+  术语与原始数字在 `--detail`。
+- **V5 周期属性**：非周期公司显示「非周期」，不再显示「非金融企业」；周期公司显示「明显周期」；
+  银行显示「非周期（银行）」。
+
 ## 8. 账本与不变项
 
-- `data/ledger/equity-conclusions.jsonl`：98 条（96 条原有 + 2 条改判：君正集团、扬农化工），
+- `data/ledger/equity-conclusions.jsonl`：99 条（98 条原有不变 + 1 条试用新增：茅台 2026-11-14），
   `--check-conclusions` 0 问题；旧记录内容不变。
 - 新增 `data/ledger/hstech-monthly-valuation.jsonl`（1 条）与 `data/ledger/update-log.jsonl`；
   两者均只追加。
@@ -129,11 +147,13 @@
 ## 9. 复现
 
 ```bash
-scripts/verify-clean-archive.sh                         # 干净归档：全部测试 + 46 条问题集
+scripts/verify-clean-archive.sh                         # 干净归档：全部测试 + 52 条问题集
 .venv/bin/python tools/run_cyclical_rerun.py            # 周期清单重跑（报告 + 账本追加）
 .venv/bin/python tools/run_cyclical_rerun.py --write-ledger
 ./update                                                # 前向记录（需网络；只追加）
 ./update --check
+./ask "A股有哪些值得投资的公司"
+./ask "为什么比亚迪不是好公司"
 ./ask "茅台怎么样"
 ./ask --detail "招商银行怎么样"
 .venv/bin/python tools/run_ask_acceptance.py            # 端到端验收报告

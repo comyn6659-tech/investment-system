@@ -37,8 +37,8 @@ SUPPORTED_QUESTIONS = [
     "指数：「沪深300 现在什么位置」「恒生科技」",
     "ETF：「510300 能买吗」（产品资料 + 所跟踪指数的研究信号）",
     "池名单：「好公司池有哪些」「收息池里的国企」「银行池」",
-    "是否在池：「格力在不在好公司池」「为什么比亚迪不在」",
-    "排行：「好公司里谁离买点最近」「现在有哪些候选买点」",
+    "是否在池：「格力在不在好公司池」「为什么比亚迪不是好公司」「比亚迪算不算好公司」",
+    "排行：「好公司里谁离买点最近」「现在有哪些候选买点」「推荐几只股票」「A股有哪些值得投资的公司」",
     "历史：「茅台以前的结论」",
     "状态：「数据是哪天的」「规则什么时候复核」",
 ]
@@ -82,6 +82,21 @@ _MEMBERSHIP_PATTERNS = (
     r"属于.*池",
     r"在.*池.*吗",
     r"在.*池里吗",
+    r"不是好公司",
+    r"算不算",
+    r"是不是好公司",
+    r"是好公司吗",
+    r"好公司吗",
+    r"算好公司",
+    r"好不好",
+)
+_RECOMMEND_PATTERNS = (
+    r"值得投资",
+    r"好股票",
+    r"推荐.*股票",
+    r"买什么股票",
+    r"哪些股票.*(好|值得)",
+    r"哪只股票",
 )
 _POOL_LIST_PATTERNS = (
     r"有哪些",
@@ -175,8 +190,8 @@ def parse(question: str, target: Target | None) -> Intent:
     # 无标的：检查状态/排行/池名单/范围外/歧义
     if _has(_STATUS_PATTERNS, text):
         return Intent("status")
-    if _has(_RANKING_PATTERNS, text):
-        return Intent("ranking", pool=_pool(text))
+    if _has(_RANKING_PATTERNS, text) or _has(_RECOMMEND_PATTERNS, text):
+        return Intent("ranking", pool=_pool(text) or "all")
     if _pool(text) is not None and _has(_POOL_LIST_PATTERNS, text):
         return Intent("pool_list", pool=_pool(text), ownership=_ownership(text))
     if any(marker in text for marker in ("创业板50", "创业板100", "创业板200", "创业板300", "创业板综", "创业板R")):

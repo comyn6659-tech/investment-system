@@ -1,8 +1,8 @@
 # 对话入口端到端验收（batch4k）
 
-- 生成时间：2026-11-13T19:51:15+08:00
+- 生成时间：2026-11-14T15:46:24+08:00
 - 政策：`equity-policy-v1.1`（已批准）
-- 固定问题集：46 条，通过 46 条；端到端全部通过：是
+- 固定问题集：52 条，通过 52 条；端到端全部通过：是
 - 问题集测试使用批量快照固定价格；30 只测试股 / 指数 / 银行 / ETF 使用当日实时行情。
 
 ## 1. 固定问题集
@@ -36,12 +36,12 @@
 | q25 | 是否在池 | 茅台在不在收息池 | membership | membership | — | 8 | 通过 |
 | q26 | 是否在池 | 招商银行在不在银行池 | membership | membership | — | 8 | 通过 |
 | q27 | 是否在池 | 中国平安在不在好公司池 | membership | membership | — | 8 | 通过 |
-| q28 | 排行 | 好公司里谁离买点最近 | ranking | ranking | — | 14 | 通过 |
-| q29 | 排行 | 现在有哪些候选买点 | ranking | ranking | — | 15 | 通过 |
-| q30 | 排行 | 收息池里谁离买点最近 | ranking | ranking | — | 15 | 通过 |
-| q31 | 排行 | 离买点最近的股票有哪些 | ranking | ranking | — | 15 | 通过 |
-| q32 | 历史 | 茅台以前的结论 | history | history | — | 9 | 通过 |
-| q33 | 历史 | 600519 历史结论 | history | history | — | 9 | 通过 |
+| q28 | 排行 | 好公司里谁离买点最近 | ranking | ranking | — | 15 | 通过 |
+| q29 | 排行 | 现在有哪些候选买点 | ranking | ranking | — | 16 | 通过 |
+| q30 | 排行 | 收息池里谁离买点最近 | ranking | ranking | — | 16 | 通过 |
+| q31 | 排行 | 离买点最近的股票有哪些 | ranking | ranking | — | 16 | 通过 |
+| q32 | 历史 | 茅台以前的结论 | history | history | — | 10 | 通过 |
+| q33 | 历史 | 600519 历史结论 | history | history | — | 10 | 通过 |
 | q34 | 历史 | 招行的结论记录 | history | history | — | 8 | 通过 |
 | q35 | 状态 | 数据是哪天的 | status | status | — | 12 | 通过 |
 | q36 | 状态 | 规则什么时候复核 | status | status | — | 12 | 通过 |
@@ -55,6 +55,12 @@
 | q44 | 范围外/歧义 | 平安 | ambiguous | ambiguous | — | 11 | 通过 |
 | q45 | 历史 | 君正集团以前的结论 | history | history | — | 8 | 通过 |
 | q46 | 历史 | 扬农化工以前的结论 | history | history | — | 8 | 通过 |
+| q47 | 排行 | A股有哪些值得投资的公司 | ranking | ranking | — | 16 | 通过 |
+| q48 | 排行 | 有什么好股票 | ranking | ranking | — | 16 | 通过 |
+| q49 | 排行 | 推荐几只股票 | ranking | ranking | — | 16 | 通过 |
+| q50 | 是否在池 | 为什么比亚迪不是好公司 | membership | membership | — | 10 | 通过 |
+| q51 | 是否在池 | 比亚迪算不算好公司 | membership | membership | — | 10 | 通过 |
+| q52 | 是否在池 | 比亚迪是好公司吗 | membership | membership | — | 10 | 通过 |
 
 ## 2. 30 只测试股
 

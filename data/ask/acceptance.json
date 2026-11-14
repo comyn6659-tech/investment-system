@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-11-13T19:51:15+08:00",
+  "generated_at": "2026-11-14T15:46:24+08:00",
   "policy": "equity-policy-v1.1",
-  "question_count": 46,
-  "question_passed": 46,
+  "question_count": 52,
+  "question_passed": 52,
   "sections": {
     "stocks": [
       {
@@ -417,7 +417,7 @@
         "lines": 10,
         "passed": true,
         "problems": [],
-        "markdown": "**结论：无法判断** — 银行估值未启用（bank-check-v1-draft 仍为草案），下面只列银行指标，不给买点或目标价。\n\n是否在银行池：是（银行池共 11 家）｜现价 42.93 元（2026-11-13）\n关键指标：市净率 0.97 倍\n股息率 4.7%｜ROE 13.4%｜不良率 0.94%｜拨备覆盖率 389.39%｜核心一级 14.39%\n为什么：银行要先确认资本充足、资产质量与监管下限证据；银行估值模型尚未启用，按已批准政策只能给「无法判断」。\n它是什么：银行池成员｜所有制 央企｜周期属性 银行｜等级 —（银行模型未启用，不评等级）\n局限：银行指标是公开报表口径，未做银行专用估值；不良率、拨备与核心一级可能随季报更新。\n来源与日期：行情 腾讯财经（2026-11-13）；财务 东方财富 2025 年报 / 2026 三季报；政策 equity-policy-v1.1（已批准 2026-11-12）；银行规则 bank-pool-v1（已批准 2026-11-13）。\n不构成投资建议。"
+        "markdown": "**结论：无法判断** — 银行估值未启用（bank-check-v1-draft 仍为草案），下面只列银行指标，不给买点或目标价。\n\n是否在银行池：是（银行池共 11 家）｜现价 42.93 元（2026-11-13）\n关键指标：市净率 0.97 倍\n股息率 4.7%｜ROE 13.4%｜不良率 0.94%｜拨备覆盖率 389.39%｜核心一级 14.39%\n为什么：银行要先确认资本充足、资产质量与监管下限证据；银行估值模型尚未启用，按已批准政策只能给「无法判断」。\n它是什么：银行池成员｜所有制 央企｜周期属性 非周期（银行）｜等级 —（银行模型未启用，不评等级）\n局限：银行指标是公开报表口径，未做银行专用估值；不良率、拨备与核心一级可能随季报更新。\n来源与日期：行情 腾讯财经（2026-11-13）；财务 东方财富 2025 年报 / 2026 三季报；政策 equity-policy-v1.1（已批准 2026-11-12）；银行规则 bank-pool-v1（已批准 2026-11-13）。\n不构成投资建议。"
       },
       {
         "question": "工商银行怎么样",
@@ -427,7 +427,7 @@
         "lines": 10,
         "passed": true,
         "problems": [],
-        "markdown": "**结论：无法判断** — 银行估值未启用（bank-check-v1-draft 仍为草案），下面只列银行指标，不给买点或目标价。\n\n是否在银行池：是（银行池共 11 家）｜现价 8.85 元（2026-11-13）\n关键指标：市净率 0.81 倍\n股息率 3.5%｜ROE 9.4%｜不良率 1.29%｜拨备覆盖率 211.64%｜核心一级 13.07%\n为什么：银行要先确认资本充足、资产质量与监管下限证据；银行估值模型尚未启用，按已批准政策只能给「无法判断」。\n它是什么：银行池成员｜所有制 央企｜周期属性 银行｜等级 —（银行模型未启用，不评等级）\n局限：银行指标是公开报表口径，未做银行专用估值；不良率、拨备与核心一级可能随季报更新。\n来源与日期：行情 腾讯财经（2026-11-13）；财务 东方财富 2025 年报 / 2026 三季报；政策 equity-policy-v1.1（已批准 2026-11-12）；银行规则 bank-pool-v1（已批准 2026-11-13）。\n不构成投资建议。"
+        "markdown": "**结论：无法判断** — 银行估值未启用（bank-check-v1-draft 仍为草案），下面只列银行指标，不给买点或目标价。\n\n是否在银行池：是（银行池共 11 家）｜现价 8.85 元（2026-11-13）\n关键指标：市净率 0.81 倍\n股息率 3.5%｜ROE 9.4%｜不良率 1.29%｜拨备覆盖率 211.64%｜核心一级 13.07%\n为什么：银行要先确认资本充足、资产质量与监管下限证据；银行估值模型尚未启用，按已批准政策只能给「无法判断」。\n它是什么：银行池成员｜所有制 央企｜周期属性 非周期（银行）｜等级 —（银行模型未启用，不评等级）\n局限：银行指标是公开报表口径，未做银行专用估值；不良率、拨备与核心一级可能随季报更新。\n来源与日期：行情 腾讯财经（2026-11-13）；财务 东方财富 2025 年报 / 2026 三季报；政策 equity-policy-v1.1（已批准 2026-11-12）；银行规则 bank-pool-v1（已批准 2026-11-13）。\n不构成投资建议。"
       }
     ],
     "etfs": [
@@ -824,7 +824,7 @@
       "code": null,
       "expected_conclusion": null,
       "actual_conclusion": null,
-      "lines": 14,
+      "lines": 15,
       "passed": true,
       "problems": []
     },
@@ -837,7 +837,7 @@
       "code": null,
       "expected_conclusion": null,
       "actual_conclusion": null,
-      "lines": 15,
+      "lines": 16,
       "passed": true,
       "problems": []
     },
@@ -850,7 +850,7 @@
       "code": null,
       "expected_conclusion": null,
       "actual_conclusion": null,
-      "lines": 15,
+      "lines": 16,
       "passed": true,
       "problems": []
     },
@@ -863,7 +863,7 @@
       "code": null,
       "expected_conclusion": null,
       "actual_conclusion": null,
-      "lines": 15,
+      "lines": 16,
       "passed": true,
       "problems": []
     },
@@ -876,7 +876,7 @@
       "code": "600519",
       "expected_conclusion": null,
       "actual_conclusion": null,
-      "lines": 9,
+      "lines": 10,
       "passed": true,
       "problems": []
     },
@@ -889,7 +889,7 @@
       "code": "600519",
       "expected_conclusion": null,
       "actual_conclusion": null,
-      "lines": 9,
+      "lines": 10,
       "passed": true,
       "problems": []
     },
@@ -1059,6 +1059,84 @@
       "expected_conclusion": null,
       "actual_conclusion": null,
       "lines": 8,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q47",
+      "category": "排行",
+      "question": "A股有哪些值得投资的公司",
+      "expected_intent": "ranking",
+      "actual_intent": "ranking",
+      "code": null,
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 16,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q48",
+      "category": "排行",
+      "question": "有什么好股票",
+      "expected_intent": "ranking",
+      "actual_intent": "ranking",
+      "code": null,
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 16,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q49",
+      "category": "排行",
+      "question": "推荐几只股票",
+      "expected_intent": "ranking",
+      "actual_intent": "ranking",
+      "code": null,
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 16,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q50",
+      "category": "是否在池",
+      "question": "为什么比亚迪不是好公司",
+      "expected_intent": "membership",
+      "actual_intent": "membership",
+      "code": "002594",
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 10,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q51",
+      "category": "是否在池",
+      "question": "比亚迪算不算好公司",
+      "expected_intent": "membership",
+      "actual_intent": "membership",
+      "code": "002594",
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 10,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q52",
+      "category": "是否在池",
+      "question": "比亚迪是好公司吗",
+      "expected_intent": "membership",
+      "actual_intent": "membership",
+      "code": "002594",
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 10,
       "passed": true,
       "problems": []
     }

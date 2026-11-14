@@ -143,11 +143,11 @@ def test_etf_card_has_product_facts_and_index(service):
 
 def test_insufficient_or_unsupported_explains_in_chinese(service):
     insurance = service.ask("中国平安").markdown
-    assert "保险企业路线首版未实现" in insurance
+    assert "保险公司需要专门的估值方法" in insurance
     assert "保险" in insurance
     assert "cyclical" not in insurance
     bridge = service.ask("格力电器现在能买吗").markdown
-    assert "勾稽" in bridge
+    assert "经营现金流" in bridge
     assert "partial" not in bridge
 
 
