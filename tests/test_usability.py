@@ -203,3 +203,122 @@ def test_claude_md_present_and_short():
     assert len(text.splitlines()) <= 40
     assert "投资分析系统" in text
     assert "不得补充" in text or "不补充" in text
+
+
+# --- r3：X1–X7 -------------------------------------------------------------
+def test_x1_pool_and_price_words_go_ranking(service):
+    questions = (
+        "收息池有哪些公司现在的价格很合适",
+        "好公司池里哪些现在便宜",
+        "好公司池哪些划算",
+        "收息池里哪些低估",
+        "好公司池里现在哪些值得买",
+        "收息池哪些能买",
+        "好公司池里价格合适的公司",
+        "收息池离买点最近的公司",
+        "银行池里哪些便宜",
+    )
+    for question in questions:
+        result = service.ask(question)
+        assert result.intent.name == "ranking", question
+        if "银行池" in question:
+            assert "银行池不排行" in result.markdown, question
+            assert "不良率" in result.markdown, question
+        else:
+            assert "入池不等于买入" in result.markdown, question
+
+
+def test_x2_pool_list_has_price_question_hint(service):
+    quality = service.ask("好公司池有哪些").markdown
+    income = service.ask("收息池有哪些公司").markdown
+    assert "想看哪些现在离买点最近，可问：好公司池里谁离买点最近" in quality
+    assert "想看哪些现在离买点最近，可问：稳定收息池里谁离买点最近" in income
+
+
+def test_x3_x4_x5_bank_card_for_banks_outside_pool(service):
+    for question, ownership in (("平安银行怎么样", "民企"), ("宁波银行怎么样", "地方国企")):
+        result = service.ask(question)
+        text = result.markdown
+        assert "是否在银行池：否" in text, question
+        for label in ("不良率", "拨备覆盖率", "核心一级", "所有制"):
+            assert label in text, (question, label)
+        assert ownership in text, (question, ownership)
+        assert "银行专用估值方法还没启用（股东 2026-11-13 决定）" in text
+        for internal in ("bank-check", "draft", "bank-pool", "equity-policy", "ROE"):
+            assert internal not in text, (question, internal)
+
+
+def test_x6_index_card_sources_uses_and_plain_signal(service):
+    for question in ("沪深300 现在什么位置", "中证500 贵不贵", "中证1000 什么位置"):
+        text = service.ask(question).markdown
+        assert "月度参考" in text and "用于近 5 年分位" in text, question
+        assert "官方周度" in text and "用于研究信号" in text, question
+        assert "两个 PE 为什么不同" in text, question
+        assert "比过去 5 年里" in text and ("都贵" in text or "都便宜" in text), question
+        assert "按研究规则处于" in text, question
+        assert "研究信号，规则未批准" in text, question
+        for term in ("entry", "exit", "研究画像", "候选 A"):
+            assert term not in text, (question, term)
+
+
+def test_x6_hstech_card_plain(service):
+    text = service.ask("恒生科技").markdown
+    assert "官方月度" in text
+    assert "只作月度快照" in text
+    assert "无法给出近 5 年位置" in text
+    for term in ("entry", "exit", "研究画像", "候选 A"):
+        assert term not in text, term
+
+
+def test_x7_index_position_bands():
+    from engine.ask.index_bands import band_for
+
+    expected = {
+        0: "偏低",
+        19.9: "偏低",
+        20: "较低",
+        39.9: "较低",
+        40: "居中",
+        59.9: "居中",
+        60: "较高",
+        79.9: "较高",
+        80: "偏高",
+        100: "偏高",
+    }
+    for percentile, label in expected.items():
+        band = band_for(percentile)
+        assert band is not None
+        assert band["label"] == label, percentile
+        assert "目前估值处于近 5 年" in band["summary"]
+
+
+def test_x7_index_conclusion_has_position_summary(service):
+    for question in ("沪深300 现在什么位置", "中证500 贵不贵", "中证1000 什么位置"):
+        first = service.ask(question).markdown.splitlines()[0]
+        assert first.startswith("**结论：无法判断** — 目前估值处于近 5 年")
+        assert "位置。" in first
+
+
+def test_x7_bands_config_is_versioned():
+    import json
+
+    path = ROOT / "data" / "policies" / "index-position-bands-v1.json"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == "index-position-bands/1"
+    assert len(payload["bands"]) == 5
+    assert [band["label"] for band in payload["bands"]] == ["偏低", "较低", "居中", "较高", "偏高"]
+
+
+def test_x3_all_in_scope_banks_have_indicator_and_ownership():
+    service = AskService(allow_update=False, write_ledger=False)
+    inputs = service._bank_inputs()
+    checked = 0
+    for code, row in inputs.items():
+        if str(row.get("in_scope")) != "True":
+            continue
+        checked += 1
+        indicator = service._bank_indicator(code)
+        for key in ("npl_ratio", "provision_coverage", "core_tier1_ratio"):
+            assert indicator.get(key) not in (None, ""), (code, key)
+        assert service._bank_ownership(code), code
+    assert checked == 36

@@ -83,10 +83,10 @@
         "code": "600036",
         "conclusion": "undetermined",
         "contains": [
-          "银行估值未启用",
+          "银行专用估值方法还没启用",
           "市净率",
           "股息率",
-          "ROE",
+          "净资产收益率",
           "不良率",
           "拨备覆盖率",
           "核心一级"
@@ -102,7 +102,7 @@
         "code": "601398",
         "conclusion": "undetermined",
         "contains": [
-          "银行估值未启用",
+          "银行专用估值方法还没启用",
           "市净率"
         ]
       }
@@ -116,8 +116,8 @@
         "code": "600036",
         "conclusion": "undetermined",
         "contains": [
-          "股息率",
-          "ROE"
+          "净资产收益率",
+          "股息率"
         ]
       }
     },
@@ -145,10 +145,10 @@
         "code": "000300",
         "conclusion": "undetermined",
         "contains": [
-          "PE（滚动）",
-          "分位",
-          "候选 A 研究信号",
-          "研究"
+          "月度参考",
+          "官方周度",
+          "研究信号",
+          "较高位置"
         ]
       }
     },
@@ -161,8 +161,9 @@
         "code": "000905",
         "conclusion": "undetermined",
         "contains": [
-          "PE（滚动）",
-          "分位"
+          "月度参考",
+          "官方周度",
+          "研究信号"
         ]
       }
     },
@@ -175,8 +176,9 @@
         "code": "000852",
         "conclusion": "undetermined",
         "contains": [
-          "PE（滚动）",
-          "分位"
+          "月度参考",
+          "官方周度",
+          "研究信号"
         ]
       }
     },
@@ -189,8 +191,9 @@
         "code": "HSTECH",
         "conclusion": "undetermined",
         "contains": [
-          "官方月度 PE",
-          "股息率"
+          "官方月度",
+          "股息率",
+          "无法给出近 5 年位置"
         ]
       }
     },
@@ -660,6 +663,116 @@
         "contains": [
           "不在好公司池",
           "成绩单"
+        ]
+      }
+    },
+    {
+      "id": "q53",
+      "category": "排行",
+      "question": "收息池有哪些公司现在的价格很合适",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "稳定收息池",
+          "入池不等于买入",
+          "距候选门槛最近"
+        ]
+      }
+    },
+    {
+      "id": "q54",
+      "category": "排行",
+      "question": "好公司池里哪些现在便宜",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "好公司池",
+          "入池不等于买入"
+        ]
+      }
+    },
+    {
+      "id": "q55",
+      "category": "排行",
+      "question": "好公司池哪些划算",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "好公司池",
+          "入池不等于买入"
+        ]
+      }
+    },
+    {
+      "id": "q56",
+      "category": "排行",
+      "question": "收息池里哪些低估",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "稳定收息池",
+          "入池不等于买入"
+        ]
+      }
+    },
+    {
+      "id": "q57",
+      "category": "排行",
+      "question": "好公司池里现在哪些值得买",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "好公司池",
+          "入池不等于买入"
+        ]
+      }
+    },
+    {
+      "id": "q58",
+      "category": "排行",
+      "question": "收息池哪些能买",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "稳定收息池",
+          "入池不等于买入"
+        ]
+      }
+    },
+    {
+      "id": "q59",
+      "category": "排行",
+      "question": "好公司池里价格合适的公司",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "好公司池",
+          "入池不等于买入"
+        ]
+      }
+    },
+    {
+      "id": "q60",
+      "category": "排行",
+      "question": "收息池离买点最近的公司",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "稳定收息池",
+          "距候选门槛最近"
+        ]
+      }
+    },
+    {
+      "id": "q61",
+      "category": "排行",
+      "question": "银行池里哪些便宜",
+      "expect": {
+        "intent": "ranking",
+        "contains": [
+          "银行池不排行",
+          "只列指标",
+          "不良率"
         ]
       }
     }

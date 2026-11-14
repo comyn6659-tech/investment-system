@@ -1,8 +1,8 @@
 # 对话入口端到端验收（batch4k）
 
-- 生成时间：2026-11-14T15:46:24+08:00
+- 生成时间：2026-11-14T16:56:20+08:00
 - 政策：`equity-policy-v1.1`（已批准）
-- 固定问题集：52 条，通过 52 条；端到端全部通过：是
+- 固定问题集：61 条，通过 61 条；端到端全部通过：是
 - 问题集测试使用批量快照固定价格；30 只测试股 / 指数 / 银行 / ETF 使用当日实时行情。
 
 ## 1. 固定问题集
@@ -19,18 +19,18 @@
 | q08 | 银行 | 工商银行贵不贵 | bank | bank | undetermined | 10 | 通过 |
 | q09 | 银行 | 招行股息率多少 | bank | bank | undetermined | 10 | 通过 |
 | q10 | 银行 | 平安银行怎么样 | bank | bank | undetermined | 10 | 通过 |
-| q11 | 指数 | 沪深300 现在什么位置 | index | index | undetermined | 9 | 通过 |
-| q12 | 指数 | 中证500 贵不贵 | index | index | undetermined | 9 | 通过 |
-| q13 | 指数 | 中证1000 什么位置 | index | index | undetermined | 9 | 通过 |
-| q14 | 指数 | 恒生科技 | index | index | undetermined | 10 | 通过 |
+| q11 | 指数 | 沪深300 现在什么位置 | index | index | undetermined | 13 | 通过 |
+| q12 | 指数 | 中证500 贵不贵 | index | index | undetermined | 13 | 通过 |
+| q13 | 指数 | 中证1000 什么位置 | index | index | undetermined | 13 | 通过 |
+| q14 | 指数 | 恒生科技 | index | index | undetermined | 11 | 通过 |
 | q15 | ETF | 510300 能买吗 | etf | etf | undetermined | 9 | 通过 |
 | q16 | ETF | 510500 怎么样 | etf | etf | undetermined | 9 | 通过 |
 | q17 | ETF | 512100 能买吗 | etf | etf | undetermined | 9 | 通过 |
 | q18 | ETF | 159915 能买吗 | out_of_scope | out_of_scope | — | 10 | 通过 |
-| q19 | 池名单 | 好公司池有哪些 | pool_list | pool_list | — | 8 | 通过 |
-| q20 | 池名单 | 收息池里的国企 | pool_list | pool_list | — | 7 | 通过 |
-| q21 | 池名单 | 银行池 | pool_list | pool_list | — | 17 | 通过 |
-| q22 | 池名单 | 稳定收息池有哪些 | pool_list | pool_list | — | 8 | 通过 |
+| q19 | 池名单 | 好公司池有哪些 | pool_list | pool_list | — | 9 | 通过 |
+| q20 | 池名单 | 收息池里的国企 | pool_list | pool_list | — | 8 | 通过 |
+| q21 | 池名单 | 银行池 | pool_list | pool_list | — | 18 | 通过 |
+| q22 | 池名单 | 稳定收息池有哪些 | pool_list | pool_list | — | 9 | 通过 |
 | q23 | 是否在池 | 格力在不在好公司池 | membership | membership | — | 9 | 通过 |
 | q24 | 是否在池 | 为什么比亚迪不在 | membership | membership | — | 10 | 通过 |
 | q25 | 是否在池 | 茅台在不在收息池 | membership | membership | — | 8 | 通过 |
@@ -61,6 +61,15 @@
 | q50 | 是否在池 | 为什么比亚迪不是好公司 | membership | membership | — | 10 | 通过 |
 | q51 | 是否在池 | 比亚迪算不算好公司 | membership | membership | — | 10 | 通过 |
 | q52 | 是否在池 | 比亚迪是好公司吗 | membership | membership | — | 10 | 通过 |
+| q53 | 排行 | 收息池有哪些公司现在的价格很合适 | ranking | ranking | — | 16 | 通过 |
+| q54 | 排行 | 好公司池里哪些现在便宜 | ranking | ranking | — | 15 | 通过 |
+| q55 | 排行 | 好公司池哪些划算 | ranking | ranking | — | 15 | 通过 |
+| q56 | 排行 | 收息池里哪些低估 | ranking | ranking | — | 16 | 通过 |
+| q57 | 排行 | 好公司池里现在哪些值得买 | ranking | ranking | — | 15 | 通过 |
+| q58 | 排行 | 收息池哪些能买 | ranking | ranking | — | 16 | 通过 |
+| q59 | 排行 | 好公司池里价格合适的公司 | ranking | ranking | — | 15 | 通过 |
+| q60 | 排行 | 收息池离买点最近的公司 | ranking | ranking | — | 16 | 通过 |
+| q61 | 排行 | 银行池里哪些便宜 | ranking | ranking | — | 17 | 通过 |
 
 ## 2. 30 只测试股
 
@@ -101,10 +110,10 @@
 
 | 问题 | 意图 | 结论 | 行数 | 结果 |
 |---|---|---|---:|---|
-| 沪深300 现在什么位置 | index | undetermined | 9 | 通过 |
-| 中证500 现在什么位置 | index | undetermined | 9 | 通过 |
-| 中证1000 现在什么位置 | index | undetermined | 9 | 通过 |
-| 恒生科技 | index | undetermined | 10 | 通过 |
+| 沪深300 现在什么位置 | index | undetermined | 13 | 通过 |
+| 中证500 现在什么位置 | index | undetermined | 13 | 通过 |
+| 中证1000 现在什么位置 | index | undetermined | 13 | 通过 |
+| 恒生科技 | index | undetermined | 11 | 通过 |
 
 ## 4. 两家银行
 

@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-11-14T15:46:24+08:00",
+  "generated_at": "2026-11-14T16:56:20+08:00",
   "policy": "equity-policy-v1.1",
-  "question_count": 52,
-  "question_passed": 52,
+  "question_count": 61,
+  "question_passed": 61,
   "sections": {
     "stocks": [
       {
@@ -372,40 +372,40 @@
         "intent": "index",
         "code": "000300",
         "conclusion": "undetermined",
-        "lines": 9,
+        "lines": 13,
         "passed": true,
         "problems": [],
-        "markdown": "**结论：无法判断** — 指数只做研究画像（规则未批准），不给买点或目标点位。\n\n标的：沪深300（INDEX:000300.SH）｜画像日期 2026-11-10\n现在什么位置： PE（滚动） 12.65（2026-11-10，近 5 年分位 76%）｜PB 1.32（2026-11-10，近 5 年分位 39%）\n候选 A 研究信号：2026-W45 / 2026-11-06｜PE 13.13｜周度分位 67.7%｜信号 exit（研究信号，规则与阈值未批准）\n为什么：指数分位只描述历史位置，不是买卖判断；候选 A 规则与阈值未获批准。\n局限：分位依赖供应商历史序列口径；官方最新值不参与第三方历史排名；指数没有盈利预测，无法给内在价值。\n来源与日期：乐咕乐股（月度画像）｜候选 A：中证指数官网官方日频序列（2026-11-10）\n不构成投资建议。"
+        "markdown": "**结论：无法判断** — 目前估值处于近 5 年较高位置。\n说明：指数只做位置说明，规则未批准，不给买点或目标点位。\n\n标的：沪深300（INDEX:000300.SH）｜画像日期 2026-11-10\n月度参考：PE 12.65（乐咕乐股，2026-11-10；用于近 5 年分位）｜PB 1.32（乐咕乐股，2026-11-10；用于近 5 年分位）\n官方周度：PE 13.13（中证指数官网，2026-11-06；用于研究信号）\n两个 PE 为什么不同：来源不同（第三方月度参考 vs 中证指数官网日频）、时点不同、加权与样本口径未公开，不能直接对比。\n研究信号：按研究规则处于偏贵区间（卖出/不买入一侧）；研究信号，规则未批准。\n直白说：PE 比过去 5 年里 76% 的时间都贵；PB 比过去 5 年里 61% 的时间都便宜。\n为什么：分位只描述历史位置，不是买卖判断；研究信号的规则与阈值还没有批准。\n局限：分位依赖供应商历史序列口径；官方最新值不参与第三方历史排名；指数没有盈利预测，无法给内在价值。\n来源与日期：乐咕乐股（月度画像）｜研究信号：中证指数官网官方日频序列（2026-11-10）\n不构成投资建议。"
       },
       {
         "question": "中证500 现在什么位置",
         "intent": "index",
         "code": "000905",
         "conclusion": "undetermined",
-        "lines": 9,
+        "lines": 13,
         "passed": true,
         "problems": [],
-        "markdown": "**结论：无法判断** — 指数只做研究画像（规则未批准），不给买点或目标点位。\n\n标的：中证500（INDEX:000905.SH）｜画像日期 2026-11-10\n现在什么位置： PE（滚动） 22.72（2026-11-10，近 5 年分位 75%）｜PB 2.05（2026-11-10，近 5 年分位 77%）\n候选 A 研究信号：2026-W45 / 2026-11-06｜PE 22.18｜周度分位 68.9%｜信号 exit（研究信号，规则与阈值未批准）\n为什么：指数分位只描述历史位置，不是买卖判断；候选 A 规则与阈值未获批准。\n局限：分位依赖供应商历史序列口径；官方最新值不参与第三方历史排名；指数没有盈利预测，无法给内在价值。\n来源与日期：乐咕乐股（月度画像）｜候选 A：中证指数官网官方日频序列（2026-11-10）\n不构成投资建议。"
+        "markdown": "**结论：无法判断** — 目前估值处于近 5 年较高位置。\n说明：指数只做位置说明，规则未批准，不给买点或目标点位。\n\n标的：中证500（INDEX:000905.SH）｜画像日期 2026-11-10\n月度参考：PE 22.72（乐咕乐股，2026-11-10；用于近 5 年分位）｜PB 2.05（乐咕乐股，2026-11-10；用于近 5 年分位）\n官方周度：PE 22.18（中证指数官网，2026-11-06；用于研究信号）\n两个 PE 为什么不同：来源不同（第三方月度参考 vs 中证指数官网日频）、时点不同、加权与样本口径未公开，不能直接对比。\n研究信号：按研究规则处于偏贵区间（卖出/不买入一侧）；研究信号，规则未批准。\n直白说：PE 比过去 5 年里 75% 的时间都贵；PB 比过去 5 年里 77% 的时间都贵。\n为什么：分位只描述历史位置，不是买卖判断；研究信号的规则与阈值还没有批准。\n局限：分位依赖供应商历史序列口径；官方最新值不参与第三方历史排名；指数没有盈利预测，无法给内在价值。\n来源与日期：乐咕乐股（月度画像）｜研究信号：中证指数官网官方日频序列（2026-11-10）\n不构成投资建议。"
       },
       {
         "question": "中证1000 现在什么位置",
         "intent": "index",
         "code": "000852",
         "conclusion": "undetermined",
-        "lines": 9,
+        "lines": 13,
         "passed": true,
         "problems": [],
-        "markdown": "**结论：无法判断** — 指数只做研究画像（规则未批准），不给买点或目标点位。\n\n标的：中证1000（INDEX:000852.SH）｜画像日期 2026-11-10\n现在什么位置： PE（滚动） 25.58（2026-11-10，近 5 年分位 65%）｜PB 2.06（2026-11-10，近 5 年分位 34%）\n候选 A 研究信号：2026-W45 / 2026-11-06｜PE 26.01｜周度分位 62.0%｜信号 exit（研究信号，规则与阈值未批准）\n为什么：指数分位只描述历史位置，不是买卖判断；候选 A 规则与阈值未获批准。\n局限：分位依赖供应商历史序列口径；官方最新值不参与第三方历史排名；指数没有盈利预测，无法给内在价值。\n来源与日期：乐咕乐股（月度画像）｜候选 A：中证指数官网官方日频序列（2026-11-10）\n不构成投资建议。"
+        "markdown": "**结论：无法判断** — 目前估值处于近 5 年较高位置。\n说明：指数只做位置说明，规则未批准，不给买点或目标点位。\n\n标的：中证1000（INDEX:000852.SH）｜画像日期 2026-11-10\n月度参考：PE 25.58（乐咕乐股，2026-11-10；用于近 5 年分位）｜PB 2.06（乐咕乐股，2026-11-10；用于近 5 年分位）\n官方周度：PE 26.01（中证指数官网，2026-11-06；用于研究信号）\n两个 PE 为什么不同：来源不同（第三方月度参考 vs 中证指数官网日频）、时点不同、加权与样本口径未公开，不能直接对比。\n研究信号：按研究规则处于偏贵区间（卖出/不买入一侧）；研究信号，规则未批准。\n直白说：PE 比过去 5 年里 65% 的时间都贵；PB 比过去 5 年里 66% 的时间都便宜。\n为什么：分位只描述历史位置，不是买卖判断；研究信号的规则与阈值还没有批准。\n局限：分位依赖供应商历史序列口径；官方最新值不参与第三方历史排名；指数没有盈利预测，无法给内在价值。\n来源与日期：乐咕乐股（月度画像）｜研究信号：中证指数官网官方日频序列（2026-11-10）\n不构成投资建议。"
       },
       {
         "question": "恒生科技",
         "intent": "index",
         "code": "HSTECH",
         "conclusion": "undetermined",
-        "lines": 10,
+        "lines": 11,
         "passed": true,
         "problems": [],
-        "markdown": "**结论：无法判断** — 指数只做研究画像（规则未批准），不给买点或目标点位。\n\n标的：恒生科技指数（INDEX:HSTECH.HKEX）｜画像日期 2026-11-12\n现在什么位置：没有足够的同源历史，未计算分位。\n候选 A 研究信号：暂无可评估的周度观察点。\n官方月度 PE：25.43（2026-10-30）、股息率 1.23%；没有官方估值历史，不能做分位/信号。\n为什么：指数分位只描述历史位置，不是买卖判断；候选 A 规则与阈值未获批准。\n局限：分位依赖供应商历史序列口径；官方最新值不参与第三方历史排名；指数没有盈利预测，无法给内在价值。\n来源与日期：指数数据供应商（月度画像）｜候选 A：中证指数官网官方日频序列（2026-11-12）\n不构成投资建议。"
+        "markdown": "**结论：无法判断** — 官方月度估值历史不足，无法给出近 5 年位置。\n说明：指数只做位置说明，规则未批准，不给买点或目标点位。\n\n标的：恒生科技指数（INDEX:HSTECH.HKEX）｜画像日期 2026-11-12\n月度参考：没有足够的同源历史，未计算分位。\n研究信号：暂无可评估的周度观察点。\n官方月度：PE 25.43（恒生指数公司，2026-10-30；股息率 1.23%；只作月度快照，不用于分位或研究信号）。\n为什么：分位只描述历史位置，不是买卖判断；研究信号的规则与阈值还没有批准。\n局限：分位依赖供应商历史序列口径；官方最新值不参与第三方历史排名；指数没有盈利预测，无法给内在价值。\n来源与日期：恒生指数公司官方月度指数单张（2026-10-30）；指数快照 INDEX:HSTECH.HKEX。\n不构成投资建议。"
       }
     ],
     "banks": [
@@ -417,7 +417,7 @@
         "lines": 10,
         "passed": true,
         "problems": [],
-        "markdown": "**结论：无法判断** — 银行估值未启用（bank-check-v1-draft 仍为草案），下面只列银行指标，不给买点或目标价。\n\n是否在银行池：是（银行池共 11 家）｜现价 42.93 元（2026-11-13）\n关键指标：市净率 0.97 倍\n股息率 4.7%｜ROE 13.4%｜不良率 0.94%｜拨备覆盖率 389.39%｜核心一级 14.39%\n为什么：银行要先确认资本充足、资产质量与监管下限证据；银行估值模型尚未启用，按已批准政策只能给「无法判断」。\n它是什么：银行池成员｜所有制 央企｜周期属性 非周期（银行）｜等级 —（银行模型未启用，不评等级）\n局限：银行指标是公开报表口径，未做银行专用估值；不良率、拨备与核心一级可能随季报更新。\n来源与日期：行情 腾讯财经（2026-11-13）；财务 东方财富 2025 年报 / 2026 三季报；政策 equity-policy-v1.1（已批准 2026-11-12）；银行规则 bank-pool-v1（已批准 2026-11-13）。\n不构成投资建议。"
+        "markdown": "**结论：无法判断** — 银行专用估值方法还没启用（股东 2026-11-13 决定），所以只列指标、不下结论。\n\n是否在银行池：是（银行池共 11 家）｜现价 42.93 元（2026-11-13）\n关键指标：市净率 0.97 倍\n股息率 4.7%｜净资产收益率 13.4%｜不良率 0.94%｜拨备覆盖率 389.39%｜核心一级 14.39%\n为什么：银行的资本充足、资产质量与监管口径需要专用方法；本版只展示公开报表指标，不评价贵贱。\n它是什么：银行池成员｜所有制 央企｜周期属性 非周期（银行）｜等级 —（银行模型未启用，不评等级）\n局限：银行指标是公开报表口径，未做银行专用估值；不良率、拨备与核心一级可能随季报更新。\n来源与日期：行情 腾讯财经（2026-11-13）；财务 东方财富 2025 年报 / 2026 三季报；政策与银行规则均已批准（2026-11-13）。\n不构成投资建议。"
       },
       {
         "question": "工商银行怎么样",
@@ -427,7 +427,7 @@
         "lines": 10,
         "passed": true,
         "problems": [],
-        "markdown": "**结论：无法判断** — 银行估值未启用（bank-check-v1-draft 仍为草案），下面只列银行指标，不给买点或目标价。\n\n是否在银行池：是（银行池共 11 家）｜现价 8.85 元（2026-11-13）\n关键指标：市净率 0.81 倍\n股息率 3.5%｜ROE 9.4%｜不良率 1.29%｜拨备覆盖率 211.64%｜核心一级 13.07%\n为什么：银行要先确认资本充足、资产质量与监管下限证据；银行估值模型尚未启用，按已批准政策只能给「无法判断」。\n它是什么：银行池成员｜所有制 央企｜周期属性 非周期（银行）｜等级 —（银行模型未启用，不评等级）\n局限：银行指标是公开报表口径，未做银行专用估值；不良率、拨备与核心一级可能随季报更新。\n来源与日期：行情 腾讯财经（2026-11-13）；财务 东方财富 2025 年报 / 2026 三季报；政策 equity-policy-v1.1（已批准 2026-11-12）；银行规则 bank-pool-v1（已批准 2026-11-13）。\n不构成投资建议。"
+        "markdown": "**结论：无法判断** — 银行专用估值方法还没启用（股东 2026-11-13 决定），所以只列指标、不下结论。\n\n是否在银行池：是（银行池共 11 家）｜现价 8.85 元（2026-11-13）\n关键指标：市净率 0.81 倍\n股息率 3.5%｜净资产收益率 9.4%｜不良率 1.29%｜拨备覆盖率 211.64%｜核心一级 13.07%\n为什么：银行的资本充足、资产质量与监管口径需要专用方法；本版只展示公开报表指标，不评价贵贱。\n它是什么：银行池成员｜所有制 央企｜周期属性 非周期（银行）｜等级 —（银行模型未启用，不评等级）\n局限：银行指标是公开报表口径，未做银行专用估值；不良率、拨备与核心一级可能随季报更新。\n来源与日期：行情 腾讯财经（2026-11-13）；财务 东方财富 2025 年报 / 2026 三季报；政策与银行规则均已批准（2026-11-13）。\n不构成投资建议。"
       }
     ],
     "etfs": [
@@ -603,7 +603,7 @@
       "code": "000300",
       "expected_conclusion": "undetermined",
       "actual_conclusion": "undetermined",
-      "lines": 9,
+      "lines": 13,
       "passed": true,
       "problems": []
     },
@@ -616,7 +616,7 @@
       "code": "000905",
       "expected_conclusion": "undetermined",
       "actual_conclusion": "undetermined",
-      "lines": 9,
+      "lines": 13,
       "passed": true,
       "problems": []
     },
@@ -629,7 +629,7 @@
       "code": "000852",
       "expected_conclusion": "undetermined",
       "actual_conclusion": "undetermined",
-      "lines": 9,
+      "lines": 13,
       "passed": true,
       "problems": []
     },
@@ -642,7 +642,7 @@
       "code": "HSTECH",
       "expected_conclusion": "undetermined",
       "actual_conclusion": "undetermined",
-      "lines": 10,
+      "lines": 11,
       "passed": true,
       "problems": []
     },
@@ -707,7 +707,7 @@
       "code": null,
       "expected_conclusion": null,
       "actual_conclusion": null,
-      "lines": 8,
+      "lines": 9,
       "passed": true,
       "problems": []
     },
@@ -720,7 +720,7 @@
       "code": null,
       "expected_conclusion": null,
       "actual_conclusion": null,
-      "lines": 7,
+      "lines": 8,
       "passed": true,
       "problems": []
     },
@@ -733,7 +733,7 @@
       "code": null,
       "expected_conclusion": null,
       "actual_conclusion": null,
-      "lines": 17,
+      "lines": 18,
       "passed": true,
       "problems": []
     },
@@ -746,7 +746,7 @@
       "code": null,
       "expected_conclusion": null,
       "actual_conclusion": null,
-      "lines": 8,
+      "lines": 9,
       "passed": true,
       "problems": []
     },
@@ -1137,6 +1137,123 @@
       "expected_conclusion": null,
       "actual_conclusion": null,
       "lines": 10,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q53",
+      "category": "排行",
+      "question": "收息池有哪些公司现在的价格很合适",
+      "expected_intent": "ranking",
+      "actual_intent": "ranking",
+      "code": null,
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 16,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q54",
+      "category": "排行",
+      "question": "好公司池里哪些现在便宜",
+      "expected_intent": "ranking",
+      "actual_intent": "ranking",
+      "code": null,
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 15,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q55",
+      "category": "排行",
+      "question": "好公司池哪些划算",
+      "expected_intent": "ranking",
+      "actual_intent": "ranking",
+      "code": null,
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 15,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q56",
+      "category": "排行",
+      "question": "收息池里哪些低估",
+      "expected_intent": "ranking",
+      "actual_intent": "ranking",
+      "code": null,
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 16,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q57",
+      "category": "排行",
+      "question": "好公司池里现在哪些值得买",
+      "expected_intent": "ranking",
+      "actual_intent": "ranking",
+      "code": "300785",
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 15,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q58",
+      "category": "排行",
+      "question": "收息池哪些能买",
+      "expected_intent": "ranking",
+      "actual_intent": "ranking",
+      "code": null,
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 16,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q59",
+      "category": "排行",
+      "question": "好公司池里价格合适的公司",
+      "expected_intent": "ranking",
+      "actual_intent": "ranking",
+      "code": null,
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 15,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q60",
+      "category": "排行",
+      "question": "收息池离买点最近的公司",
+      "expected_intent": "ranking",
+      "actual_intent": "ranking",
+      "code": null,
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 16,
+      "passed": true,
+      "problems": []
+    },
+    {
+      "id": "q61",
+      "category": "排行",
+      "question": "银行池里哪些便宜",
+      "expected_intent": "ranking",
+      "actual_intent": "ranking",
+      "code": null,
+      "expected_conclusion": null,
+      "actual_conclusion": null,
+      "lines": 17,
       "passed": true,
       "problems": []
     }

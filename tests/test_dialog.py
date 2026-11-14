@@ -123,14 +123,15 @@ def test_detail_expands_and_keeps_disclaimer(service):
 
 def test_bank_card_has_all_required_metrics(service):
     text = service.ask("招商银行怎么样").markdown
-    for label in ("市净率", "股息率", "ROE", "不良率", "拨备覆盖率", "核心一级"):
+    for label in ("市净率", "股息率", "净资产收益率", "不良率", "拨备覆盖率", "核心一级"):
         assert label in text
 
 
 def test_index_card_has_position_and_research_signal(service):
     text = service.ask("沪深300 现在什么位置").markdown
     assert "近 5 年分位" in text
-    assert "候选 A 研究信号" in text
+    assert "研究信号" in text
+    assert "官方周度" in text
     assert "未批准" in text
 
 

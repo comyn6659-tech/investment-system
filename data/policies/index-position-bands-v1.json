@@ -1,0 +1,20 @@
+{
+  "schema_version": "index-position-bands/1",
+  "band_id": "index-position-bands-v1",
+  "version": "v1",
+  "status": "implementation_completion",
+  "effective_date": "2026-11-14",
+  "basis": "施工单 batch4k-r3 X7：按 PE 近 5 年分位给出位置概括，只做描述，不构成买卖判断。",
+  "percentile_definition": "近 5 年同源同列月度参考池分位（0–100）；分位越高表示当前估值相对历史越贵。",
+  "bands": [
+    {"lower": 0, "upper": 20, "label": "偏低", "summary": "目前估值处于近 5 年偏低位置"},
+    {"lower": 20, "upper": 40, "label": "较低", "summary": "目前估值处于近 5 年较低位置"},
+    {"lower": 40, "upper": 60, "label": "居中", "summary": "目前估值处于近 5 年居中位置"},
+    {"lower": 60, "upper": 80, "label": "较高", "summary": "目前估值处于近 5 年较高位置"},
+    {"lower": 80, "upper": 100, "label": "偏高", "summary": "目前估值处于近 5 年偏高位置"}
+  ],
+  "notes": [
+    "lower 含、upper 不含（最后一段含 100）；分位 20 归入较低，40 归入居中，60 归入较高，80 归入偏高。",
+    "只使用月度画像的 PE 分位；没有 PE 分位时不硬套分档。"
+  ]
+}

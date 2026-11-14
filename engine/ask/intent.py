@@ -90,6 +90,16 @@ _MEMBERSHIP_PATTERNS = (
     r"算好公司",
     r"好不好",
 )
+_PRICE_PATTERNS = (
+    r"便宜",
+    r"合适",
+    r"划算",
+    r"低估",
+    r"值得买",
+    r"能买",
+    r"价格",
+    r"离买点",
+)
 _RECOMMEND_PATTERNS = (
     r"值得投资",
     r"好股票",
@@ -160,6 +170,11 @@ def parse(question: str, target: Target | None) -> Intent:
     if not text:
         return Intent("unrecognized", reason="问题为空")
 
+    # 池名 + 价格类词：优先走该池排行，即使句子里混进了股票名（如「值得买」）
+    pool_with_price = _pool(text)
+    if pool_with_price is not None and _has(_PRICE_PATTERNS, text):
+        return Intent("ranking", pool=pool_with_price)
+
     # 标的已识别：先看是否在问状态/历史/排行/是否在池
     if target is not None and target.ambiguous:
         return Intent("ambiguous", target=target, reason="同一名称或代码对应多个标的")
@@ -192,6 +207,8 @@ def parse(question: str, target: Target | None) -> Intent:
         return Intent("status")
     if _has(_RANKING_PATTERNS, text) or _has(_RECOMMEND_PATTERNS, text):
         return Intent("ranking", pool=_pool(text) or "all")
+    if _pool(text) is not None and _has(_PRICE_PATTERNS, text):
+        return Intent("ranking", pool=_pool(text))
     if _pool(text) is not None and _has(_POOL_LIST_PATTERNS, text):
         return Intent("pool_list", pool=_pool(text), ownership=_ownership(text))
     if any(marker in text for marker in ("创业板50", "创业板100", "创业板200", "创业板300", "创业板综", "创业板R")):

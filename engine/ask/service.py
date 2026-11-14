@@ -17,6 +17,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from engine.ask.intent import SUPPORTED_QUESTIONS, Intent, parse
+from engine.ask.index_bands import band_for
 from engine.ask.plain import (
     BANNED_TERMS,
     cycle_text,
@@ -66,6 +67,8 @@ INCOME_SNAPSHOT = ROOT / "data" / "income-pool" / "snapshot-qps-d8fb7e3718675b93
 BANK_SNAPSHOT = ROOT / "data" / "bank-pool" / "snapshot-qps-dc9c12160476db8b"
 OWNERSHIP = INCOME_SNAPSHOT / "ownership.csv.gz"
 BANK_INPUTS = ROOT / "data" / "bank-pool" / "valuation-inputs.csv.gz"
+BANK_INDICATORS = BANK_SNAPSHOT / "bank-indicators.csv.gz"
+BANK_OWNERSHIP = BANK_SNAPSHOT / "ownership.csv.gz"
 OFFICIAL_LEDGER = ROOT / "data" / "ledger" / "official-valuation-daily.jsonl"
 HSTECH_LEDGER = ROOT / "data" / "ledger" / "hstech-monthly-valuation.jsonl"
 
@@ -827,6 +830,8 @@ class AskService:
 
     def _ranking(self, intent: Intent, *, detail: bool = False) -> dict[str, Any]:
         pool = intent.pool or "all"
+        if pool == "bank":
+            return self._bank_pool_ranking(detail=detail)
         codes = self._pool_codes(pool)
         rows = []
         for code in codes:
@@ -897,6 +902,43 @@ class AskService:
         ]
         return {"markdown": "\n".join(lines), "data": {"pool": pool, "count": len(codes), "candidates": candidates, "ranking": rows}}
 
+    def _bank_pool_ranking(self, *, detail: bool = False) -> dict[str, Any]:
+        inputs = self._bank_inputs()
+        rows = sorted(self.pool_rows["bank"].values(), key=lambda row: str(row["code"]))
+        lines = [
+            "**结论：银行池不排行** — 银行专用估值方法还没启用（股东 2026-11-13 决定），"
+            "所以只列指标、不按价格排高低。",
+            "",
+        ]
+        for row in rows[: (50 if detail else 15)]:
+            code = str(row["code"]).zfill(6)
+            indicator = self._bank_indicator(code)
+            quote = (self.quote_rows.get(code) or {}) if self.use_live_quotes else {}
+            price = quote.get("price")
+            if price is None and inputs.get(code):
+                try:
+                    price = float(inputs[code]["price"])
+                except (TypeError, ValueError, KeyError):
+                    price = None
+            ownership = self._bank_ownership(code) or row.get("ownership") or "未标记"
+            lines.append(
+                f"- {code} {row['name']}：现价 {_money(price)} 元"
+                f"｜不良率 {indicator.get('npl_ratio') or row.get('npl_ratio') or '—'}%"
+                f"｜拨备覆盖率 {indicator.get('provision_coverage') or row.get('provision_coverage') or '—'}%"
+                f"｜核心一级 {indicator.get('core_tier1_ratio') or row.get('core_tier1_ratio') or '—'}%"
+                f"｜所有制 {ownership}"
+            )
+        lines += [
+            "",
+            "想看单家银行详情，可问：平安银行怎么样。",
+            "来源与日期：银行指标 东方财富 2026 三季报；行情 腾讯财经（最新交易日）；规则已批准（2026-11-13）。",
+            "不构成投资建议。",
+        ]
+        return {
+            "markdown": "\n".join(lines),
+            "data": {"pool": "bank", "count": len(rows), "ranked": False},
+        }
+
     # --- 卡片：池名单 -------------------------------------------------------
     def _pool_list(self, intent: Intent, *, detail: bool = False) -> dict[str, Any]:
         pool = intent.pool or "all"
@@ -954,6 +996,15 @@ class AskService:
             lines += ["", "【详情】完整名单："]
             for name, _policy_id, _report, rows in sections:
                 lines.append(f"{name}（{len(rows)} 家）：" + "、".join(f"{row['code']} {row['name']}" for row in rows))
+        for name, _policy_id, _report, _rows in sections:
+            if name == "银行池":
+                lines.append(
+                    "银行池不排行：银行专用估值方法还没启用，只列指标；可问：平安银行怎么样。"
+                )
+            else:
+                lines.append(
+                    f"想看哪些现在离买点最近，可问：{name}里谁离买点最近"
+                )
         lines += [
             "",
             "入池不等于买入：入池只说明历史公开数据满足规则，不说明现在便宜；名单每年复盘。",
@@ -1079,6 +1130,36 @@ class AskService:
         except (TypeError, ValueError):
             return None
 
+    def _bank_indicator(self, code: str) -> dict[str, Any]:
+        if not hasattr(self, "_bank_indicator_rows"):
+            grouped: dict[str, list[dict]] = {}
+            for row in read_table(BANK_INDICATORS):
+                grouped.setdefault(str(row.get("code")).zfill(6), []).append(row)
+            latest: dict[str, dict] = {}
+            fill_fields = ("npl_ratio", "provision_coverage", "core_tier1_ratio")
+            for key, items in grouped.items():
+                items.sort(key=lambda row: str(row.get("report_date") or ""))
+                current = dict(items[-1])
+                for field in fill_fields:
+                    if current.get(field) not in (None, ""):
+                        continue
+                    for previous in reversed(items[:-1]):
+                        if previous.get(field) not in (None, ""):
+                            current[field] = previous[field]
+                            current[f"{field}_fallback_date"] = previous.get("report_date")
+                            break
+                latest[key] = current
+            self._bank_indicator_rows = latest
+        return self._bank_indicator_rows.get(code) or {}
+
+    def _bank_ownership(self, code: str) -> str | None:
+        if not hasattr(self, "_bank_ownership_map"):
+            self._bank_ownership_map = {
+                str(row["code"]).zfill(6): str(row.get("ownership") or "")
+                for row in read_table(BANK_OWNERSHIP)
+            }
+        return self._bank_ownership_map.get(code)
+
     def _bank_inputs(self) -> dict[str, dict]:
         import csv
         import gzip
@@ -1124,26 +1205,33 @@ class AskService:
             except (TypeError, ValueError, KeyError, ZeroDivisionError):
                 pass
         bank_row = self.pool_rows["bank"].get(code) or {}
-        npl = bank_row.get("npl_ratio")
-        provision = bank_row.get("provision_coverage")
-        cet1 = bank_row.get("core_tier1_ratio")
-        ownership = bank_row.get("ownership") or self.ownership.get(code) or "未标记"
+        indicator = self._bank_indicator(code)
+        npl = indicator.get("npl_ratio") or bank_row.get("npl_ratio")
+        provision = indicator.get("provision_coverage") or bank_row.get("provision_coverage")
+        cet1 = indicator.get("core_tier1_ratio") or bank_row.get("core_tier1_ratio")
+        ownership = (
+            self._bank_ownership(code)
+            or bank_row.get("ownership")
+            or self.ownership.get(code)
+            or "未标记"
+        )
         lines = [
-            "**结论：无法判断** — 银行估值未启用（bank-check-v1-draft 仍为草案），下面只列银行指标，不给买点或目标价。",
+            "**结论：无法判断** — 银行专用估值方法还没启用（股东 2026-11-13 决定），所以只列指标、不下结论。",
             "",
             f"是否在银行池：{'是' if in_pool else '否'}（银行池共 {len(self.pool_sets['bank'])} 家）"
             f"｜现价 {_money(price)} 元（{price_date or '日期未知'}）",
             f"关键指标：市净率 {pb:.2f} 倍" if pb is not None else "关键指标：市净率 —",
-            f"股息率 {_pct(dividend_yield)}｜ROE {_pct(roe)}｜不良率 {npl if npl is not None else '—'}%"
+            f"股息率 {_pct(dividend_yield)}｜净资产收益率 {_pct(roe)}"
+            f"｜不良率 {npl if npl is not None else '—'}%"
             f"｜拨备覆盖率 {provision if provision is not None else '—'}%"
             f"｜核心一级 {cet1 if cet1 is not None else '—'}%",
-            f"为什么：银行要先确认资本充足、资产质量与监管下限证据；银行估值模型尚未启用，"
-            "按已批准政策只能给「无法判断」。",
+            "为什么：银行的资本充足、资产质量与监管口径需要专用方法；本版只展示公开报表指标，"
+            "不评价贵贱。",
             f"它是什么：{'银行池成员' if in_pool else '银行（不在银行池）'}｜所有制 {ownership}"
             f"｜周期属性 {cycle_text('bank')}｜等级 —（银行模型未启用，不评等级）",
             "局限：银行指标是公开报表口径，未做银行专用估值；不良率、拨备与核心一级可能随季报更新。",
             f"来源与日期：行情 腾讯财经（{price_date or '—'}）；财务 东方财富 2025 年报 / 2026 三季报；"
-            f"政策 equity-policy-v1.1（已批准 2026-11-12）；银行规则 bank-pool-v1（已批准 2026-11-13）。",
+            "政策与银行规则均已批准（2026-11-13）。",
             "不构成投资建议。",
         ]
         if detail:
@@ -1164,8 +1252,18 @@ class AskService:
                 "pb": pb,
                 "dividend_yield": dividend_yield,
                 "roe": roe,
+                "npl": npl,
+                "provision": provision,
+                "cet1": cet1,
+                "ownership": ownership,
             },
         }
+
+    @staticmethod
+    def _percentile_sentence(percentile: float) -> str:
+        if percentile >= 50:
+            return f"比过去 5 年里 {percentile:.0f}% 的时间都贵"
+        return f"比过去 5 年里 {100 - percentile:.0f}% 的时间都便宜"
 
     # --- 卡片：指数 ---------------------------------------------------------
     def _index_card(self, target: Target | None, *, detail: bool = False) -> dict[str, Any]:
@@ -1199,50 +1297,93 @@ class AskService:
                 "data": {},
             }
         metrics = profile.get("metrics") or {}
+        pe = metrics.get("pe_rolling") or {}
+        pb = metrics.get("pb") or {}
+        pe_percentile = (
+            float(pe["percentile"])
+            if pe.get("status") == "computed" and pe.get("percentile") is not None
+            else None
+        )
+        pb_percentile = (
+            float(pb["percentile"])
+            if pb.get("status") == "computed" and pb.get("percentile") is not None
+            else None
+        )
+        band = band_for(pe_percentile)
+        if band:
+            headline = band["summary"]
+        elif not metrics:
+            headline = "官方月度估值历史不足，无法给出近 5 年位置"
+        else:
+            headline = "暂无可用的近 5 年位置"
+        latest = (signal.get("latest") or {}) if signal else {}
         lines = [
-            f"**结论：无法判断** — 指数只做研究画像（规则未批准），不给买点或目标点位。",
+            f"**结论：无法判断** — {headline}。",
+            "说明：指数只做位置说明，规则未批准，不给买点或目标点位。",
             "",
             f"标的：{target.name}（{target.instrument_id or target.code}）｜画像日期 {profile.get('as_of') or '—'}",
         ]
-        bits = []
-        for key, label in (("pe_rolling", "PE（滚动）"), ("pb", "PB")):
-            item = metrics.get(key) or {}
+        monthly_bits = []
+        for item, label in ((pe, "PE"), (pb, "PB")):
             comparison = ((item.get("window") or {}).get("comparison") or {})
             if item.get("status") == "computed" and item.get("percentile") is not None:
-                bits.append(
-                    f"{label} {comparison.get('value')}（{comparison.get('date')}，近 5 年分位 {item['percentile']:.0f}%）"
+                publisher = (item.get("source") or {}).get("publisher") or "第三方月度参考"
+                monthly_bits.append(
+                    f"{label} {comparison.get('value')}（{publisher}，{comparison.get('date')}；用于近 5 年分位）"
                 )
-        if bits:
-            lines.append("现在什么位置： " + "｜".join(bits))
+        if monthly_bits:
+            lines.append("月度参考：" + "｜".join(monthly_bits))
         else:
-            lines.append("现在什么位置：没有足够的同源历史，未计算分位。")
-        latest = (signal.get("latest") or {}) if signal else {}
+            lines.append("月度参考：没有足够的同源历史，未计算分位。")
+
         if latest:
             lines.append(
-                f"候选 A 研究信号：{latest.get('week')} / {latest.get('date')}"
-                f"｜PE {latest.get('pe')}｜周度分位 {latest.get('percentile') if latest.get('percentile') is None else f'{latest.get('percentile'):.1f}%'}"
-                f"｜信号 {signal.get('signal')}（研究信号，规则与阈值未批准）"
+                f"官方周度：PE {latest.get('pe')}（中证指数官网，{latest.get('date')}；用于研究信号）"
             )
+            lines.append(
+                "两个 PE 为什么不同：来源不同（第三方月度参考 vs 中证指数官网日频）、时点不同、"
+                "加权与样本口径未公开，不能直接对比。"
+            )
+            signal_text = {
+                "entry": "按研究规则处于偏便宜区间（买入一侧）",
+                "exit": "按研究规则处于偏贵区间（卖出/不买入一侧）",
+                "hold": "按研究规则继续持有（中间区域）",
+                "none": "按研究规则没有触发（中间区域）",
+                "not_evaluable": "数据不足，无法判断",
+            }.get(str(signal.get("signal")), "暂无可评估的研究信号")
+            lines.append(f"研究信号：{signal_text}；研究信号，规则未批准。")
         else:
-            lines.append("候选 A 研究信号：暂无可评估的周度观察点。")
+            lines.append("研究信号：暂无可评估的周度观察点。")
+
+        sentences = []
+        if pe_percentile is not None:
+            sentences.append(f"PE {self._percentile_sentence(pe_percentile)}")
+        if pb_percentile is not None:
+            sentences.append(f"PB {self._percentile_sentence(pb_percentile)}")
+        if sentences:
+            lines.append("直白说：" + "；".join(sentences) + "。")
+
         if not metrics and profile.get("official_short_history"):
             short = profile["official_short_history"]
-            pe = {}
+            official = {}
             for key in ("official_pe_ratio_1", "official_pe_1"):
-                pe = ((short.get(key) or {}).get("latest") or {})
-                if pe:
+                official = ((short.get(key) or {}).get("latest") or {})
+                if official:
                     break
-            if pe:
+            if official:
                 dividend = self._hstech_dividend_yield()
                 dy_text = f"、股息率 {dividend}%" if dividend is not None else ""
                 lines.append(
-                    f"官方月度 PE：{pe.get('value')}（{pe.get('date')}）{dy_text}；"
-                    "没有官方估值历史，不能做分位/信号。"
+                    f"官方月度：PE {official.get('value')}（恒生指数公司，{official.get('date')}；"
+                    f"股息率 {dividend}%；只作月度快照，不用于分位或研究信号）。"
+                    if dividend is not None
+                    else f"官方月度：PE {official.get('value')}（恒生指数公司，{official.get('date')}；"
+                    "只作月度快照，不用于分位或研究信号）。"
                 )
         lines += [
-            "为什么：指数分位只描述历史位置，不是买卖判断；候选 A 规则与阈值未获批准。",
+            "为什么：分位只描述历史位置，不是买卖判断；研究信号的规则与阈值还没有批准。",
             "局限：分位依赖供应商历史序列口径；官方最新值不参与第三方历史排名；指数没有盈利预测，无法给内在价值。",
-            f"来源与日期：{self._index_sources(metrics, signal)}",
+            f"来源与日期：{self._index_sources(metrics, signal) if metrics else self._index_snapshot_source(target)}",
             "不构成投资建议。",
         ]
         if detail:
@@ -1253,6 +1394,11 @@ class AskService:
                     f"有效月 {((item.get('window') or {}).get('valid_months'))}/"
                     f"{((item.get('window') or {}).get('expected_months'))}"
                 )
+            if signal:
+                lines.append(
+                    f"- 原始研究信号：{signal.get('signal')}（候选 A；规则未批准）"
+                    f"，最新观察点 {latest.get('date') if latest else '—'}"
+                )
             backtest = signal.get("backtest") or {}
             if backtest:
                 lines.append(
@@ -1260,12 +1406,14 @@ class AskService:
                     f"累计 {_pct(backtest.get('cumulative_return'))}，最大回撤 {_pct(backtest.get('max_drawdown'))}"
                 )
         return {
-            "markdown": "\n".join(self._clip(lines)),
+            "markdown": "\n".join(lines),
             "data": {
                 "instrument_id": target.instrument_id,
                 "conclusion": "undetermined",
                 "signal": signal.get("signal"),
                 "profile_status": profile.get("status"),
+                "band": band["label"] if band else None,
+                "pe_percentile": pe_percentile,
             },
         }
 
@@ -1285,6 +1433,13 @@ class AskService:
         return float(value) if value is not None else None
 
     @staticmethod
+    def _index_snapshot_source(target: Target) -> str:
+        return (
+            f"恒生指数公司官方月度指数单张（2026-10-30）；"
+            f"指数快照 {target.instrument_id or target.code}。"
+        )
+
+    @staticmethod
     def _index_sources(metrics: dict[str, Any], signal: dict[str, Any]) -> str:
         publishers = []
         for item in metrics.values():
@@ -1293,7 +1448,7 @@ class AskService:
                 publishers.append(publisher)
         return (
             f"{'、'.join(publishers) or '指数数据供应商'}（月度画像）｜"
-            f"候选 A：中证指数官网官方日频序列（{signal.get('as_of') or '—'}）"
+            f"研究信号：中证指数官网官方日频序列（{signal.get('as_of') or '—'}）"
         )
 
     # --- 卡片：ETF ----------------------------------------------------------
