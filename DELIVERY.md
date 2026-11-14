@@ -6,7 +6,7 @@
 |---|---|
 | 项目 | `/Users/comyn/Documents/deepseek-harness/投资/investment-system/` |
 | 本轮阶段 | 第四阶段第十三批：**银行买点批准落地（v2.1）** |
-| 本轮实现提交 | `（本次收尾提交，见 git log）` |
+| 本轮实现提交 | `ac77aa6` |
 ## 1. 结果
 
 | 项 | 数值 |
