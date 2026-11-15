@@ -141,7 +141,7 @@ def stock_trace(
         quote = {
             "kind": "snapshot_fact",
             "snapshot_id": str(financial.get("snapshot_id") or ""),
-            "price_date": "",
+            "price_date": str(financial.get("price_date") or ""),
             "path": financial.get("path"),
             "sha256": financial.get("manifest_sha256") or financial.get("sha256"),
         }

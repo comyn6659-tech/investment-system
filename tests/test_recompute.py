@@ -164,3 +164,51 @@ def test_recompute_inconsistent_exit_code(tmp_path):
     )
     assert result.returncode == 1, result.stderr[-500:]
     assert json.loads(result.stdout)["status"] == "inconsistent"
+
+
+def test_cli_stock_record_trace_has_quote_price_date_and_recomputes(tmp_path):
+    """CLI 单标的快照路径：trace.quote 必须带价格日期，且 --recompute 一致。"""
+    ledger = tmp_path / "cli-ledger.jsonl"
+    run = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "engine.cli",
+            "--json",
+            "--analysis-date",
+            "2026-11-15",
+            "600519",
+            "--conclusion-ledger",
+            str(ledger),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=180,
+    )
+    assert run.returncode == 0, run.stderr[-800:]
+    rows = ConclusionLedger(ledger).load()
+    row = next(item for item in rows if item["code"] == "600519")
+    quote = row["trace"]["quote"]
+    assert quote["kind"] == "snapshot_fact"
+    assert row["price_date"] == "2026-11-11"
+    assert quote["price_date"] == row["price_date"]
+    assert quote["price_date"] != ""
+    assert recompute(row)["status"] == "consistent"
+    check = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "engine.ask",
+            "--recompute",
+            row["record_id"],
+            "--ledger",
+            str(ledger),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=180,
+    )
+    assert check.returncode == 0, check.stderr[-500:]
+    assert json.loads(check.stdout)["status"] == "consistent"

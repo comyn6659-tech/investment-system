@@ -48,18 +48,18 @@ A 股个股 / 境内宽基指数 / 境内普通被动 ETF / 三池名单的分�
 |---|---|
 | D1 测试隔离 | 新增 `INVESTMENT_SYSTEM_LEDGER_DIR`：测试的账本**写入**一律到临时目录（读取仍用已提交账本）；`tests/conftest.py` 会话级守护在测试前后比对 `data/ledger/` 全部文件哈希，不同即失败；`tests/test_isolation_guards.py` 5 项显式证明（CLI/AskService 写临时账本、守护可检测改动、时钟注入） |
 | D2 日期无关 | 新增 `engine/clock.py` + `INVESTMENT_SYSTEM_TODAY`（测试/复现用，生产默认真实时间）；卡片/问题集固定分析日 2026-11-14；CLI 默认分析日走统一时钟 |
-| D3 结论可复算 | 新正式结论记录带 `trace`：政策 sha256、财务快照（批量 `qps-…`/单标的快照 id/银行估值输入，均含路径+哈希）、行情快照（id+路径+sha256+价格日期）；新增 `./ask --recompute <record_id>`（0=一致、1=不一致、2=不可复算，逐项相对差 ≤1e-9） |
-| 本地全量测试（2026-11-15） | **707 passed**；测试前后真实账本 110 行、sha256 `39894efe…` 不变 |
+| D3 结论可复算 | 新正式结论记录带 `trace`：政策 sha256、财务快照（批量 `qps-…`/单标的快照 id/银行估值输入，均含路径+哈希）、行情快照（id+路径+sha256+价格日期）；新增 `./ask --recompute <record_id>`（0=一致、1=不一致、2=不可复算，逐项相对差 ≤1e-9）。CLI 单标的快照路径的 `trace.quote.price_date` 已单独覆盖（见 §6） |
+| 本地全量测试 | **708 passed**（含 CLI 追溯补测；模拟日期 2026-11-15 当时为 707）；真实账本 110 行、sha256 `39894efe…` 不变 |
 | 三个模拟日期 | 2026-11-15 / 2026-12-31 / 2027-06-01 各跑干净归档：**706 passed + 1 skipped**、问题集 **67/67**、银行 **2/2**、测试股 30/30、指数 4/4、ETF 3/3 |
 | Ask 卡片行为 | 与 `d3cecd6` 基线抓取 **122/122 逐字节相同（0 差异）**；直接工作树抓取时 6 张“状态/数据日期”卡显示批前 update-log 的 2026-11-15 日常更新追加，属数据追加，不是行为变化 |
 | E4 账本/政策 | `git diff d3cecd6..HEAD -- data/ledger data/policies` **为空**；8 个账本、16 个政策文件 blob 逐字节不变 |
-| 仓库大小 | 受控文件 **1124 → 1132 个**（+8）、146,461,775 → **146,528,554 字节**（+66,779，来自 3 个复算模块、2 个测试文件、1 份演示文档）；工作树 **约 500.6 MB**（含 `.venv`、`.git`） |
+| 仓库大小 | 受控文件 **1124 → 1132 个**（+8）、146,461,775 → **146,530,000 字节**（+68,225，来自 3 个复算模块、2 个测试文件、1 份演示文档）；工作树 **约 500.6 MB**（含 `.venv`、`.git`） |
 
 ## 5. 冻结验收自检（E1–E5）
 
 | 编号 | 结果 |
 |---|---|
-| E1 | 守护测试存在并通过；2026-11-15 跑全套测试 **707 passed**，真实账本哈希不变 |
+| E1 | 守护测试存在并通过；本地全套测试 **708 passed**（2026-11-15 模拟日期当时 707），真实账本哈希不变 |
 | E2 | 三个模拟日期全部通过（各 706 passed + 1 skipped、67/67、银行 2/2），真实账本不变 |
 | E3 | 新记录含追溯字段；临时账本新记录 `--recompute` 逐项一致；维护说明 §7.3 列出 #96 等旧记录及原因 |
 | E4 | 账本/政策与整理后版本逐字节相同；全部测试与问题集通过 |
@@ -84,6 +84,9 @@ INVESTMENT_SYSTEM_LEDGER_DIR=/tmp/batch5r-demo \
 结果：`status=consistent`、`mismatched_fields=[]`；`values.pessimistic/base/optimistic`、`price`、
 `price_date`、`grade`、`margin_of_safety`、`conclusion`、`binding_condition` 9 项全部 `ok`、
 相对差 0.0；招商银行（银行路径）与贵州茅台（批量个股路径）各一条均一致。
+另覆盖 CLI 单标的快照路径（`./ask --recompute` 对 `engine.cli --analysis-date 2026-11-15
+--conclusion-ledger <tmp> 600519` 写出的记录）：`trace.quote.price_date = "2026-11-11"` 与顶层一致、
+非空，`--recompute` 一致；测试 `test_cli_stock_record_trace_has_quote_price_date_and_recomputes`。
 
 旧记录（历史不改）全量试算：**104 条一致**；第 54/61 行（君正集团/扬农化工 2026-11-13 原始结论）
 按当前引擎重算为“无法判断”，属 2026-11-13 周期清单补全后的预期历史差异（后续已有改判记录第
@@ -155,7 +158,7 @@ INVESTMENT_SYSTEM_LEDGER_DIR=/tmp/batch5r-demo \
 ## 9. 复现
 
 ```bash
-.venv/bin/python -m pytest -q -p no:cacheprovider                          # 707 passed
+.venv/bin/python -m pytest -q -p no:cacheprovider                          # 708 passed
 INVESTMENT_SYSTEM_TODAY=2026-11-15 .venv/bin/python -m pytest -q -p no:cacheprovider
 for d in 2026-11-15 2026-12-31 2027-06-01; do INVESTMENT_SYSTEM_TODAY=$d scripts/verify-clean-archive.sh; done  # git archive 到临时目录，跑全量测试 + 问题集
 .venv/bin/python scripts/verify-ledger-snapshots.py
