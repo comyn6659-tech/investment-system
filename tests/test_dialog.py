@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -23,7 +24,10 @@ FORBIDDEN = ("建议买入", "建议卖出", "推荐买入", "推荐卖出", "�
 @pytest.fixture(scope="module")
 def service() -> AskService:
     # 固定用批量快照价格，保证问题集可重复；不写正式账本
-    return AskService(allow_update=False, write_ledger=False, use_live_quotes=False)
+    return AskService(
+        allow_update=False, write_ledger=False, use_live_quotes=False,
+        analysis_date=date(2026, 11, 14),
+    )
 
 
 @pytest.fixture(scope="module")
@@ -159,6 +163,7 @@ def test_ledger_write_is_append_only_and_deduped(tmp_path):
         write_ledger=True,
         ledger_path=ledger,
         use_live_quotes=False,
+        analysis_date=date(2026, 11, 14),
     )
     first = service.ask("茅台怎么样")
     assert first.data["ledger"]["status"] == "added"

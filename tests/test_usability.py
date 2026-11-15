@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import re
 import time
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -24,7 +24,10 @@ TZ = ZoneInfo("Asia/Singapore")
 
 @pytest.fixture(scope="module")
 def service() -> AskService:
-    return AskService(allow_update=False, write_ledger=False, use_live_quotes=False)
+    return AskService(
+        allow_update=False, write_ledger=False, use_live_quotes=False,
+        analysis_date=date(2026, 11, 14),
+    )
 
 
 @pytest.fixture(scope="module")

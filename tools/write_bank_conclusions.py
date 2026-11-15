@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from engine.bank.conclusion import append_bank_formal, bank_pool_codes, valuation_for  # noqa: E402
+from engine.policy import trace as policy_trace  # noqa: E402
 from engine.quality.tables import read_table  # noqa: E402
 
 LEDGER = ROOT / "data" / "ledger" / "equity-conclusions.jsonl"
@@ -29,8 +30,16 @@ def main() -> int:
             "avoid",
         ):
             raise SystemExit(f"{code} 未得到正式银行结论")
+        price_date = str(valuation.get("price_date") or "")
         outcome = append_bank_formal(
-            valuation, ledger_path=LEDGER, analysis_date=ANALYSIS_DATE
+            valuation,
+            ledger_path=LEDGER,
+            analysis_date=ANALYSIS_DATE,
+            trace=policy_trace.bank_trace(
+                policy_path=ROOT / "data" / "policies" / "bank-valuation-v2.1.json",
+                price_date=price_date,
+                quote=policy_trace.live_quote_reference(price_date),
+            ),
         )
         results.append(
             {

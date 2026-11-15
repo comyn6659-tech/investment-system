@@ -27,6 +27,8 @@ from engine.ask.plain import (
     unmet_plain,
 )
 from engine.ask.resolve import Target, TargetIndex, board_only, overseas
+from engine.clock import TZ as CLOCK_TZ
+from engine.clock import now as clock_now
 from engine.contracts import reason_codes as rc
 from engine.data.snapshot import SnapshotStore
 from engine.evidence.models import BusinessEvidence
@@ -42,6 +44,7 @@ from engine.policy.conclusion_ledger import (
     ConclusionLedger,
     ConclusionRecord,
 )
+from engine.policy import trace as policy_trace
 from engine.policy.equity import load_policy
 from engine.policy.freshness import check_freshness
 from engine.policy.trial import evaluate_company
@@ -52,6 +55,7 @@ from engine.quality.policy import load_policy as load_pool_policy
 from engine.quality.snapshot import load_snapshot_dir
 from engine.reporting.labels import condition_labels, family_label
 from engine.quality.tables import read_table
+from engine import ledger_paths
 
 TZ = ZoneInfo("Asia/Singapore")
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -64,6 +68,7 @@ BANK_REPORT = ROOT / "data" / "bank-pool" / "report.json"
 QUALITY_POLICY = ROOT / "data" / "policies" / "quality-pool-v1.2.json"
 INCOME_POLICY = ROOT / "data" / "policies" / "income-pool-v1.json"
 BANK_POLICY = ROOT / "data" / "policies" / "bank-pool-v1.json"
+BANK_VALUATION_POLICY = ROOT / "data" / "policies" / "bank-valuation-v2.1.json"
 QUALITY_SNAPSHOT = ROOT / "data" / "quality-pool" / "snapshot-qps-3ebbd24be612bf7e"
 INCOME_SNAPSHOT = ROOT / "data" / "income-pool" / "snapshot-qps-d8fb7e3718675b93"
 BANK_SNAPSHOT = ROOT / "data" / "bank-pool" / "snapshot-qps-dc9c12160476db8b"
@@ -84,7 +89,7 @@ POOL_LABELS = {"quality": "好公司池", "income": "稳定收息池", "bank": "
 
 
 def _now(now: datetime | None = None) -> datetime:
-    return now or datetime.now(TZ)
+    return clock_now(default=now)
 
 
 def _money(value: Any) -> str:
@@ -185,7 +190,11 @@ class AskService:
         self.clock = _now(now)
         self.analysis_date = analysis_date or self.clock.date()
         self.write_ledger = write_ledger
-        self.ledger_path = Path(ledger_path or LEDGER)
+        # 读账本用仓库内已提交文件；写账本在测试环境变量下重定向到临时目录。
+        self.ledger_path = ledger_paths.read_path("equity-conclusions.jsonl", explicit=ledger_path)
+        self.write_ledger_path = ledger_paths.write_path(
+            "equity-conclusions.jsonl", explicit=ledger_path
+        )
         self.use_live_quotes = use_live_quotes
         self.update_timeout = float(update_timeout)
         self._batch: BatchStore | None = None
@@ -701,6 +710,17 @@ class AskService:
             }
             record["trial_conclusion"] = {"conclusion": "undetermined", "reason": "数据新鲜度护栏触发"}
             record["reason_codes"] = [hit.code for hit in hits]
+        quote_ref = None
+        if self.use_live_quotes and price_date:
+            quote_ref = policy_trace.live_quote_reference(str(price_date))
+        if quote_ref is None:
+            quote_ref = policy_trace.batch_price_reference(self.batch)
+            quote_ref["price_date"] = str(price_date or "")
+        record["trace"] = policy_trace.stock_trace(
+            policy_path=POLICY,
+            financial=policy_trace.batch_reference(self.batch),
+            quote=quote_ref,
+        )
         block = build_policy_conclusion(
             record, policy=self.policy, analysis_date=self.analysis_date.isoformat()
         )
@@ -734,7 +754,7 @@ class AskService:
 
         try:
             outcome = append_evaluation(
-                ConclusionLedger(self.ledger_path),
+                ConclusionLedger(self.write_ledger_path),
                 record,
                 policy=self.policy,
                 analysis_date=self.analysis_date.isoformat(),
@@ -1285,10 +1305,27 @@ class AskService:
             ]
         ledger = None
         if self.write_ledger:
+            quote_ref = None
+            if self.use_live_quotes and price_date:
+                quote_ref = policy_trace.live_quote_reference(str(price_date))
+            if quote_ref is None:
+                inputs = policy_trace.bank_financial_reference()
+                quote_ref = {
+                    "kind": "bank_inputs_price",
+                    "snapshot_id": inputs["snapshot_id"],
+                    "path": inputs["path"],
+                    "sha256": inputs["sha256"],
+                    "price_date": str(price_date or ""),
+                }
             ledger = append_bank_formal(
                 valuation,
-                ledger_path=self.ledger_path,
+                ledger_path=self.write_ledger_path,
                 analysis_date=self.analysis_date.isoformat(),
+                trace=policy_trace.bank_trace(
+                    policy_path=BANK_VALUATION_POLICY,
+                    price_date=str(price_date or ""),
+                    quote=quote_ref,
+                ),
             )
         return {
             "markdown": "\n".join(lines),

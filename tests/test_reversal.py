@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -182,7 +183,10 @@ def test_real_ledger_has_two_reversals_for_junzheng_and_yangnong():
 def test_history_question_shows_two_records_and_reason():
     from engine.ask.service import AskService
 
-    service = AskService(allow_update=False, write_ledger=False, use_live_quotes=False)
+    service = AskService(
+        allow_update=False, write_ledger=False, use_live_quotes=False,
+        analysis_date=date(2026, 11, 14),
+    )
     for question, code in (("君正集团以前的结论", "601216"), ("扬农化工以前的结论", "600486")):
         text = service.ask(question).markdown
         assert "账本记录共 2 条" in text

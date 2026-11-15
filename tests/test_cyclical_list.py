@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -180,7 +181,10 @@ def test_live_policy_conclusion_label_is_formal():
 def test_ask_card_uses_chinese_condition_names():
     from engine.ask.service import AskService
 
-    service = AskService(allow_update=False, write_ledger=False, use_live_quotes=False)
+    service = AskService(
+        allow_update=False, write_ledger=False, use_live_quotes=False,
+        analysis_date=date(2026, 11, 14),
+    )
     text = service.ask("茅台怎么样").markdown
     assert "少量近似处理" in text
     assert "approximation_impact" not in text

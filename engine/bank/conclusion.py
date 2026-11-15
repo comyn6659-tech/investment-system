@@ -67,7 +67,9 @@ def valuation_for(
     return value_bank(item, policy, equity_policy, macro)
 
 
-def ledger_record(valuation: dict[str, Any], *, analysis_date: str) -> dict[str, Any]:
+def ledger_record(
+    valuation: dict[str, Any], *, analysis_date: str, trace: dict[str, Any] | None = None
+) -> dict[str, Any]:
     code = str(valuation["code"]).zfill(6)
     return {
         "instrument_id": f"EQUITY:{code}.{'SH' if code.startswith('6') else 'SZ'}",
@@ -87,13 +89,18 @@ def ledger_record(valuation: dict[str, Any], *, analysis_date: str) -> dict[str,
             },
         },
         "reason_codes": [],
+        "trace": trace or None,
     }
 
 
 def append_bank_formal(
-    valuation: dict[str, Any], *, ledger_path: Path, analysis_date: str
+    valuation: dict[str, Any],
+    *,
+    ledger_path: Path,
+    analysis_date: str,
+    trace: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    record = ledger_record(valuation, analysis_date=analysis_date)
+    record = ledger_record(valuation, analysis_date=analysis_date, trace=trace)
     return append_evaluation(
         ConclusionLedger(ledger_path),
         record,

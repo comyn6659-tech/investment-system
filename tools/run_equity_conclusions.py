@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from engine.pipeline import Analyzer, AnalyzerConfig  # noqa: E402
+from engine.policy import trace as policy_trace  # noqa: E402
 from engine.policy.conclusion import record_from_result  # noqa: E402
 from engine.policy.conclusion_ledger import ConclusionLedger  # noqa: E402
 
@@ -162,7 +163,26 @@ def main(argv: list[str] | None = None) -> int:
             }
         )
         if got in ("candidate", "wait", "avoid"):
-            formal.append(record_from_result(result, recorded_at=now.isoformat(timespec="seconds")))
+            trace_block = None
+            if result.snapshot_id:
+                try:
+                    trace_block = policy_trace.stock_trace(
+                        policy_path=ROOT / "data" / "policies" / "equity-policy-v1.1.json",
+                        financial=policy_trace.snapshot_reference(
+                            result.snapshot_id,
+                            price_date=str(block.get("price_date") or ""),
+                        ),
+                        quote=None,
+                    )
+                except policy_trace.TraceError:
+                    trace_block = None
+            formal.append(
+                record_from_result(
+                    result,
+                    recorded_at=now.isoformat(timespec="seconds"),
+                    trace=trace_block,
+                )
+            )
 
     ledger = ConclusionLedger(LEDGER)
     outcome = {"added": [], "skipped": []} if args.no_write else ledger.append(formal)

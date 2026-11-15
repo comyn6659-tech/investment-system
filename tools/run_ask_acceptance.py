@@ -18,6 +18,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from datetime import date  # noqa: E402
+
 from engine.ask.service import AskService  # noqa: E402
 
 QUESTION_SET = ROOT / "data" / "ask" / "questions.json"
@@ -52,8 +54,15 @@ def _check_markdown(markdown: str, *, research: bool = False) -> list[str]:
 
 
 def _question_run() -> list[dict]:
-    questions = json.loads(QUESTION_SET.read_text(encoding="utf-8"))["questions"]
-    service = AskService(allow_update=False, write_ledger=False, use_live_quotes=False)
+    payload = json.loads(QUESTION_SET.read_text(encoding="utf-8"))
+    questions = payload["questions"]
+    analysis_date = date.fromisoformat(payload.get("analysis_date") or "2026-11-14")
+    service = AskService(
+        allow_update=False,
+        write_ledger=False,
+        use_live_quotes=False,
+        analysis_date=analysis_date,
+    )
     rows = []
     for item in questions:
         result = service.ask(item["question"])
@@ -105,7 +114,15 @@ def _single(service: AskService, question: str, *, research: bool = False) -> di
 def _report_rows() -> dict:
     quality = json.loads(QUALITY_REPORT.read_text(encoding="utf-8"))
     stocks = [str(row["code"]).zfill(6) for row in quality["test_set"]]
-    service = AskService(allow_update=False, write_ledger=False, use_live_quotes=True)
+    analysis_date = date.fromisoformat(
+        json.loads(QUESTION_SET.read_text(encoding="utf-8")).get("analysis_date") or "2026-11-14"
+    )
+    service = AskService(
+        allow_update=False,
+        write_ledger=False,
+        use_live_quotes=True,
+        analysis_date=analysis_date,
+    )
     names = {str(row["code"]).zfill(6): row["name"] for row in quality["test_set"]}
     stock_rows = []
     for code in stocks:

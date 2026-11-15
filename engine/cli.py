@@ -22,6 +22,8 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+from engine import clock, ledger_paths
+from engine.policy import trace as policy_trace
 from engine.assumptions.schema import load_assumptions
 from engine.contracts.validation import ContractViolation
 from engine.identity.catalog import RegistryError
@@ -50,11 +52,23 @@ def _bank_query(query: str) -> tuple[str, str] | None:
     return None
 
 
-def _bank_cli(query: str, *, as_json: bool, analysis_date: str | None) -> tuple[str, int]:
+def _bank_cli(
+    query: str,
+    *,
+    as_json: bool,
+    analysis_date: str | None,
+    ledger: Path | None = None,
+) -> tuple[str, int]:
+    from datetime import date as _date
+
     from engine.ask.service import AskService
     from engine.bank.conclusion import append_bank_formal, valuation_for
 
-    service = AskService(allow_update=False, write_ledger=False)
+    service = AskService(
+        allow_update=False,
+        write_ledger=False,
+        analysis_date=_date.fromisoformat(analysis_date) if analysis_date else None,
+    )
     card = service.ask(query)
     code = str(card.target.code if card.target else "").zfill(6)
     conclusion = str(card.data.get("conclusion") or "undetermined")
@@ -95,10 +109,17 @@ def _bank_cli(query: str, *, as_json: bool, analysis_date: str | None) -> tuple[
             code, price=card.data.get("price"), price_date=card.data.get("price_date")
         )
         if valuation is not None:
+            price_date = str(card.data.get("price_date") or "")
             append_bank_formal(
                 valuation,
-                ledger_path=ROOT / "data" / "ledger" / "equity-conclusions.jsonl",
+                ledger_path=ledger
+                or ledger_paths.write_path("equity-conclusions.jsonl"),
                 analysis_date=analysis_date or service.analysis_date.isoformat(),
+                trace=policy_trace.bank_trace(
+                    policy_path=ROOT / "data" / "policies" / "bank-valuation-v2.1.json",
+                    price_date=price_date,
+                    quote=policy_trace.live_quote_reference(price_date),
+                ),
             )
     text = json.dumps(payload, ensure_ascii=False, indent=2) if as_json else card.markdown
     return text, 0
@@ -219,7 +240,12 @@ def main(argv: list[str] | None = None) -> int:
 
     bank_query = _bank_query(query)
     if bank_query is not None:
-        text, code = _bank_cli(query, as_json=args.json, analysis_date=args.analysis_date)
+        text, code = _bank_cli(
+            query,
+            as_json=args.json,
+            analysis_date=args.analysis_date,
+            ledger=Path(args.conclusion_ledger) if args.conclusion_ledger else None,
+        )
         if args.out:
             Path(args.out).write_text(text + "\n", encoding="utf-8")
         print(text)
@@ -239,7 +265,9 @@ def main(argv: list[str] | None = None) -> int:
             Path(args.policy_evidence_dir) if args.policy_evidence_dir else DEFAULT_POLICY_EVIDENCE
         ),
         conclusion_ledger_path=(
-            Path(args.conclusion_ledger) if args.conclusion_ledger else DEFAULT_CONCLUSION_LEDGER
+            Path(args.conclusion_ledger)
+            if args.conclusion_ledger
+            else ledger_paths.write_path("equity-conclusions.jsonl")
         ),
     )
     try:
@@ -256,7 +284,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     try:
-        now = None
+        now = clock.now()
         if args.analysis_date:
             from datetime import datetime as _datetime
 
@@ -291,8 +319,23 @@ def main(argv: list[str] | None = None) -> int:
     if result.decision in ("candidate", "wait", "avoid") and block:
         try:
             ledger = ConclusionLedger(config.conclusion_ledger_path)
+            trace_block = None
+            price_date = str(((block.get("price_date")) or ""))
+            if result.snapshot_id:
+                try:
+                    trace_block = policy_trace.stock_trace(
+                        policy_path=config.policy_path,
+                        financial=policy_trace.snapshot_reference(
+                            result.snapshot_id, price_date=price_date
+                        ),
+                        quote=None,
+                    )
+                except policy_trace.TraceError:
+                    trace_block = None
             record = record_from_result(
-                result, recorded_at=datetime.now(TZ).isoformat(timespec="seconds")
+                result,
+                recorded_at=clock.now().isoformat(timespec="seconds"),
+                trace=trace_block,
             )
             outcome = ledger.append([record])
             if outcome["added"]:

@@ -14,6 +14,7 @@ from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+from engine import clock
 from engine.contracts import reason_codes as rc
 from engine.contracts.enums import (
     AnalysisStatus,
@@ -134,7 +135,7 @@ class Analyzer:
         assumptions: AssumptionSet | None = None,
         cross_check_assumptions: AssumptionSet | None = None,
     ) -> AnalysisResult:
-        generated_at = (now or datetime.now(TZ)).isoformat(timespec="seconds")
+        generated_at = clock.now(default=now).isoformat(timespec="seconds")
         resolution = resolve(query, self.catalog)
 
         if resolution.status == ResolutionStatus.INVALID.value:

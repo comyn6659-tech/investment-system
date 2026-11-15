@@ -11,6 +11,7 @@ from typing import Any
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from engine import clock
 from engine.contracts import reason_codes as rc
 from engine.contracts.enums import Decision, ValuationState
 from engine.evidence.applicability import FAMILY_LABELS
@@ -134,7 +135,7 @@ def build_policy_conclusion(
 
 
 
-def record_from_result(result: Any, *, recorded_at: str):
+def record_from_result(result: Any, *, recorded_at: str, trace: dict[str, Any] | None = None):
     """从 AnalysisResult 构造账本记录；只用于 candidate/wait/avoid。"""
     from engine.policy.conclusion_ledger import ConclusionRecord
 
@@ -164,6 +165,7 @@ def record_from_result(result: Any, *, recorded_at: str):
             or ""
         ),
         recorded_at=recorded_at,
+        trace=trace,
     )
 
 __all__ = [
@@ -265,7 +267,8 @@ def append_evaluation(
                 )
                 or ""
             ),
-            recorded_at=datetime.now(TZ).isoformat(timespec="seconds"),
+            recorded_at=clock.now().isoformat(timespec="seconds"),
+            trace=record.get("trace") if isinstance(record.get("trace"), dict) else None,
         )
         outcome = ledger.append([item])
         return {
@@ -301,7 +304,7 @@ def append_evaluation(
         margin_of_safety=None,
         conclusion="undetermined",
         binding_condition="",
-        recorded_at=datetime.now(TZ).isoformat(timespec="seconds"),
+        recorded_at=clock.now().isoformat(timespec="seconds"),
         record_type="reversal",
         reason_codes=tuple(_reversal_codes(record)),
         reason=_reversal_reason(record),

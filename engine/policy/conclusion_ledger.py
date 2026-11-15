@@ -72,6 +72,7 @@ class ConclusionRecord:
     reason_codes: tuple[str, ...] = ()
     reason: str = ""
     reversal_of: str = ""
+    trace: dict[str, Any] | None = None
 
     def core(self) -> dict[str, Any]:
         payload = {
@@ -99,6 +100,9 @@ class ConclusionRecord:
                     "reversal_of": self.reversal_of,
                 }
             )
+        # 第五阶段收尾 D3：新记录带追溯信息；旧记录没有该字段时 record_id 不变。
+        if self.trace:
+            payload["trace"] = dict(self.trace)
         return payload
 
     @property
@@ -157,6 +161,7 @@ class ConclusionRecord:
                 reason_codes=tuple(str(item) for item in (data.get("reason_codes") or ())),
                 reason=str(data.get("reason") or ""),
                 reversal_of=str(data.get("reversal_of") or ""),
+                trace=data.get("trace") if isinstance(data.get("trace"), dict) else None,
             )
 
         missing_formal = [key for key in _FORMAL_FIELDS if key not in data]
@@ -187,6 +192,7 @@ class ConclusionRecord:
             reason_codes=tuple(str(item) for item in (data.get("reason_codes") or ())),
             reason=str(data.get("reason") or ""),
             reversal_of=str(data.get("reversal_of") or ""),
+            trace=data.get("trace") if isinstance(data.get("trace"), dict) else None,
         )
 
 
