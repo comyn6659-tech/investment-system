@@ -911,7 +911,7 @@ def render_markdown(payload: dict) -> str:
         "## 9. 复现与产物",
         "",
         "```bash",
-        "cd /Users/comyn/Documents/deepseek-harness/投资/investment-system",
+        "cd /Users/comyn/Documents/投资/投资分析系统/investment-system",
         ".venv/bin/python tools/rebuild_policy_trial_snapshots.py          # R3/R11 重建快照（不联网）",
         ".venv/bin/python tools/run_equity_policy_trial.py                # 生成本报告与 JSON",
         "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider",

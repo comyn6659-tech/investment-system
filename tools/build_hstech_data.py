@@ -710,7 +710,7 @@ def render_markdown(feasibility: dict) -> str:
         "## 4. 复现",
         "",
         "```bash",
-        "cd /Users/comyn/Documents/deepseek-harness/投资/investment-system",
+        "cd /Users/comyn/Documents/投资/投资分析系统/investment-system",
         ".venv/bin/python tools/build_hstech_data.py",
         ".venv/bin/python -m engine.cli 恒生科技",
         "```",

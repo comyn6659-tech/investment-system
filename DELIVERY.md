@@ -4,7 +4,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 项目 | `/Users/comyn/Documents/deepseek-harness/投资/investment-system/` |
+| 项目 | `/Users/comyn/Documents/投资/投资分析系统/investment-system/` |
 | 本轮阶段 | 第五阶段收尾：**测试隔离与结论可复算**（D1–D3） |
 | 本轮实现提交 | `7981ca0` |
 

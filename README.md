@@ -21,7 +21,7 @@ A 股个股 / 境内宽基指数 / 境内普通被动 ETF / 三池名单的分�
 ## 快速开始
 
 ```bash
-cd /Users/comyn/Documents/deepseek-harness/投资/investment-system
+cd /Users/comyn/Documents/投资/投资分析系统/investment-system
 ./ask "招商银行怎么样"          # 输出卡片（提问前尝试一次轻量自动更新）
 ./ask --detail "茅台怎么样"     # 展开细节
 ./ask --no-update "沪深300 现在什么位置"   # 完全离线

@@ -111,7 +111,7 @@ def render_markdown(payload: dict) -> str:
         "## 复现",
         "",
         "```bash",
-        "cd /Users/comyn/Documents/deepseek-harness/投资/investment-system",
+        "cd /Users/comyn/Documents/投资/投资分析系统/investment-system",
         ".venv/bin/python tools/run_equity_conclusions.py --date 2026-11-12",
         ".venv/bin/python -m engine.cli --check-conclusions",
         "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider",
