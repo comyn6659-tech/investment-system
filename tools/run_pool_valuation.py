@@ -19,7 +19,7 @@ from engine.policy.conclusion_ledger import (  # noqa: E402
     ConclusionLedger,
     ConclusionRecord,
 )
-from engine.policy import trace as policy_trace  # noqa: E402
+from engine.repro import trace as policy_trace  # noqa: E402
 from engine.policy.equity import load_policy  # noqa: E402
 from engine.policy.freshness import check_freshness  # noqa: E402
 from engine.policy.trial import evaluate_company  # noqa: E402

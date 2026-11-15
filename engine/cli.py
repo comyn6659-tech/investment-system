@@ -23,7 +23,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from engine import clock, ledger_paths
-from engine.policy import trace as policy_trace
+from engine.repro import trace as policy_trace
 from engine.assumptions.schema import load_assumptions
 from engine.contracts.validation import ContractViolation
 from engine.identity.catalog import RegistryError

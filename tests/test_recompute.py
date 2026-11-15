@@ -12,7 +12,7 @@ import pytest
 
 from engine.ask.service import AskService
 from engine.policy.conclusion_ledger import ConclusionLedger
-from engine.policy.recompute import recompute
+from engine.repro.recompute import recompute
 
 ROOT = Path(__file__).resolve().parent.parent
 REAL_LEDGER = ROOT / "data" / "ledger" / "equity-conclusions.jsonl"
@@ -97,7 +97,7 @@ def test_record_96_is_not_recomputable_with_reason():
 
 def test_legacy_batch_derived_record_recomputes():
     rows = ConclusionLedger(REAL_LEDGER).load()
-    from engine.policy import trace as policy_trace
+    from engine.repro import trace as policy_trace
 
     row = next(
         item

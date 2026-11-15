@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from engine.bank.conclusion import append_bank_formal, bank_pool_codes, valuation_for  # noqa: E402
-from engine.policy import trace as policy_trace  # noqa: E402
+from engine.repro import trace as policy_trace  # noqa: E402
 from engine.quality.tables import read_table  # noqa: E402
 
 LEDGER = ROOT / "data" / "ledger" / "equity-conclusions.jsonl"

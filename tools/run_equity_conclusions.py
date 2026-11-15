@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from engine.pipeline import Analyzer, AnalyzerConfig  # noqa: E402
-from engine.policy import trace as policy_trace  # noqa: E402
+from engine.repro import trace as policy_trace  # noqa: E402
 from engine.policy.conclusion import record_from_result  # noqa: E402
 from engine.policy.conclusion_ledger import ConclusionLedger  # noqa: E402
 

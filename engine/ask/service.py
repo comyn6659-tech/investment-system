@@ -44,7 +44,7 @@ from engine.policy.conclusion_ledger import (
     ConclusionLedger,
     ConclusionRecord,
 )
-from engine.policy import trace as policy_trace
+from engine.repro import trace as policy_trace
 from engine.policy.equity import load_policy
 from engine.policy.freshness import check_freshness
 from engine.policy.trial import evaluate_company

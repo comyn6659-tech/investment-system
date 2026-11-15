@@ -42,7 +42,7 @@ def main(argv: list[str] | None = None) -> int:
         from pathlib import Path
 
         from engine.policy.conclusion_ledger import ConclusionLedger
-        from engine.policy.recompute import recompute
+        from engine.repro.recompute import recompute
 
         path = (
             Path(args.ledger)

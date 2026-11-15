@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import json
+from functools import lru_cache
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -17,7 +18,7 @@ from typing import Any
 from engine.bank.conclusion import BINDING_TEXT, valuation_for as bank_valuation_for
 from engine.data.snapshot import Snapshot
 from engine.evidence.models import EvidenceBook
-from engine.policy import trace as policy_trace
+from engine.repro import trace as policy_trace
 from engine.policy.equity import load_policy
 from engine.policy.freshness import check_freshness
 from engine.policy.trial import evaluate_company
@@ -98,6 +99,11 @@ def _not_recomputable(record: dict[str, Any], reason: str) -> dict[str, Any]:
 
 
 # --- 引用解析 ---------------------------------------------------------------
+@lru_cache(maxsize=4)
+def _load_batch(directory: str) -> BatchStore:
+    return BatchStore(Path(directory))
+
+
 def _batch_dirs() -> dict[str, Path]:
     output: dict[str, Path] = {}
     for manifest in (ROOT / "data" / "pool-valuation").glob("snapshot-qps-*/manifest.json"):
@@ -172,7 +178,7 @@ def _verify_trace(record: dict[str, Any], trace: dict[str, Any]) -> tuple[dict[s
         if payload.get("snapshot_id") != financial.get("snapshot_id"):
             return None, "批量快照 id 与清单不一致"
         try:
-            batch = BatchStore(directory)
+            batch = _load_batch(str(directory.resolve()))
         except Exception as exc:  # noqa: BLE001
             return None, f"批量快照校验失败：{type(exc).__name__}: {exc}"
         return batch.directory, None
@@ -202,7 +208,7 @@ def _evaluate_stock_batch(
     code = str(record.get("code") or "").zfill(6)
     policy = load_policy(EQUITY_POLICY)
     macro = load_macro_series(MACRO)
-    batch = BatchStore(directory)
+    batch = _load_batch(str(Path(directory).resolve()))
     snapshot = build_snapshot(
         batch,
         code,
