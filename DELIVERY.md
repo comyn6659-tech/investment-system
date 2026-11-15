@@ -6,7 +6,7 @@
 |---|---|
 | 项目 | `/Users/comyn/Documents/deepseek-harness/投资/investment-system/` |
 | 本轮阶段 | 第五阶段收尾：**测试隔离与结论可复算**（D1–D3） |
-| 本轮实现提交 | `（本次收尾提交，见 git log）` |
+| 本轮实现提交 | `c62dd7a` |
 
 ## 1. 系统是什么、怎么用
 
@@ -53,7 +53,7 @@ A 股个股 / 境内宽基指数 / 境内普通被动 ETF / 三池名单的分�
 | 三个模拟日期 | 2026-11-15 / 2026-12-31 / 2027-06-01 各跑干净归档：**706 passed + 1 skipped**、问题集 **67/67**、银行 **2/2**、测试股 30/30、指数 4/4、ETF 3/3 |
 | Ask 卡片行为 | 与 `d3cecd6` 基线抓取 **122/122 逐字节相同（0 差异）**；直接工作树抓取时 6 张“状态/数据日期”卡显示批前 update-log 的 2026-11-15 日常更新追加，属数据追加，不是行为变化 |
 | E4 账本/政策 | `git diff d3cecd6..HEAD -- data/ledger data/policies` **为空**；8 个账本、16 个政策文件 blob 逐字节不变 |
-| 仓库大小 | 受控文件 **1124 → 1132 个**（+8）、146,461,775 → **146,525,106 字节**（+63,331，来自 3 个复算模块、2 个测试文件、1 份演示文档）；工作树 **约 500.6 MB**（含 `.venv`、`.git`） |
+| 仓库大小 | 受控文件 **1124 → 1132 个**（+8）、146,461,775 → **146,528,554 字节**（+66,779，来自 3 个复算模块、2 个测试文件、1 份演示文档）；工作树 **约 500.6 MB**（含 `.venv`、`.git`） |
 
 ## 5. 冻结验收自检（E1–E5）
 
@@ -157,7 +157,7 @@ INVESTMENT_SYSTEM_LEDGER_DIR=/tmp/batch5r-demo \
 ```bash
 .venv/bin/python -m pytest -q -p no:cacheprovider                          # 707 passed
 INVESTMENT_SYSTEM_TODAY=2026-11-15 .venv/bin/python -m pytest -q -p no:cacheprovider
-for d in 2026-11-15 2026-12-31 2027-06-01; do INVESTMENT_SYSTEM_TODAY=$d scripts/verify-clean-archive.sh; done
+for d in 2026-11-15 2026-12-31 2027-06-01; do INVESTMENT_SYSTEM_TODAY=$d scripts/verify-clean-archive.sh; done  # git archive 到临时目录，跑全量测试 + 问题集
 .venv/bin/python scripts/verify-ledger-snapshots.py
 git diff d3cecd6..HEAD -- data/ledger data/policies                        # 应为空
 ./ask --recompute concl-88c210a0d4d016ad                                   # 旧记录：consistent
