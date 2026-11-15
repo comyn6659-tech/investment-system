@@ -5,27 +5,30 @@
 | 项目 | 内容 |
 |---|---|
 | 项目 | `/Users/comyn/Documents/deepseek-harness/投资/investment-system/` |
-| 本轮阶段 | 第五阶段：**整理收尾**（整理 + 三处修正 + 文档合并） |
-| 本轮实现提交 | `2c8c809` |
+| 本轮阶段 | 第五阶段收尾：**测试隔离与结论可复算**（D1–D3） |
+| 本轮实现提交 | `（本次收尾提交，见 git log）` |
 
 ## 1. 系统是什么、怎么用
 
 A 股个股 / 境内宽基指数 / 境内普通被动 ETF / 三池名单的分析引擎：所有结论由**已批准规则 +
-已提交固定数据**重算，内部不调用大模型；只前向验证，账本只追加。
+已提交固定数据**重算，内部不调用大模型；只前向验证，账本只追加、可复算。
 
 ```bash
-./ask "招商银行怎么样"   # 卡片（默认 ≤25 行）；--detail 展开、--json 结构化、--no-update 离线
-./update                 # 刷新前向记录（只追加）；每日自动更新需手动安装 scripts/install-daily-update.sh
+./ask "招商银行怎么样"                 # 卡片（默认 ≤25 行）；--detail 展开、--json 结构化、--no-update 离线
+./ask --recompute <record_id>          # 按记录引用的快照与政策复算并逐项对比（只读）
+./update                               # 刷新前向记录（只追加）；每日自动更新需安装 scripts/install-daily-update.sh
 ```
+
 ## 2. 三份文档
 
 | 文档 | 内容 |
 |---|---|
-| [使用说明](docs/使用说明.md) | 怎么问、支持的问法、卡片怎么读、四种结论含义 |
-| [规则说明](docs/规则说明.md) | 已批准的全部规则、决策①–④、已知局限与未做事项 |
-| [维护说明](docs/维护说明.md) | 每日更新、年度重跑、半年更新、2027-05 复盘、出错处理 |
+| [使用说明](docs/使用说明.md) | 怎么问、支持的问法、卡片怎么读、四种结论含义、`--recompute` |
+| [规则说明](docs/规则说明.md) | 已批准的全部规则、决策①–④、追溯字段、已知局限与未做事项 |
+| [维护说明](docs/维护说明.md) | 每日更新、年度重跑、半年更新、2027-05 复盘、测试隔离与模拟日期、结论复算与旧记录清单、每月提交约定、出错处理 |
 
 历史批次报告在 [docs/archive/](docs/archive/)（不删除）；验收截图在 `docs/evidence/`。
+
 ## 3. 全部批准记录
 
 | 批准对象 | 决策 | 批准日期 | 下次复核 |
@@ -37,37 +40,76 @@ A 股个股 / 境内宽基指数 / 境内普通被动 ETF / 三池名单的分�
 | 周期行业清单 v1 / 指数位置分档 v1 | 实现完成 | 2026-11-13 / 2026-11-14 | — |
 
 **下一次复核日期：2027-05-31**（个股政策 v1.1 与银行 v2.1 首次复盘；三池规则 2027-11-13）。
-## 4. 本轮整理结果
+本轮**不改任何规则、结论数字与账本旧记录**。
+
+## 4. 本轮结果（D1–D3）
 
 | 项 | 结果 |
 |---|---|
-| 删除清单 | [docs/archive/phase5-deletion-list.md](docs/archive/phase5-deletion-list.md)：3 个被取代的草案快照目录、**323 个文件 / 41,814,043 字节**；逐项含理由与引用检查 |
-| 禁删项 | 8 个账本、账本引用池快照与单标的快照、16 个政策文件（含草案）、测试、`.git` 全部保留；快照存在且哈希通过 |
-| 本地缓存 | 清理 git 忽略缓存约 68 MB；清理后全量测试通过 |
-| 整理前（`7d6bd38`） | 受控文件 **1440 个 / 188,207,591 字节**；工作树 **607,163,555 字节**（含 `.venv`、`.git`） |
-| 整理后 | 受控文件 **1124 个 / 146,461,775 字节**；工作树 **约 499.0 MB**（含 `.venv`、`.git`；减少约 108.2 MB） |
-| 本地全量测试 | **694 passed**（136s） |
-| 干净归档（`git archive`） | **693 passed + 1 skipped**；端到端问题集 **67/67**；银行 **2/2** |
-| 行为基线（C2） | 122 张卡片：24 张变化、98 张逐字节相同；全部归入三处修正，归一化后逐字节相同；见 [docs/archive/phase5-capture-diff.md](docs/archive/phase5-capture-diff.md) |
-| 账本/政策哈希（C3） | 8 个账本 sha256 与整理前完全一致；16 个政策文件也一致 |
-## 5. 冻结验收自检（C1–C6）与三处修正
+| D1 测试隔离 | 新增 `INVESTMENT_SYSTEM_LEDGER_DIR`：测试的账本**写入**一律到临时目录（读取仍用已提交账本）；`tests/conftest.py` 会话级守护在测试前后比对 `data/ledger/` 全部文件哈希，不同即失败；`tests/test_isolation_guards.py` 5 项显式证明（CLI/AskService 写临时账本、守护可检测改动、时钟注入） |
+| D2 日期无关 | 新增 `engine/clock.py` + `INVESTMENT_SYSTEM_TODAY`（测试/复现用，生产默认真实时间）；卡片/问题集固定分析日 2026-11-14；CLI 默认分析日走统一时钟 |
+| D3 结论可复算 | 新正式结论记录带 `trace`：政策 sha256、财务快照（批量 `qps-…`/单标的快照 id/银行估值输入，均含路径+哈希）、行情快照（id+路径+sha256+价格日期）；新增 `./ask --recompute <record_id>`（0=一致、1=不一致、2=不可复算，逐项相对差 ≤1e-9） |
+| 本地全量测试（2026-11-15） | **707 passed**；测试前后真实账本 110 行、sha256 `39894efe…` 不变 |
+| 三个模拟日期 | 2026-11-15 / 2026-12-31 / 2027-06-01 各跑干净归档：**706 passed + 1 skipped**、问题集 **67/67**、银行 **2/2**、测试股 30/30、指数 4/4、ETF 3/3 |
+| Ask 卡片行为 | 与 `d3cecd6` 基线抓取 **122/122 逐字节相同（0 差异）**；直接工作树抓取时 6 张“状态/数据日期”卡显示批前 update-log 的 2026-11-15 日常更新追加，属数据追加，不是行为变化 |
+| E4 账本/政策 | `git diff d3cecd6..HEAD -- data/ledger data/policies` **为空**；8 个账本、16 个政策文件 blob 逐字节不变 |
+| 仓库大小 | 受控文件 **1124 → 1132 个**（+8）、146,461,775 → **146,525,106 字节**（+63,331，来自 3 个复算模块、2 个测试文件、1 份演示文档）；工作树 **约 500.6 MB**（含 `.venv`、`.git`） |
+
+## 5. 冻结验收自检（E1–E5）
 
 | 编号 | 结果 |
 |---|---|
-| C1 | 删除清单逐项有理由与引用检查；禁删项全部保留；`scripts/verify-ledger-snapshots.py` 通过，并由 `tests/test_clean_inputs.py` 覆盖 |
-| C2 | 干净目录全部测试与问题集通过；122 张卡片差异仅三处修正（24 张），归一化后逐字节相同 |
-| C3 | 8 个账本逐字节不变；16 个政策文件逐字节不变 |
-| C4 | 三份文档齐全、与已批准规则一致；README 指向它们 |
-| C5 | 整理前后大小与文件数见 §4 |
-| C6 | 本文件为最终版：系统、用法、三份文档、全部批准记录、下一次复核日期 |
+| E1 | 守护测试存在并通过；2026-11-15 跑全套测试 **707 passed**，真实账本哈希不变 |
+| E2 | 三个模拟日期全部通过（各 706 passed + 1 skipped、67/67、银行 2/2），真实账本不变 |
+| E3 | 新记录含追溯字段；临时账本新记录 `--recompute` 逐项一致；维护说明 §7.3 列出 #96 等旧记录及原因 |
+| E4 | 账本/政策与整理后版本逐字节相同；全部测试与问题集通过 |
+| E5 | 本文件已更新：D1–D3、验证数字、命令、`--recompute` 用法、#96、每月提交约定、批前 update-log 说明 |
 
-- 修正1（`engine/ask/service.py`）：非银行池银行列出未通过条件（例：`- 最近 5 年现金分红率：观测值 21.94%，要求 ≥ 25.00%，未通过`），结论仍为无法判断。
-- 修正2/3（`engine/ask/service.py`、`engine/bank/history.py`）：市净率改普通股口径并加口径行；历史分位注明口径差异；来源写具体日期。
+## 6. `--recompute` 用法与验证（E3）
 
-> 偏离说明：政策 JSON 中的历史文档引用与 `engine/pool_valuation/adapter.py` 的快照说明未改路径
-> （前者政策 sha256 冻结、后者参与批量快照内容哈希，改了会改变系统行为）；对应文档现位于 `docs/archive/`。
-> 89 个账本逐公司派生 `snap-*` id 未落盘属既有设计，校验脚本已区分说明。
-## 6. 两张卡片原文
+```bash
+./ask --recompute <record_id>                     # 用仓库账本
+./ask --recompute <record_id> --ledger <path>     # 临时账本（沙箱）
+```
+
+示例（2026-11-15 模拟日期，临时账本；详见 [复算演示](docs/archive/phase5-r-recompute-demo.md)）：
+
+```bash
+INVESTMENT_SYSTEM_LEDGER_DIR=/tmp/batch5r-demo \
+  .venv/bin/python -m engine.ask --no-update --analysis-date 2026-11-15 "招商银行怎么样"
+.venv/bin/python -m engine.ask --recompute concl-4b87957712b5cd4b \
+  --ledger /tmp/batch5r-demo/equity-conclusions.jsonl
+```
+
+结果：`status=consistent`、`mismatched_fields=[]`；`values.pessimistic/base/optimistic`、`price`、
+`price_date`、`grade`、`margin_of_safety`、`conclusion`、`binding_condition` 9 项全部 `ok`、
+相对差 0.0；招商银行（银行路径）与贵州茅台（批量个股路径）各一条均一致。
+
+旧记录（历史不改）全量试算：**104 条一致**；第 54/61 行（君正集团/扬农化工 2026-11-13 原始结论）
+按当前引擎重算为“无法判断”，属 2026-11-13 周期清单补全后的预期历史差异（后续已有改判记录第
+97–98 行）；**第 96 行 `concl-469933db0d7e70bd` 不可复算**（600519/2026-11-13）：只存批量派生
+`snapshot_id=snap-9487dfafa48e24dc`，未记录批量快照 ID，无法证明当时所用的批量快照版本
+（用当前 `qps-f140a9790e4015ea` + 价格 1435.26/2026-11-13 可算出同一派生 id，但历史版本不可证）；
+第 99 行为同一派生快照的同类记录，同样不可复算；2 条改判记录无价格/价值，不参与复算。
+
+## 7. 每日更新文件与每月提交约定；批前工作树说明
+
+- `data/pool-valuation/live/quotes-*.json`（含 manifest）与 `data/ledger/update-log.jsonl`
+  均在非忽略目录、已被 git 跟踪。
+- 约定：**每月手动提交一次**（不每日自动提交）。理由：每日提交会把运行日志变成噪音提交，且可能
+  把失败的联网尝试固化成多条小提交；按月提交便于股东一次性审阅。命令：
+
+  ```bash
+  git add data/pool-valuation/live data/ledger/update-log.jsonl
+  git commit -m "日常更新：<YYYY-MM>"
+  ```
+
+- **工作树唯一未提交项** = 批前日常更新追加：`data/ledger/update-log.jsonl` 新增 1 条
+  2026-11-15T18:30:35 的 launchd 运行记录（status=failed，官方序列超时；sha256
+  `969fe297…`）。按本约定待股东按月提交；本批未提交、未 checkout、未改内容。
+  `data/logs/`、`data/policy-trial/build.log` 是 git 忽略的运行日志，保持现状。
+
+## 8. 两张卡片原文
 
 ### 招商银行怎么样
 
@@ -109,12 +151,20 @@ A 股个股 / 境内宽基指数 / 境内普通被动 ETF / 三池名单的分�
 来源与日期：行情 腾讯财经（2026-11-13）；财务 东方财富 2025 年报 / 2026 三季报；银行专用估值政策（已批准 2026-11-14，复核 2027-05-31）。
 不构成投资建议。
 ```
-## 7. 复现
+
+## 9. 复现
+
 ```bash
-PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
-scripts/verify-clean-archive.sh
+.venv/bin/python -m pytest -q -p no:cacheprovider                          # 707 passed
+INVESTMENT_SYSTEM_TODAY=2026-11-15 .venv/bin/python -m pytest -q -p no:cacheprovider
+for d in 2026-11-15 2026-12-31 2027-06-01; do INVESTMENT_SYSTEM_TODAY=$d scripts/verify-clean-archive.sh; done
 .venv/bin/python scripts/verify-ledger-snapshots.py
-.venv/bin/python tools/run_ask_acceptance.py
+git diff d3cecd6..HEAD -- data/ledger data/policies                        # 应为空
+./ask --recompute concl-88c210a0d4d016ad                                   # 旧记录：consistent
+./ask --recompute concl-469933db0d7e70bd                                   # 第 96 行：not_recomputable
 ```
 
-政策：[data/policies/](data/policies/)｜账本：[data/ledger/](data/ledger/)｜问题集：[data/ask/questions.json](data/ask/questions.json)。
+说明与证据：[复算演示](docs/archive/phase5-r-recompute-demo.md)｜
+[删除清单](docs/archive/phase5-deletion-list.md)｜
+[行为基线差异](docs/archive/phase5-capture-diff.md)｜政策：[data/policies/](data/policies/)｜
+账本：[data/ledger/](data/ledger/)。
