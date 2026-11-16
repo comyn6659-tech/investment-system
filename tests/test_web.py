@@ -139,12 +139,21 @@ def test_server_listens_on_loopback_only(web):
     assert payload == {"status": "ok", "host": "127.0.0.1"}
 
 
+def _web_entry_command() -> list[str]:
+    """干净归档不含 .venv：有本机解释器时直接跑 ./web，否则用同一模块入口。"""
+    venv_python = ROOT / ".venv" / "bin" / "python"
+    args = ["--no-browser", "--no-update", "--port", "0"]
+    if venv_python.exists():
+        return [str(ROOT / "web")] + args
+    return [sys.executable, "-m", "engine.web"] + args
+
+
 def test_web_command_starts_and_prints_local_url():
     """`./web` 一条命令启动：打印本机地址、只监听 127.0.0.1、无需其它参数。"""
     env = os.environ.copy()
     env.setdefault("INVESTMENT_SYSTEM_TODAY", "2026-11-14")
     process = subprocess.Popen(
-        [str(ROOT / "web"), "--no-browser", "--no-update", "--port", "0"],
+        _web_entry_command(),
         cwd=ROOT,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
