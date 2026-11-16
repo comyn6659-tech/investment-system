@@ -341,3 +341,24 @@ details.raw summary { cursor: pointer; color: var(--accent); font-size: 13px; }
 .modal-tabs button.active { background: var(--chip); color: var(--accent); border-color: var(--accent); font-weight: 600; }
 .modal-body .card { background: var(--card); }
 .pool-title { font-size: 15px; font-weight: 600; margin: 0; }
+
+/* 最近变动（数据状态） */
+.changes-title { font-size: 15px; font-weight: 600; margin: 20px 0 8px; }
+.change-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.change-list li {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.change-date { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.change-type {
+  color: var(--accent);
+  background: var(--chip);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 12px;
+  white-space: nowrap;
+}

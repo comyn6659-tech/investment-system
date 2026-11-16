@@ -26,6 +26,7 @@ INTENT_LABELS = {
     "ranking": "排行",
     "history": "历史结论",
     "status": "数据与规则状态",
+    "changes": "最近变动",
     "out_of_scope": "范围外",
     "ambiguous": "歧义",
     "unrecognized": "未识别",
@@ -41,6 +42,7 @@ SUPPORTED_QUESTIONS = [
     "排行：「好公司里谁离买点最近」「银行池里谁离买点最近」「现在有哪些候选买点」「推荐几只股票」「A股有哪些值得投资的公司」",
     "历史：「茅台以前的结论」",
     "状态：「数据是哪天的」「规则什么时候复核」",
+    "变动：「最近有什么变动」「最近哪些公司出池」",
 ]
 
 _STATUS_PATTERNS = (
@@ -52,6 +54,14 @@ _STATUS_PATTERNS = (
     r"复核.*(时间|日期|哪天|日)",
     r"政策.*版本",
     r"什么时候复核",
+)
+_CHANGES_PATTERNS = (
+    r"最近.*(变动|变化|更新)",
+    r"有什么(变动|变化)",
+    r"(哪些|什么)(变动|变化)",
+    r"出池",
+    r"被剔除",
+    r"剔除.*(哪些|什么)",
 )
 _HISTORY_PATTERNS = (
     r"以前",
@@ -176,6 +186,10 @@ def parse(question: str, target: Target | None) -> Intent:
     pool_with_price = _pool(text)
     if pool_with_price is not None and _has(_PRICE_PATTERNS, text):
         return Intent("ranking", pool=pool_with_price)
+
+    # 最近变动：先于标的与状态判断（「茅台最近有什么变动」也返回全局变动列表）
+    if _has(_CHANGES_PATTERNS, text):
+        return Intent("changes")
 
     # 标的已识别：先看是否在问状态/历史/排行/是否在池
     if target is not None and target.ambiguous:

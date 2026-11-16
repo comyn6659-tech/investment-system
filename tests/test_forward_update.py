@@ -189,6 +189,7 @@ def test_update_light_skips_heavy_series_and_logs(tmp_path, monkeypatch):
 
 def test_update_failure_does_not_block_other_steps(tmp_path, monkeypatch):
     monkeypatch.setattr(update, "LOG", tmp_path / "update-log.jsonl")
+    monkeypatch.setattr(update, "run_monitoring", lambda clock, dry_run=False: [])
     monkeypatch.setattr(
         update.series,
         "refresh_official_series",

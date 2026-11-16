@@ -190,8 +190,11 @@ class WebApp:
                 report = json.loads(REPORT_PATHS[pool].read_text(encoding="utf-8"))
                 meta = report.get("meta") or {}
                 rows: list[dict[str, Any]] = []
+                effective = self.service.pool_sets.get(pool) or set()
                 for row in report.get("in_pool") or []:
                     code = str(row.get("code")).zfill(6)
+                    if code not in effective:
+                        continue
                     metrics: list[tuple[str, str]] = []
                     try:
                         company_result = self.service._company_result(pool, code)
@@ -212,6 +215,17 @@ class WebApp:
                             ],
                         }
                     )
+                excluded = [
+                    {
+                        "code": code,
+                        "name": item.get("name"),
+                        "status": item.get("status"),
+                        "as_of": item.get("as_of"),
+                        "pools": item.get("pools") or [],
+                    }
+                    for code, item in sorted(self.service.exclusions.items())
+                    if pool in (item.get("pools") or [])
+                ]
                 payload[pool] = {
                     "title": POOL_TITLES[pool],
                     "policy_id": meta.get("policy_id"),
@@ -221,6 +235,7 @@ class WebApp:
                     "count": len(rows),
                     "columns": self._columns(rows),
                     "rows": rows,
+                    "excluded": excluded,
                 }
             self._pools_cache = {"pools": payload, "order": list(POOL_ORDER)}
             return self._pools_cache

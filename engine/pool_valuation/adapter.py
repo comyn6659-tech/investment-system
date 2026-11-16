@@ -120,6 +120,20 @@ class BatchStore:
             for entry in self.manifest.get("tables") or []
         }
         self.entries = {entry["file"]: entry for entry in self.manifest.get("tables") or []}
+        self.report_periods = sorted(
+            {
+                str(entry.get("report_date"))
+                for entry in self.manifest.get("tables") or []
+                if entry.get("kind")
+                in ("balance_full", "income_full", "cashflow_full", "interim_income_full")
+                and entry.get("report_date")
+            }
+        )
+        self.earnings_latest_period = str(
+            self.manifest.get("earnings_latest_period")
+            or (self.manifest.get("build_stats") or {}).get("earnings_period")
+            or ""
+        ) or None
         self._prepare()
 
     def _prepare(self):
@@ -198,6 +212,48 @@ class BatchStore:
 
     def industry_for(self, code: str) -> str:
         return self.industry.get(code, "")
+
+    def has_period(self, code: str, period: str) -> bool:
+        code = str(code).zfill(6)
+        period = str(period or "")
+        if period in self.balance:
+            return (
+                code in self.balance[period]
+                and code in self.income.get(period, {})
+                and code in self.cashflow.get(period, {})
+            )
+        if period in self.interim:
+            return code in self.interim[period]
+        return False
+
+    def latest_period_for(self, code: str) -> str | None:
+        code = str(code).zfill(6)
+        periods = [period for period in self.balance if code in self.balance[period]]
+        periods += [period for period in self.interim if code in self.interim[period]]
+        return max(periods) if periods else None
+
+    def report_note(self, code: str) -> str | None:
+        """新报告期缺该公司报表时的卡片提示；有数据返回 None。"""
+        expected = self.earnings_latest_period
+        if not expected or self.has_period(code, expected):
+            return None
+        latest = self.latest_period_for(code)
+        if not latest:
+            return f"财报未更新：{_period_label(expected)}未取得，且没有旧报表可沿用。"
+        return f"财报未更新：{_period_label(expected)}未取得，沿用 {_period_label(latest)} 数据。"
+
+
+def _period_label(period: str) -> str:
+    text = str(period or "")
+    if len(text) < 10:
+        return text
+    year, month = text[:4], text[5:7]
+    return {
+        "12": f"{year} 年报",
+        "06": f"{year} 半年报",
+        "09": f"{year} 三季报",
+        "03": f"{year} 一季报",
+    }.get(month, text)
 
 
 def _fiscal_label(report_date: str | None) -> str | None:

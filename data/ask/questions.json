@@ -866,6 +866,18 @@
           "银行候选买点"
         ]
       }
+    },
+    {
+      "id": "q68",
+      "category": "变动提醒",
+      "question": "最近有什么变动",
+      "expect": {
+        "intent": "changes",
+        "contains": [
+          "最近",
+          "变动"
+        ]
+      }
     }
   ]
 }

@@ -30,7 +30,8 @@ from engine.quality.tables import read_table  # noqa: E402
 
 TZ = ZoneInfo("Asia/Singapore")
 BANK_DIR = ROOT / "data" / "bank-pool"
-INPUTS = BANK_DIR / "valuation-v2" / "inputs.csv.gz"
+from engine.bank.inputs import current_inputs  # noqa: E402
+INPUTS = current_inputs()
 V2 = BANK_DIR / "valuation-v2.json"
 V1 = BANK_DIR / "valuation-rehearsal.json"
 BANK_REPORT = BANK_DIR / "report.json"

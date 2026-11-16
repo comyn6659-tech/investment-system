@@ -350,10 +350,16 @@ function renderPools() {
     fillSelect($('pool-cycle'), cycles);
     $('pool-industry').dataset.pool = state.activePool;
   }
+  const excluded = pool.excluded || [];
   $('pool-meta').textContent =
     pool.title + '：' + pool.count + ' 家｜规则 ' + (pool.policy_id || '—') +
     '（' + (pool.policy_status || '—') + '）｜快照 ' + (pool.snapshot_id || '—') +
-    '（' + (pool.as_of || '—') + '）。点任一公司可看卡片与成绩单；入池不等于买入。';
+    '（' + (pool.as_of || '—') + '）。点任一公司可看卡片与成绩单；入池不等于买入。' +
+    (excluded.length
+      ? ' 另有 ' + excluded.length + ' 家因红线出池：' +
+        excluded.slice(0, 6).map((item) => item.code + ' ' + item.name).join('、') +
+        (excluded.length > 6 ? '……' : '') + '（见「数据状态 → 最近变动」）。'
+      : '');
   const search = $('pool-search').value.trim().toLowerCase();
   const industry = $('pool-industry').value;
   const ownership = $('pool-ownership').value;
@@ -722,10 +728,31 @@ function renderStatus(payload) {
     ['银行专用估值', '批准 ' + status.bank_valuation.approved_at + '；复核 ' + status.bank_valuation.review_date],
     ['上次自动更新', (status.update.run_at || '尚未运行') + '（' + (status.update.status || '—') + '）'],
   ];
+  const monitoring = status.monitoring || {};
+  const scan = monitoring.last_scan || {};
+  rows.push([
+    '红线监测',
+    scan.scan_date
+      ? scan.scan_date + '（覆盖 ' + ((scan.counts || {}).covered || 0) + '/' +
+        ((scan.counts || {}).members || 0) + '，命中 ' + ((scan.counts || {}).hit || 0) +
+        '，未完成 ' + ((scan.counts || {}).incomplete || 0) + '）'
+      : '尚未运行（下次每日更新自动扫描）',
+  ]);
+  rows.push(['已出池', String(monitoring.exclusions || 0) + ' 家']);
+  const changes = (monitoring.changes || {}).items || [];
+  const changeHtml = changes.length
+    ? '<ul class="change-list">' + changes.map((item) =>
+        '<li><span class="change-date">' + esc(item.date) + '</span>' +
+        '<span class="change-type">' + esc(item.type) + '</span>' +
+        '<span>' + esc(item.code ? item.code + ' ' + item.name + ' — ' : '') + esc(item.detail) + '</span></li>'
+      ).join('') + '</ul>'
+    : '<p class="hint">最近 365 天没有变动。</p>';
   $('status-body').innerHTML =
     '<dl class="status-grid">' +
     rows.map((row) => '<dt>' + esc(row[0]) + '</dt><dd>' + esc(row[1]) + '</dd>').join('') +
     '</dl>' +
+    '<h3 class="changes-title">最近变动（最近 365 天，共 ' + changes.length + ' 条）</h3>' +
+    changeHtml +
     '<p class="review-line">下一次复核日期：<strong>' + esc(payload.next_review_date || '—') + '</strong></p>' +
     '<p class="hint">每日自动更新需股东手动安装一次：<code>scripts/install-daily-update.sh</code>；' +
     '更新只追加、重复跳过、冲突不覆盖。页面不访问外网，也不改任何规则与账本旧记录。</p>';

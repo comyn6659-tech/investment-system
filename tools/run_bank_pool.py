@@ -109,6 +109,8 @@ def check_ledger() -> int:
     problems = []
     seen = set()
     for index, row in enumerate(rows, start=1):
+        if row.get("record_type") == "exclusion":
+            continue  # 红线出池记录由监测账本校验，不参与名单池哈希
         if row.get("record_id") != _record_id(row):
             problems.append(f"第 {index} 行 record_id 被改写")
         key = (row.get("as_of"), row.get("policy_id"), row.get("snapshot_id"))

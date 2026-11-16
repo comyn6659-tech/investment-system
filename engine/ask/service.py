@@ -26,6 +26,8 @@ from engine.ask.company_type import (
     type_line,
 )
 from engine.ask.not_found import unknown_subject
+from engine.monitoring.changes import changes_data
+from engine.monitoring.ledger import MonitoringStore
 from engine.ask.plain import (
     BANNED_TERMS,
     cycle_text,
@@ -192,6 +194,7 @@ class AskService:
         ledger_path: Path | None = None,
         use_live_quotes: bool = True,
         update_timeout: float = 10.0,
+        monitoring: MonitoringStore | None = None,
     ):
         self.root = root
         self.allow_update = allow_update
@@ -205,6 +208,7 @@ class AskService:
         )
         self.use_live_quotes = use_live_quotes
         self.update_timeout = float(update_timeout)
+        self.monitoring = monitoring or MonitoringStore(ledger_paths.ledger_dir())
         self._batch: BatchStore | None = None
         self._catalog = None
         self._target_index: TargetIndex | None = None
@@ -218,6 +222,7 @@ class AskService:
         self._update_note: dict[str, Any] | None = None
         self._companies: dict[str, dict[str, Any]] = {}
         self._policies = {}
+        self._exclusions: dict[str, dict[str, Any]] | None = None
 
     # --- 懒加载 -------------------------------------------------------------
     @property
@@ -277,11 +282,12 @@ class AskService:
             quality = json.loads(QUALITY_REPORT.read_text(encoding="utf-8"))
             income = json.loads(INCOME_REPORT.read_text(encoding="utf-8"))
             bank = json.loads(BANK_REPORT.read_text(encoding="utf-8"))
-            self._pool_sets = {
+            base = {
                 "quality": {str(row["code"]).zfill(6) for row in quality["in_pool"]},
                 "income": {str(row["code"]).zfill(6) for row in income["in_pool"]},
                 "bank": {str(row["code"]).zfill(6) for row in bank["in_pool"]},
             }
+            self._pool_sets = self.monitoring.effective_sets(base)
         return self._pool_sets
 
     @property
@@ -296,6 +302,12 @@ class AskService:
                 "bank": {str(row["code"]).zfill(6): row for row in bank["in_pool"]},
             }
         return self._pool_rows
+
+    @property
+    def exclusions(self) -> dict[str, dict[str, Any]]:
+        if self._exclusions is None:
+            self._exclusions = self.monitoring.all_exclusions()
+        return self._exclusions
 
     @property
     def ownership(self) -> dict[str, str]:
@@ -419,7 +431,9 @@ class AskService:
         if intent.name == "stock" and self._is_bank(intent.target):
             intent = Intent("bank", target=intent.target)
         data: dict[str, Any] = {"update": update_note}
-        if intent.name == "ambiguous":
+        if intent.name == "changes":
+            markdown = self._changes_card(detail=detail)
+        elif intent.name == "ambiguous":
             markdown = self._ambiguous_card(question, intent, target)
         elif intent.name == "out_of_scope":
             markdown = self._out_of_scope_card(question, intent)
@@ -606,6 +620,17 @@ class AskService:
         q_policy = json.loads(QUALITY_POLICY.read_text(encoding="utf-8")).get("approval") or {}
         bank_policy = json.loads(BANK_VALUATION_POLICY.read_text(encoding="utf-8")).get("approval") or {}
         index_date = self._latest_text_series("INDEX:000300.SH", "official_close")[0]
+        changes = changes_data(self.monitoring, now=self.clock)
+        try:
+            from engine.monitoring.policy import load_policy as load_monitoring_policy
+
+            monitoring_policy = load_monitoring_policy()
+            monitoring_id = monitoring_policy.policy_id
+            monitoring_review = monitoring_policy.data.get("next_review_date")
+        except Exception:  # noqa: BLE001 - 页面/卡片不因监测政策文件异常而失败
+            monitoring_id = "pool-monitoring-v1"
+            monitoring_review = None
+        last_scan = self.monitoring.last_scan()
         return {
             "quote_date": quote_date,
             "quote_rows": len(quote_payload["rows"]) if quote_payload else 0,
@@ -639,6 +664,17 @@ class AskService:
                 "status": state.get("status"),
                 "light": state.get("light"),
             },
+            "monitoring": {
+                "policy_id": monitoring_id,
+                "review_date": monitoring_review,
+                "last_scan": {
+                    "scan_date": (last_scan or {}).get("scan_date"),
+                    "coverage": (last_scan or {}).get("coverage"),
+                    "counts": (last_scan or {}).get("counts"),
+                },
+                "exclusions": len(self.exclusions),
+                "changes": changes,
+            },
         }
 
     def _status_card(self, *, detail: bool = False) -> str:
@@ -669,6 +705,21 @@ class AskService:
             f"- 前向更新：{state['run_at'] or '尚未运行'}（{state['status'] or '—'}）；"
             "每日定时任务需股东手动安装一次（scripts/install-daily-update.sh）",
         ]
+        monitoring = data.get("monitoring") or {}
+        scan = monitoring.get("last_scan") or {}
+        if scan.get("scan_date"):
+            counts = scan.get("counts") or {}
+            lines.append(
+                f"- 红线监测：最近扫描 {scan['scan_date']}（覆盖 {counts.get('covered')}/"
+                f"{counts.get('members')}，命中 {counts.get('hit')}，未完成 {counts.get('incomplete')}）；"
+                f"已出池 {monitoring.get('exclusions', 0)} 家"
+            )
+        else:
+            lines.append("- 红线监测：尚未运行（下次每日更新自动扫描）")
+        lines.append(
+            f"- 最近变动：{monitoring.get('changes', {}).get('count', 0)} 条（最近 365 天；"
+            "问「最近有什么变动」查看）"
+        )
         if detail:
             lines += [
                 "",
@@ -680,6 +731,43 @@ class AskService:
                 f"- 更新日志：data/ledger/update-log.jsonl",
             ]
         lines += ["", "不构成投资建议。"]
+        return "\n".join(lines)
+
+    # --- 卡片：最近变动 -----------------------------------------------------
+    def _changes_card(self, *, detail: bool = False) -> str:
+        data = changes_data(self.monitoring, now=self.clock)
+        items = data["items"]
+        if not items:
+            lines = [
+                f"**结论：最近 {data['window_days']} 天（截至 {self.analysis_date.isoformat()}）"
+                "没有变动** — 出池、结论变化、财报更新、扫描失败均无新增记录。",
+                "",
+                "监测规则：pool-monitoring-v1（决策⑤，2026-11-17 批准）；"
+                "红线周度扫描、财报季更新均只追加记录。",
+                "不构成投资建议。",
+            ]
+            return "\n".join(lines)
+        lines = [
+            f"**结论：最近 {data['window_days']} 天（截至 {self.analysis_date.isoformat()}）"
+            f"有 {len(items)} 条变动** — 出池、结论变化、财报更新、扫描失败按日期倒序。",
+            "",
+        ]
+        for item in items:
+            head = f"- {item['date']} {item['type']}："
+            who = f"{item['code']} {item['name']}" if item["code"] else ""
+            lines.append(f"{head}{who + ' — ' if who else ''}{item['detail']}")
+        if detail:
+            lines += ["", "【详情】"]
+            for item in items:
+                lines.append(
+                    f"- {item['date']} {item['type']}｜记录 {item['record_id']}｜"
+                    f"证据 {str(item['evidence'])[:180]}"
+                )
+        lines += [
+            "",
+            "说明：只列最近 365 天；完整记录见 data/ledger/changes.jsonl（只追加，至少保留 1 年）。",
+            "不构成投资建议。",
+        ]
         return "\n".join(lines)
 
     # --- 卡片：历史 ---------------------------------------------------------
@@ -1119,17 +1207,29 @@ class AskService:
         bank = json.loads(BANK_REPORT.read_text(encoding="utf-8"))
         sections = []
         if pool in ("quality", "all"):
-            rows = list(quality["in_pool"])
+            rows = [
+                row
+                for row in quality["in_pool"]
+                if str(row.get("code")).zfill(6) in self.pool_sets["quality"]
+            ]
             if ownership:
                 rows = [row for row in rows if ownership in str(row.get("ownership") or "")]
             sections.append(("好公司池", "quality-pool-v1.2", quality, rows))
         if pool in ("income", "all"):
-            rows = list(income["in_pool"])
+            rows = [
+                row
+                for row in income["in_pool"]
+                if str(row.get("code")).zfill(6) in self.pool_sets["income"]
+            ]
             if ownership:
                 rows = [row for row in rows if ownership in str(row.get("ownership") or "")]
             sections.append(("稳定收息池", "income-pool-v1", income, rows))
         if pool in ("bank", "all"):
-            rows = list(bank["in_pool"])
+            rows = [
+                row
+                for row in bank["in_pool"]
+                if str(row.get("code")).zfill(6) in self.pool_sets["bank"]
+            ]
             sections.append(("银行池", "bank-pool-v1", bank, rows))
         total = sum(len(item[3]) for item in sections)
         headline = (
@@ -1176,12 +1276,35 @@ class AskService:
                 lines.append(
                     f"想看哪些现在离买点最近，可问：{name}里谁离买点最近"
                 )
+        pool_keys = set()
+        if pool in ("quality", "all"):
+            pool_keys.add("quality")
+        if pool in ("income", "all"):
+            pool_keys.add("income")
+        if pool in ("bank", "all"):
+            pool_keys.add("bank")
+        excluded_names = [
+            item
+            for item in self.exclusions.values()
+            if set(item.get("pools") or []) & pool_keys
+        ]
+        if excluded_names:
+            lines += [
+                "",
+                f"另有 {len(excluded_names)} 家因红线出池（已从名单移除，旧记录不改）："
+                + "、".join(
+                    f"{str(item.get('code')).zfill(6)} {item.get('name')}"
+                    for item in excluded_names[:12]
+                )
+                + ("……" if len(excluded_names) > 12 else "")
+                + "；问「最近有什么变动」查看事由。",
+            ]
         lines += [
             "",
             "入池不等于买入：入池只说明历史公开数据满足规则，不说明现在便宜；名单每年复盘。",
             "不构成投资建议。",
         ]
-        return {"markdown": "\n".join(lines), "data": {"pool": pool, "ownership": ownership, "counts": {item[0]: len(item[3]) for item in sections}}}
+        return {"markdown": "\n".join(lines), "data": {"pool": pool, "ownership": ownership, "counts": {item[0]: len(item[3]) for item in sections}, "excluded": len(excluded_names)}}
 
     # --- 卡片：是否在池 -----------------------------------------------------
     def _company_result(self, pool: str, code: str):
@@ -1236,6 +1359,9 @@ class AskService:
         if pool == "all":
             pool = "quality"
         label = POOL_LABELS.get(pool, "好公司池")
+        exclusion = self.exclusions.get(str(target.code).zfill(6))
+        if exclusion:
+            return self._excluded_membership(target, label, pool, exclusion, detail=detail)
         result = self._company_result(pool, target.code)
         if result is None:
             return {
@@ -1282,6 +1408,63 @@ class AskService:
             for item in result.conditions:
                 lines.append(f"- {item.label}：{item.status}（{item.reason}）")
         return {"markdown": "\n".join(lines), "data": {"pool": pool, "in_pool": in_pool, "status": result.status, "failing": [item.condition_id for item in failing]}}
+
+    def _excluded_membership(
+        self,
+        target: Target,
+        label: str,
+        pool: str,
+        exclusion: dict[str, Any],
+        *,
+        detail: bool = False,
+    ) -> dict[str, Any]:
+        code = str(target.code).zfill(6)
+        pools = "、".join(
+            POOL_LABELS.get(item, item) for item in exclusion.get("pools") or []
+        )
+        lines = [
+            f"**结论：已出池（红线）** — {exclusion.get('name') or target.name}（{code}）"
+            f"于 {exclusion.get('as_of')} 从{pools or '池'}出池。",
+            "",
+            f"状态：{exclusion.get('status')}",
+        ]
+        for hit in exclusion.get("red_lines") or []:
+            reference = hit.get("doc_no") or hit.get("url") or "文号缺失"
+            lines.append(
+                f"- 红线：{hit.get('label')}（{hit.get('date')}，{reference}）"
+            )
+        lines += [
+            "- 处置：即时剔除，只追加池账本记录；不在年中自动回池，"
+            "回池只在年度重跑时按全部条件重新判定。",
+            "",
+        ]
+        result = self._company_result(pool, code)
+        if result is not None and getattr(result, "status", "") == "in_pool":
+            bits = self._scorecard_rows(pool, code, result)
+            if bits:
+                lines.append("历史成绩单（出池前的规则结果）：" + "｜".join(
+                    f"{name} {text}" for name, text in bits
+                ))
+                lines.append("")
+        lines += [
+            f"规则：好公司池 quality-pool-v1.2 / 收息池 income-pool-v1 / 银行池 bank-pool-v1；"
+            "红线监测 pool-monitoring-v1（决策⑤，2026-11-17 批准）。",
+            "说明：出池只说明触发红线，不改写旧记录，也不代表对股价的判断。",
+            "不构成投资建议。",
+        ]
+        if detail:
+            lines += ["", "【详情】红线原文："]
+            for hit in exclusion.get("red_lines") or []:
+                lines.append(f"- {hit.get('evidence') or hit.get('label')}（{hit.get('url') or '—'}）")
+        return {
+            "markdown": "\n".join(lines),
+            "data": {
+                "pool": pool,
+                "in_pool": False,
+                "status": "excluded",
+                "exclusion": exclusion,
+            },
+        }
 
     # --- 卡片：银行 ---------------------------------------------------------
     def _is_bank(self, target: Target | None) -> bool:
@@ -1397,6 +1580,7 @@ class AskService:
             "",
             f"现价 {_money(price)} 元（{price_date or '日期未知'}）｜门槛 {_money(threshold)} 元"
             f"｜距门槛 {_pct_number(distance)}",
+            *([self.batch.report_note(code)] if self.batch.report_note(code) else []),
             "正式结论（银行专用估值政策，已批准 2026-11-14）",
             "关键指标："
             f"市净率 {f'{pb:.2f} 倍' if pb is not None else '—'}｜股息率 {_pct(dividend_yield)}｜"
@@ -1966,6 +2150,9 @@ class AskService:
             f"｜候选门槛 {_money(entry.get('value'))} 元"
             f"｜距门槛 {_pct_number(block.get('distance_to_candidate_pct'))}",
         ]
+        report_note = self.batch.report_note(target.code)
+        if report_note:
+            lines.append(report_note)
         formal = conclusion in ("candidate_buy_point", "wait", "avoid")
         if formal and (values.get("pessimistic") or values.get("base") or values.get("optimistic")):
             lines.append(

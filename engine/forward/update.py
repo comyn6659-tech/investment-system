@@ -64,6 +64,35 @@ def should_attempt(now: datetime | None = None) -> bool:
     )
 
 
+def run_monitoring(clock: datetime, *, dry_run: bool = False) -> list[dict[str, Any]]:
+    """监测步骤：财报季更新 → 周度红线扫描 → 结论变化。
+
+    只由完整每日更新调用；`./ask` 的轻量更新与 `--skip-network` 不跑。
+    """
+    from engine.ask.service import AskService
+    from engine.monitoring import conclusions, earnings, scanner
+    from engine.monitoring.pools import default_store
+
+    store = default_store()
+    service = AskService(allow_update=False, analysis_date=clock.date(), now=clock)
+    return [
+        _step(
+            "earnings_update",
+            lambda: earnings.run_due_earnings(store=store, now=clock, dry_run=dry_run),
+        ),
+        _step(
+            "monitoring_scan",
+            lambda: scanner.run_due(store=store, now=clock, dry_run=dry_run),
+        ),
+        _step(
+            "conclusion_changes",
+            lambda: conclusions.refresh_conclusions(
+                service=service, store=store, now=clock, dry_run=dry_run
+            ),
+        ),
+    ]
+
+
 def run(
     *,
     now: datetime | None = None,
@@ -102,6 +131,8 @@ def run(
             ),
         ]
     )
+    if not light and not skip_network:
+        steps.extend(run_monitoring(clock, dry_run=dry_run))
     failed = [item for item in steps if item["status"] == "failed"]
     conflicts = [item for item in steps if item["status"] == "conflict"]
     status = "ok" if not failed and not conflicts else ("failed" if failed else "conflict")
@@ -129,6 +160,9 @@ def summary_text(payload: dict[str, Any]) -> str:
         "quotes": "全市场行情",
         "official_valuations": "官方当日估值",
         "hstech_monthly": "恒生科技月度估值",
+        "earnings_update": "财报季批量快照",
+        "monitoring_scan": "红线周度扫描",
+        "conclusion_changes": "结论变化",
     }
     lines = [f"前向更新：{payload['status']}（{payload['run_at']}）"]
     for item in payload["steps"]:
@@ -142,6 +176,27 @@ def summary_text(payload: dict[str, Any]) -> str:
             detail = f"{item.get('status')} {item.get('date') or ''}".strip()
         if item["step"] == "signal_ledger":
             detail = f"新写 {item.get('added')} 条，跳过 {item.get('skipped')} 条"
+        if item["step"] == "earnings_update":
+            snaps = item.get("snapshots") or []
+            detail = (
+                "；".join(f"{snap.get('season')} → {snap.get('snapshot_id')}" for snap in snaps)
+                or item.get("reason")
+                or ""
+            )
+        if item["step"] == "monitoring_scan":
+            counts = item.get("counts") or {}
+            if counts:
+                detail = (
+                    f"覆盖 {counts.get('covered')}/{counts.get('members')}，"
+                    f"命中 {counts.get('hit')}，未完成 {counts.get('incomplete')}"
+                )
+            else:
+                detail = item.get("reason") or ""
+        if item["step"] == "conclusion_changes":
+            if item.get("changed") is not None:
+                detail = f"检查 {item.get('checked')} 家，变化 {item.get('changed')} 家"
+            else:
+                detail = item.get("reason") or ""
         lines.append(f"- {label}：{item['status']} {detail}".rstrip())
     return "\n".join(lines)
 

@@ -21,6 +21,8 @@ sys.path.insert(0, str(ROOT))
 from engine.forward import hstech, official, quotes  # noqa: E402
 from engine.forward.update import run, summary_text  # noqa: E402
 from engine.signals.ledger import SignalLedger  # noqa: E402
+from engine.monitoring.ledger import MonitoringStore  # noqa: E402
+from engine import ledger_paths  # noqa: E402
 
 
 def check() -> int:
@@ -32,6 +34,7 @@ def check() -> int:
     hstech_count, hstech_problems = hstech.check()
     problems.extend(hstech_problems)
     quote_manifest = quotes.load_manifest()
+    monitoring = MonitoringStore(ledger_paths.ledger_dir())
     print(
         json.dumps(
             {
@@ -39,6 +42,11 @@ def check() -> int:
                 "official_valuation_daily": official_count,
                 "hstech_monthly_valuation": hstech_count,
                 "quote_snapshots": len(quote_manifest.get("snapshots") or []),
+                "monitoring": {
+                    "scans": len(monitoring.scans()),
+                    "exclusions": len(monitoring.all_exclusions()),
+                    "changes": len(monitoring.changes()),
+                },
                 "problems": problems,
             },
             ensure_ascii=False,

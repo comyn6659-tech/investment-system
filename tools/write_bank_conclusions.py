@@ -15,7 +15,8 @@ from engine.repro import trace as policy_trace  # noqa: E402
 from engine.quality.tables import read_table  # noqa: E402
 
 LEDGER = ROOT / "data" / "ledger" / "equity-conclusions.jsonl"
-INPUTS = ROOT / "data" / "bank-pool" / "valuation-v2" / "inputs.csv.gz"
+from engine.bank.inputs import current_inputs  # noqa: E402
+INPUTS = current_inputs()
 ANALYSIS_DATE = "2026-11-14"
 
 

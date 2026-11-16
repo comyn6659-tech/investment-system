@@ -400,8 +400,13 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[{index}/{len(inputs)}] {code} {name} history={history.get('status')}", flush=True)
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
+    period = max(
+        (str(row.get("report_date") or "")[:10] for row in input_rows if row.get("report_date")),
+        default="",
+    ) or generated_at[:10]
+    target_name = f"inputs-{period}.csv.gz"
     input_meta = write_table(
-        OUT_DIR / "inputs.csv.gz",
+        OUT_DIR / target_name,
         input_rows,
         INPUT_COLUMNS,
         metadata={
@@ -424,7 +429,11 @@ def main(argv: list[str] | None = None) -> int:
         "schema_version": "bank-valuation-v2-data/1",
         "generated_at": generated_at,
         "inputs": "inputs.csv.gz",
+        "current_inputs": target_name,
+        "financial_period": period,
         "history": "history.csv.gz",
+        "current_history": "history.csv.gz",
+        "periods": [{"period": period, "file": target_name, "generated_at": generated_at}],
         "inputs_rows": len(input_rows),
         "in_scope": sum(1 for row in input_rows if row["in_scope"]),
         "history_rows": len(history_table),

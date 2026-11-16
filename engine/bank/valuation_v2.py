@@ -75,7 +75,11 @@ class BankValuationInputs:
             shares=_num(row.get("shares")),
             price=_num(row.get("price")),
             price_date=str(row.get("price_date") or "") or None,
-            roe_latest=_num(row.get("roe_2025")),
+            roe_latest=_num(
+                row.get("roe_latest")
+                if row.get("roe_latest") not in (None, "")
+                else row.get("roe_2025")
+            ),
             roe_2022=_num(row.get("roe_2022")),
             roe_3y_avg=_num(row.get("roe_3y_avg")),
             roe_5y_avg=_num(row.get("roe_5y_avg")),

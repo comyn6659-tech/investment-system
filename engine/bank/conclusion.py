@@ -14,10 +14,10 @@ from engine.policy.conclusion_ledger import ConclusionLedger
 from engine.policy.equity import load_policy as load_equity_policy
 from engine.policy.valuation import load_macro_series
 from engine.quality.tables import read_table
+from engine.bank.inputs import current_inputs
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 POLICY = ROOT / "data" / "policies" / "bank-valuation-v2.1.json"
-INPUTS = ROOT / "data" / "bank-pool" / "valuation-v2" / "inputs.csv.gz"
 BANK_REPORT = ROOT / "data" / "bank-pool" / "report.json"
 EQUITY_POLICY = ROOT / "data" / "policies" / "equity-policy-v1.1.json"
 BINDING_TEXT = {
@@ -38,7 +38,7 @@ class BankPolicyRef:
 
 
 def _rows() -> dict[str, dict[str, Any]]:
-    return {str(row["code"]).zfill(6): row for row in read_table(INPUTS)}
+    return {str(row["code"]).zfill(6): row for row in read_table(current_inputs())}
 
 
 def bank_pool_codes() -> set[str]:

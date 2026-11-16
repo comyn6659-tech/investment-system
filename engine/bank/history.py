@@ -8,14 +8,14 @@ from typing import Any
 
 from engine.bank.valuation_v2 import load_policy
 from engine.quality.tables import read_table
+from engine.bank.inputs import current_inputs
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-INPUTS = ROOT / "data" / "bank-pool" / "valuation-v2" / "inputs.csv.gz"
 
 
 @lru_cache(maxsize=1)
 def _rows() -> dict[str, dict[str, Any]]:
-    return {str(row["code"]).zfill(6): row for row in read_table(INPUTS)}
+    return {str(row["code"]).zfill(6): row for row in read_table(current_inputs())}
 
 
 def position(code: str) -> dict[str, Any]:
@@ -37,11 +37,12 @@ def position(code: str) -> dict[str, Any]:
 
 def implicit_return(code: str, price: float | None) -> float | None:
     row = _rows().get(str(code).zfill(6)) or {}
-    if price is None or row.get("bvps") in (None, "") or row.get("roe_2025") in (None, ""):
+    latest_field = row.get("roe_latest") if row.get("roe_latest") not in (None, "") else row.get("roe_2025")
+    if price is None or row.get("bvps") in (None, "") or latest_field in (None, ""):
         return None
     try:
         bvps = float(row["bvps"])
-        latest_roe = float(row["roe_2025"])
+        latest_roe = float(latest_field)
         if bvps <= 0 or price <= 0:
             return None
         pb = price / bvps

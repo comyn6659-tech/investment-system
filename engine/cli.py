@@ -39,8 +39,9 @@ ROOT = Path(__file__).resolve().parent.parent
 def _bank_query(query: str) -> tuple[str, str] | None:
     """识别银行池/银行样本名称或代码，返回 (code, name)。"""
     from engine.quality.tables import read_table
+    from engine.bank.inputs import current_inputs
 
-    path = ROOT / "data" / "bank-pool" / "valuation-v2" / "inputs.csv.gz"
+    path = current_inputs()
     if not path.exists():
         return None
     text = str(query or "").strip()

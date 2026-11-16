@@ -118,8 +118,10 @@ def snapshot_reference(snapshot_id: str, *, price_date: str | None = None) -> di
 
 
 def bank_financial_reference() -> dict[str, Any]:
-    inputs = ROOT / "data" / "bank-pool" / "valuation-v2" / "inputs.csv.gz"
-    history = ROOT / "data" / "bank-pool" / "valuation-v2" / "history.csv.gz"
+    from engine.bank.inputs import current_history, current_inputs
+
+    inputs = current_inputs()
+    history = current_history()
     ref = _file_ref(inputs)
     return {
         "kind": "bank_valuation_inputs",

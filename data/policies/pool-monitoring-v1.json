@@ -1,0 +1,144 @@
+{
+  "schema_version": "pool-monitoring-policy/1.0",
+  "policy_id": "pool-monitoring-v1",
+  "label": "池成员持续监测与红线即时剔除 v1（已批准）",
+  "status": "approved",
+  "approved": true,
+  "version_date": "2026-11-17",
+  "supersedes": null,
+  "decision_reference": "决策⑤（2026-11-17，设计文件/决策记录/decision5.md）",
+  "source_document": "第七阶段施工单（batch7-monitoring-instructions.md）第一、二、三节",
+  "scope": {
+    "pools": [
+      "quality",
+      "income",
+      "bank"
+    ],
+    "members": "三池全部成员（同一公司可在多个池）",
+    "note": "只对已入池公司做红线监测；财务条件仍只在年度重跑时评估。"
+  },
+  "red_lines": {
+    "basis": "与好公司池 v1.2 治理条件完全相同（quality-pool-v1.2.json groups.governance）",
+    "lookback_years": 5,
+    "events": [
+      {
+        "id": "penalty",
+        "label": "证监会立案调查、信息披露类行政处罚或交易所公开谴责",
+        "window_years": 5,
+        "count_max": 0,
+        "event_types": [
+          "立案",
+          "行政处罚",
+          "公开谴责",
+          "纪律处分"
+        ],
+        "counted_rule": "立案、行政处罚须为信息披露类且由中国证监会/证监局作出；公开谴责、纪律处分只在决定为公开谴责时计入。",
+        "subject_scope": "公司本身；控股股东、实际控制人及其一致行动人；被处分事项发生时任职的董监高。",
+        "other_subjects": "其他股东（非控股、非一致行动人）及其他主体的处分只记录、不计入。",
+        "unknown_subject": "公告正文无法判断主体身份时，该公司该条记为「待定（主体身份不明）」，不得默认计入或不计入。",
+        "matter_scope": "仅信息披露类事项；内幕交易、短线交易、环保、安全生产、金融监管处罚不计入。",
+        "source": "quality-pool-v1.2 definitions.penalty；batch4f K3"
+      },
+      {
+        "id": "audit_opinion",
+        "label": "最近 5 个财年审计意见均为标准无保留",
+        "window_years": 5,
+        "standard": "标准无保留意见",
+        "nonstandard_max": 0,
+        "source": "quality-pool-v1.2 groups.governance.audit_opinion"
+      },
+      {
+        "id": "pledge_ratio",
+        "label": "控股股东（无控股股东时第一大股东）质押比例不超过 50%",
+        "max": 0.5,
+        "operator": "<=",
+        "hit_if": "> 0.5",
+        "no_controller": "公司公告「无控股股东」时，用第一大股东（含其一致行动人合计）的质押股数 ÷ 持股数；第一大股东质押数据也取不到则记待定。",
+        "nominee_exclusion": "香港中央结算有限公司、HKSCC NOMINEES LIMITED、香港中央结算（代理人）有限公司等名义持有人不是实际持有人，不作为第一大股东；由其下一名实际持有人承担该角色。",
+        "threshold_note": "30% 与 50% 只是报告口径；本版判定门槛仍为 50%（≤50% 通过）。",
+        "source": "quality-pool-v1.2 parameters.pledge_ratio_max；batch4f K1/K2"
+      }
+    ]
+  },
+  "actions": {
+    "exclusion": "红线命中 → 该公司从其所在全部池中即时剔除；剔除只追加池账本记录，不改旧记录。",
+    "status_template": "出池（红线：{reason}，{date}，{doc_no_or_url}）",
+    "pool_ledger": "data/ledger/{quality,income,bank}-pool.jsonl（record_type=exclusion，只追加）",
+    "no_midyear_reentry": true,
+    "reentry_rule": "已剔除的公司不在年中自动回池；回池只在年度重跑时按全部条件重新判定。",
+    "financial_conditions": "财务条件仍只在年度重跑时评估，不因季度波动进出。"
+  },
+  "schedule": {
+    "redline_scan": {
+      "frequency": "weekly",
+      "run": "每周首个每日更新（launchd 18:30 已安装，无需新增安装）",
+      "coverage": "三池全部成员；逐家检查公告、最新定期报告审计意见、控股股东质押比例",
+      "on_failure": "取数失败记「本周未完成」，不默认通过、也不剔除，下次重试"
+    },
+    "earnings_update": {
+      "dates": [
+        "05-05",
+        "09-05",
+        "11-05"
+      ],
+      "run": "日期之后的首次每日更新",
+      "periods": {
+        "05-05": "上年年报（YYYY-1-12-31）",
+        "09-05": "当年半年报（YYYY-06-30）",
+        "11-05": "当年三季报（YYYY-09-30）"
+      },
+      "snapshot": "按报告期批量抓取新财报，生成新的批量财务快照；旧快照保留",
+      "switch": "之后个股与银行估值改用新快照（追溯字段随之变化）",
+      "missing_company": "单个公司缺新报表时沿用旧数据，并在卡片注明「财报未更新」"
+    },
+    "conclusion_changes": {
+      "run": "财报或价格更新后",
+      "rule": "已有正式结论的公司若结论改变（含改判为无法判断），按既有改判规则追加记录；旧记录不改。"
+    }
+  },
+  "alerts": {
+    "events": [
+      "出池",
+      "候选买点新增",
+      "候选买点消失"
+    ],
+    "channel": "macOS 通知（osascript display notification）",
+    "failure": "通知失败不影响任务",
+    "changes_feed": "data/ledger/changes.jsonl（只追加，至少保留 1 年）",
+    "page": "本地页面「数据状态」的「最近变动」",
+    "ask": "./ask \"最近有什么变动\" 返回同一列表"
+  },
+  "sources": {
+    "audit_opinion": {
+      "source": "东方财富 F10 个股资产负债表 OPINION_TYPE",
+      "scope": "最近 5 个财年 + 最新年报",
+      "failure": "缺任一年或接口失败 → 本周未完成"
+    },
+    "penalty": {
+      "source": "东方财富公告检索（立案/行政处罚/公开谴责/纪律处分）+ 公告正文核对",
+      "scope": "最近 5 年；主体口径同好公司池 v1.2",
+      "failure": "任一关键词检索失败 → 本周未完成"
+    },
+    "pledge": {
+      "source": "东方财富公司整体质押表 + 重要股东质押明细 + 最新定期报告前十名股东表",
+      "scope": "控股股东（无控股股东时第一大股东，名义持有人排除）",
+      "failure": "取不到 → 本周未完成"
+    }
+  },
+  "approval": {
+    "approved_by": "股东",
+    "approved_at": "2026-11-17",
+    "decision": "决策⑤",
+    "basis": "decision5.md：2026-11-17 股东同意（红线事件即时剔除、财务一年一评、财报季更新与变动提醒）",
+    "known_gaps": "未经独立 AI 审查；补救：2027-05-31 复盘时一并检查剔除记录",
+    "remedy": "2027-05-31 复盘时检查剔除记录",
+    "next_review_date": "2027-11-13"
+  },
+  "next_review_date": "2027-11-13",
+  "notes": [
+    "本政策只回答「池成员何时因红线出池」与「何时重跑财报」，不改任何估值规则与阈值。",
+    "红线口径、阈值与好公司池 v1.2 逐项相同；测试会与 quality-pool-v1.2.json 对比。",
+    "剔除只追加池账本记录；旧记录、旧快照不改。",
+    "监测数据取不到时记「本周未完成」，不默认通过，也不剔除。"
+  ]
+}
