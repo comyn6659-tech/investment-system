@@ -10,6 +10,8 @@
 - 形如 `snap-*` 但在上述目录中没有文件的 id：属于批量路径生成的逐公司派生 id
   （例如 `data/pool-valuation/pool-member-valuation.json` 里的 snapshot_id），
   校验它们能否在已保留的批量结果文件中追溯到来源；无法追溯的列出但不删除任何文件；
+- 池成员估值批量快照（`data/pool-valuation/snapshot-qps-*`，schema 不是池快照）：
+  结论记录的 `trace.financial.manifest_sha256` 记了清单哈希时，按清单 sha256 校验；
 - `bank-valuation-v2.1:*` 这类政策派生 id 不是文件引用，只登记不校验。
 
 退出码 0 表示：所有持久化快照存在且哈希通过。
@@ -17,6 +19,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from collections import Counter
@@ -35,16 +38,22 @@ DERIVED_REPORT_FILES = (
 )
 
 
-def _ledger_refs() -> dict[str, set[str]]:
-    refs: dict[str, set[str]] = {}
+def _ledger_refs() -> dict[str, dict[str, set[str]]]:
+    """账本 → snapshot_id → 同一对象里记录过的清单 sha256（trace 用）。"""
+    refs: dict[str, dict[str, set[str]]] = {}
     for path in sorted((ROOT / "data" / "ledger").glob("*.jsonl")):
-        found: set[str] = set()
+        found: dict[str, set[str]] = {}
 
         def walk(node) -> None:
             if isinstance(node, dict):
+                hashes = {
+                    value
+                    for key, value in node.items()
+                    if key == "manifest_sha256" and isinstance(value, str)
+                }
                 for key, value in node.items():
                     if key == "snapshot_id" and isinstance(value, str):
-                        found.add(value)
+                        found.setdefault(value, set()).update(hashes)
                     walk(value)
             elif isinstance(node, list):
                 for item in node:
@@ -55,6 +64,15 @@ def _ledger_refs() -> dict[str, set[str]]:
                 walk(json.loads(line))
         refs[str(path.relative_to(ROOT))] = found
     return refs
+
+
+def _batch_manifest_matches(directory: Path, expected_hashes: set[str]) -> bool:
+    """池成员估值批量快照：按清单 sha256 校验（trace 里记录了清单哈希）。"""
+    manifest_path = directory / "manifest.json"
+    if not expected_hashes or not manifest_path.is_file():
+        return False
+    digest = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+    return digest in expected_hashes
 
 
 def _qps_dirs() -> dict[str, Path]:
@@ -87,6 +105,7 @@ def verify() -> dict:
     untraceable: list[str] = []
     for ledger, ids in refs.items():
         for snapshot_id in sorted(ids):
+            expected_hashes = ids[snapshot_id]
             if snapshot_id.startswith("qps-"):
                 directory = qps_dirs.get(snapshot_id)
                 if directory is None:
@@ -95,6 +114,9 @@ def verify() -> dict:
                 try:
                     manifest, _companies, _stats = load_snapshot_dir(directory)
                 except Exception as exc:  # noqa: BLE001 - 失败就是问题
+                    if _batch_manifest_matches(directory, expected_hashes):
+                        checked["batch"] += 1
+                        continue
                     problems.append(f"{ledger}: {snapshot_id} 校验失败：{type(exc).__name__}: {exc}")
                     continue
                 if manifest.get("snapshot_id") != snapshot_id:
@@ -125,6 +147,7 @@ def verify() -> dict:
     return {
         "ledgers": len(refs),
         "qps": checked["qps"],
+        "batch": checked["batch"],
         "snap": checked["snap"],
         "policy": checked["policy"],
         "derived": sorted(set(derived)),
@@ -136,7 +159,8 @@ def verify() -> dict:
 def main() -> int:
     result = verify()
     print(
-        f"账本 {result['ledgers']} 个；已校验池快照 {result['qps']} 个、单标的快照 {result['snap']} 个；"
+        f"账本 {result['ledgers']} 个；已校验池快照 {result['qps']} 个、"
+        f"池成员估值批量快照 {result['batch']} 个、单标的快照 {result['snap']} 个；"
         f"政策派生 id {result['policy']} 个（不是文件引用）"
     )
     print(

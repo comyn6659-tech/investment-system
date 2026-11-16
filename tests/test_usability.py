@@ -513,15 +513,17 @@ def test_b3_cli_bank_conclusions_match_v21_and_ledger_has_11(service):
         for line in (ROOT / "data" / "ledger" / "equity-conclusions.jsonl").read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
-    assert len(ledger) == 110
+    # 账本只追加：允许之后有新增记录（例如每日更新），但前 99 条与银行 v2.1 首批 11 条不变。
+    assert len(ledger) >= 110
     assert len(ledger[:99]) == 99
     assert all(str(row["code"]).zfill(6) not in {
         "002839", "002966", "600036", "601009", "601166", "601288",
         "601328", "601398", "601658", "601939", "601998",
     } for row in ledger[:99])
-    bank_rows = ledger[99:]
+    bank_rows = ledger[99:110]
     assert len(bank_rows) == 11
     assert all(row.get("record_type", "formal") == "formal" for row in bank_rows)
+    assert all(row.get("policy_version") == "bank-valuation-v2.1" for row in bank_rows)
     payload = json.loads((ROOT / "data" / "bank-pool" / "valuation-v2.1.json").read_text(encoding="utf-8"))
     expected = {
         item["code"]: item["conclusion"]

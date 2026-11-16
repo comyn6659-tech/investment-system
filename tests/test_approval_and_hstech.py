@@ -135,7 +135,7 @@ def test_bank_valuation_v21_enabled():
         for line in EQUITY_LEDGER.read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
-    assert len(rows) == 110
+    assert len(rows) >= 110  # 账本只追加
     assert any(str(row.get("code")) == "600036" for row in rows)
 
 
@@ -265,7 +265,14 @@ def test_existing_indices_and_ledgers_unchanged():
         for line in OFFICIAL_LEDGER.read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
-    assert len(official) == 4
+    # 官方估值账本只追加：前 4 条（2026-11-11 三只宽基 + 创业板指）不变即可
+    assert len(official) >= 4
+    assert {row.get("index_code") for row in official[:4]} == {
+        "000300",
+        "000905",
+        "000852",
+        "399006",
+    }
     assert not any(row.get("index_code") == "HSTECH" for row in official)
     equity = [
         json.loads(line)

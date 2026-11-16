@@ -1,0 +1,5 @@
+#!/bin/sh
+# 本地交互页面：./web
+# 只监听 127.0.0.1，自动打开浏览器；关闭终端即停止；不访问外网。
+cd "$(dirname "$0")" || exit 1
+exec .venv/bin/python -m engine.web "$@"

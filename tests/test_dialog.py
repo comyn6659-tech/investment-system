@@ -73,7 +73,12 @@ def test_every_question_matches_expected(service, question_set):
         if expect.get("label") and expect["label"] not in markdown:
             problems.append(f"{item['id']} missing label {expect['label']!r}")
         assert len(markdown.splitlines()) <= 25, f"{item['id']} 超过 25 行"
-        assert markdown.splitlines()[0].startswith("**结论："), f"{item['id']} 第一行不是结论"
+        first = markdown.splitlines()[0]
+        if result.intent.name in ("stock", "bank"):
+            assert first.startswith("类型："), f"{item['id']} 第一行不是类型"
+            assert "提示：系统不判断护城河是否仍然存在" in markdown, f"{item['id']} 缺护城河提示"
+        else:
+            assert first.startswith("**结论："), f"{item['id']} 第一行不是结论"
         assert "不构成投资建议" in markdown, f"{item['id']} 缺免责声明"
         assert re.search(r"20\d\d-\d\d-\d\d", markdown), f"{item['id']} 缺数据日期"
         assert any(term in markdown for term in ("来源", "快照", "账本", "规则")), f"{item['id']} 缺来源"
@@ -83,7 +88,9 @@ def test_every_question_matches_expected(service, question_set):
 def test_card_structure(service):
     result = service.ask("茅台怎么样")
     lines = result.markdown.splitlines()
-    assert lines[0].startswith("**结论：等待**")
+    assert lines[0].startswith("类型：好公司型＋收息型")
+    assert lines[1].startswith("提示：系统不判断护城河")
+    assert "**结论：等待**" in result.markdown
     assert any(line.startswith("现价 ") for line in lines)
     assert any("三档价值（元/股）" in line for line in lines)
     assert any(line.startswith("为什么：") for line in lines)

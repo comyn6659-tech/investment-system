@@ -30,11 +30,16 @@ FORBIDDEN = ("建议买入", "建议卖出", "推荐买入", "推荐卖出", "�
 DATE_RE = re.compile(r"20\d\d-\d\d-\d\d")
 
 
-def _check_markdown(markdown: str, *, research: bool = False) -> list[str]:
+def _check_markdown(markdown: str, *, research: bool = False, typed: bool = False) -> list[str]:
     problems = []
     lines = markdown.splitlines()
-    if not lines or not lines[0].startswith("**结论："):
-        problems.append("第一行不是结论")
+    first_ok = bool(lines) and (
+        lines[0].startswith("**结论：") or (typed and lines[0].startswith("类型："))
+    )
+    if not first_ok:
+        problems.append("第一行不是类型/结论")
+    if typed and "提示：系统不判断护城河是否仍然存在" not in markdown:
+        problems.append("缺护城河提示")
     if len(lines) > 25:
         problems.append(f"超过 25 行（{len(lines)}）")
     if not DATE_RE.search(markdown):
@@ -67,7 +72,9 @@ def _question_run() -> list[dict]:
     for item in questions:
         result = service.ask(item["question"])
         expect = item["expect"]
-        problems = _check_markdown(result.markdown)
+        problems = _check_markdown(
+            result.markdown, typed=result.intent.name in ("stock", "bank")
+        )
         if result.intent.name != expect["intent"]:
             problems.append(f"意图 {result.intent.name} ≠ {expect['intent']}")
         code = result.target.code if result.target else None
@@ -98,7 +105,11 @@ def _question_run() -> list[dict]:
 
 def _single(service: AskService, question: str, *, research: bool = False) -> dict:
     result = service.ask(question)
-    problems = _check_markdown(result.markdown, research=research)
+    problems = _check_markdown(
+        result.markdown,
+        research=research,
+        typed=result.intent.name in ("stock", "bank"),
+    )
     return {
         "question": question,
         "intent": result.intent.name,
@@ -127,7 +138,9 @@ def _report_rows() -> dict:
     stock_rows = []
     for code in stocks:
         result = service.ask(f"{names[code]}怎么样")
-        problems = _check_markdown(result.markdown)
+        problems = _check_markdown(
+            result.markdown, typed=result.intent.name in ("stock", "bank")
+        )
         stock_rows.append(
             {
                 "code": code,
@@ -267,7 +280,8 @@ def render(payload: dict) -> str:
         "- 禁用词：逐条扫描「建议买入 / 建议卖出 / 推荐买入 / 推荐卖出 / 强烈推荐 / 建议加仓 / 建议减仓」，0 命中。",
         "- 日期与来源：每张卡片都有日期（行情/财务/规则/账本），并有来源或快照/账本/规则指路。",
         "- 研究模型：指数、ETF、银行卡片均未出现「正式结论」字样；结论统一为「无法判断」。",
-        "- 结构：默认卡片 ≤ 25 行；第一行是结论；末行是「不构成投资建议」。",
+        "- 结构：默认卡片 ≤ 25 行；个股与银行第一行是类型（第二行护城河提示），其余卡片第一行是结论；"
+        "末行是「不构成投资建议」。",
         "",
         "## 7. 限制",
         "",

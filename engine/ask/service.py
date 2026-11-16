@@ -18,6 +18,14 @@ from zoneinfo import ZoneInfo
 
 from engine.ask.intent import SUPPORTED_QUESTIONS, Intent, parse
 from engine.ask.index_bands import band_for
+from engine.ask.company_type import (
+    TYPE_BANK,
+    classify as classify_company_type,
+    hint_line,
+    ordered_types,
+    type_line,
+)
+from engine.ask.not_found import unknown_subject
 from engine.ask.plain import (
     BANNED_TERMS,
     cycle_text,
@@ -451,7 +459,11 @@ class AskService:
             markdown = result["markdown"]
             data.update(result["data"])
         else:
-            markdown = self._help_card(intent)
+            subject = unknown_subject(question) if intent.name == "unrecognized" else None
+            if subject:
+                markdown = self._not_found_card(subject)
+            else:
+                markdown = self._help_card(intent)
         notice = self._update_notice(markdown)
         if notice:
             lines = markdown.splitlines()
@@ -478,6 +490,23 @@ class AskService:
             "把问题换成上面的说法再试一次，例如「茅台怎么样」「好公司池有哪些」。",
             "数据与来源：本地固定快照、政策文件与身份注册表（核实 2026-11-11）；"
             "个股政策 equity-policy-v1.1（已批准 2026-11-12）。",
+        ]
+        return "\n".join(lines)
+
+    def _not_found_card(self, name: str) -> str:
+        lines = [
+            f"**结论：无法判断** — 没找到叫『{name}』的上市公司，请用证券简称或 6 位代码。",
+            "",
+            "可能原因：这不是沪深 A 股的证券简称，或名称写法与登记简称不同。",
+            "支持的问法（示例）：",
+        ]
+        lines.extend(f"- {item}" for item in SUPPORTED_QUESTIONS)
+        lines += [
+            "",
+            "把问题换成上面的说法再试一次，例如「茅台怎么样」「600519 贵不贵」。",
+            "数据与来源：全市场 A 股名单 data/registry/cn_a_equities.json（核实 2026-11-11）；"
+            "个股政策 equity-policy-v1.1（已批准 2026-11-12）。",
+            "不构成投资建议。",
         ]
         return "\n".join(lines)
 
@@ -551,20 +580,21 @@ class AskService:
             return None, None
         return item.end_date, item.source.publisher
 
-    def _status_card(self, *, detail: bool = False) -> str:
+    def status_data(self) -> dict[str, Any]:
+        """数据与规则状态：卡片与本地页面共用同一份取数，不各自解析。"""
         quote_payload = None
         try:
             quote_payload = quotes.latest_snapshot()
         except Exception:  # noqa: BLE001
             quote_payload = None
-        quote_date = quote_payload["price_date"] if quote_payload else "未取得"
-        official_rows = []
+        quote_date = quote_payload["price_date"] if quote_payload else None
+        official_rows: list[dict[str, Any]] = []
         if OFFICIAL_LEDGER.exists():
             official_rows = [
                 json.loads(line) for line in OFFICIAL_LEDGER.read_text(encoding="utf-8").splitlines() if line
             ]
-        official_latest = max((row.get("date") for row in official_rows), default="—")
-        hstech_rows = []
+        official_latest = max((row.get("date") for row in official_rows), default=None)
+        hstech_rows: list[dict[str, Any]] = []
         if HSTECH_LEDGER.exists():
             hstech_rows = [
                 json.loads(line) for line in HSTECH_LEDGER.read_text(encoding="utf-8").splitlines() if line
@@ -574,33 +604,78 @@ class AskService:
         policy = self.policy
         approval = policy.data.get("approval") or {}
         q_policy = json.loads(QUALITY_POLICY.read_text(encoding="utf-8")).get("approval") or {}
+        bank_policy = json.loads(BANK_VALUATION_POLICY.read_text(encoding="utf-8")).get("approval") or {}
+        index_date = self._latest_text_series("INDEX:000300.SH", "official_close")[0]
+        return {
+            "quote_date": quote_date,
+            "quote_rows": len(quote_payload["rows"]) if quote_payload else 0,
+            "financial": "2025 年报 + 2026 三季报（东方财富合并报表，批量快照 2026-11-12）",
+            "index_official_series_date": index_date,
+            "official_valuation_latest": official_latest,
+            "official_valuation_records": len(official_rows),
+            "hstech": {
+                "date": (hstech_latest or {}).get("date"),
+                "pe": (hstech_latest or {}).get("pe"),
+                "dividend_yield_pct": (hstech_latest or {}).get("dividend_yield_pct"),
+                "records": len(hstech_rows),
+            },
+            "equity_policy": {
+                "policy_id": policy.policy_id,
+                "status": policy.status,
+                "approved_at": approval.get("approved_at"),
+                "review_date": approval.get("review_date"),
+            },
+            "pool_rules": {
+                "approved_at": q_policy.get("approved_at"),
+                "next_review_date": q_policy.get("next_review_date"),
+            },
+            "bank_valuation": {
+                "approved_at": bank_policy.get("approved_at"),
+                "review_date": bank_policy.get("review_date")
+                or bank_policy.get("next_review"),
+            },
+            "update": {
+                "run_at": state.get("run_at"),
+                "status": state.get("status"),
+                "light": state.get("light"),
+            },
+        }
+
+    def _status_card(self, *, detail: bool = False) -> str:
+        data = self.status_data()
+        quote_date = data["quote_date"] or "未取得"
+        hstech = data["hstech"]
+        policy = data["equity_policy"]
+        pool_rules = data["pool_rules"]
+        state = data["update"]
         lines = [
             "**结论：数据状态如下** — 回答里每个数字都带日期，正式结论按最新可用数据重算。",
             "",
             f"- 行情：{quote_date}（腾讯财经全市场快照；收盘前取上一交易日收盘）",
-            "- 财务：2025 年报 + 2026 三季报（东方财富合并报表，批量快照 2026-11-12）",
-            f"- 指数官方序列：{self._latest_text_series('INDEX:000300.SH', 'official_close')[0] or '—'}（中证指数官网）",
-            f"- 官方当日估值账本：{official_latest}（沪深300 / 中证500 / 中证1000）",
+            f"- 财务：{data['financial']}",
+            f"- 指数官方序列：{data['index_official_series_date'] or '—'}（中证指数官网）",
+            f"- 官方当日估值账本：{data['official_valuation_latest'] or '—'}（沪深300 / 中证500 / 中证1000）",
         ]
-        if hstech_latest:
+        if hstech["date"]:
             lines.append(
-                f"- 恒生科技官方月度估值：{hstech_latest.get('date')} "
-                f"（PE {hstech_latest.get('pe')}，股息率 {hstech_latest.get('dividend_yield_pct')}%）"
+                f"- 恒生科技官方月度估值：{hstech['date']} "
+                f"（PE {hstech['pe']}，股息率 {hstech['dividend_yield_pct']}%）"
             )
         lines += [
-            f"- 个股政策：{policy.policy_id}（{policy.status}；批准 {approval.get('approved_at')}；"
-            f"复核 {approval.get('review_date')}）",
+            f"- 个股政策：{policy['policy_id']}（{policy['status']}；批准 {policy['approved_at']}；"
+            f"复核 {policy['review_date']}）",
             f"- 池规则：好公司池 quality-pool-v1.2 / 收息池 income-pool-v1 / 银行池 bank-pool-v1"
-            f"（批准 {q_policy.get('approved_at')}；下次复核 {q_policy.get('next_review_date')}）",
-            f"- 前向更新：{state.get('run_at') or '尚未运行'}（{state.get('status') or '—'}）；"
+            f"（批准 {pool_rules['approved_at']}；下次复核 {pool_rules['next_review_date']}）",
+            f"- 前向更新：{state['run_at'] or '尚未运行'}（{state['status'] or '—'}）；"
             "每日定时任务需股东手动安装一次（scripts/install-daily-update.sh）",
         ]
         if detail:
             lines += [
                 "",
                 "【详情】",
-                f"- 官方估值账本记录：{len(official_rows)} 条；恒生科技月度记录：{len(hstech_rows)} 条",
-                f"- 行情快照行数：{len(quote_payload['rows']) if quote_payload else 0}",
+                f"- 官方估值账本记录：{data['official_valuation_records']} 条；"
+                f"恒生科技月度记录：{hstech['records']} 条",
+                f"- 行情快照行数：{data['quote_rows']}",
                 f"- 政策文件：{POLICY.relative_to(ROOT)}",
                 f"- 更新日志：data/ledger/update-log.jsonl",
             ]
@@ -856,6 +931,17 @@ class AskService:
             return sorted(self.pool_sets["income"] - self.pool_sets["bank"])
         return sorted((self.pool_sets["quality"] | self.pool_sets["income"]) - self.pool_sets["bank"])
 
+    @staticmethod
+    def _grouped_ranking_lines(rows, *, limit, render):
+        """按类型分组显示，组内保持传入顺序（距门槛升序）。"""
+        selected = rows if limit is None else rows[:limit]
+        lines: list[str] = []
+        for company_type in ordered_types([row["type"] for row in selected]):
+            group = [row for row in selected if row["type"] == company_type]
+            lines.append(f"【{company_type}】（{len(group)} 家）")
+            lines.extend(render(row) for row in group)
+        return lines
+
     def _ranking(self, intent: Intent, *, detail: bool = False) -> dict[str, Any]:
         pool = intent.pool or "all"
         if pool == "bank":
@@ -887,6 +973,10 @@ class AskService:
                     "grade": (result["record"].get("grade") or {}).get("grade"),
                     "pools": result["pools"],
                     "binding": (block.get("binding_condition") or {}).get("label"),
+                    "type": classify_company_type(code, self.pool_sets),
+                    "industry": result.get("industry"),
+                    "ownership": result.get("ownership"),
+                    "cycle": result.get("cycle_label"),
                 }
             )
         rows.sort(key=lambda item: item["distance"])
@@ -903,38 +993,49 @@ class AskService:
         ]
         if candidates:
             lines.append("候选买点（现价不高于候选门槛，且不高于悲观价值）：")
-            for row in (candidates if detail else candidates[:10]):
-                lines.append(
+            lines += self._grouped_ranking_lines(
+                candidates,
+                limit=None if detail else 10,
+                render=lambda row: (
                     f"- {row['code']} {row['name']}：现价 {_money(row['price'])} 元"
                     f"｜门槛 {_money(row['entry'])}｜距门槛 {_pct_number(row['distance'])}"
                     f"｜等级 {row['grade']}"
-                )
+                ),
+            )
         else:
             lines.append("当前没有同时满足安全边际与悲观价值约束的标的。")
         closest = [row for row in rows if row["conclusion"] != "candidate_buy_point"][: (20 if detail else 5)]
         if closest:
             lines += ["", "距候选门槛最近（尚未到买点）："]
-            for row in closest:
-                lines.append(
+            lines += self._grouped_ranking_lines(
+                closest,
+                limit=None,
+                render=lambda row: (
                     f"- {row['code']} {row['name']}：现价 {_money(row['price'])} 元"
                     f"｜门槛 {_money(row['entry'])}｜{_pct_number(row['distance'])}"
                     f"｜{_label(row['conclusion'])}"
-                )
+                ),
+            )
+        bank_rows: list[dict[str, Any]] = []
         if pool == "all":
             bank_rows = self._bank_ranking_rows()
             bank_candidates = [
                 row for row in bank_rows if row["conclusion"] == "candidate_buy_point"
             ]
-            lines += ["", "银行部分（银行专用估值）："]
+            lines += ["", "银行部分（银行专用估值）"]
             if bank_candidates:
-                lines.append(f"银行候选买点（{len(bank_candidates)} 家）：")
-                for row in bank_candidates:
-                    lines.append(
+                lines[-1] += f"｜银行候选买点（{len(bank_candidates)} 家）："
+                lines += self._grouped_ranking_lines(
+                    bank_candidates,
+                    limit=None,
+                    render=lambda row: (
                         f"- {row['code']} {row['name']}：现价 {_money(row['price'])} 元"
                         f"｜门槛 {_money(row['entry'])}｜距门槛 {_pct_number(row['distance'])}"
                         f"｜候选买点"
-                    )
+                    ),
+                )
             else:
+                lines[-1] += "："
                 lines.append("银行池当前没有候选买点。")
         lines += [
             "",
@@ -944,7 +1045,17 @@ class AskService:
             "财务 东方财富批量快照 2026-11-12。",
             "不构成投资建议。",
         ]
-        return {"markdown": "\n".join(lines), "data": {"pool": pool, "count": len(codes), "candidates": candidates, "ranking": rows}}
+        return {
+            "markdown": "\n".join(lines),
+            "data": {
+                "pool": pool,
+                "count": len(codes),
+                "candidates": candidates,
+                "ranking": rows,
+                "bank_ranking": bank_rows,
+                "data_date": data_date,
+            },
+        }
 
     def _bank_pool_ranking(self, *, detail: bool = False) -> dict[str, Any]:
         rows = self._bank_ranking_rows()
@@ -956,22 +1067,28 @@ class AskService:
         ]
         if candidates:
             lines.append("候选买点（现价不高于门槛价，且不高于悲观价值）：")
-            for row in candidates:
-                lines.append(
+            lines += self._grouped_ranking_lines(
+                candidates,
+                limit=None,
+                render=lambda row: (
                     f"- {row['code']} {row['name']}：现价 {_money(row['price'])} 元"
                     f"｜门槛 {_money(row['entry'])}｜距门槛 {_pct_number(row['distance'])}"
-                )
+                ),
+            )
         else:
             lines.append("银行池当前没有同时满足安全边际与悲观价值约束的标的。")
         closest = [row for row in rows if row["conclusion"] != "candidate_buy_point"][: (20 if detail else 5)]
         if closest:
             lines += ["", "距候选门槛最近（尚未到买点）："]
-            for row in closest:
-                lines.append(
+            lines += self._grouped_ranking_lines(
+                closest,
+                limit=None,
+                render=lambda row: (
                     f"- {row['code']} {row['name']}：现价 {_money(row['price'])} 元"
                     f"｜门槛 {_money(row['entry'])}｜{_pct_number(row['distance'])}"
                     f"｜{_label(row['conclusion'])}"
-                )
+                ),
+            )
         price_dates = sorted({row["price_date"] for row in rows if row.get("price_date")})
         data_date = price_dates[-1] if price_dates else self.analysis_date.isoformat()
         lines += [
@@ -983,7 +1100,14 @@ class AskService:
         ]
         return {
             "markdown": "\n".join(lines),
-            "data": {"pool": "bank", "count": len(rows), "candidates": candidates, "ranking": rows},
+            "data": {
+                "pool": "bank",
+                "count": len(rows),
+                "candidates": candidates,
+                "ranking": rows,
+                "bank_ranking": rows,
+                "data_date": data_date,
+            },
         }
 
     # --- 卡片：池名单 -------------------------------------------------------
@@ -1069,6 +1193,41 @@ class AskService:
         evaluator = {"quality": evaluate_quality, "income": evaluate_income, "bank": evaluate_bank}[pool]
         return evaluator(company, policy)
 
+    SCORECARD_FIELDS = (
+        ("roe_average", "平均净资产收益率"),
+        ("roe_recent_average", "近 3 年净资产收益率"),
+        ("cash_conversion", "经营现金流与利润的匹配"),
+        ("dividend_payout", "分红率"),
+        ("net_debt_to_ebitda", "有息负债水平"),
+        ("npl_ratio", "不良率"),
+        ("provision_coverage", "拨备覆盖率"),
+        ("core_tier1_ratio", "核心一级"),
+    )
+
+    def _scorecard_rows(self, pool: str, code: str, result) -> list[tuple[str, str]]:
+        """成绩单指标（标签 + 数值文本）：卡片与页面共用同一取数与格式。"""
+        rows: list[tuple[str, str]] = []
+        for key, label_text in self.SCORECARD_FIELDS:
+            value = self.pool_rows[pool].get(code, {}).get(key)
+            if value is None and isinstance(getattr(result, "metrics", None), dict):
+                raw = result.metrics.get(key)
+                value = raw.get("value") if isinstance(raw, dict) else raw
+            if value is None:
+                continue
+            if pool == "bank" and key in (
+                "npl_ratio",
+                "provision_coverage",
+                "core_tier1_ratio",
+                "roe_average",
+                "roe_recent_average",
+            ):
+                rows.append((label_text, f"{float(value):.2f}%"))
+            elif key == "net_debt_to_ebitda":
+                rows.append((label_text, f"{float(value):.2f} 倍"))
+            else:
+                rows.append((label_text, _pct(value)))
+        return rows
+
     def _membership(self, intent: Intent, *, detail: bool = False) -> dict[str, Any]:
         target = intent.target
         if target is None or target.kind != "stock":
@@ -1108,38 +1267,9 @@ class AskService:
         if result.reason and not in_pool and not failing:
             lines.append(f"原因：{result.reason}")
         if in_pool:
-            metrics = self.pool_rows[pool].get(target.code) or result.metrics
-            bits = []
-            for key, label_text in (
-                ("roe_average", "平均净资产收益率"),
-                ("roe_recent_average", "近 3 年净资产收益率"),
-                ("cash_conversion", "经营现金流与利润的匹配"),
-                ("dividend_payout", "分红率"),
-                ("net_debt_to_ebitda", "有息负债水平"),
-                ("npl_ratio", "不良率"),
-                ("provision_coverage", "拨备覆盖率"),
-                ("core_tier1_ratio", "核心一级"),
-            ):
-                value = self.pool_rows[pool].get(target.code, {}).get(key)
-                if value is None and isinstance(result.metrics, dict):
-                    raw = result.metrics.get(key)
-                    value = raw.get("value") if isinstance(raw, dict) else raw
-                if value is None:
-                    continue
-                if pool == "bank" and key in (
-                    "npl_ratio",
-                    "provision_coverage",
-                    "core_tier1_ratio",
-                    "roe_average",
-                    "roe_recent_average",
-                ):
-                    bits.append(f"{label_text} {float(value):.2f}%")
-                elif key == "net_debt_to_ebitda":
-                    bits.append(f"{label_text} {float(value):.2f} 倍")
-                else:
-                    bits.append(f"{label_text} {_pct(value)}")
+            bits = self._scorecard_rows(pool, target.code, result)
             if bits:
-                lines.append("成绩单：" + "｜".join(bits))
+                lines.append("成绩单：" + "｜".join(f"{label} {text}" for label, text in bits))
         lines += [
             "",
             f"规则：{label} {self._pool_policy(pool).policy_id}（已批准）；快照 2026-11-12；"
@@ -1258,7 +1388,11 @@ class AskService:
         indicator = self._bank_indicator(code) or {}
         ownership = self._bank_ownership(code) or "未标记"
         implicit = valuation.get("implicit_return")
+        company_type = classify_company_type(code, self.pool_sets)
         lines = [
+            type_line(company_type),
+            hint_line(),
+            "",
             f"**结论：{headline}** — {reason}",
             "",
             f"现价 {_money(price)} 元（{price_date or '日期未知'}）｜门槛 {_money(threshold)} 元"
@@ -1332,6 +1466,7 @@ class AskService:
             "data": {
                 "code": code,
                 "conclusion": conclusion,
+                "company_type": company_type,
                 "in_bank_pool": True,
                 "price": price,
                 "price_date": price_date,
@@ -1374,6 +1509,10 @@ class AskService:
                     "distance": distance,
                     "conclusion": valuation["conclusion"],
                     "values": valuation.get("values") or {},
+                    "type": TYPE_BANK,
+                    "industry": "银行",
+                    "ownership": self._bank_ownership(code) or "未标记",
+                    "cycle": cycle_text("bank"),
                 }
             )
         rows.sort(key=lambda item: item["distance"])
@@ -1478,7 +1617,11 @@ class AskService:
             conclusion_text = "银行数据不完整，暂不给正式结论。"
         else:
             conclusion_text = "不在银行池（未通过：银行池规则）；只给价值数字，不给买卖结论。"
+        company_type = classify_company_type(code, self.pool_sets)
         lines = [
+            type_line(company_type),
+            hint_line(),
+            "",
             f"**结论：无法判断** — {conclusion_text}",
             "",
             f"是否在银行池：{'是' if in_pool else '否'}（银行池共 {len(self.pool_sets['bank'])} 家）"
@@ -1528,6 +1671,7 @@ class AskService:
             "data": {
                 "code": code,
                 "conclusion": "undetermined",
+                "company_type": company_type,
                 "in_bank_pool": in_pool,
                 "pb": pb,
                 "dividend_yield": dividend_yield,
@@ -1810,7 +1954,11 @@ class AskService:
             if conclusion in ("candidate_buy_point", "wait", "avoid")
             else "政策结果（政策 equity-policy-v1.1，已批准）：无法判断"
         )
+        company_type = classify_company_type(target.code, self.pool_sets)
         lines = [
+            type_line(company_type),
+            hint_line(),
+            "",
             f"**结论：{_label(conclusion)}** — {self._stock_reason(result)}",
             f"{label}",
             "",
@@ -1863,7 +2011,14 @@ class AskService:
         ]
         if detail:
             lines = lines[:-1] + self._stock_detail(result) + [lines[-1]]
-        return {"markdown": "\n".join(lines), "data": {**self._stock_data(result), "detail": detail}}
+        return {
+            "markdown": "\n".join(lines),
+            "data": {
+                **self._stock_data(result),
+                "company_type": company_type,
+                "detail": detail,
+            },
+        }
 
     def _limitation(self, result: dict[str, Any]) -> str:
         record = result["record"]
@@ -1974,9 +2129,13 @@ class AskService:
 
     @staticmethod
     def _clip(lines: list[str]) -> list[str]:
-        """默认卡片不超过 25 行；超出时截断并提示用 --detail。"""
+        """默认卡片不超过 25 行；超出时截断并提示用 --detail（保留末行免责声明）。"""
         if len(lines) <= 25:
             return lines
-        clipped = lines[:24]
+        keep_last = lines[-1] if lines and lines[-1].startswith("不构成投资建议") else None
+        room = 24 if keep_last else 25
+        clipped = lines[: room - 1]
         clipped.append("（内容较长已截断；加 --detail 查看全部）")
+        if keep_last:
+            clipped.append(keep_last)
         return clipped

@@ -86,7 +86,7 @@ def test_legacy_policy_snapshot_record_recomputes_with_note():
 
 def test_record_96_is_not_recomputable_with_reason():
     rows = ConclusionLedger(REAL_LEDGER).load()
-    assert len(rows) == 110
+    assert len(rows) >= 110  # 账本只追加
     row = next(item for item in rows if item["record_id"] == RECORD_96)
     assert row["code"] == "600519" and row["analysis_date"] == "2026-11-13"
     result = recompute(row)

@@ -412,9 +412,10 @@ def test_bank_ledger_and_other_ledgers_unchanged():
         for line in (ROOT / "data" / "ledger" / "equity-conclusions.jsonl").read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
-    assert len(conclusions) == 110
+    assert len(conclusions) >= 110  # 账本只追加
     bank_rows = [row for row in conclusions if row.get("policy_version") == "bank-valuation-v2.1"]
-    assert len(bank_rows) == 11
+    # 账本只追加：2026-11-14 那次银行 v2.1 正式结论仍是 11 条
+    assert len([row for row in bank_rows if row.get("analysis_date") == "2026-11-14"]) == 11
     assert any(str(row.get("code")).zfill(6) == "600036" for row in bank_rows)
 
 
