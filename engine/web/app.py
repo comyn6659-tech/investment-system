@@ -26,7 +26,11 @@ from engine.ask.service import (
     AskService,
 )
 from engine.forward import quotes
-from engine.policy.conclusion_ledger import ConclusionLedger
+from engine.policy.conclusion_ledger import (
+    FORMAL_CONCLUSIONS,
+    ConclusionLedger,
+    ConclusionLedgerError,
+)
 from engine.pool_valuation.adapter import POOL_DIR as POOL_VALUATION_DIR
 from engine.repro.recompute import recompute
 from engine.web.index_trend import pe_trend
@@ -57,6 +61,16 @@ INDICES = (
 
 def _label(conclusion: Any) -> str:
     return CONCLUSION_LABELS.get(str(conclusion), "无法判断")
+
+
+def _price_over_fair_value(price: Any, fair_value: Any) -> float | None:
+    """现价 ÷ 合理价，百分比数值；任一项缺失或合理价为 0 时为空。"""
+    try:
+        if price is None or fair_value is None or float(fair_value) == 0:
+            return None
+        return float(price) / float(fair_value) * 100.0
+    except (TypeError, ValueError):
+        return None
 
 
 def _jsonable(value: Any) -> Any:
@@ -154,7 +168,38 @@ class WebApp:
         }
 
     # --- 买点总览 -------------------------------------------------------
-    def _overview_row(self, row: dict[str, Any], *, bank: bool = False) -> dict[str, Any]:
+    def _latest_conclusion_bases(self) -> dict[str, float | None]:
+        """每家公司账本最后追加的一条记录：正式结论取 values.base，其余为空。"""
+        path = self.service.ledger_path
+        latest: dict[str, dict[str, Any]] = {}
+        try:
+            records = ConclusionLedger(path).load()
+        except (ConclusionLedgerError, OSError):
+            # 账本损坏时总览仍可显示行情与结论；合理价留空，具体错误由账本页/检查命令给出。
+            return {}
+        for record in records:
+            code = str(record.get("code") or "").zfill(6)
+            if code:
+                latest[code] = record
+        bases: dict[str, float | None] = {}
+        for code, record in latest.items():
+            if (
+                record.get("record_type") == "reversal"
+                or record.get("conclusion") not in FORMAL_CONCLUSIONS
+            ):
+                bases[code] = None
+                continue
+            value = (record.get("values") or {}).get("base")
+            bases[code] = float(value) if value is not None else None
+        return bases
+
+    def _overview_row(
+        self,
+        row: dict[str, Any],
+        *,
+        bank: bool = False,
+        fair_value: float | None = None,
+    ) -> dict[str, Any]:
         pools = ["银行池"] if bank else list(row.get("pools") or [])
         return {
             "code": row["code"],
@@ -167,6 +212,8 @@ class WebApp:
             "price": row.get("price"),
             "price_date": row.get("price_date"),
             "entry": row.get("entry"),
+            "fair_value": fair_value,
+            "price_over_fair_value": _price_over_fair_value(row.get("price"), fair_value),
             "distance": row.get("distance"),
             "conclusion": row.get("conclusion"),
             "conclusion_label": _label(row.get("conclusion")),
@@ -181,9 +228,16 @@ class WebApp:
             if self._overview_cache is None:
                 result = self.service._ranking(Intent("ranking", pool="all"), detail=False)
                 data = result["data"]
-                rows = [self._overview_row(row) for row in data.get("ranking") or []]
+                bases = self._latest_conclusion_bases()
+                rows = [
+                    self._overview_row(row, fair_value=bases.get(row["code"]))
+                    for row in data.get("ranking") or []
+                ]
                 rows += [
-                    self._overview_row(row, bank=True) for row in data.get("bank_ranking") or []
+                    self._overview_row(
+                        row, bank=True, fair_value=bases.get(row["code"])
+                    )
+                    for row in data.get("bank_ranking") or []
                 ]
                 self._overview_cache = {
                     "data_date": data.get("data_date"),
@@ -201,8 +255,8 @@ class WebApp:
                     "pool_filters": ["好公司池", "稳定收息池", "银行池"],
                     "card_markdown": result["markdown"],
                     "note": (
-                        "与终端「现在有哪些候选买点」同一次评估；按类型分组，组内按距门槛排序。"
-                        "距门槛为负表示现价低于门槛。排序不代表公司质量或收益预期。"
+                        "与终端「现在有哪些候选买点」同一次评估；按类型分组，组内按距买点线排序。"
+                        "距买点线为负表示现价低于买点线。排序不代表公司质量或收益预期。"
                     ),
                 }
         return self._overview_cache

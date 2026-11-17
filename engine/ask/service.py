@@ -835,7 +835,7 @@ class AskService:
                 lines.append(
                     f"- {row.get('analysis_date')}：{label}"
                     f"｜现价 {_money(row.get('price'))}（{row.get('price_date') or '—'}）"
-                    f"｜基准价值 {_money(values.get('base'))}"
+                    f"｜合理价（基准） {_money(values.get('base'))}"
                     f"｜等级 {row.get('grade') or '—'}"
                     f"｜政策 {row.get('policy_version')}"
                     f"{extra}"
@@ -850,7 +850,7 @@ class AskService:
                     lines.append(
                         f"- {row.get('analysis_date')}｜{row.get('instrument_id')}｜"
                         f"快照 {row.get('snapshot_id')}｜{label}｜"
-                        f"悲观/基准/乐观 {_money(values.get('pessimistic'))} / "
+                        f"悲观/合理价（基准）/乐观 {_money(values.get('pessimistic'))} / "
                         f"{_money(values.get('base'))} / {_money(values.get('optimistic'))}"
                         + (
                             f"｜原因码 {'、'.join(row.get('reason_codes') or [])}"
@@ -979,14 +979,14 @@ class AskService:
         optimistic = (block.get("values") or {}).get("optimistic") or {}
         if conclusion == "candidate_buy_point":
             return (
-                f"现价 {_money(price)} 元（{block.get('price_date')}）不高于候选门槛 "
+                f"现价 {_money(price)} 元（{block.get('price_date')}）不高于买点线 "
                 f"{_money(entry)} 元，也不高于悲观情景价值 {_money(pessimism.get('value'))} 元。"
             )
         if conclusion == "wait":
             distance = block.get("distance_to_candidate_pct")
             tail = f"，高出 {distance:.1f}%" if distance is not None else ""
             return (
-                f"现价 {_money(price)} 元（{block.get('price_date')}）仍高于候选门槛 "
+                f"现价 {_money(price)} 元（{block.get('price_date')}）仍高于买点线 "
                 f"{_money(entry)} 元{tail}；未同时满足安全边际与悲观价值约束。"
             )
         if conclusion == "avoid":
@@ -1052,7 +1052,7 @@ class AskService:
 
     @staticmethod
     def _grouped_ranking_lines(rows, *, limit, render):
-        """按类型分组显示，组内保持传入顺序（距门槛升序）。"""
+        """按类型分组显示，组内保持传入顺序（距买点线升序）。"""
         selected = rows if limit is None else rows[:limit]
         lines: list[str] = []
         for company_type in ordered_types([row["type"] for row in selected]):
@@ -1111,13 +1111,13 @@ class AskService:
             "",
         ]
         if candidates:
-            lines.append("候选买点（现价不高于候选门槛，且不高于悲观价值）：")
+            lines.append("候选买点（现价不高于买点线，且不高于悲观价值）：")
             lines += self._grouped_ranking_lines(
                 candidates,
                 limit=None if detail else 10,
                 render=lambda row: (
                     f"- {row['code']} {row['name']}：现价 {_money(row['price'])} 元"
-                    f"｜门槛 {_money(row['entry'])}｜距门槛 {_pct_number(row['distance'])}"
+                    f"｜买点线 {_money(row['entry'])}｜距买点线 {_pct_number(row['distance'])}"
                     f"｜等级 {row['grade']}"
                 ),
             )
@@ -1125,13 +1125,13 @@ class AskService:
             lines.append("当前没有同时满足安全边际与悲观价值约束的标的。")
         closest = [row for row in rows if row["conclusion"] != "candidate_buy_point"][: (20 if detail else 5)]
         if closest:
-            lines += ["", "距候选门槛最近（尚未到买点）："]
+            lines += ["", "距买点线最近（尚未到买点）："]
             lines += self._grouped_ranking_lines(
                 closest,
                 limit=None,
                 render=lambda row: (
                     f"- {row['code']} {row['name']}：现价 {_money(row['price'])} 元"
-                    f"｜门槛 {_money(row['entry'])}｜{_pct_number(row['distance'])}"
+                    f"｜买点线 {_money(row['entry'])}｜{_pct_number(row['distance'])}"
                     f"｜{_label(row['conclusion'])}"
                 ),
             )
@@ -1149,7 +1149,7 @@ class AskService:
                     limit=None,
                     render=lambda row: (
                         f"- {row['code']} {row['name']}：现价 {_money(row['price'])} 元"
-                        f"｜门槛 {_money(row['entry'])}｜距门槛 {_pct_number(row['distance'])}"
+                        f"｜买点线 {_money(row['entry'])}｜距买点线 {_pct_number(row['distance'])}"
                         f"｜候选买点"
                     ),
                 )
@@ -1159,7 +1159,7 @@ class AskService:
         lines += [
             "",
             "入池不等于买入：池名单只说明历史公开数据满足规则，不代表现在值得买。",
-            "说明：排序只按「现价距候选门槛」，不代表公司质量或收益预期；无法判断的标的不参与排行。",
+            "说明：排序只按「现价距买点线」，不代表公司质量或收益预期；无法判断的标的不参与排行。",
             f"来源与日期：价格 腾讯财经（{data_date}）；政策 equity-policy-v1.1（已批准 2026-11-12）；"
             "财务 东方财富批量快照 2026-11-12。",
             "不构成投资建议。",
@@ -1181,30 +1181,30 @@ class AskService:
         candidates = [row for row in rows if row["conclusion"] == "candidate_buy_point"]
         lines = [
             f"**结论：银行池{'有 ' + str(len(candidates)) + ' 个候选买点' if candidates else '当前没有候选买点'}**"
-            " — 按银行专用估值的现价距门槛排序。",
+            " — 按银行专用估值的现价距买点线排序。",
             "",
         ]
         if candidates:
-            lines.append("候选买点（现价不高于门槛价，且不高于悲观价值）：")
+            lines.append("候选买点（现价不高于买点线，且不高于悲观价值）：")
             lines += self._grouped_ranking_lines(
                 candidates,
                 limit=None,
                 render=lambda row: (
                     f"- {row['code']} {row['name']}：现价 {_money(row['price'])} 元"
-                    f"｜门槛 {_money(row['entry'])}｜距门槛 {_pct_number(row['distance'])}"
+                    f"｜买点线 {_money(row['entry'])}｜距买点线 {_pct_number(row['distance'])}"
                 ),
             )
         else:
             lines.append("银行池当前没有同时满足安全边际与悲观价值约束的标的。")
         closest = [row for row in rows if row["conclusion"] != "candidate_buy_point"][: (20 if detail else 5)]
         if closest:
-            lines += ["", "距候选门槛最近（尚未到买点）："]
+            lines += ["", "距买点线最近（尚未到买点）："]
             lines += self._grouped_ranking_lines(
                 closest,
                 limit=None,
                 render=lambda row: (
                     f"- {row['code']} {row['name']}：现价 {_money(row['price'])} 元"
-                    f"｜门槛 {_money(row['entry'])}｜{_pct_number(row['distance'])}"
+                    f"｜买点线 {_money(row['entry'])}｜{_pct_number(row['distance'])}"
                     f"｜{_label(row['conclusion'])}"
                 ),
             )
@@ -1213,7 +1213,7 @@ class AskService:
         lines += [
             "",
             "入池不等于买入：银行池只说明通过质量筛选，不代表现在便宜。",
-            "说明：排序只按「现价距候选门槛」，不代表公司质量或收益预期；无法判断的标的不参与排行。",
+            "说明：排序只按「现价距买点线」，不代表公司质量或收益预期；无法判断的标的不参与排行。",
             f"来源与日期：价格 腾讯财经（{data_date}）；银行专用估值政策（已批准 2026-11-14，复核 2027-05-31）。",
             "不构成投资建议。",
         ]
@@ -1576,7 +1576,7 @@ class AskService:
         values = valuation.get("values") or {}
         roe = valuation.get("roe") or {}
         binding = (
-            "安全边际（基准价值打折后的价格）"
+            "安全边际（合理价打折后的价格）"
             if valuation.get("binding_condition") == "margin_of_safety"
             else "悲观价值"
         )
@@ -1592,9 +1592,9 @@ class AskService:
             "avoid": "回避",
         }.get(conclusion, "无法判断")
         if conclusion == "candidate_buy_point":
-            reason = "现价不高于门槛价，也不高于悲观价值。"
+            reason = "现价不高于买点线，也不高于悲观价值。"
         elif conclusion == "wait":
-            reason = "现价仍高于门槛价，未同时满足安全边际与悲观价值约束。"
+            reason = "现价仍高于买点线，未同时满足安全边际与悲观价值约束。"
         elif conclusion == "avoid":
             reason = "现价高于乐观价值，按规则判回避。"
         else:
@@ -1609,8 +1609,8 @@ class AskService:
             "",
             f"**结论：{headline}** — {reason}",
             "",
-            f"现价 {_money(price)} 元（{price_date or '日期未知'}）｜门槛 {_money(threshold)} 元"
-            f"｜距门槛 {_pct_number(distance)}",
+            f"现价 {_money(price)} 元（{price_date or '日期未知'}）｜买点线 {_money(threshold)} 元"
+            f"｜距买点线 {_pct_number(distance)}",
             *([self.batch.report_note(code)] if self.batch.report_note(code) else []),
             "正式结论（银行专用估值政策，已批准 2026-11-14）",
             "关键指标："
@@ -1622,11 +1622,11 @@ class AskService:
             "每股净资产 =（归母净资产 − 其他权益工具）÷ 股本（与银行 v2.1 估值同口径）。",
             "三档价值（元/股）："
             f"悲观 {_money(values.get('pessimistic'))}（最悲观假设下每股值多少）"
-            f"｜基准 {_money(values.get('base'))}（安全边际的计算基准）"
+            f"｜合理价（基准） {_money(values.get('base'))}（安全边际的计算依据）"
             f"｜乐观 {_money(values.get('optimistic'))}（高于它就判回避）",
             f"为什么：起约束条件 {binding}；{reason}",
             "三档净资产收益率："
-            f"基准 {_pct(roe.get('base'))}（假设停在最近一年）"
+            f"中间 {_pct(roe.get('base'))}（假设停在最近一年）"
             f"｜悲观 {_pct(roe.get('pessimistic'))}（再按近 3 年速度下滑 3 年）"
             f"｜乐观 {_pct(roe.get('optimistic'))}（近 3 年平均）",
             bank_history.one_line(code),
@@ -1649,7 +1649,7 @@ class AskService:
                 f"- 普通股口径每股净资产：{_money(valuation.get('bvps'))} 元"
                 "（=（归母净资产 − 其他权益工具）÷ 股本）",
                 f"- 银行股权成本 k：{_pct(valuation.get('cost_of_equity'), 2)}；银行溢价：{_pct(valuation.get('bank_premium'), 1)}",
-                f"- 基准价值对应合理市净率：{_money((valuation.get('multiples') or {}).get('base'), 3)}",
+                f"- 合理价（基准）对应合理市净率：{_money((valuation.get('multiples') or {}).get('base'), 3)}",
                 f"- 资产质量扣减：{'是' if valuation.get('asset_quality_deduction') else '否'}",
             ]
         ledger = None
@@ -1734,7 +1734,7 @@ class AskService:
         return rows
 
     def _bank_pool_condition_lines(self, code: str) -> list[str]:
-        """非银行池银行：逐条给出未通过/待定/未检验的银行池条件（条件、实际值、门槛、状态）。"""
+        """非银行池银行：逐条给出未通过/待定/未检验的银行池条件（条件、实际值、阈值、状态）。"""
         try:
             result = self._company_result("bank", code)
         except Exception:  # noqa: BLE001 - 评估失败时不给条件，避免编造
@@ -1853,7 +1853,7 @@ class AskService:
                 [
                     "三档价值（元/股）："
                     f"悲观 {_money(valuation['values'].get('pessimistic'))}"
-                    f"｜基准 {_money(valuation['values'].get('base'))}"
+                    f"｜合理价（基准） {_money(valuation['values'].get('base'))}"
                     f"｜乐观 {_money(valuation['values'].get('optimistic'))}"
                     "（v2.1 试算，只给数字）"
                 ]
@@ -2134,7 +2134,7 @@ class AskService:
         lines.append("跟踪指数位置：" + ("｜".join(bits) if bits else "指数历史不足，未计算分位"))
         lines += [
             "为什么：ETF 的工作是「跟踪指数 + 产品执行」；资料齐备不等于满足买入条件。",
-            "局限：同日折溢价是事后计算，不能证明收盘前可交易；本轮不制定溢价/流动性/费率买卖门槛。",
+            "局限：同日折溢价是事后计算，不能证明收盘前可交易；本轮不制定溢价/流动性/费率买卖条件。",
             "来源与日期：产品资料 天天基金等（2026-11-11）；行情 东方财富（2026-11-10）；"
             "指数画像见 data/series；规则未批准。",
             "不构成投资建议。",
@@ -2178,8 +2178,8 @@ class AskService:
             f"{label}",
             "",
             f"现价 {_money(price.get('value'))} 元（{block.get('price_date') or '日期未知'}）"
-            f"｜候选门槛 {_money(entry.get('value'))} 元"
-            f"｜距门槛 {_pct_number(block.get('distance_to_candidate_pct'))}",
+            f"｜买点线 {_money(entry.get('value'))} 元"
+            f"｜距买点线 {_pct_number(block.get('distance_to_candidate_pct'))}",
         ]
         report_note = self.batch.report_note(target.code)
         if report_note:
@@ -2189,7 +2189,7 @@ class AskService:
             lines.append(
                 "三档价值（元/股）："
                 f"悲观 {_money((values.get('pessimistic') or {}).get('value'))}（最悲观假设下每股值多少）"
-                f"｜基准 {_money((values.get('base') or {}).get('value'))}（安全边际的计算基准）"
+                f"｜合理价（基准） {_money((values.get('base') or {}).get('value'))}（安全边际的计算依据）"
                 f"｜乐观 {_money((values.get('optimistic') or {}).get('value'))}（高于它就判回避）"
             )
         else:
@@ -2199,7 +2199,7 @@ class AskService:
         unmet = list(dict.fromkeys(unmet_plain(name) for name in unmet_names))
         binding_name = str(binding.get("name") or "")
         binding_label = {
-            "margin_of_safety": "安全边际（现价需低于基准价值打折后的价格）",
+            "margin_of_safety": "安全边际（现价需低于合理价打折后的价格）",
             "pessimistic_value": "悲观情景价值",
         }.get(binding_name, str(binding.get("label") or "—"))
         binding_text = (

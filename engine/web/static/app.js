@@ -5,6 +5,7 @@
 const state = {
   currentAsk: null,
   overview: null,
+  overviewSort: { key: null, dir: 1 },
   pools: null,
   activePool: 'quality',
   poolSort: { key: null, dir: 1 },
@@ -34,6 +35,11 @@ function fmtDistance(value) {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return '—';
   const number = Number(value);
   return (number >= 0 ? '+' : '') + number.toFixed(1) + '%';
+}
+
+function fmtRatio(value) {
+  if (value === null || value === undefined || value === '' || Number.isNaN(Number(value))) return '—';
+  return Number(value).toFixed(1) + '%';
 }
 
 function fmtPlain(value) {
@@ -255,6 +261,8 @@ function overviewRowHtml(row) {
     '<td>' + esc(row.type) + '</td>' +
     '<td class="num">' + fmtMoney(row.price) + '</td>' +
     '<td class="num">' + fmtMoney(row.entry) + '</td>' +
+    '<td class="num">' + fmtMoney(row.fair_value) + '</td>' +
+    '<td class="num">' + fmtRatio(row.price_over_fair_value) + '</td>' +
     '<td class="num">' + fmtDistance(row.distance) + '</td>' +
     '<td><span class="badge ' + conclusionClass(row.conclusion_label) + '">' + esc(row.conclusion_label) + '</span></td>' +
     '<td>' + esc(row.grade || '—') + '</td>' +
@@ -262,21 +270,54 @@ function overviewRowHtml(row) {
   );
 }
 
+function overviewSortHeader(label, key, title) {
+  const active = state.overviewSort.key === key;
+  const arrow = active ? (state.overviewSort.dir > 0 ? ' ▲' : ' ▼') : '';
+  return (
+    '<th class="sortable" data-sort="' + esc(key) + '"' +
+    (title ? ' title="' + esc(title) + '"' : ' title="点击排序"') +
+    '>' + esc(label) + arrow + '</th>'
+  );
+}
+
+function sortedOverviewRows(rows) {
+  const key = state.overviewSort.key;
+  if (!key) return rows;
+  const direction = state.overviewSort.dir;
+  return rows.slice().sort((left, right) => {
+    const a = left[key];
+    const b = right[key];
+    const aMissing = a === null || a === undefined || a === '' || Number.isNaN(Number(a));
+    const bMissing = b === null || b === undefined || b === '' || Number.isNaN(Number(b));
+    if (aMissing && bMissing) return 0;
+    if (aMissing) return 1;
+    if (bMissing) return -1;
+    return (Number(a) - Number(b)) * direction;
+  });
+}
+
 function overviewTable(rows, emptyText) {
   if (!rows.length) return '<p class="hint">' + esc(emptyText) + '</p>';
   const types = state.overview.types.filter((type) => rows.some((row) => row.type === type));
   const body = types
     .map((type) => {
-      const items = rows.filter((row) => row.type === type);
+      const items = sortedOverviewRows(rows.filter((row) => row.type === type));
       return (
-        '<tr class="group-row"><td colspan="8">' + esc(type) + '（' + items.length + ' 家）</td></tr>' +
+        '<tr class="group-row"><td colspan="10">' + esc(type) + '（' + items.length + ' 家）</td></tr>' +
         items.map(overviewRowHtml).join('')
       );
     })
     .join('');
   return (
     '<table class="grid"><thead><tr>' +
-    '<th>代码</th><th>名称</th><th>类型</th><th>现价</th><th>门槛</th><th>距门槛</th><th>结论</th><th>等级</th>' +
+    '<th>代码</th><th>名称</th><th>类型</th><th>现价</th><th>买点线</th>' +
+    overviewSortHeader(
+      '合理价',
+      'fair_value',
+      '按已批准规则估出的每股价值，含假设，不是精确值；买点线 = 合理价打折后与悲观价值取低者。'
+    ) +
+    overviewSortHeader('现价/合理价', 'price_over_fair_value') +
+    '<th>距买点线</th><th>结论</th><th>等级</th>' +
     '</tr></thead><tbody>' + body + '</tbody></table>'
   );
 }
@@ -302,9 +343,19 @@ function renderOverview() {
     overviewTable(candidates, '按当前筛选没有候选买点。') +
     '<h3>距买点最近（尚未到买点，共 ' + closest.length + ' 家）</h3>' +
     overviewTable(closest, '按当前筛选没有可排行的公司。') +
+    '<p class="hint">按已批准规则估出的每股价值，含假设，不是精确值；买点线 = 合理价打折后与悲观价值取低者。</p>' +
     '<p class="hint">' + esc(payload.note) + '</p>' +
     '<details class="raw"><summary>看对应的终端排行卡片原文</summary>' +
     '<div class="card">' + renderCard(payload.card_markdown) + '</div></details>';
+  $('overview-body').querySelectorAll('th[data-sort]').forEach((th) => {
+    th.addEventListener('click', () => {
+      const key = th.dataset.sort;
+      state.overviewSort = state.overviewSort.key === key
+        ? { key: key, dir: -state.overviewSort.dir }
+        : { key: key, dir: 1 };
+      renderOverview();
+    });
+  });
 }
 
 /* ---------- 三个池 ---------- */
@@ -648,7 +699,7 @@ function renderLedger(payload) {
     .join('');
   $('ledger-body').innerHTML =
     '<table class="grid"><thead><tr>' +
-    '<th>分析日</th><th>代码</th><th>名称</th><th>结论</th><th>现价（日期）</th><th>基准价值</th>' +
+    '<th>分析日</th><th>代码</th><th>名称</th><th>结论</th><th>现价（日期）</th><th>合理价（基准）</th>' +
     '<th>政策</th><th>类型</th><th>复算</th>' +
     '</tr></thead><tbody>' +
     (body || '<tr><td colspan="9">没有符合条件的记录</td></tr>') +

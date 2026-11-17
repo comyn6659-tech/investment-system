@@ -256,9 +256,68 @@ def test_overview_payload_groups_by_type_and_carries_filters(web):
         assert row["conclusion_label"]
         assert "industry" in row and "ownership" in row and "cycle" in row
         assert row["type"] in TYPE_ORDER
+        assert "fair_value" in row and "price_over_fair_value" in row
     assert [row for row in rows if row["conclusion"] == "candidate_buy_point"]
     assert payload["data_date"]
     assert payload["card_markdown"].splitlines()[0].startswith("**结论：")
+
+
+def test_overview_fair_value_equals_latest_conclusion_base(web):
+    status, payload = get_json(_api(web["url"], "api/overview"))
+    assert status == 200
+    latest: dict[str, dict] = {}
+    for record in _ledger_rows():
+        latest[str(record.get("code")).zfill(6)] = record
+    formal = {"candidate_buy_point", "wait", "avoid"}
+    for row in payload["rows"]:
+        record = latest.get(row["code"])
+        expected = None
+        if record is not None:
+            if record.get("record_type") != "reversal" and record.get("conclusion") in formal:
+                expected = (record.get("values") or {}).get("base")
+        assert row["fair_value"] == expected, row["code"]
+        if expected is None or row["price"] is None:
+            assert row["price_over_fair_value"] is None, row["code"]
+        else:
+            assert row["price_over_fair_value"] == pytest.approx(
+                row["price"] / expected * 100.0
+            ), row["code"]
+    samples = {"002839": 8.57, "603365": 24.72, "601009": 20.35, "600036": 67.84}
+    by_code = {row["code"]: row for row in payload["rows"]}
+    for code, expected in samples.items():
+        assert by_code[code]["fair_value"] == pytest.approx(expected, abs=0.005)
+        assert by_code[code]["price_over_fair_value"] is not None
+
+
+def test_overview_fair_value_is_blank_without_a_formal_conclusion(web):
+    app = web["app"]
+    bases = app._latest_conclusion_bases()
+    assert bases["600486"] is None  # 最新一条是改判为无法判断
+    row = app._overview_row(
+        {
+            "code": "600486",
+            "name": "扬农化工",
+            "price": 10.0,
+            "entry": None,
+            "distance": None,
+            "conclusion": "undetermined",
+        },
+        fair_value=bases["600486"],
+    )
+    assert row["fair_value"] is None
+    assert row["price_over_fair_value"] is None
+
+
+def test_overview_static_table_has_fair_value_columns_and_explanation(web):
+    script = (STATIC_DIR / "app.js").read_text(encoding="utf-8")
+    for label in ("买点线", "合理价", "现价/合理价", "距买点线"):
+        assert label in script, label
+    assert "按已批准规则估出的每股价值，含假设，不是精确值；" in script
+    assert "买点线 = 合理价打折后与悲观价值取低者。" in script
+    assert 'data-sort=' in script
+    assert "overviewSortHeader(" in script
+    assert "price_over_fair_value" in script
+    assert "overviewSort" in script
 
 
 def test_pools_payload_matches_reports_and_has_columns(web):

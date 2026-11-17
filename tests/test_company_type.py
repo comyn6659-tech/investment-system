@@ -36,7 +36,7 @@ REPORTS = {
 }
 GROUP_RE = re.compile(r"^【(?P<type>.+?)】（(?P<count>\d+) 家）$")
 ITEM_RE = re.compile(r"^- (?P<code>\d{6}) .+：现价")
-DISTANCE_RE = re.compile(r"(?:距门槛\s*)?([+-]\d+\.\d+)%")
+DISTANCE_RE = re.compile(r"(?:距买点线\s*)?([+-]\d+\.\d+)%")
 
 
 @pytest.fixture(scope="module")
@@ -148,7 +148,7 @@ def _ranking_blocks(
 ) -> list[list[tuple[str, list[tuple[str, float | None]]]]]:
     """把卡片拆成若干「区块」，每个区块内是按类型分组的连续段落。
 
-    排行卡片有两个区块：候选买点、距候选门槛最近（问「现在有哪些候选买点」时
+    排行卡片有两个区块：候选买点、距买点线最近（问「现在有哪些候选买点」时
     还有银行部分）；区块之间组内顺序各自独立。
     """
     blocks: list[list[tuple[str, list[tuple[str, float | None]]]]] = []
@@ -204,7 +204,7 @@ def test_ranking_is_grouped_by_type_and_sorted_inside_group(
                 )
             distances = [distance for _code, distance in items if distance is not None]
             assert distances == sorted(distances), (
-                f"{question} 的 {company_type} 组内没有按距门槛排序"
+                f"{question} 的 {company_type} 组内没有按距买点线排序"
             )
 
 

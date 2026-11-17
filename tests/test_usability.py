@@ -227,7 +227,7 @@ def test_x1_pool_and_price_words_go_ranking(service):
         assert result.intent.name == "ranking", question
         if "银行池" in question:
             assert "银行池" in result.markdown, question
-            assert ("候选买点" in result.markdown) or ("距门槛" in result.markdown), question
+            assert ("候选买点" in result.markdown) or ("距买点线" in result.markdown), question
         else:
             assert "入池不等于买入" in result.markdown, question
 
@@ -569,7 +569,7 @@ def test_b4_non_bank_pool_has_no_formal_conclusion_and_rank_includes_bank(servic
             assert label not in text, (question, label)
         assert "三档价值" in text and "隐含长期回报率" in text
     ranked = service.ask("银行池里谁离买点最近").markdown
-    assert "银行池" in ranked and "候选买点" in ranked and "距门槛" in ranked
+    assert "银行池" in ranked and "候选买点" in ranked and "距买点线" in ranked
     all_rank = service.ask("现在有哪些候选买点").markdown
     assert "银行部分" in all_rank and "银行候选买点" in all_rank
     bank_rank = service.ask("银行里有哪些买点").markdown

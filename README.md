@@ -44,7 +44,7 @@ engine/        运行时代码（不联网取数、不调用大模型）
 engine/web/    本地页面（标准库 http.server + 静态页面；只监听 127.0.0.1）
 data/          已提交的固定数据：快照、政策、账本、注册表、序列
 tools/         取数、建快照、年度重跑、验收与报告工具（需要时才联网）
-tests/         离线测试（816 项）
+tests/         离线测试（819 项）
 docs/          三份股东文档；docs/archive/ 为历史批次报告；docs/evidence/ 为验收截图
 scripts/       干净归档验证、账本快照校验、每日更新安装
 ask / update   两个入口脚本
@@ -60,7 +60,8 @@ web            本地页面入口脚本
 - 银行专用估值 v2.1（决策④，2026-11-14 批准，复核 2027-05-31）；
 - 指数候选 A 研究信号：规则未批准，只前向记录（决策①）；
 - 类型标注（好公司型 / 好公司型＋收息型 / 收息型 / 银行池 / 池外）：第六阶段，只用已批准名单；
-- 本地页面 `./web`：第六阶段，六个部分，与 `./ask` 同一引擎、同一账本规则；
+- 本地页面 `./web`：第六阶段，六个部分，与 `./ask` 同一引擎、同一账本规则；买点总览显示
+  「合理价」「现价/合理价」，卡片统一用「合理价（基准）」「买点线」（显示补丁 F1–F3）；
 - 持续监测与即时剔除（`pool-monitoring-v1`，决策⑤，2026-11-17 批准，复核 2027-11-13）：
   红线周度扫描、财报季批量快照、结论变化、最近变动；
 - 行情日期按腾讯行情时间戳逐行判断；行情过期时 `./ask` 首行与页面顶部提示落后交易日数；
@@ -74,7 +75,7 @@ web            本地页面入口脚本
 ## 复现与验证
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider   # 816 passed
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider   # 819 passed
 scripts/verify-clean-archive.sh
 .venv/bin/python scripts/verify-ledger-snapshots.py
 .venv/bin/python tools/run_ask_acceptance.py
