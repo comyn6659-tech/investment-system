@@ -46,8 +46,8 @@ def _check_markdown(markdown: str, *, research: bool = False, typed: bool = Fals
         problems.append("第一行不是类型/结论")
     if typed and "提示：系统不判断护城河是否仍然存在" not in markdown:
         problems.append("缺护城河提示")
-    if len(raw_lines) > 25:
-        problems.append(f"超过 25 行（{len(raw_lines)}）")
+    if len(lines) > 25:
+        problems.append(f"超过 25 行（{len(lines)}）")
     if not DATE_RE.search(markdown):
         problems.append("缺数据日期")
     if not any(term in markdown for term in ("来源", "数据与来源", "快照", "账本", "规则")):

@@ -507,11 +507,12 @@ class AskService:
             else:
                 lines.append(notice)
             markdown = "\n".join(lines)
+        if not detail:
+            markdown = "\n".join(self._clip(markdown.splitlines()))
+        # 过期提示是卡片外的系统提醒，不占「卡片 ≤25 行」的正文行数
         stale = self._stale_price_notice()
         if stale and intent.name in PRICE_INTENTS:
             markdown = f"{stale}\n\n{markdown}"
-        if not detail:
-            markdown = "\n".join(self._clip(markdown.splitlines()))
         data["question"] = question
         return AskResult(markdown=markdown, intent=intent, target=target, data=data)
 
