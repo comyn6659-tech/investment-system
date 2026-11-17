@@ -95,6 +95,9 @@ class GovernanceFacts:
     pledge_date: str = ""
     pledge_source: str = ""
     pledge_detail: str = ""
+    pledge_live_checked: bool = False
+    pledge_base_date: str = ""
+    pledge_new_announcements: int = 0
     failures: Mapping[str, str] = field(default_factory=dict)
     penalty_source: str = ""
     penalty_window: str = ""
@@ -131,6 +134,9 @@ class GovernanceFacts:
             "as_of": self.pledge_date or as_of or "最新定期报告（未注明日期）",
             "source": self.pledge_source,
             "detail": self.pledge_detail or (self.failure("pledge") or ""),
+            "live_checked": bool(self.pledge_live_checked),
+            "base_date": self.pledge_base_date,
+            "new_announcements": int(self.pledge_new_announcements),
         }
 
     def penalty_evidence(self, *, as_of: str = "") -> dict[str, Any]:

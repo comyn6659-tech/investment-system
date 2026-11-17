@@ -72,6 +72,11 @@ class ScanReport:
         ]
 
     @property
+    def live_checked(self) -> int:
+        """本次扫描真实查询过质押明细的公司数。"""
+        return sum(1 for item in self.members if item.facts.pledge_live_checked)
+
+    @property
     def covered(self) -> int:
         return sum(1 for item in self.members if item.status != STATUS_INCOMPLETE)
 

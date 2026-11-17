@@ -85,6 +85,63 @@ _LAST_REQUEST = [0.0]
 _MIN_INTERVAL = 0.18
 
 
+def _pledge_base_day(
+    report_date: str,
+    *,
+    source_url: str = "",
+    snapshot_date: str = "",
+    as_of: date | None = None,
+) -> date | None:
+    """已提交质押表的基准日。
+
+    report_date 是完整日期时直接使用；只有年份时按公告日期推断报告期
+    （10 月后公告视为三季报 09-30，4 月前后公告视为上年年报 12-31，其余按半年报 06-30）。
+    report_date 缺失时用该池快照的取数日期；仍无则退回扫描日。
+    """
+    text = str(report_date or "").strip()
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", text):
+        return date.fromisoformat(text)
+    if re.fullmatch(r"\d{4}", text):
+        year = int(text)
+        match = re.search(r"AN(\d{4})(\d{2})(\d{2})", str(source_url or ""))
+        if match:
+            published = date(int(match.group(1)), int(match.group(2)), int(match.group(3)))
+            if published.month >= 10:
+                return date(year, 9, 30)
+            if published.month <= 4:
+                return date(year, 12, 31)
+            return date(year, 6, 30)
+        return date(year, 1, 1)
+    for fallback in (snapshot_date, as_of.isoformat() if as_of else ""):
+        if fallback:
+            try:
+                return date.fromisoformat(str(fallback)[:10])
+            except ValueError:
+                continue
+    return None
+
+
+def committed_snapshot_dates() -> dict[str, str]:
+    """每个已提交治理表所属池快照的取数日期（as_of）。"""
+    output: dict[str, str] = {}
+    for pool in POOL_DIRS:
+        snapshot = current_snapshot(pool)
+        if snapshot is None:
+            continue
+        manifest_path = snapshot / "manifest.json"
+        as_of = ""
+        if manifest_path.exists():
+            try:
+                as_of = str(json.loads(manifest_path.read_text(encoding="utf-8")).get("as_of") or "")
+            except (OSError, json.JSONDecodeError):
+                as_of = ""
+        for row in _read_gzip_rows(snapshot / "governance-pledge.csv.gz"):
+            code = str(row.get("code") or "").zfill(6)
+            if code:
+                output.setdefault(code, as_of)
+    return output
+
+
 def _throttle() -> None:
     with _THROTTLE_LOCK:
         wait = _MIN_INTERVAL - (time.monotonic() - _LAST_REQUEST[0])
@@ -239,6 +296,7 @@ class EastmoneySource:
         review: dict[str, Any] | None = None,
         committed: tuple[dict[str, dict], dict[str, dict[int, str]]] | None = None,
         committed_penalty_rows: dict[str, dict] | None = None,
+        committed_dates: dict[str, str] | None = None,
         shares: dict[str, float] | None = None,
     ):
         self.clock = _now(now)
@@ -248,6 +306,7 @@ class EastmoneySource:
         self.committed_penalty_rows = (
             committed_penalties_loader() if committed_penalty_rows is None else committed_penalty_rows
         )
+        self.committed_dates = committed_snapshot_dates() if committed_dates is None else committed_dates
         self.shares = current_shares() if shares is None else shares
         self._total_shares_cache: dict[str, float | None] = {}
 
@@ -257,7 +316,16 @@ class EastmoneySource:
         failures: dict[str, str] = {}
         penalties, penalty_source = self._penalties(code, name, failures)
         opinions, audit_sources = self._audit(code, failures)
-        pledge_ratio, subject, pledge_date, source, detail = self._pledge(code, name, failures)
+        (
+            pledge_ratio,
+            subject,
+            pledge_date,
+            source,
+            detail,
+            pledge_live_checked,
+            pledge_base_date,
+            pledge_new_announcements,
+        ) = self._pledge(code, name, failures)
         cutoff = self.as_of.replace(year=self.as_of.year - 5)
         facts = GovernanceFacts(
             code=code,
@@ -269,6 +337,9 @@ class EastmoneySource:
             pledge_date=pledge_date,
             pledge_source=source,
             pledge_detail=detail,
+            pledge_live_checked=pledge_live_checked,
+            pledge_base_date=pledge_base_date,
+            pledge_new_announcements=pledge_new_announcements,
             failures=failures,
             penalty_source=penalty_source,
             penalty_window=f"{cutoff.isoformat()} 至 {self.as_of.isoformat()}",
@@ -519,7 +590,11 @@ class EastmoneySource:
 
     def _pledge(
         self, code: str, name: str, failures: dict[str, str]
-    ) -> tuple[float | None, str, str, str, str]:
+    ) -> tuple[float | None, str, str, str, str, bool, str, int]:
+        """每周都查明细；基准日后无新公告才沿用已提交比例。
+
+        返回：(比例, 主体, 日期, 来源, 说明, live_checked, 基准日, 基准日后新公告条数)
+        """
         committed = self.committed_pledge.get(code) or {}
         subject = str(committed.get("subject") or "")
         committed_ratio = None
@@ -529,101 +604,70 @@ class EastmoneySource:
         except (TypeError, ValueError):
             committed_ratio = None
         report_date = str(committed.get("report_date") or "")
+        base_day = _pledge_base_day(
+            report_date,
+            source_url=str(committed.get("source_url") or ""),
+            snapshot_date=self.committed_dates.get(code, ""),
+            as_of=self.as_of,
+        )
+        base_text = base_day.isoformat() if base_day else (report_date or self.committed_dates.get(code, ""))
+        source_id = str(committed.get("source_id") or "governance.snapshot")
         if committed_ratio is not None and not 0 <= committed_ratio <= 1:
-            failures["pledge"] = (
-                f"已提交质押比例 {committed_ratio:.2%} 超过 0–100%，不采用"
-            )
-            return None, subject, report_date, "governance.snapshot", ""
-        if committed_ratio == 0:
-            # 最新定期报告已确认控股股东质押为 0：不再逐家请求明细。
-            return (
-                0.0,
-                subject,
-                report_date,
-                str(committed.get("source_id") or "governance.snapshot"),
-                f"已提交质押表：{report_date or '最新定期报告'} 控股股东质押 0",
-            )
-        try:
-            rows = self._pledge_rows(code)
-        except Exception as exc:  # noqa: BLE001
-            if committed_ratio is not None:
-                return (
-                    committed_ratio,
-                    subject,
-                    report_date,
-                    str(committed.get("source_id") or "governance.snapshot"),
-                    f"质押明细请求失败（{type(exc).__name__}），沿用已提交质押表（{report_date or '最新定期报告'}）",
-                )
-            failures["pledge"] = f"{type(exc).__name__}: {exc}"
-            return None, subject, report_date, "eastmoney.pledge.detail", ""
-        latest_detail = None
+            failures["pledge"] = f"已提交质押比例 {committed_ratio:.2%} 超过 0–100%，不采用"
+            return None, subject, report_date, source_id, "", False, base_text, 0
+
+        rows, live_checked = self._pledge_rows_checked(code, failures)
+        if not live_checked:
+            return None, subject, report_date, "eastmoney.pledge.detail", "", False, base_text, 0
+
+        new_rows: list[tuple[date, dict]] = []
         for row in rows:
             day = _parse_day(row.get("NOTICE_DATE"), as_of=self.as_of)
-            if day and (latest_detail is None or day > latest_detail):
-                latest_detail = day
-        committed_day = _parse_day(report_date, as_of=self.as_of)
-        if (
-            committed_ratio is None
-            and committed_day is not None
-            and latest_detail is not None
-            and latest_detail < committed_day
-        ):
-            failures["pledge"] = (
-                f"质押明细日期 {latest_detail.isoformat()} 早于最新定期报告 "
-                f"{committed_day.isoformat()}，不采用"
-            )
-            return None, subject, report_date, "eastmoney.pledge.detail", ""
-        if (
-            committed_ratio is not None
-            and committed_day is not None
-            and (latest_detail is None or latest_detail <= committed_day)
-        ):
+            if day is not None and base_day is not None and day > base_day:
+                new_rows.append((day, row))
+        new_count = len(new_rows)
+
+        if not new_rows:
+            if committed_ratio is None:
+                if rows:
+                    failures["pledge"] = (
+                        f"质押明细均早于最新定期报告（基准日 {base_text}），且无已提交数据"
+                    )
+                else:
+                    failures["pledge"] = "质押明细为空且无已提交数据"
+                return None, subject, report_date, "eastmoney.pledge.detail", "", True, base_text, 0
             return (
                 committed_ratio,
                 subject,
                 report_date,
-                str(committed.get("source_id") or "governance.snapshot"),
-                f"已提交质押表（{report_date or '最新定期报告'}）最新；明细 {latest_detail or '无更新'}",
+                source_id,
+                f"明细已查，基准日后无新公告（基准日 {base_text}；明细 {len(rows)} 条）",
+                True,
+                base_text,
+                0,
             )
-        if not rows:
-            if committed_ratio is not None:
-                return (
-                    committed_ratio,
-                    subject,
-                    report_date,
-                    str(committed.get("source_id") or "governance.snapshot"),
-                    f"沿用已提交质押表（{report_date or '最新定期报告'}）",
-                )
-            failures["pledge"] = "质押明细为空且无已提交数据"
-            return None, subject, "", "", ""
-        holder_rows = [row for row in rows if _norm_name(row.get("HOLDER_NAME")) == _norm_name(subject)]
-        if not holder_rows:
-            # 明细里没有控股股东：若已提交表为 0，记 0；否则沿用已提交比例并注明来源。
-            if committed_ratio is not None and committed_ratio == 0:
-                return (
-                    0.0,
-                    subject,
-                    report_date,
-                    "eastmoney.pledge.detail",
-                    "重要股东质押明细无控股股东未解押记录",
-                )
-            if committed_ratio is not None:
-                return (
-                    committed_ratio,
-                    subject,
-                    report_date,
-                    str(committed.get("source_id") or "governance.snapshot"),
-                    f"沿用已提交质押表（{report_date or '最新定期报告'}；明细未匹配到控股股东）",
-                )
-            failures["pledge"] = "质押明细未匹配到控股股东且无已提交数据"
-            return None, subject, report_date, "eastmoney.pledge.detail", ""
-        outstanding = [
-            row for row in holder_rows if str(row.get("UNFREEZE_STATE") or "") == "未解押"
+
+        holder_new = [
+            (day, row)
+            for day, row in new_rows
+            if subject and _norm_name(row.get("HOLDER_NAME")) == _norm_name(subject)
         ]
-        latest = max(
-            outstanding or holder_rows,
-            key=lambda row: str(row.get("NOTICE_DATE") or ""),
-        )
+        if not holder_new:
+            if committed_ratio is not None:
+                return (
+                    committed_ratio,
+                    subject,
+                    report_date,
+                    source_id,
+                    f"明细已查，基准日后无控股股东新公告（基准日 {base_text}；新公告 {new_count} 条，均非控股股东）",
+                    True,
+                    base_text,
+                    new_count,
+                )
+            failures["pledge"] = "基准日后无控股股东公告且无已提交数据"
+            return None, subject, report_date, "eastmoney.pledge.detail", "", True, base_text, new_count
+
+        latest_day, latest = max(holder_new, key=lambda item: item[0])
         accum = latest.get("ACCUM_PLEDGE_TSR")
         holdings = None
         try:
@@ -636,47 +680,49 @@ class EastmoneySource:
             except (TypeError, ValueError):
                 holdings = None
         if holdings is None or holdings <= 0:
-            failures["pledge"] = "持股数缺失"
-            return None, subject, report_date, "eastmoney.pledge.detail", ""
+            failures["pledge"] = "基准日后新公告的持股数缺失"
+            return None, subject, report_date, "eastmoney.pledge.detail", "", True, base_text, new_count
         if accum in (None, ""):
-            if outstanding:
-                if committed_ratio is not None:
-                    return (
-                        committed_ratio,
-                        subject,
-                        report_date,
-                        str(committed.get("source_id") or "governance.snapshot"),
-                        f"沿用已提交质押表（{report_date or '最新定期报告'}；明细缺累计比例）",
-                    )
-                failures["pledge"] = "累计质押比例缺失"
-                return None, subject, report_date, "eastmoney.pledge.detail", ""
-            return 0.0, subject, report_date, "eastmoney.pledge.detail", "重要股东质押明细无未解押记录"
+            if str(latest.get("UNFREEZE_STATE") or "") == "未解押":
+                failures["pledge"] = "基准日后新公告缺累计质押比例"
+                return None, subject, report_date, "eastmoney.pledge.detail", "", True, base_text, new_count
+            accum = 0.0
         total_shares = self.shares.get(code)
         if total_shares is None:
             total_shares = self._total_shares(code)
         if not total_shares:
             failures["pledge"] = "总股本缺失"
-            return None, subject, report_date, "eastmoney.pledge.detail", ""
+            return None, subject, report_date, "eastmoney.pledge.detail", "", True, base_text, new_count
         pledged = float(accum) / 100.0 * float(total_shares)
         ratio = pledged / holdings
         if not 0 <= ratio <= 1:
-            if committed_ratio is not None:
-                return (
-                    committed_ratio,
-                    subject,
-                    report_date,
-                    str(committed.get("source_id") or "governance.snapshot"),
-                    f"明细计算比例 {ratio:.2%} 不可用，沿用已提交质押表（{report_date or '最新定期报告'}）",
-                )
             failures["pledge"] = f"质押明细计算比例 {ratio:.2%} 超过 0–100%，不采用"
-            return None, subject, report_date, "eastmoney.pledge.detail", ""
+            return None, subject, report_date, "eastmoney.pledge.detail", "", True, base_text, new_count
         return (
             ratio,
             subject,
-            str(latest.get("NOTICE_DATE") or "")[:10] or report_date,
+            latest_day.isoformat(),
             "eastmoney.pledge.detail",
-            f"重要股东质押明细：累计质押 {accum}% 总股本；持股 {holdings:,.0f} 股",
+            f"基准日后新公告 {new_count} 条；最新累计质押 {accum}% 总股本，持股 {holdings:,.0f} 股",
+            True,
+            base_text,
+            new_count,
         )
+
+    def _pledge_rows_checked(self, code: str, failures: dict[str, str]) -> tuple[list[dict], bool]:
+        """本次扫描内重试 3 次；仍失败记未完成，不用旧数据补成通过。"""
+        last: Exception | None = None
+        for attempt in range(3):
+            try:
+                return self._pledge_rows(code), True
+            except Exception as exc:  # noqa: BLE001
+                last = exc
+                if attempt < 2:
+                    time.sleep(0.2 * (attempt + 1))
+        failures["pledge"] = (
+            f"质押明细请求连续失败（重试 3 次）：{type(last).__name__ if last else 'RuntimeError'}: {last}"
+        )
+        return [], False
 
     def _pledge_rows(self, code: str) -> list[dict]:
         payload = _get_json(
@@ -693,6 +739,8 @@ class EastmoneySource:
                 "client": "WEB",
                 "filter": f'(SECURITY_CODE="{code}")',
             },
+            timeout=20,
+            tries=1,
         )
         return ((payload.get("result") or {}).get("data")) or []
 
@@ -716,6 +764,7 @@ __all__ = [
     "SourceIncomplete",
     "committed_governance",
     "committed_penalties_loader",
+    "committed_snapshot_dates",
     "current_shares",
     "current_snapshot",
 ]

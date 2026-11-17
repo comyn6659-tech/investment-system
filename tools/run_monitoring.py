@@ -43,6 +43,7 @@ def status_payload(store: MonitoringStore) -> dict:
             "week": last.get("week"),
             "coverage": last.get("coverage"),
             "counts": last.get("counts"),
+            "live_checked": last.get("live_checked"),
             "pending": last.get("pending")
             if last.get("pending") is not None
             else sum(
@@ -110,7 +111,8 @@ def summary_text(payload: dict) -> str:
         f"红线扫描：{payload.get('status')}（{payload.get('as_of')}，第 {payload.get('week')} 周）",
         f"- 覆盖 {counts.get('covered')}/{counts.get('members')}，"
         f"命中 {counts.get('hit')}，未完成 {counts.get('incomplete')}，"
-        f"待定 {payload.get('pending', 0)}，通过 {counts.get('ok')}",
+        f"待定 {payload.get('pending', 0)}，质押明细已查 {payload.get('live_checked', 0)}，"
+        f"通过 {counts.get('ok')}",
     ]
     for item in payload.get("hits") or []:
         lines.append(f"- 命中：{item['code']} {item['name']}：{item['status_text']}")

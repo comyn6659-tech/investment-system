@@ -411,3 +411,172 @@ def test_r4_scan_record_appends_evidence_and_keeps_old_records(tmp_path):
     assert member["evidence"]["pledge"]["ratio"] == 0.1
     assert member["evidence"]["audit"]["2024"]["opinion"] == "标准无保留意见"
     assert member["evidence"]["penalty"]["source"] == "eastmoney"
+
+
+# ---------------------------------------------------------------------------
+# P1–P3 每周真实查询质押明细
+# ---------------------------------------------------------------------------
+def _pledge_source(*, ratio: str = "0", report_date: str = "2026-09-30") -> EastmoneySource:
+    return EastmoneySource(
+        now=TODAY,
+        committed=(
+            {
+                "600001": {
+                    "subject": "控股股东甲",
+                    "pledge_ratio": ratio,
+                    "report_date": report_date,
+                    "source_id": "eastmoney.announcement.pdf",
+                }
+            },
+            {},
+        ),
+        committed_penalty_rows={},
+        committed_dates={"600001": "2026-11-12"},
+        shares={"600001": 1_000_000_000},
+        review={},
+    )
+
+
+def test_p1_committed_zero_still_checks_and_finds_new_60_percent_pledge():
+    source = _pledge_source()
+    source._pledge_rows = lambda code: [  # type: ignore[assignment]
+        {
+            "HOLDER_NAME": "控股股东甲",
+            "HOLD_NUM": "10000",
+            "ACCUM_PLEDGE_TSR": "6",
+            "UNFREEZE_STATE": "未解押",
+            "NOTICE_DATE": "2026-11-10 00:00:00",
+        }
+    ]
+    failures: dict[str, str] = {}
+    ratio, subject, date, origin, detail, live, base, new_count = source._pledge("600001", "测试公司", failures)
+    assert failures == {}
+    assert live is True and base == "2026-09-30" and new_count == 1
+    assert ratio == pytest.approx(0.6)
+    assert date == "2026-11-10" and origin == "eastmoney.pledge.detail"
+    assert "新公告 1 条" in detail
+
+    facts = GovernanceFacts(
+        "600001",
+        "测试公司",
+        audit_opinions=STANDARD,
+        pledge_ratio=ratio,
+        pledge_subject=subject,
+        pledge_date=date,
+        pledge_source=origin,
+        pledge_live_checked=live,
+        pledge_base_date=base,
+        pledge_new_announcements=new_count,
+    )
+    scan = evaluate_member(Member("600001", "测试公司", ("quality",)), facts, load_policy(), as_of=TODAY.date())
+    assert scan.status == "hit"
+
+
+def test_p1_stale_2015_detail_is_not_used_when_committed_is_zero():
+    source = _pledge_source()
+    source._pledge_rows = lambda code: [  # type: ignore[assignment]
+        {
+            "HOLDER_NAME": "控股股东甲",
+            "HOLD_NUM": "10000",
+            "ACCUM_PLEDGE_TSR": "153",
+            "UNFREEZE_STATE": "未解押",
+            "NOTICE_DATE": "2015-09-30 00:00:00",
+        }
+    ]
+    failures: dict[str, str] = {}
+    ratio, *_rest = source._pledge("600001", "测试公司", failures)
+    assert ratio == 0.0
+    assert failures == {}
+    assert _rest[4] is True  # live_checked
+    assert "基准日后无新公告" in _rest[3]
+
+
+def test_p2_pledge_detail_failure_retries_and_is_incomplete():
+    source = _pledge_source()
+    calls = {"count": 0}
+
+    def broken(code: str) -> list[dict]:
+        calls["count"] += 1
+        raise RuntimeError("接口超时")
+
+    source._pledge_rows = broken  # type: ignore[assignment]
+    failures: dict[str, str] = {}
+    ratio, subject, date, origin, detail, live, base, new_count = source._pledge(
+        "600001", "测试公司", failures
+    )
+    assert calls["count"] == 3
+    assert ratio is None
+    assert live is False
+    assert "重试 3 次" in failures["pledge"]
+    facts = GovernanceFacts("600001", "测试公司", audit_opinions=STANDARD, failures=failures)
+    scan = evaluate_member(Member("600001", "测试公司", ("quality",)), facts, load_policy(), as_of=TODAY.date())
+    assert scan.status == "incomplete"
+    assert scan.hits == ()
+
+
+def test_p3_pledge_evidence_has_live_checked_base_and_new_count():
+    source = _pledge_source()
+    source._pledge_rows = lambda code: [  # type: ignore[assignment]
+        {
+            "HOLDER_NAME": "控股股东甲",
+            "HOLD_NUM": "10000",
+            "ACCUM_PLEDGE_TSR": "6",
+            "UNFREEZE_STATE": "未解押",
+            "NOTICE_DATE": "2026-11-10 00:00:00",
+        },
+        {
+            "HOLDER_NAME": "其他股东",
+            "HOLD_NUM": "1000",
+            "ACCUM_PLEDGE_TSR": "0",
+            "UNFREEZE_STATE": "未解押",
+            "NOTICE_DATE": "2026-11-11 00:00:00",
+        },
+    ]
+    failures: dict[str, str] = {}
+    ratio, subject, date, origin, detail, live, base, new_count = source._pledge("600001", "测试公司", failures)
+    facts = GovernanceFacts(
+        "600001",
+        "测试公司",
+        audit_opinions=STANDARD,
+        pledge_ratio=ratio,
+        pledge_subject=subject,
+        pledge_date=date,
+        pledge_source=origin,
+        pledge_live_checked=live,
+        pledge_base_date=base,
+        pledge_new_announcements=new_count,
+    )
+    evidence = facts.pledge_evidence()
+    assert evidence["live_checked"] is True
+    assert evidence["base_date"] == "2026-09-30"
+    assert evidence["new_announcements"] == 2
+
+
+def test_p3_scan_reports_live_checked_count(tmp_path):
+    directory = tmp_path / "ledger"
+    directory.mkdir()
+    for pool in ("quality", "income", "bank"):
+        (directory / f"{pool}-pool.jsonl").write_text(
+            json.dumps({"as_of": "2026-11-12", "pool_codes": ["600001"], "record_id": f"qpr-{pool}"})
+            + "\n",
+            encoding="utf-8",
+        )
+    facts = GovernanceFacts(
+        "600001",
+        "测试公司",
+        audit_opinions=STANDARD,
+        audit_sources={year: "eastmoney.f10.audit_opinion" for year in STANDARD},
+        pledge_ratio=0.1,
+        pledge_subject="控股股东甲",
+        pledge_date="2026-09-30",
+        pledge_source="eastmoney.pledge.detail",
+        pledge_live_checked=True,
+        pledge_base_date="2026-09-30",
+        pledge_new_announcements=2,
+        penalty_source="eastmoney",
+        penalty_window="2021-11-17 至 2026-11-17",
+    )
+    store = MonitoringStore(directory)
+    payload = run_scan(store=store, source=FakeSource(facts), now=TODAY, members=[Member("600001", "测试公司", ("quality",))])
+    assert payload["live_checked"] == 1
+    assert (store.last_scan() or {})["live_checked"] == 1
