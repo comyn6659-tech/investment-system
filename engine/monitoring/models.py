@@ -31,6 +31,10 @@ class PenaltyEvent:
     doc_no: str = ""
     url: str = ""
     evidence: str = ""
+    pending: bool = False
+    matter: str = ""
+    basis: str = ""
+    decision_source: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -46,6 +50,10 @@ class PenaltyEvent:
             "doc_no": self.doc_no,
             "url": self.url,
             "evidence": self.evidence,
+            "pending": self.pending,
+            "matter": self.matter,
+            "basis": self.basis,
+            "decision_source": self.decision_source,
         }
 
     @classmethod
@@ -63,6 +71,10 @@ class PenaltyEvent:
             doc_no=str(data.get("doc_no") or ""),
             url=str(data.get("url") or ""),
             evidence=str(data.get("evidence") or ""),
+            pending=bool(data.get("pending")),
+            matter=str(data.get("matter") or ""),
+            basis=str(data.get("basis") or ""),
+            decision_source=str(data.get("decision_source") or ""),
         )
 
 
@@ -84,12 +96,51 @@ class GovernanceFacts:
     pledge_source: str = ""
     pledge_detail: str = ""
     failures: Mapping[str, str] = field(default_factory=dict)
+    penalty_source: str = ""
+    penalty_window: str = ""
+    audit_sources: Mapping[int, str] = field(default_factory=dict)
 
     def failure(self, item: str) -> str | None:
         return self.failures.get(item)
 
     def audit_missing_years(self, years: list[int]) -> list[int]:
         return [year for year in years if not str(self.audit_opinions.get(year) or "").strip()]
+
+    def audit_evidence(self) -> dict[str, dict[str, str]]:
+        return {
+            str(year): {
+                "opinion": str(opinion),
+                "source": str(self.audit_sources.get(year) or "未注明"),
+            }
+            for year, opinion in sorted(self.audit_opinions.items())
+        }
+
+    def pledge_evidence(self, *, as_of: str = "") -> dict[str, Any]:
+        if self.failure("pledge"):
+            status = "missing"
+        elif self.pledge_ratio is None:
+            status = "missing"
+        elif self.pledge_ratio < 0 or self.pledge_ratio > 1:
+            status = "rejected"
+        else:
+            status = "ok"
+        return {
+            "status": status,
+            "ratio": self.pledge_ratio,
+            "subject": self.pledge_subject,
+            "as_of": self.pledge_date or as_of or "最新定期报告（未注明日期）",
+            "source": self.pledge_source,
+            "detail": self.pledge_detail or (self.failure("pledge") or ""),
+        }
+
+    def penalty_evidence(self, *, as_of: str = "") -> dict[str, Any]:
+        return {
+            "source": self.penalty_source or "未注明",
+            "window": self.penalty_window or "",
+            "events": [event.to_dict() for event in self.penalties],
+            "failure": self.failure("penalty") or "",
+            "as_of": as_of,
+        }
 
 
 @dataclass(frozen=True)
@@ -160,6 +211,12 @@ class MemberScan:
         for item in self.missing:
             reason = self.facts.failure(item)
             label = {"penalty": "公告检索", "audit": "审计意见", "pledge": "质押比例"}.get(item, item)
+            if item == "penalty" and not reason:
+                pending = [event for event in self.facts.penalties if event.pending]
+                if pending:
+                    reason = "待定：" + "；".join(event.basis or "主体/事项未确定" for event in pending)
+                elif any(event.subject_unknown for event in self.facts.penalties):
+                    reason = "主体身份不明，待定"
             notes.append(f"{label}（{reason}）" if reason else label)
         return notes
 
@@ -185,6 +242,11 @@ class MemberScan:
             "audit_opinions": {str(k): v for k, v in sorted(self.facts.audit_opinions.items())},
             "pledge_ratio": self.facts.pledge_ratio,
             "pledge_subject": self.facts.pledge_subject,
+            "evidence": {
+                "pledge": self.facts.pledge_evidence(),
+                "audit": self.facts.audit_evidence(),
+                "penalty": self.facts.penalty_evidence(),
+            },
         }
 
 

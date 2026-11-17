@@ -142,7 +142,7 @@ def run_scan(
         added_changes = store.append_changes(entries, now=clock)
         store.append_scan(
             {
-                "schema_version": "monitoring-scan/1",
+                "schema_version": "monitoring-scan/2",
                 "scan_date": as_of.isoformat(),
                 "as_of": as_of.isoformat(),
                 "week": iso_week(as_of),
@@ -150,10 +150,9 @@ def run_scan(
                 "policy_digest": policy.digest,
                 "counts": report.counts(),
                 "coverage": round(report.coverage, 4),
-                "members": [
-                    {"code": item.code, "status": item.status, "missing": list(item.missing)}
-                    for item in report.members
-                ],
+                "pending": len(report.pending),
+                "evidence_schema": "monitoring-evidence/1",
+                "members": [item.to_dict() for item in report.members],
                 "hits": [item.to_dict() for item in report.hits],
                 "incomplete": [item.to_dict() for item in report.incomplete],
             },
@@ -176,6 +175,7 @@ def run_scan(
         "week": iso_week(as_of),
         "counts": report.counts(),
         "coverage": round(report.coverage, 4),
+        "pending": len(report.pending),
         "hits": [item.to_dict() for item in report.hits],
         "incomplete": [item.to_dict() for item in report.incomplete],
         "added_exclusions": added_exclusions,

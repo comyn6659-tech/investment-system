@@ -43,6 +43,14 @@ def status_payload(store: MonitoringStore) -> dict:
             "week": last.get("week"),
             "coverage": last.get("coverage"),
             "counts": last.get("counts"),
+            "pending": last.get("pending")
+            if last.get("pending") is not None
+            else sum(
+                1
+                for member in last.get("members") or []
+                if any(event.get("pending") for event in (member.get("evidence") or {}).get("penalty", {}).get("events") or [])
+            ),
+            "schema_version": last.get("schema_version"),
         },
         "exclusions": [
             {
@@ -63,6 +71,12 @@ def check(store: MonitoringStore) -> int:
     for row in store.scans():
         if not row.get("scan_date") or not row.get("counts"):
             problems.append(f"扫描记录缺字段：{row.get('record_id')}")
+        if row.get("schema_version") == "monitoring-scan/2":
+            for member in row.get("members") or []:
+                evidence = member.get("evidence") or {}
+                if not all(key in evidence for key in ("pledge", "audit", "penalty")):
+                    problems.append(f"扫描记录缺证据：{member.get('code')}（{row.get('record_id')}）")
+                    break
     for pool in ("quality", "income", "bank"):
         membership = store.membership(pool)
         if membership is None:
@@ -95,7 +109,8 @@ def summary_text(payload: dict) -> str:
     lines = [
         f"红线扫描：{payload.get('status')}（{payload.get('as_of')}，第 {payload.get('week')} 周）",
         f"- 覆盖 {counts.get('covered')}/{counts.get('members')}，"
-        f"命中 {counts.get('hit')}，未完成 {counts.get('incomplete')}，通过 {counts.get('ok')}",
+        f"命中 {counts.get('hit')}，未完成 {counts.get('incomplete')}，"
+        f"待定 {payload.get('pending', 0)}，通过 {counts.get('ok')}",
     ]
     for item in payload.get("hits") or []:
         lines.append(f"- 命中：{item['code']} {item['name']}：{item['status_text']}")

@@ -44,7 +44,7 @@ engine/        运行时代码（不联网取数、不调用大模型）
 engine/web/    本地页面（标准库 http.server + 静态页面；只监听 127.0.0.1）
 data/          已提交的固定数据：快照、政策、账本、注册表、序列
 tools/         取数、建快照、年度重跑、验收与报告工具（需要时才联网）
-tests/         离线测试（789 项）
+tests/         离线测试（811 项）
 docs/          三份股东文档；docs/archive/ 为历史批次报告；docs/evidence/ 为验收截图
 scripts/       干净归档验证、账本快照校验、每日更新安装
 ask / update   两个入口脚本
@@ -65,12 +65,14 @@ web            本地页面入口脚本
   红线周度扫描、财报季批量快照、结论变化、最近变动；
 - 行情日期按腾讯行情时间戳逐行判断；行情过期时 `./ask` 首行与页面顶部提示落后交易日数；
   `./update --check` 同时自检 launchd plist 路径（补丁 H1–H3）；
+- 红线判定与建池共用同一函数，已提交判定按 art_code 沿用；正文不确定记「待定」，
+  扫描记录逐家写质押/审计/公告证据（返工 R1–R6）；
 - 已知局限：ETF 执行检查未做、券商保险不做、创业板指已移出（见《规则说明》第 7 节）。
 
 ## 复现与验证
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider   # 789 passed
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider   # 811 passed
 scripts/verify-clean-archive.sh
 .venv/bin/python scripts/verify-ledger-snapshots.py
 .venv/bin/python tools/run_ask_acceptance.py

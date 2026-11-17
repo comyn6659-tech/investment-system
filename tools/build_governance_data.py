@@ -37,6 +37,8 @@ from requests.adapters import HTTPAdapter
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from engine.monitoring.classify import classify_event, load_review  # noqa: E402
+from engine.monitoring.sources import committed_penalties_loader  # noqa: E402
 from engine.quality.snapshot import build_snapshot_dir  # noqa: E402
 from engine.quality.tables import read_table, write_table  # noqa: E402
 
@@ -271,6 +273,7 @@ def penalty_events(code: str) -> dict:
         except Exception:  # noqa: BLE001
             content = ""
         blob = event["title"] + " " + content
+        event["content"] = content
         event["doc_no"] = _extract_doc_no(blob)
         event["reason"] = _reason_snippet(blob, ("信息披露", "内幕交易", "短线交易", "虚假记载", "重大遗漏", "行政处罚", "立案"))
     return {
@@ -299,135 +302,43 @@ def _reason_snippet(text: str, words: tuple[str, ...], width: int = 140) -> str 
 
 
 # ---------------------------------------------------------------------------
-# 处罚主体判定（batch4f K3）
+# 处罚主体判定（batch4f K3 / R1：与监测共用 engine.monitoring.classify）
 # ---------------------------------------------------------------------------
 
-COUNTED_ROLES = frozenset(
-    {"company", "controller", "actual_controller", "concert_party", "director_officer"}
-)
-ROLE_LABELS = {
-    "company": "公司本身",
-    "controller": "控股股东",
-    "actual_controller": "实际控制人",
-    "concert_party": "一致行动人",
-    "director_officer": "时任董监高",
-    "other_shareholder": "其他股东（非控股、非一致行动人）",
-    "subsidiary": "子公司/分公司",
-    "other_entity": "其他主体",
-    "unknown": "主体身份不明",
-}
-INFO_PATTERNS = (
-    "信息披露违法违规",
-    "涉嫌信息披露违法",
-    "信息披露违法",
-    "虚假记载",
-    "重大遗漏",
-    "未按规定披露",
-    "未及时披露",
-    "未准确披露",
-    "信息披露不准确",
-    "未真实披露",
-    "违规披露",
-)
-INFO_BOILERPLATE = (
-    "保证信息披露的内容真实",
-    "保证公告内容的真实",
-    "履行信息披露义务",
-    "指定信息披露媒体",
-    "信息披露媒体为",
-    "及时履行信息披露义务",
-    "按照有关法律法规的规定和要求，及时履行信息披露义务",
-    "没有虚假记载",
-    "不存在虚假记载",
-    "误导性陈述或重大遗漏",
-    "真实、准确、完整",
-)
-DUTY_PATTERN = re.compile(r"董事|监事|高级管理人员|高管|总经理|副总经理|董事会秘书|财务总监")
-PUBLIC_CENSURE = ("公开谴责",)
-
-
-def _info_disclosure(blob: str) -> bool:
-    text = re.sub(r"\s+", "", blob)
-    for phrase in INFO_BOILERPLATE:
-        text = text.replace(re.sub(r"\s+", "", phrase), "")
-    return any(pattern in text for pattern in INFO_PATTERNS)
-
-
-def _penalty_role(title: str, company_name: str) -> tuple[str | None, str | None]:
-    if "实际控制人" in title:
-        return "actual_controller", "实际控制人（公告所述）"
-    if DUTY_PATTERN.search(title):
-        return "director_officer", _duty_subject(title)
-    if "间接控股股东" in title:
-        return "other_entity", "间接控股股东"
-    if "控股股东" in title:
-        return "controller", "控股股东"
-    if "股东" in title:
-        return "other_shareholder", _shareholder_subject(title)
-    if "子公司" in title or "分公司" in title:
-        return "subsidiary", "子公司/分公司"
-    if title.strip():
-        return "company", company_name
-    return "unknown", None
-
-
-def _duty_subject(title: str) -> str:
-    match = re.search(r"董事|监事|高级管理人员|高管|总经理|副总经理|董事会秘书|财务总监", title)
-    return f"时任{match.group(0)}（公告所述）" if match else "时任董监高（公告所述）"
-
-
-def _shareholder_subject(title: str) -> str:
-    match = re.search(r"股东[^，。；)）]{0,20}", title)
-    return match.group(0) if match else "股东（公告所述）"
-
-
-def _regulator(blob: str, event_type: str) -> bool:
-    if event_type in ("立案", "行政处罚"):
-        return any(word in blob for word in ("中国证券监督管理委员会", "证监会", "证监局"))
-    return any(
-        word in blob
-        for word in ("上交所", "上海证券交易所", "深交所", "深圳证券交易所", "证券交易所")
-    )
-
-
 def classify_penalty_events(code: str, name: str, events: list[dict]) -> list[dict]:
-    review = _review()["penalty_events"]
+    """调用监测同一个 `classify_event`；已提交快照/人工核对按 art_code 优先。"""
+    review = load_review()
+    committed = committed_penalties_loader()
     output = []
     for event in events:
-        blob = event["title"] + " " + (event.get("reason") or "")
-        override = review.get(event.get("art_code")) or {}
-        if override:
-            subject = override.get("subject")
-            role = override.get("role")
-            info = bool(override.get("info_disclosure"))
-            basis = override.get("basis")
-            public_censure = bool(override.get("public_censure", "公开谴责" in blob))
-        else:
-            role, subject = _penalty_role(event["title"], name)
-            info = _info_disclosure(blob)
-            basis = "标题/正文关键词：" + ("信息披露类" if info else "非信息披露类")
-            if subject is None:
-                subject = name if role == "company" else None
-            public_censure = any(word in blob for word in PUBLIC_CENSURE)
-        regulator = override.get("regulator") if override and "regulator" in override else _regulator(blob, event["type"])
-        if event["type"] in ("公开谴责", "纪律处分"):
-            final = public_censure
-        else:
-            final = True
-        counted = info and regulator and final and role in COUNTED_ROLES
-        unknown = info and regulator and final and role == "unknown"
-        output.append(
-            dict(
-                event,
-                subject=subject,
-                subject_role=role,
-                subject_basis=basis,
-                info_disclosure=info,
-                regulator=regulator,
-                counted=counted,
-                subject_unknown=unknown,
-            )
+        art_code = str(event.get("art_code") or "")
+        content = str(event.get("content") or event.get("reason") or "")
+        result = classify_event(
+            code=code,
+            company_name=name,
+            event_type=str(event.get("type") or ""),
+            title=str(event.get("title") or ""),
+            date=str(event.get("date") or ""),
+            url=str(event.get("url") or ""),
+            content=content,
+            art_code=art_code,
+            review=review,
+            committed=committed.get(art_code),
         )
+        row = dict(event)
+        row.update(
+            subject=result["subject"],
+            subject_role=result["role"],
+            subject_basis=result["basis"],
+            info_disclosure=result["info_disclosure"],
+            regulator=result["regulator"],
+            counted=result["counted"],
+            subject_unknown=result["subject_unknown"],
+            pending=result["pending"],
+            matter=result["matter"],
+            decision_source=result["decision_source"],
+        )
+        output.append(row)
     return output
 
 

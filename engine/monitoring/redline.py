@@ -64,6 +64,14 @@ class ScanReport:
         return [item for item in self.members if item.status == STATUS_OK]
 
     @property
+    def pending(self) -> list[MemberScan]:
+        return [
+            item
+            for item in self.members
+            if any(event.pending for event in item.facts.penalties)
+        ]
+
+    @property
     def covered(self) -> int:
         return sum(1 for item in self.members if item.status != STATUS_INCOMPLETE)
 
@@ -137,6 +145,7 @@ def evaluate_member(
     else:
         start = _five_years_before(as_of)
         unknown = False
+        pending = False
         for event in facts.penalties:
             event_day = event.date[:10]
             if event_day and event_day < start.isoformat():
@@ -154,9 +163,11 @@ def evaluate_member(
                         evidence=event.evidence or event.title,
                     )
                 )
+            elif event.pending:
+                pending = True
             elif event.subject_unknown:
                 unknown = True
-        if unknown and not hits:
+        if (pending or unknown) and not hits:
             missing.append("penalty")
 
     # --- 审计意见：最近 5 个财年均为标准无保留 ---------------------------
@@ -186,7 +197,8 @@ def evaluate_member(
     # --- 质押比例 -------------------------------------------------------
     if facts.failure("pledge"):
         missing.append("pledge")
-    elif facts.pledge_ratio is None:
+    elif facts.pledge_ratio is None or not 0 <= facts.pledge_ratio <= 1:
+        # R3：质押比例 >100% 视为明细不可用，记未完成，不得据此剔除。
         missing.append("pledge")
     else:
         maximum = float(pledge_rule.get("max", 0.5))

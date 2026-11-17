@@ -1,7 +1,7 @@
-"""红线监测的真实取数源（东方财富公开接口），带按日缓存与逐项失败记录。
+"""红线监测的真实取数源（东方财富公开接口），每次直接取数，不读也不写缓存。
 
-只用 Python 标准库（urllib）；每次扫描直接取数，不依赖任何本地缓存文件。接口失败
-不抛到全表：对应项记入 `GovernanceFacts.failures`，由扫描记「本周未完成」。
+只用 Python 标准库（urllib）；接口失败不抛到全表：对应项记入 `GovernanceFacts.failures`，
+由扫描记「本周未完成」。所有判定与建池共用 `engine.monitoring.classify`。
 """
 
 from __future__ import annotations
@@ -31,6 +31,12 @@ from engine.monitoring.models import GovernanceFacts, PenaltyEvent
 from engine.monitoring.redline import audit_years
 
 TZ = ZoneInfo("Asia/Singapore")
+
+
+class SourceIncomplete(RuntimeError):
+    """备用源没有覆盖完整区间：记未完成，不能当成「没有事件」。"""
+
+
 ROOT = Path(__file__).resolve().parent.parent.parent
 POOL_DIRS = {
     "quality": ROOT / "data" / "quality-pool",
@@ -41,6 +47,7 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 ANNOUNCE_URL = "https://np-anotice-stock.eastmoney.com/api/security/ann"
 CONTENT_URL = "https://np-cnotice-stock.eastmoney.com/api/content/ann"
 AUDIT_URL = "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/zcfzbAjaxNew"
+SINA_MAX_PAGES = 6
 SINA_LIST = "https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletin.php"
 SINA_DETAIL = "https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php"
 DATA_URL = "https://datacenter-web.eastmoney.com/api/data/v1/get"
@@ -54,6 +61,12 @@ def _now(now: datetime | None = None) -> datetime:
 
 def _symbol(code: str) -> str:
     return ("SH" if code.startswith("6") else "SZ") + code
+
+
+def _truth(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in ("true", "1", "yes", "是")
 
 
 def _norm_name(name: str | None) -> str:
@@ -178,6 +191,26 @@ def committed_governance() -> tuple[dict[str, dict], dict[str, dict[int, str]]]:
     return pledge, audit
 
 
+def committed_penalties_loader() -> dict[str, dict]:
+    """已提交建池快照里的处罚判定，按公告 art_code 索引；同一公告以先读到的为准。"""
+    output: dict[str, dict] = {}
+    for pool in POOL_DIRS:
+        snapshot = current_snapshot(pool)
+        if snapshot is None:
+            continue
+        for row in _read_gzip_rows(snapshot / "governance-penalty.csv.gz"):
+            url = str(row.get("url") or "")
+            match = re.search(r"(AN\d+)\.html", url)
+            keys = [match.group(1)] if match else []
+            if row.get("doc_no"):
+                keys.append(str(row["doc_no"]))
+            keys.append(f"{row.get('code')}|{row.get('event_date')}|{row.get('title')}")
+            for key in keys:
+                if key:
+                    output.setdefault(key, row)
+    return output
+
+
 def current_shares() -> dict[str, float]:
     """当前批量财务快照里的总股本（用于质押比例换算）。"""
     manifest_path = ROOT / "data" / "pool-valuation" / "manifest.json"
@@ -197,85 +230,35 @@ def current_shares() -> dict[str, float]:
 
 
 class EastmoneySource:
-    """按公司取三项监测事实；带按日 JSON 缓存。"""
+    """按公司取三项监测事实；每次直接取公开接口，不读也不写任何缓存。"""
 
     def __init__(
         self,
         *,
         now: datetime | None = None,
-        cache_dir: Path | None = None,
         review: dict[str, Any] | None = None,
         committed: tuple[dict[str, dict], dict[str, dict[int, str]]] | None = None,
+        committed_penalty_rows: dict[str, dict] | None = None,
         shares: dict[str, float] | None = None,
     ):
         self.clock = _now(now)
         self.as_of = self.clock.date()
-        self.cache_dir = Path(cache_dir) if cache_dir else None
         self.review = load_review() if review is None else review
         self.committed_pledge, self.committed_audit = committed or committed_governance()
+        self.committed_penalty_rows = (
+            committed_penalties_loader() if committed_penalty_rows is None else committed_penalty_rows
+        )
         self.shares = current_shares() if shares is None else shares
         self._total_shares_cache: dict[str, float | None] = {}
-
-    # --- 缓存 -----------------------------------------------------------
-    def _cache_path(self, code: str) -> Path | None:
-        return self.cache_dir / f"{code}.json" if self.cache_dir else None
-
-    def _read_cache(self, code: str) -> GovernanceFacts | None:
-        path = self._cache_path(code)
-        if path is None:
-            return None
-        if not path.exists():
-            return None
-        try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            return None
-        if payload.get("as_of") != self.as_of.isoformat():
-            return None
-        return GovernanceFacts(
-            code=code,
-            name=str(payload.get("name") or ""),
-            penalties=tuple(PenaltyEvent.from_dict(item) for item in payload.get("penalties") or []),
-            audit_opinions={int(k): str(v) for k, v in (payload.get("audit_opinions") or {}).items()},
-            pledge_ratio=payload.get("pledge_ratio"),
-            pledge_subject=str(payload.get("pledge_subject") or ""),
-            pledge_date=str(payload.get("pledge_date") or ""),
-            pledge_source=str(payload.get("pledge_source") or ""),
-            pledge_detail=str(payload.get("pledge_detail") or ""),
-            failures=dict(payload.get("failures") or {}),
-        )
-
-    def _write_cache(self, facts: GovernanceFacts) -> None:
-        path = self._cache_path(facts.code)
-        if path is None:
-            return
-        self.cache_dir.mkdir(parents=True, exist_ok=True)
-        payload = {
-            "as_of": self.as_of.isoformat(),
-            "name": facts.name,
-            "penalties": [item.to_dict() for item in facts.penalties],
-            "audit_opinions": {str(k): v for k, v in facts.audit_opinions.items()},
-            "pledge_ratio": facts.pledge_ratio,
-            "pledge_subject": facts.pledge_subject,
-            "pledge_date": facts.pledge_date,
-            "pledge_source": facts.pledge_source,
-            "pledge_detail": facts.pledge_detail,
-            "failures": dict(facts.failures),
-        }
-        path.write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-        )
 
     # --- 三项取数 -------------------------------------------------------
     def fetch(self, code: str, name: str = "") -> GovernanceFacts:
         code = str(code).zfill(6)
-        cached = self._read_cache(code)
-        if cached is not None:
-            return cached
         failures: dict[str, str] = {}
-        penalties = self._penalties(code, name, failures)
-        opinions = self._audit(code, failures)
+        penalties, penalty_source = self._penalties(code, name, failures)
+        opinions, audit_sources = self._audit(code, failures)
         pledge_ratio, subject, pledge_date, source, detail = self._pledge(code, name, failures)
+        cutoff = self.as_of.replace(year=self.as_of.year - 5)
         facts = GovernanceFacts(
             code=code,
             name=name,
@@ -287,8 +270,10 @@ class EastmoneySource:
             pledge_source=source,
             pledge_detail=detail,
             failures=failures,
+            penalty_source=penalty_source,
+            penalty_window=f"{cutoff.isoformat()} 至 {self.as_of.isoformat()}",
+            audit_sources=audit_sources,
         )
-        self._write_cache(facts)
         return facts
 
     def _announcements(self, code: str, keyword: str) -> list[dict]:
@@ -307,20 +292,23 @@ class EastmoneySource:
         return ((payload.get("data") or {}).get("list")) or []
 
     def _sina_events(self, code: str, name: str, *, since: str) -> list[PenaltyEvent]:
-        """东方财富公告接口被限流时的备用源：新浪公告列表（只取 since 之后）。"""
+        """东方财富公告接口被限流时的备用源：新浪公告列表（必须覆盖 since 之后）。"""
         events: dict[str, dict] = {}
         keywords = ("立案", "行政处罚", "公开谴责", "纪律处分")
-        for page in range(1, 4):
+        covered = False
+        for page in range(1, SINA_MAX_PAGES + 1):
             text = _get_text(f"{SINA_LIST}?stockid={code}&Page={page}", encoding="gbk")
             rows = re.findall(
                 r"(\d{4}-\d{2}-\d{2})&nbsp;<a[^>]+href='([^']+)'>([^<]+)</a>", text
             )
             if not rows:
-                break
-            stop = False
+                if page == 1:
+                    raise SourceIncomplete("新浪公告列表首页解析不到任何行")
+                raise SourceIncomplete(f"新浪公告列表第 {page} 页为空，未覆盖到 {since}")
+            if min(day for day, _href, _title in rows) < since:
+                covered = True
             for day, href, title in rows:
                 if day < since:
-                    stop = True
                     continue
                 clean = strip_tags(title)
                 if not any(keyword in clean for keyword in keywords):
@@ -342,8 +330,12 @@ class EastmoneySource:
                     "art_code": art_code,
                     "url": href if href.startswith("http") else "https://vip.stock.finance.sina.com.cn" + href,
                 }
-            if stop:
+            if covered:
                 break
+        if not covered:
+            raise SourceIncomplete(
+                f"新浪公告列表翻页上限 {SINA_MAX_PAGES} 页仍未覆盖起始日 {since}"
+            )
         output: list[PenaltyEvent] = []
         for event in sorted(events.values(), key=lambda item: item["date"], reverse=True):
             content = ""
@@ -351,7 +343,7 @@ class EastmoneySource:
                 content = strip_tags(
                     _get_text(event["url"], encoding="gbk", timeout=30)
                 )
-            except Exception:  # noqa: BLE001 - 正文取不到时按标题判定
+            except Exception:  # noqa: BLE001 - 正文取不到时记待定
                 content = ""
             classified = classify_event(
                 code=code,
@@ -363,11 +355,48 @@ class EastmoneySource:
                 content=content,
                 art_code=event["art_code"],
                 review=self.review,
+                committed=self.committed_penalty_rows.get(event["art_code"]),
             )
             output.append(PenaltyEvent.from_dict(classified))
         return output
 
-    def _penalties(self, code: str, name: str, failures: dict[str, str]) -> list[PenaltyEvent]:
+    def _committed_events(self, code: str, cutoff: date) -> list[PenaltyEvent]:
+        """已提交建池快照里的同公司事件；备用源只覆盖 120 天时用来补齐旧区间。"""
+        output: list[PenaltyEvent] = []
+        seen: set[str] = set()
+        for row in self.committed_penalty_rows.values():
+            if str(row.get("code") or "").zfill(6) != code:
+                continue
+            event_day = str(row.get("event_date") or "")[:10]
+            if not event_day or event_day < cutoff.isoformat():
+                continue
+            key = str(row.get("url") or "") or f"{event_day}|{row.get('title')}"
+            if key in seen:
+                continue
+            seen.add(key)
+            output.append(
+                PenaltyEvent(
+                    date=event_day,
+                    event_type=str(row.get("event_type") or ""),
+                    title=str(row.get("title") or ""),
+                    subject=str(row.get("subject") or ""),
+                    role=str(row.get("subject_role") or ""),
+                    counted=_truth(row.get("counted")),
+                    subject_unknown=_truth(row.get("subject_unknown")),
+                    info_disclosure=_truth(row.get("info_disclosure")),
+                    regulator=_truth(row.get("regulator")),
+                    doc_no=str(row.get("doc_no") or ""),
+                    url=str(row.get("url") or ""),
+                    evidence=str(row.get("reason") or row.get("title") or ""),
+                    basis=str(row.get("subject_basis") or "沿用建池快照判定"),
+                    decision_source="snapshot",
+                )
+            )
+        return sorted(output, key=lambda item: item.date, reverse=True)
+
+    def _penalties(
+        self, code: str, name: str, failures: dict[str, str]
+    ) -> tuple[list[PenaltyEvent], str]:
         cutoff = self.as_of.replace(year=self.as_of.year - 5)
         events: dict[str, dict] = {}
         priority = {"立案": 3, "行政处罚": 2, "公开谴责": 1, "纪律处分": 0}
@@ -409,13 +438,13 @@ class EastmoneySource:
                     code, name, since=(self.as_of - timedelta(days=120)).isoformat()
                 )
             except Exception as exc:  # noqa: BLE001
-                failures["penalty"] = f"东方财富/新浪均失败：{type(exc).__name__}"
-                return []
-            if fallback:
-                failures.pop("penalty", None)
-            else:
-                failures.pop("penalty", None)
-            return fallback
+                failures["penalty"] = f"东方财富/新浪均失败：{exc}"
+                return [], "sina"
+            failures.pop("penalty", None)
+            merged = {event.url or event.title: event for event in fallback}
+            for event in self._committed_events(code, cutoff):
+                merged.setdefault(event.url or event.title, event)
+            return sorted(merged.values(), key=lambda item: item.date, reverse=True), "sina+snapshot"
         output: list[PenaltyEvent] = []
         for event in sorted(events.values(), key=lambda item: item["date"], reverse=True):
             content = ""
@@ -424,7 +453,7 @@ class EastmoneySource:
                     content = strip_tags(
                         (_get_json(CONTENT_URL, {"art_code": event["art_code"], "client_source": "web", "page_index": "1"}).get("data") or {}).get("notice_content")
                     )
-                except Exception:  # noqa: BLE001 - 正文取不到时按标题判定
+                except Exception:  # noqa: BLE001 - 正文取不到时记待定
                     content = ""
             classified = classify_event(
                 code=code,
@@ -436,15 +465,21 @@ class EastmoneySource:
                 content=content,
                 art_code=event["art_code"],
                 review=self.review,
+                committed=self.committed_penalty_rows.get(event["art_code"]),
             )
             output.append(PenaltyEvent.from_dict(classified))
-        return output
+        return output, "eastmoney"
 
-    def _audit(self, code: str, failures: dict[str, str]) -> dict[int, str]:
+    def _audit(
+        self, code: str, failures: dict[str, str]
+    ) -> tuple[dict[int, str], dict[int, str]]:
         years = audit_years(self.as_of)
         committed = self.committed_audit.get(code) or {}
         if all(committed.get(year) for year in years):
-            return {year: str(committed[year]) for year in years}
+            return (
+                {year: str(committed[year]) for year in years},
+                {year: "governance.snapshot" for year in years},
+            )
         dates = ",".join(f"{year}-12-31" for year in years)
         rows: list[dict] = []
         error = ""
@@ -467,16 +502,20 @@ class EastmoneySource:
             if rows:
                 break
         opinions: dict[int, str] = {}
+        sources: dict[int, str] = {}
         for row in rows:
             year = str(row.get("REPORT_DATE") or "")[:4]
             if year.isdigit() and row.get("OPINION_TYPE"):
                 opinions[int(year)] = str(row["OPINION_TYPE"])
-        # 已提交快照是同一来源的固定数据：网络缺某年时用它补齐，但记录来源。
+                sources[int(year)] = "eastmoney.f10.audit_opinion"
+        # 已提交快照是同一来源的固定数据：网络缺某年时用它补齐，并逐年纪录来源。
         for year, value in committed.items():
-            opinions.setdefault(year, value)
+            if year not in opinions:
+                opinions[year] = value
+                sources[year] = "governance.snapshot"
         if not rows and not opinions:
             failures["audit"] = error or "F10 审计意见为空"
-        return opinions
+        return opinions, sources
 
     def _pledge(
         self, code: str, name: str, failures: dict[str, str]
@@ -490,6 +529,11 @@ class EastmoneySource:
         except (TypeError, ValueError):
             committed_ratio = None
         report_date = str(committed.get("report_date") or "")
+        if committed_ratio is not None and not 0 <= committed_ratio <= 1:
+            failures["pledge"] = (
+                f"已提交质押比例 {committed_ratio:.2%} 超过 0–100%，不采用"
+            )
+            return None, subject, report_date, "governance.snapshot", ""
         if committed_ratio == 0:
             # 最新定期报告已确认控股股东质押为 0：不再逐家请求明细。
             return (
@@ -502,6 +546,14 @@ class EastmoneySource:
         try:
             rows = self._pledge_rows(code)
         except Exception as exc:  # noqa: BLE001
+            if committed_ratio is not None:
+                return (
+                    committed_ratio,
+                    subject,
+                    report_date,
+                    str(committed.get("source_id") or "governance.snapshot"),
+                    f"质押明细请求失败（{type(exc).__name__}），沿用已提交质押表（{report_date or '最新定期报告'}）",
+                )
             failures["pledge"] = f"{type(exc).__name__}: {exc}"
             return None, subject, report_date, "eastmoney.pledge.detail", ""
         latest_detail = None
@@ -510,6 +562,17 @@ class EastmoneySource:
             if day and (latest_detail is None or day > latest_detail):
                 latest_detail = day
         committed_day = _parse_day(report_date, as_of=self.as_of)
+        if (
+            committed_ratio is None
+            and committed_day is not None
+            and latest_detail is not None
+            and latest_detail < committed_day
+        ):
+            failures["pledge"] = (
+                f"质押明细日期 {latest_detail.isoformat()} 早于最新定期报告 "
+                f"{committed_day.isoformat()}，不采用"
+            )
+            return None, subject, report_date, "eastmoney.pledge.detail", ""
         if (
             committed_ratio is not None
             and committed_day is not None
@@ -596,6 +659,17 @@ class EastmoneySource:
             return None, subject, report_date, "eastmoney.pledge.detail", ""
         pledged = float(accum) / 100.0 * float(total_shares)
         ratio = pledged / holdings
+        if not 0 <= ratio <= 1:
+            if committed_ratio is not None:
+                return (
+                    committed_ratio,
+                    subject,
+                    report_date,
+                    str(committed.get("source_id") or "governance.snapshot"),
+                    f"明细计算比例 {ratio:.2%} 不可用，沿用已提交质押表（{report_date or '最新定期报告'}）",
+                )
+            failures["pledge"] = f"质押明细计算比例 {ratio:.2%} 超过 0–100%，不采用"
+            return None, subject, report_date, "eastmoney.pledge.detail", ""
         return (
             ratio,
             subject,
@@ -637,4 +711,11 @@ class EastmoneySource:
         return value
 
 
-__all__ = ["EastmoneySource", "committed_governance", "current_shares", "current_snapshot"]
+__all__ = [
+    "EastmoneySource",
+    "SourceIncomplete",
+    "committed_governance",
+    "committed_penalties_loader",
+    "current_shares",
+    "current_snapshot",
+]
