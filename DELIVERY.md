@@ -3,40 +3,35 @@
 | 项目 | 内容 |
 |---|---|
 | 项目 | `/Users/comyn/Documents/投资/投资分析系统/investment-system/` |
-| 本轮阶段 | 第七阶段补丁：**行情日期、过期提示、定时任务自检（H1–H6）** |
-| 本轮实现提交 | `5d22e2c`（验收兼容 `0508a28`；本文档单独提交） |
-| 上一阶段 | 第七阶段 M1–M7 交付见 `7e202b1`；本补丁只改运行与提示，不改规则/阈值/账本旧记录 |
+| 本轮阶段 | 第七阶段返工：**红线扫描判定一致性与可审计性（R1–R6）** |
+| 本轮实现提交 | `4b583df`（交付文档单独提交） |
+| 范围 | 只改监测代码、测试、文档与运行记录；未改任何政策文件、阈值、旧账本记录 |
 
-## 1. 修了什么（H1–H6）
+## 1. 修了什么
 
-| 编号 | 修复 | 测试与验证 |
+| 编号 | 返工内容 | 验证 |
 |---|---|---|
-| H1 行情日期 | `fetch_quotes` 改为逐行按腾讯行情时间戳判断：行情日早于今天 → 当前价、日期=行情日；行情日=今天且 15:00 前 → 昨收、日期=上一交易日；15:00 后 → 当前价、日期=今天。`expected_price_date` 同步修正（凌晨/开盘前不再落到前前一天）。 | `test_h1_quote_price_date_by_timestamp`（周二 00:12、13:06、18:30，周六 10:00，国庆后开盘前 5 个时点）；`test_h1_expected_date_before_open_is_previous_trading_day`。真实 15:01 `./update` 新写 `quotes-2026-11-17.json`（5,225 行），此前 11-16 不再被拒。 |
-| H2 过期提醒 | 最新 `price_date` < 应取日期时，`./ask` 每个带价格回答的第一行显示「价格停在 X，已落后 N 个交易日，请运行 ./update 或检查定时任务」；页面顶部与「数据状态」同一提示。N 只数交易日。 | `test_h2_stale_price_is_first_line_of_ask`（价格 11-16、应取 11-17、落后 1 日；不带价格的变动回答不提示）；`test_h2_page_top_has_stale_banner`。15:01 更新前真实 `./ask` 首行即为该提示；更新后消失。 |
-| H3 定时任务自检 | `./update --check` 读取 `~/Library/LaunchAgents/com.investment-system.forward-update.plist`，核对 `WorkingDirectory` / `ProgramArguments` / 日志路径；plist 不存在或指向旧路径时明确报错并给出 `修复：cd … && scripts/install-daily-update.sh`。安装脚本安装后打印 plist、解释器、脚本与工作目录实际路径。 | `test_h3_launchd_check_ok_and_missing`；`test_h3_launchd_check_reports_old_path_with_fix`；`test_h3_install_script_prints_actual_plist_paths`。本机 `./update --check` → `launchd.status=ok`、`problems=[]`。 |
-| H4 卸载脚本 | `scripts/uninstall-daily-update.sh` 第 23 行 `$LABEL（` 改为 `${LABEL}`；测试扫描所有 shell 入口，禁止变量后紧跟中文。 | `test_h4_uninstall_reports_label_without_unbound_variable`（临时 HOME 真实执行，rc=0，输出「已卸载定时任务」）；`test_h4_no_shell_variable_glued_to_chinese`。 |
-| H5 财报季崩溃 | 复现：顶层 `data/pool-valuation/manifest.json` 的 `tables` 是数量（int），`annual_periods()` 却当表清单迭代 → `TypeError: 'int' object is not iterable`。修复：`applied_seasons` 从 `current` 快照目录的 manifest 读报告期；`tables` 非 list 时报错写清字段；单季失败带季节/报告期/报表，失败步骤不再拖垮整次更新。 | `test_h5_applied_seasons_reads_current_snapshot_manifest`（指针 `tables` 为 int 时能算出已应用季；2026 半年报/三季报可进入刷新）。真实 15:01 `./update` 状态 **ok**，`earnings_update` 正确 skipped（无到期季），不再 failed。 |
-| H6 页面缓存 | `WebApp` 的个股/总览/三池/指数缓存按「最新行情快照 + 结论账本 + 批量快照指针」签名自动失效，并清空 `AskService` 的行情/快照派生缓存；页面每 60 秒检查数据状态，行情日期变化时顶部提示「数据已更新，点击刷新」。 | `test_h6_web_cache_invalidates_on_quote_and_ledger_change`（同一签名只评估 1 次；换行情快照后 2 次；改结论账本后 3 次；缓存重置 1→2 次）。 |
+| R1 判定统一 | 新增 `engine/monitoring/classify.py` 为监测与建池共用的唯一事件判定函数；`tools/build_governance_data.py` 改为调用它。已提交建池快照/人工核对按 `art_code` 沿用原判定；样板句改正则去除（覆盖“任何”“或者”等变体）；内幕交易、短线交易、环保、安全生产、金融监管显式判“不计入”。 | 国药股份 2024-01-10 公告正文夹具（`tests/fixtures/600511-2024-01-10.txt`）：`counted=False`，理由 `内幕交易（他公司股票），非信息披露类`；建池与监测结果一致。 |
+| R2 不确定待定 | 正文取不到、或正文无法同时确定主体/事项，记 `pending`（待定），不计入、不算通过；只有凭正文（或已提交/人工核对判定）计入的事件才触发剔除。 | `test_r2_missing_content_is_pending_and_not_a_pass`、`test_r2_content_without_matter_is_pending`：待定公司状态为 `incomplete`，不产生红线命中。 |
+| R3 备用源/质押失败 | 新浪列表首页解析不到行、翻页上限未覆盖起始日 → 记未完成；质押比例 >100%、明细早于最新定期报告 → 不采用明细；无可用数据 → 未完成。 | 新浪首页空、翻页不覆盖、比例 153%、2015 年过期明细、无数据五类测试；真实 600285 首次明细超时后自动沿用已提交质押表。 |
+| R4 扫描证据 | `monitoring-scans.jsonl` 升为 `monitoring-scan/2`，逐家写：质押（比例/主体/截至日/来源/状态）、审计（年份→意见/来源）、公告（eastmoney/sina/已提交、检索区间、事件、是否计入、理由）。只追加。 | `test_r4_member_dict_contains_pledge_audit_penalty_evidence`、`test_r4_scan_record_appends_evidence_and_keeps_old_records`；真实扫描 232 家全部带证据，`check` 无问题。 |
+| R5 清理缓存 | 删除 `data/cache/monitoring/2026-11-17/`；生产取数不再读写任何监测缓存；维护说明写明“监测不使用缓存”。 | 目录已不存在；`tests/test_clean_inputs.py` 通过；`sources.py` 已移除缓存读写代码。 |
+| R6 重新首扫 | 修复后真实全量扫描（不覆盖旧记录，追加新记录）。 | 232/232 覆盖（100%），命中 **0**，待定 **0**；国药股份判定为 `ok`（理由同上）。第一次扫描 600285 质押接口超时（231/232），修复“明细失败沿用已提交质押表”后重跑 232/232；两次均只追加。 |
 
-## 2. 验收数字与真实运行
+## 2. 验收数字
 
-- **本地测试：789 passed**（`PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider`，约 4 分 17 秒）。
-- **干净归档：788 passed + 1 skipped**（`tests/test_pool_valuation.py:161` 无 `.git` 跳过）；`git archive` 后问题集 **68/68**、测试股 30/30、指数 4/4、银行 2/2、ETF 3/3，`全部通过=True`。
-- **H5 财报季实跑**：真实数据源试跑 2026 三季报刷新，取数 **5,287 家**，2 家未取得（`002731`、`688613`）；主快照未切换（正式 `./update` 判定无到期季，避免重复切换/重复表）。同次真实更新结论变动 **2 家**（`002690` 美亚光电、`600993` 马应龙，等待→回避）；14:06 真实运行另有 1 家（`600406` 国电南瑞）。
-- **真实 15:01 `./update`**：状态 `ok`；行情 appended 11-17（5,225 行）；财报季 skipped；红线扫描本周已扫描；结论检查 98 家、变化 2 家。
-- **数据完整性**：`data/policies` 相对 `7e202b1` **零差异**；`data/ledger` 只有新增追加行（删除行 0），旧记录逐字节不变；`quotes-2026-11-13.json` sha256 `b3e0786b…caa0d` 与 HEAD 一致。新增的每日行情/序列/账本追加按既有「按月提交」约定留在工作树，不混入本补丁提交。
+- **本地测试：811 passed**（`PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider`）。
+- **干净归档：810 passed + 1 skipped**（`git archive` 后重跑；`tests/test_pool_valuation.py` 无 `.git` 跳过）。
+- **新增测试：22 项**（R1–R4；R5 由目录/清洁输入测试覆盖；R6 为真实运行）。
+- **真实扫描记录**：`data/ledger/monitoring-scans.jsonl` 新增 2 条 `monitoring-scan/2`（第一次 231/232，第二次 232/232）；旧记录首字节不变。
+- **国药股份（600511）**：状态 `通过`；公告 2024-01-10 立案，正文明确为副总经理个人“涉嫌内幕交易其他公司股票”“不涉及本公司股票交易”，按 matter_scope 不计入；扫描记录理由为 `内幕交易（他公司股票），非信息披露类`。
+- **数据完整性**：`data/policies` 零差异；已有账本记录只追加、无删除/改写；`data/cache/monitoring/2026-11-17/` 已删除。
 
-## 3. 说明
-
-- H1 只改价格日期判断与补数逻辑，不改估值/结论规则；H5 只改报告期读取与错误信息，不切换主快照。
-- 页面提示只影响展示；不静默使用旧价格，也不自动改账本。
-- 定时任务仍需股东手动安装；本次未自动安装、未改 plist。
-
-## 4. 复现命令
+## 3. 复现命令
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider   # 789 passed
-scripts/verify-clean-archive.sh                                                # git archive：788 passed + 1 skipped；68/68；全部通过=True
-./update --check                                                               # 账本 + launchd 路径自检
-.venv/bin/python tools/run_monitoring.py check
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider   # 811 passed
+scripts/verify-clean-archive.sh                                                # 810 passed + 1 skipped
+.venv/bin/python tools/run_monitoring.py check                                 # problems: []
+.venv/bin/python tools/run_monitoring.py scan --dry-run                        # 232/232，命中 0，待定 0
 ```
