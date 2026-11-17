@@ -795,6 +795,7 @@ class AskService:
         lines += [
             "",
             "说明：只列最近 365 天；完整记录见 data/ledger/changes.jsonl（只追加，至少保留 1 年）。",
+            "监测规则：pool-monitoring-v1（决策⑤，2026-11-17 批准）；变动记录只追加。",
             "不构成投资建议。",
         ]
         return "\n".join(lines)

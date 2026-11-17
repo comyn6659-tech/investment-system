@@ -32,7 +32,13 @@ DATE_RE = re.compile(r"20\d\d-\d\d-\d\d")
 
 def _check_markdown(markdown: str, *, research: bool = False, typed: bool = False) -> list[str]:
     problems = []
-    lines = markdown.splitlines()
+    raw_lines = markdown.splitlines()
+    # H2：行情过期时 `./ask` 第一行是过期提示，验收检查内容从下一行开始
+    lines = raw_lines
+    if lines and lines[0].startswith("价格停在 ") and "请运行 ./update 或检查定时任务" in lines[0]:
+        lines = lines[1:]
+        if lines and not lines[0].strip():
+            lines = lines[1:]
     first_ok = bool(lines) and (
         lines[0].startswith("**结论：") or (typed and lines[0].startswith("类型："))
     )
@@ -40,15 +46,15 @@ def _check_markdown(markdown: str, *, research: bool = False, typed: bool = Fals
         problems.append("第一行不是类型/结论")
     if typed and "提示：系统不判断护城河是否仍然存在" not in markdown:
         problems.append("缺护城河提示")
-    if len(lines) > 25:
-        problems.append(f"超过 25 行（{len(lines)}）")
+    if len(raw_lines) > 25:
+        problems.append(f"超过 25 行（{len(raw_lines)}）")
     if not DATE_RE.search(markdown):
         problems.append("缺数据日期")
     if not any(term in markdown for term in ("来源", "数据与来源", "快照", "账本", "规则")):
         problems.append("缺来源")
     if "不构成投资建议" not in markdown:
         problems.append("缺免责声明")
-    if lines and lines[-1] != "不构成投资建议。":
+    if raw_lines and raw_lines[-1] != "不构成投资建议。":
         problems.append("末行不是免责声明")
     for word in FORBIDDEN:
         if word in markdown:
