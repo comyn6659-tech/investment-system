@@ -44,7 +44,7 @@ engine/        运行时代码（不联网取数、不调用大模型）
 engine/web/    本地页面（标准库 http.server + 静态页面；只监听 127.0.0.1）
 data/          已提交的固定数据：快照、政策、账本、注册表、序列
 tools/         取数、建快照、年度重跑、验收与报告工具（需要时才联网）
-tests/         离线测试（774 项）
+tests/         离线测试（789 项）
 docs/          三份股东文档；docs/archive/ 为历史批次报告；docs/evidence/ 为验收截图
 scripts/       干净归档验证、账本快照校验、每日更新安装
 ask / update   两个入口脚本
@@ -68,7 +68,7 @@ web            本地页面入口脚本
 ## 复现与验证
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider   # 774 passed
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider   # 789 passed
 scripts/verify-clean-archive.sh
 .venv/bin/python scripts/verify-ledger-snapshots.py
 .venv/bin/python tools/run_ask_acceptance.py

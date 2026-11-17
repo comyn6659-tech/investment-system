@@ -18,6 +18,7 @@ from engine.monitoring.batch import (
     SnapshotBuild,
     annual_periods,
     build_earnings_snapshot,
+    current_snapshot_dir,
     interim_periods,
     load_pointer,
 )
@@ -29,6 +30,10 @@ SCHEDULE = (
     (9, 5, "interim", "半年报"),
     (11, 5, "q3", "三季报"),
 )
+
+
+class EarningsUpdateError(RuntimeError):
+    """财报季刷新失败：消息里带季节、报告期与出错的字段/报表。"""
 
 
 def _now(now: datetime | None = None) -> datetime:
@@ -87,15 +92,27 @@ def due_seasons(day: date, applied: Iterable[str]) -> list[Season]:
     )
 
 
-def applied_seasons(manifest: dict[str, Any], *, day: date | None = None) -> set[str]:
+def applied_seasons(
+    manifest: dict[str, Any],
+    *,
+    day: date | None = None,
+    snapshot_manifest: dict[str, Any] | None = None,
+    pool_dir: Path | None = None,
+) -> set[str]:
     """已应用的财报季：清单里的报告期 + `earnings_applied` 记录。
 
-    报告期覆盖：已有年报报告期即视为对应年报季已应用；已有不早于半年报/三季报的
-    季度收入表，即视为该季已应用（后一期覆盖前一期）。
+    `manifest` 是顶层 `data/pool-valuation/manifest.json` 指针；它的 `tables` 只是数量，
+    报告期必须从 `current` 快照目录的 manifest 读取（H5：不要把 int 当表清单迭代）。
+    `snapshot_manifest` 可由调用方直接传入，避免重复读盘。
     """
     day = day or date.today()
-    annual = set(annual_periods(manifest))
-    interim = interim_periods(manifest)
+    if snapshot_manifest is None:
+        if isinstance(manifest.get("tables"), list):
+            snapshot_manifest = manifest
+        else:
+            _directory, snapshot_manifest = current_snapshot_dir(Path(pool_dir or POOL_DIR))
+    annual = set(annual_periods(snapshot_manifest))
+    interim = interim_periods(snapshot_manifest)
     applied = {str(item.get("season")) for item in manifest.get("earnings_applied") or []}
     for season in seasons_for(day.year - 1) + seasons_for(day.year):
         if season.kind == "annual":
@@ -158,7 +175,13 @@ def run_due_earnings(
     if not pointer_path.exists():
         return {"status": "skipped", "reason": "批量快照清单不存在"}
     pointer = load_pointer(pool_dir)
-    applied = applied_seasons(pointer, day=clock.date())
+    _snapshot_dir, snapshot_manifest = current_snapshot_dir(pool_dir)
+    applied = applied_seasons(
+        pointer,
+        day=clock.date(),
+        snapshot_manifest=snapshot_manifest,
+        pool_dir=pool_dir,
+    )
     due = due_seasons(clock.date(), applied)
     if not due:
         return {
@@ -178,15 +201,21 @@ def run_due_earnings(
     builds: list[SnapshotBuild] = []
     bank_results: list[dict[str, Any]] = []
     for season in due:
-        build = build_earnings_snapshot(
-            season=season.key,
-            period=season.period,
-            kind=season.kind,
-            source=source,
-            pool_dir=pool_dir,
-            now=clock,
-            dry_run=dry_run,
-        )
+        try:
+            build = build_earnings_snapshot(
+                season=season.key,
+                period=season.period,
+                kind=season.kind,
+                source=source,
+                pool_dir=pool_dir,
+                now=clock,
+                dry_run=dry_run,
+            )
+        except Exception as exc:  # noqa: BLE001 - 带上季节/报告期，便于定位到具体报表与字段
+            raise EarningsUpdateError(
+                f"财报季 {season.key}（{season.label}，报告期 {season.period}）刷新失败："
+                f"{type(exc).__name__}: {exc}"
+            ) from exc
         builds.append(build)
         if refresh_bank and not dry_run:
             from engine.monitoring.bank_inputs import refresh_inputs
@@ -217,6 +246,7 @@ def run_due_earnings(
 
 __all__ = [
     "SCHEDULE",
+    "EarningsUpdateError",
     "Season",
     "applied_seasons",
     "change_entry",

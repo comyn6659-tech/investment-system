@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from engine.forward import hstech, official, quotes  # noqa: E402
+from engine.forward import hstech, launchd, official, quotes  # noqa: E402
 from engine.forward.update import run, summary_text  # noqa: E402
 from engine.signals.ledger import SignalLedger  # noqa: E402
 from engine.monitoring.ledger import MonitoringStore  # noqa: E402
@@ -35,6 +35,8 @@ def check() -> int:
     problems.extend(hstech_problems)
     quote_manifest = quotes.load_manifest()
     monitoring = MonitoringStore(ledger_paths.ledger_dir())
+    task = launchd.check_launchd(ROOT)
+    problems.extend(task["problems"])
     print(
         json.dumps(
             {
@@ -47,6 +49,7 @@ def check() -> int:
                     "exclusions": len(monitoring.all_exclusions()),
                     "changes": len(monitoring.changes()),
                 },
+                "launchd": task,
                 "problems": problems,
             },
             ensure_ascii=False,

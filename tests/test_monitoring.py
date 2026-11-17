@@ -694,3 +694,36 @@ def test_m3_pledge_uses_latest_periodic_report_over_stale_detail(monkeypatch):
     )
     ratio, *_ = source._pledge("002057", "中钢天源", failures)
     assert ratio == pytest.approx(0.6)
+
+
+# ---------------------------------------------------------------------------
+# H5 财报季真实缺陷：顶层 manifest 的 tables 是数量，不能当表清单迭代
+# ---------------------------------------------------------------------------
+def test_h5_applied_seasons_reads_current_snapshot_manifest(tmp_path):
+    from engine.monitoring.batch import annual_periods
+    from engine.monitoring.earnings import applied_seasons, run_due_earnings
+
+    pool, _old_id = _make_pool(tmp_path, ["600519", "000333"])
+    pointer = json.loads((pool / "manifest.json").read_text(encoding="utf-8"))
+    assert isinstance(pointer["tables"], int)
+
+    with pytest.raises(TypeError, match="tables"):
+        annual_periods(pointer)
+
+    applied = applied_seasons(pointer, day=date(2026, 11, 17), pool_dir=pool)
+    assert "2026-annual" in applied
+    assert "2026-interim" not in applied and "2026-q3" not in applied
+
+    result = run_due_earnings(
+        pool_dir=pool,
+        source=FakeEarningsSource(["600519", "000333"]),
+        now=TODAY,
+        dry_run=True,
+    )
+    assert result["status"] == "applied"
+    # 夹具只有年报、没有 2025 半年报/三季报，所以 2025 两个季度也算到期；
+    # 关键是顶层指针的 int 不再被迭代，2026 半年报/三季报能正常进入刷新。
+    seasons = [item["season"] for item in result["seasons"]]
+    assert "2026-interim" in seasons and "2026-q3" in seasons
+    assert seasons == sorted(seasons, key=lambda value: (value[:4], {"interim": 0, "q3": 1}[value[5:]]))
+    assert all(item["snapshot_id"] == "(dry-run)" for item in result["snapshots"])

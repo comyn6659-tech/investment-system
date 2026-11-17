@@ -396,12 +396,31 @@ def test_zr1_industrial_bank_hand_calculation_with_decline():
     assert out["conclusion"] == "wait"
 
 
-def test_zr2_implicit_return_formula_and_card_line():
+def test_zr2_implicit_return_formula_and_card_line(monkeypatch):
+    from engine.forward import quotes
+
     policy, equity_policy, macro, inputs, value_bank = _bank_v2_fixture()
     out = value_bank(inputs["600036"], policy, equity_policy, macro)
     expected = 0.02 + (0.1344 - 0.02) / (42.93 / 46.867733)
     assert abs(out["implicit_return"] - expected) < 1e-12
     assert abs(out["implicit_return_vs_k"] - (expected - out["cost_of_equity"])) < 1e-12
+    # 固定 2026-11-13 收盘价，避免每日行情推进改变卡片回归数字
+    monkeypatch.setattr(
+        quotes,
+        "latest_snapshot",
+        lambda: {
+            "price_date": "2026-11-13",
+            "rows": [
+                {
+                    "code": "600036",
+                    "name": "招商银行",
+                    "price": 42.93,
+                    "price_date": "2026-11-13",
+                    "previous_close": 42.80,
+                }
+            ],
+        },
+    )
     text = AskService(allow_update=False, write_ledger=False).ask("招商银行怎么样").markdown
     assert "隐含长期回报率：约 14.5%" in text
     assert "描述性，不参与结论" in text

@@ -354,7 +354,9 @@ def test_p7_index_and_signal_ledger_unchanged():
     from engine.signals.ledger import SignalLedger
 
     signal = SignalLedger(ROOT / "data" / "ledger" / "candidate-a-signals.jsonl")
-    assert len(signal.load()) == 3
+    # 只追加：2026-11-06 的三条原始信号不变；后续周记录可以新增
+    original = [row for row in signal.load() if row.get("date") == "2026-11-06"]
+    assert len(original) == 3
     assert signal.check() == []
     analyzer = Analyzer(AnalyzerConfig())
     result = analyzer.analyze("沪深300")

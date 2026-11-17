@@ -254,8 +254,10 @@ def test_existing_indices_and_ledgers_unchanged():
         assert signal["signal"] == "exit"
     ledger = SignalLedger(CANDIDATE_LEDGER)
     assert ledger.check() == []
-    assert len(ledger.load()) == 3
-    assert {row["instrument_id"] for row in ledger.load()} == {
+    # 账本只追加：2026-11-06 的三条原始记录必须原样保留；之后新增周记录不改变历史
+    original = [row for row in ledger.load() if row.get("date") == "2026-11-06"]
+    assert len(original) == 3
+    assert {row["instrument_id"] for row in original} == {
         "INDEX:000300.SH",
         "INDEX:000905.SH",
         "INDEX:000852.SH",

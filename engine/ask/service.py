@@ -96,6 +96,7 @@ CONCLUSION_LABELS = {
     "undetermined": "无法判断",
 }
 POOL_LABELS = {"quality": "好公司池", "income": "稳定收息池", "bank": "银行池"}
+PRICE_INTENTS = {"stock", "bank", "index", "etf", "ranking", "pool_list", "status"}
 
 
 def _now(now: datetime | None = None) -> datetime:
@@ -225,6 +226,19 @@ class AskService:
         self._exclusions: dict[str, dict[str, Any]] | None = None
 
     # --- 懒加载 -------------------------------------------------------------
+    def reset_market_caches(self) -> None:
+        """丢弃行情/快照/池/账本派生缓存；页面检测到新数据时调用（H6）。"""
+        self._batch = None
+        self._quotes = None
+        self._pool_sets = None
+        self._pool_rows = None
+        self._ownership = None
+        self._companies = {}
+        self._exclusions = None
+        self._target_index = None
+        if hasattr(self, "_bank_ownership_map"):
+            delattr(self, "_bank_ownership_map")
+
     @property
     def batch(self) -> BatchStore:
         if self._batch is None:
@@ -423,6 +437,13 @@ class AskService:
             return f"数据更新：非交易日，未抓取新行情；数据截至 {data_date}。"
         return None
 
+    def _stale_price_notice(self) -> str | None:
+        """最新行情落后于应取日期时的提示；按当前时钟计算（页面长开也准确）。"""
+        try:
+            return quotes.stale_price_message(now=clock_now())
+        except Exception:  # noqa: BLE001 - 行情清单异常不阻断回答
+            return None
+
     # --- 入口 ---------------------------------------------------------------
     def ask(self, question: str, *, detail: bool = False) -> AskResult:
         update_note = self._update()
@@ -486,6 +507,9 @@ class AskService:
             else:
                 lines.append(notice)
             markdown = "\n".join(lines)
+        stale = self._stale_price_notice()
+        if stale and intent.name in PRICE_INTENTS:
+            markdown = f"{stale}\n\n{markdown}"
         if not detail:
             markdown = "\n".join(self._clip(markdown.splitlines()))
         data["question"] = question
@@ -602,6 +626,10 @@ class AskService:
         except Exception:  # noqa: BLE001
             quote_payload = None
         quote_date = quote_payload["price_date"] if quote_payload else None
+        try:
+            stale = quotes.price_lag(now=clock_now())
+        except Exception:  # noqa: BLE001 - 数据状态不因行情清单异常而失败
+            stale = None
         official_rows: list[dict[str, Any]] = []
         if OFFICIAL_LEDGER.exists():
             official_rows = [
@@ -634,6 +662,7 @@ class AskService:
         return {
             "quote_date": quote_date,
             "quote_rows": len(quote_payload["rows"]) if quote_payload else 0,
+            "stale": stale,
             "financial": "2025 年报 + 2026 三季报（东方财富合并报表，批量快照 2026-11-12）",
             "index_official_series_date": index_date,
             "official_valuation_latest": official_latest,

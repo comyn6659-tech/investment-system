@@ -25,7 +25,9 @@ from engine.ask.service import (
     QUALITY_REPORT,
     AskService,
 )
+from engine.forward import quotes
 from engine.policy.conclusion_ledger import ConclusionLedger
+from engine.pool_valuation.adapter import POOL_DIR as POOL_VALUATION_DIR
 from engine.repro.recompute import recompute
 from engine.web.index_trend import pe_trend
 
@@ -83,9 +85,51 @@ class WebApp:
         self._overview_cache: dict[str, Any] | None = None
         self._pools_cache: dict[str, Any] | None = None
         self._indices_cache: dict[str, Any] | None = None
+        self._signature = self._cache_signature()
+
+    # --- 缓存失效（H6）--------------------------------------------------
+    def _cache_signature(self) -> tuple[Any, ...]:
+        """缓存依赖的「最新行情快照 + 结论账本 + 批量快照指针」签名。"""
+        quote: tuple[str, str] | None = None
+        try:
+            entries = sorted(
+                quotes.load_manifest().get("snapshots") or [],
+                key=lambda item: item["price_date"],
+            )
+            if entries:
+                last = entries[-1]
+                quote = (str(last.get("price_date")), str(last.get("content_hash")))
+        except Exception:  # noqa: BLE001 - 行情清单异常时退化为不做缓存失效
+            quote = None
+        ledger = self.service.ledger_path
+        try:
+            stat = ledger.stat()
+            ledger_sig: tuple[int, int] | None = (stat.st_mtime_ns, stat.st_size)
+        except OSError:
+            ledger_sig = None
+        pointer = POOL_VALUATION_DIR / "manifest.json"
+        try:
+            stat = pointer.stat()
+            pool_sig: tuple[int, int] | None = (stat.st_mtime_ns, stat.st_size)
+        except OSError:
+            pool_sig = None
+        return (quote, ledger_sig, pool_sig)
+
+    def _refresh_if_stale(self) -> bool:
+        signature = self._cache_signature()
+        if signature == self._signature:
+            return False
+        self._signature = signature
+        self._stock_cache.clear()
+        self._overview_cache = None
+        self._pools_cache = None
+        self._indices_cache = None
+        self.service.reset_market_caches()
+        return True
 
     # --- 基础 -----------------------------------------------------------
     def _stock_result(self, code: str) -> dict[str, Any]:
+        self._refresh_if_stale()
         key = str(code).zfill(6)
         if key not in self._stock_cache:
             self._stock_cache[key] = self.service._evaluate_stock(key, write_ledger=False)
@@ -99,6 +143,7 @@ class WebApp:
     def ask(self, question: str, *, detail: bool = False) -> dict[str, Any]:
         """与 `./ask` 完全相同的一次提问：同一引擎、同一写账本规则。"""
         with self._lock:
+            self._refresh_if_stale()
             result = self.service.ask(question, detail=detail)
         return {
             "markdown": result.markdown,
@@ -132,6 +177,7 @@ class WebApp:
     def overview(self) -> dict[str, Any]:
         """候选买点与「离买点最近」排行：数据来自排行卡片同一套评估。"""
         with self._lock:
+            self._refresh_if_stale()
             if self._overview_cache is None:
                 result = self.service._ranking(Intent("ranking", pool="all"), detail=False)
                 data = result["data"]
@@ -183,6 +229,7 @@ class WebApp:
     def pools(self) -> dict[str, Any]:
         """三池表格：名单与指标来自已提交的 report.json（与成绩单卡片同一取数）。"""
         with self._lock:
+            self._refresh_if_stale()
             if self._pools_cache is not None:
                 return self._pools_cache
             payload: dict[str, Any] = {}
@@ -249,6 +296,7 @@ class WebApp:
         if not name:
             return {"ok": False, "error": f"全市场清单里没有代码 {key}"}
         with self._lock:
+            self._refresh_if_stale()
             card = self.service.ask(f"{name}怎么样", detail=detail)
             company_type = card.data.get("company_type") or classify_company_type(
                 key, self.service.pool_sets
@@ -279,6 +327,7 @@ class WebApp:
     # --- 指数 -----------------------------------------------------------
     def indices(self) -> dict[str, Any]:
         with self._lock:
+            self._refresh_if_stale()
             if self._indices_cache is not None:
                 return self._indices_cache
             items: list[dict[str, Any]] = []
@@ -404,6 +453,7 @@ class WebApp:
     # --- 数据状态 -------------------------------------------------------
     def status(self) -> dict[str, Any]:
         with self._lock:
+            self._refresh_if_stale()
             data = self.service.status_data()
         reviews: list[dict[str, str]] = []
         equity = data["equity_policy"]

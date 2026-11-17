@@ -471,9 +471,13 @@ def test_r1_matches_reviewer_expected_coverage():
         instrument_id = f"INDEX:{code}.SH"
         close = store.find(instrument_id, METRIC_OFFICIAL_CLOSE, frequency=FREQ_DAILY)
         pe = store.find(instrument_id, METRIC_OFFICIAL_PE_ROLLING, frequency=FREQ_DAILY)
+        # 复验报告的数据截止日（2026-11-13 周五）；之后的新观察不改变历史覆盖口径
+        cutoff = "2026-11-13"
+        close_obs = [(day, value) for day, value in close.observations if day <= cutoff]
+        pe_obs = [(day, value) for day, value in pe.observations if day <= cutoff]
         weekly = [
             w
-            for w in build_weekly_observations(close.observations, pe.observations)
+            for w in build_weekly_observations(close_obs, pe_obs)
             if w.date >= launches[code]
         ]
         result = weekly_percentiles(weekly)

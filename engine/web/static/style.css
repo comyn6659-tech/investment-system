@@ -52,6 +52,30 @@ body {
 
 main { padding: 22px clamp(16px, 4vw, 44px) 64px; }
 
+/* H2/H6：页面顶部行情过期 / 数据已更新提示 */
+.alert-bar {
+  margin: 0;
+  padding: 10px clamp(16px, 4vw, 44px);
+  background: #fff4e5;
+  border-bottom: 1px solid #f0d9b5;
+  color: #8a4b00;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.alert-bar.hidden { display: none; }
+.alert-bar button {
+  padding: 4px 12px;
+  border: 1px solid #b36b00;
+  border-radius: 6px;
+  background: #b36b00;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+
 .panel { display: none; max-width: 1180px; }
 .panel.active { display: block; }
 

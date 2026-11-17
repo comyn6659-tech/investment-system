@@ -1,7 +1,9 @@
 """全市场行情快照的前向刷新（只追加、重复跳过）。
 
 行情来自腾讯财经 `qt.gtimg.cn`，与第十批批量输入同源同解析口径：
-- 收盘前取上一交易日收盘，收盘后取当日收盘；价格日期逐行记录；
+- 逐行按行情时间戳判断：行情日早于今天 → 当前价即该日收盘价；
+  行情日等于今天且未到 15:00 → 取昨收；15:00 后 → 取当前价（当日收盘）；
+- 价格日期逐行记录，不用系统时间硬套行情日期；
 - 每个交易日一个不可变文件 `data/pool-valuation/live/quotes-YYYY-MM-DD.json`；
 - 同一价格日期再次运行：内容一致跳过，内容不同报冲突，不覆盖。
 """
@@ -60,10 +62,69 @@ def _prev_trading_day(day: date) -> date:
     return previous_trading_day(day)
 
 
+def _quote_price(
+    *, current: float, previous: float | None, quote_day: date, clock: datetime
+) -> tuple[float, date]:
+    """按行情时间戳与当前时间决定价格与价格日期（H1 日期修正）。
+
+    - 行情日早于今天：腾讯的「当前价」就是该行情日收盘价 → 当前价，日期行情日；
+    - 行情日等于今天且未到 15:00：盘中/开盘前 → 昨收，日期为今天之前的上一个交易日；
+    - 行情日等于今天且 15:00 后：收盘价 → 当前价，日期今天。
+    """
+    today = clock.date()
+    if quote_day < today:
+        return current, quote_day
+    if quote_day == today and clock.hour < 15 and is_trading_day(today):
+        if previous is not None and previous > 0:
+            return previous, _prev_trading_day(today - timedelta(days=1))
+        # 没有昨收时只能退回当前价；不把盘中价标成今天收盘。
+        return current, quote_day
+    return current, quote_day
+
+
+def parse_quotes(text: str, *, now: datetime | None = None) -> list[dict]:
+    """解析腾讯行情文本；逐行按行情时间戳决定 price / price_date。"""
+    clock = _now(now)
+    rows: list[dict] = []
+    for line in text.splitlines():
+        match = re.match(r'v_(?:sh|sz)(\d{6})="(.+)"', line.strip())
+        if not match:
+            continue
+        code, payload = match.groups()
+        fields = payload.split("~")
+        if len(fields) < 40:
+            continue
+        try:
+            current = float(fields[3])
+            previous = float(fields[4]) if fields[4] else None
+        except (TypeError, ValueError):
+            continue
+        if current <= 0:
+            continue
+        timestamp = next((item for item in fields if re.fullmatch(r"\d{14}", item)), None)
+        quote_day = (
+            date(int(timestamp[:4]), int(timestamp[4:6]), int(timestamp[6:8]))
+            if timestamp
+            else clock.date()
+        )
+        price, price_day = _quote_price(
+            current=current, previous=previous, quote_day=quote_day, clock=clock
+        )
+        rows.append(
+            {
+                "code": code,
+                "name": fields[1],
+                "price": price,
+                "price_date": price_day.isoformat(),
+                "previous_close": previous,
+            }
+        )
+    return rows
+
+
 def fetch_quotes(codes: list[str], *, now: datetime | None = None, timeout: int = 30) -> list[dict]:
     """抓取全市场行情；返回逐行字典（code/name/price/price_date/previous_close）。"""
     clock = _now(now)
-    use_previous = clock.hour < 15
     rows: list[dict] = []
     for start in range(0, len(codes), CHUNK):
         chunk = codes[start : start + CHUNK]
@@ -73,42 +134,7 @@ def fetch_quotes(codes: list[str], *, now: datetime | None = None, timeout: int 
         )
         with urllib.request.urlopen(request, timeout=timeout) as response:
             text = response.read().decode("gbk", errors="ignore")
-        for line in text.splitlines():
-            match = re.match(r'v_(?:sh|sz)(\d{6})="(.+)"', line.strip())
-            if not match:
-                continue
-            code, payload = match.groups()
-            fields = payload.split("~")
-            if len(fields) < 40:
-                continue
-            try:
-                current = float(fields[3])
-                previous = float(fields[4]) if fields[4] else None
-            except (TypeError, ValueError):
-                continue
-            if current <= 0:
-                continue
-            timestamp = next((item for item in fields if re.fullmatch(r"\d{14}", item)), None)
-            quote_day = (
-                date(int(timestamp[:4]), int(timestamp[4:6]), int(timestamp[6:8]))
-                if timestamp
-                else clock.date()
-            )
-            if use_previous and previous:
-                price = previous
-                price_day = _prev_trading_day(quote_day - timedelta(days=1))
-            else:
-                price = current
-                price_day = quote_day
-            rows.append(
-                {
-                    "code": code,
-                    "name": fields[1],
-                    "price": price,
-                    "price_date": price_day.isoformat(),
-                    "previous_close": previous,
-                }
-            )
+        rows.extend(parse_quotes(text, now=clock))
         time.sleep(0.05)
     if not rows:
         raise QuoteError("腾讯行情没有返回任何可用行")
@@ -132,8 +158,8 @@ def _payload(rows: list[dict], *, now: datetime) -> dict[str, Any]:
             "interface": "qt.gtimg.cn 全市场行情快照（分批）",
             "url": QUOTE_URL,
             "definition_note": (
-                "全市场一次性行情快照；收盘前取上一交易日收盘价，收盘后取当日收盘价；"
-                "价格日期逐行记录。"
+                "全市场一次性行情快照；按行情时间戳逐行判断：行情日早于今天取该日收盘，"
+                "当天 15:00 前取昨收、15:00 后取当日收盘；价格日期逐行记录。"
             ),
         },
         "rows": rows,
@@ -191,13 +217,50 @@ def latest_quotes() -> dict[str, dict]:
 
 
 def expected_price_date(now: datetime | None = None) -> str:
+    """当前时点应取到的最新收盘价日期。
+
+    - 交易日 15:00 后：今天；
+    - 交易日 15:00 前（含凌晨、开盘前）：今天之前的上一个交易日；
+    - 非交易日：最近一个交易日。
+    """
     clock = _now(now)
     day = clock.date()
-    if clock.hour < 15:
-        day = _prev_trading_day(day - timedelta(days=1))
-    else:
-        day = _prev_trading_day(day)
-    return day.isoformat()
+    if is_trading_day(day) and clock.hour >= 15:
+        return day.isoformat()
+    return _prev_trading_day(day - timedelta(days=1)).isoformat()
+
+
+def price_lag(now: datetime | None = None) -> dict[str, Any] | None:
+    """最新行情落后于应取日期时返回滞后信息；不落后返回 None。"""
+    clock = _now(now)
+    payload = latest_snapshot()
+    if payload is None:
+        return None
+    latest = date.fromisoformat(str(payload["price_date"]))
+    expected = date.fromisoformat(expected_price_date(clock))
+    if latest >= expected:
+        return None
+    cursor = latest
+    trading_days = 0
+    while cursor < expected:
+        cursor += timedelta(days=1)
+        if is_trading_day(cursor):
+            trading_days += 1
+    message = (
+        f"价格停在 {latest.isoformat()}，已落后 {trading_days} 个交易日，"
+        "请运行 ./update 或检查定时任务。"
+    )
+    return {
+        "price_date": latest.isoformat(),
+        "expected_price_date": expected.isoformat(),
+        "trading_days": trading_days,
+        "message": message,
+    }
+
+
+def stale_price_message(now: datetime | None = None) -> str | None:
+    data = price_lag(now)
+    return str(data["message"]) if data else None
 
 
 def is_fresh(now: datetime | None = None) -> bool:
@@ -295,5 +358,8 @@ __all__ = [
     "latest_quotes",
     "latest_snapshot",
     "load_manifest",
+    "parse_quotes",
+    "price_lag",
     "refresh",
+    "stale_price_message",
 ]

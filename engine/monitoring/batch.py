@@ -110,10 +110,22 @@ def current_snapshot_dir(pool_dir: Path) -> tuple[Path, dict[str, Any]]:
     return directory, manifest
 
 
+def _table_entries(manifest: Mapping[str, Any], *, label: str = "批量快照清单") -> list[Any]:
+    """取表清单；`manifest.json` 指针里的 `tables` 是数量，不是表清单，报错要写清字段。"""
+    tables = manifest.get("tables")
+    if isinstance(tables, list):
+        return tables
+    raise TypeError(
+        f"{label}的 tables 字段应为表清单（list），实际为 {type(tables).__name__}"
+        f"（{tables!r}）；顶层 manifest.json 的 tables 只是数量，"
+        "请读取 current 快照目录下的 manifest.json"
+    )
+
+
 def report_periods(manifest: Mapping[str, Any]) -> list[str]:
     """清单里所有报告期（年度与季度），升序。"""
     periods = []
-    for entry in manifest.get("tables") or []:
+    for entry in _table_entries(manifest):
         kind = str(entry.get("kind") or "")
         period = str(entry.get("report_date") or "")
         if kind in ("balance_full", "income_full", "cashflow_full", "interim_income_full") and period:
@@ -125,7 +137,7 @@ def annual_periods(manifest: Mapping[str, Any]) -> list[str]:
     return sorted(
         {
             str(entry.get("report_date"))
-            for entry in manifest.get("tables") or []
+            for entry in _table_entries(manifest)
             if entry.get("kind") in ("balance_full", "income_full", "cashflow_full")
             and entry.get("report_date")
         }
@@ -136,7 +148,7 @@ def interim_periods(manifest: Mapping[str, Any]) -> list[str]:
     return sorted(
         {
             str(entry.get("report_date"))
-            for entry in manifest.get("tables") or []
+            for entry in _table_entries(manifest)
             if entry.get("kind") == "interim_income_full" and entry.get("report_date")
         }
     )

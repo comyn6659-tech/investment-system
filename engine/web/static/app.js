@@ -12,6 +12,7 @@ const state = {
   ledger: null,
   status: null,
   modal: null,
+  quoteDate: null,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -693,14 +694,53 @@ async function runRecompute(recordId) {
   }
 }
 
-/* ---------- 数据状态 ---------- */
+/* ---------- 数据状态与顶部提示（H2/H6） ---------- */
+
+function renderStatusAlert(payload) {
+  const bar = $('alert-bar');
+  if (!bar) return;
+  const status = (payload && payload.status) || {};
+  const quoteDate = status.quote_date || null;
+  const stale = status.stale || null;
+  if (state.quoteDate && quoteDate && state.quoteDate !== quoteDate) {
+    bar.className = 'alert-bar';
+    bar.innerHTML =
+      '<span>数据已更新（行情 ' + esc(quoteDate) + '），点击刷新页面查看新价格与新结论。</span>' +
+      '<button type="button" id="alert-refresh">刷新</button>';
+    const button = $('alert-refresh');
+    if (button) button.addEventListener('click', () => location.reload());
+    return;
+  }
+  if (!state.quoteDate) state.quoteDate = quoteDate;
+  if (stale && stale.message) {
+    bar.className = 'alert-bar';
+    bar.textContent = stale.message;
+    return;
+  }
+  bar.className = 'alert-bar hidden';
+  bar.innerHTML = '';
+}
+
+async function pollStatusAlert() {
+  try {
+    const payload = await api('/api/status');
+    renderStatusAlert(payload);
+    if (state.status && payload.status) state.status = payload;
+  } catch (error) {
+    /* 顶部提示失败不影响页面其它部分 */
+  }
+}
 
 async function loadStatus() {
-  if (state.status) return;
+  if (state.status) {
+    renderStatusAlert(state.status);
+    return;
+  }
   $('status-body').innerHTML = '<p class="hint">正在读取数据状态…</p>';
   try {
     state.status = await api('/api/status');
     renderStatus(state.status);
+    renderStatusAlert(state.status);
   } catch (error) {
     $('status-body').innerHTML = '<div class="error">加载失败：' + esc(error.message) + '</div>';
   }
@@ -711,6 +751,9 @@ function renderStatus(payload) {
   const hstech = status.hstech;
   const rows = [
     ['行情日期', status.quote_date || '未取得（腾讯财经全市场快照）'],
+  ];
+  if (status.stale && status.stale.message) rows.push(['行情过期', status.stale.message]);
+  rows.push(
     ['行情快照行数', String(status.quote_rows)],
     ['财务数据', status.financial],
     ['指数官方序列（沪深300）', status.index_official_series_date || '—'],
@@ -719,6 +762,8 @@ function renderStatus(payload) {
       '恒生科技官方月度估值',
       hstech.date ? hstech.date + '（PE ' + hstech.pe + '，股息率 ' + hstech.dividend_yield_pct + '%）' : '—',
     ],
+  );
+  rows.push(
     [
       '个股政策',
       status.equity_policy.policy_id + '（' + status.equity_policy.status + '；批准 ' +
@@ -727,7 +772,7 @@ function renderStatus(payload) {
     ['三池规则', '批准 ' + status.pool_rules.approved_at + '；下次复核 ' + status.pool_rules.next_review_date],
     ['银行专用估值', '批准 ' + status.bank_valuation.approved_at + '；复核 ' + status.bank_valuation.review_date],
     ['上次自动更新', (status.update.run_at || '尚未运行') + '（' + (status.update.status || '—') + '）'],
-  ];
+  );
   const monitoring = status.monitoring || {};
   const scan = monitoring.last_scan || {};
   rows.push([
@@ -768,6 +813,11 @@ function init() {
   activatePanel(loaders[panel] ? panel : 'ask');
   const params = new URLSearchParams(location.search);
   const question = params.get('q');
+  pollStatusAlert();
+  window.setInterval(pollStatusAlert, 60000);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) pollStatusAlert();
+  });
   if (question) {
     $('ask-input').value = question;
     activatePanel('ask');

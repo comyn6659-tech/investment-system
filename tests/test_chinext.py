@@ -262,8 +262,10 @@ def test_ledger_has_no_chinext_record_and_existing_three_unchanged():
     ledger = SignalLedger(LEDGER_PATH)
     assert ledger.check() == []
     records = ledger.load()
-    assert len(records) == 3
-    assert {record["instrument_id"] for record in records} == {
+    # 只追加：原始三条在，之后新增的周记录不改变历史；创业板始终不得写入
+    original = [record for record in records if record.get("date") == "2026-11-06"]
+    assert len(original) == 3
+    assert {record["instrument_id"] for record in original} == {
         "INDEX:000300.SH",
         "INDEX:000905.SH",
         "INDEX:000852.SH",

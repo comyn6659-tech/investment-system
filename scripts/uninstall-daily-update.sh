@@ -20,4 +20,4 @@ fi
 
 launchctl unload -w "$PLIST" 2>/dev/null || true
 rm -f "$PLIST"
-echo "已卸载定时任务：$LABEL（账本与日志保留）"
+echo "已卸载定时任务：${LABEL}（账本与日志保留）"
